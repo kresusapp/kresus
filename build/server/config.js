@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.apply = exports.generate = void 0;
+exports.generate = generate;
+exports.apply = apply;
 const path_1 = __importDefault(require("path"));
 const ospath_1 = __importDefault(require("ospath"));
 const helpers_1 = require("./helpers");
@@ -613,7 +614,6 @@ function generate() {
     }
     return ret;
 }
-exports.generate = generate;
 function apply(config) {
     // Assume development mode if NODE_ENV isn't set.
     if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV.length === 0) {
@@ -665,4 +665,3 @@ function apply(config) {
     }
     process.kresus = kresusConfig;
 }
-exports.apply = apply;

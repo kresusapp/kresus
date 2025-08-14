@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isKnownTransactionTypeName = exports.transactionTypeIdToName = void 0;
+exports.transactionTypeIdToName = transactionTypeIdToName;
+exports.isKnownTransactionTypeName = isKnownTransactionTypeName;
 const helpers_1 = require("../helpers");
 const transaction_types_json_1 = __importDefault(require("../shared/transaction-types.json"));
 const log = (0, helpers_1.makeLogger)('lib/transaction-types');
@@ -24,8 +25,6 @@ function transactionTypeIdToName(externalId) {
     }
     return TransactionTypeToName.get(externalIdStr);
 }
-exports.transactionTypeIdToName = transactionTypeIdToName;
 function isKnownTransactionTypeName(typeName) {
     return transaction_types_json_1.default.some(type => type.name === typeName);
 }
-exports.isKnownTransactionTypeName = isKnownTransactionTypeName;

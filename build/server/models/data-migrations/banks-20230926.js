@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBanks = void 0;
+exports.updateBanks = updateBanks;
 /* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
 const typeorm_1 = require("typeorm");
 const __1 = require("../");
@@ -42,4 +42,3 @@ async function updateBanks(userId, manager) {
     }
     log.info('Finished running data migration on banks (2023-09-26)');
 }
-exports.updateBanks = updateBanks;

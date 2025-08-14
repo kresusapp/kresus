@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fullPoll = void 0;
+exports.fullPoll = fullPoll;
 const moment_1 = __importDefault(require("moment"));
 const models_1 = require("../models");
 const accounts_manager_1 = __importDefault(require("./accounts-manager"));
@@ -89,7 +89,6 @@ async function fullPoll(userId) {
     await report_manager_1.default.manageReports(userId);
     log.info('Reports have been sent.');
 }
-exports.fullPoll = fullPoll;
 class Poller {
     constructor() {
         this.run = this.run.bind(this);

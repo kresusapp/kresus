@@ -137,8 +137,12 @@ let Account = Account_1 = class Account {
         await Account_1.repo().delete({ userId });
     }
     static async update(userId, accountId, attributes) {
-        await Account_1.repo().update({ userId, id: accountId }, attributes);
-        return (0, helpers_1.unwrap)(await Account_1.find(userId, accountId));
+        // Do not use Account.repo().update as it would not trigger the AfterUpdate hook.
+        // See https://github.com/typeorm/typeorm/issues/5385
+        const account = (0, helpers_1.unwrap)(await Account_1.find(userId, accountId));
+        Object.assign(account, attributes);
+        await Account_1.repo().save(account);
+        return account;
     }
 };
 Account.REPO = null;

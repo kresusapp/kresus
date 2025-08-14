@@ -17,6 +17,7 @@ const typeorm_1 = require("typeorm");
 const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const categories_1 = __importDefault(require("./categories"));
+const views_1 = __importDefault(require("./views"));
 const helpers_1 = require("../../helpers");
 const helpers_2 = require("../helpers");
 let Budget = Budget_1 = class Budget {
@@ -45,26 +46,26 @@ let Budget = Budget_1 = class Budget {
     static async destroy(userId, budgetId) {
         await Budget_1.repo().delete({ id: budgetId, userId });
     }
-    static async byCategory(userId, categoryId) {
-        return await Budget_1.repo().findBy({ userId, categoryId });
+    static async byCategory(userId, viewId, categoryId) {
+        return await Budget_1.repo().findBy({ userId, viewId, categoryId });
     }
-    static async byYearAndMonth(userId, year, month) {
-        return await Budget_1.repo().findBy({ userId, year, month });
+    static async byYearAndMonth(userId, viewId, year, month) {
+        return await Budget_1.repo().findBy({ userId, viewId, year, month });
     }
-    static async byCategoryAndYearAndMonth(userId, categoryId, year, month) {
-        return await Budget_1.repo().findOne({ where: { userId, categoryId, year, month } });
+    static async byCategoryAndYearAndMonth(userId, viewId, categoryId, year, month) {
+        return await Budget_1.repo().findOne({ where: { userId, viewId, categoryId, year, month } });
     }
-    static async findAndUpdate(userId, categoryId, year, month, threshold) {
-        const budget = await Budget_1.byCategoryAndYearAndMonth(userId, categoryId, year, month);
+    static async findAndUpdate(userId, viewId, categoryId, year, month, threshold) {
+        const budget = await Budget_1.byCategoryAndYearAndMonth(userId, viewId, categoryId, year, month);
         if (budget === null) {
             throw new Error('budget not found');
         }
         return await Budget_1.update(userId, budget.id, { threshold });
     }
     static async replaceForCategory(userId, deletedCategoryId, replacementCategoryId) {
-        const budgets = await Budget_1.byCategory(userId, deletedCategoryId);
+        const budgets = await Budget_1.repo().findBy({ userId, categoryId: deletedCategoryId });
         for (const budget of budgets) {
-            const replacementCategoryBudget = await Budget_1.byCategoryAndYearAndMonth(userId, replacementCategoryId, budget.year, budget.month);
+            const replacementCategoryBudget = await Budget_1.byCategoryAndYearAndMonth(userId, budget.viewId, replacementCategoryId, budget.year, budget.month);
             // If there is no budget for the existing replacement category, don't actually delete
             // the current budget, just update its category with the new one.
             if (!replacementCategoryBudget) {
@@ -78,6 +79,8 @@ let Budget = Budget_1 = class Budget {
                     threshold: budget.threshold,
                 });
             }
+            // No need to destroy the budget for the previous category otherwise: it will be done
+            // in cascade on category deletion.
         }
     }
     static async destroyAll(userId) {
@@ -110,6 +113,15 @@ __decorate([
     __metadata("design:type", Number)
 ], Budget.prototype, "userId", void 0);
 __decorate([
+    (0, typeorm_1.ManyToOne)(() => views_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", views_1.default)
+], Budget.prototype, "view", void 0);
+__decorate([
+    (0, typeorm_1.Column)('integer'),
+    __metadata("design:type", Number)
+], Budget.prototype, "viewId", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", categories_1.default)
@@ -132,6 +144,6 @@ __decorate([
 ], Budget.prototype, "month", void 0);
 Budget = Budget_1 = __decorate([
     (0, typeorm_1.Entity)('budget'),
-    (0, typeorm_1.Unique)(['userId', 'year', 'month', 'categoryId'])
+    (0, typeorm_1.Unique)(['userId', 'viewId', 'year', 'month', 'categoryId'])
 ], Budget);
 exports.default = Budget;

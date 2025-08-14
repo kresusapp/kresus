@@ -227,7 +227,8 @@ class FakeBankModule(Module, CapBank):
         first_account.id = "FR235711131719@fakebank"
         first_account.label = "Compte chèque"
         first_account.currency = Currency.get_currency("42 €")
-        first_account.iban = "FR235711131719"
+        # Example IBAN from https://www.iban.com/structure.
+        first_account.iban = "FR7630006000011234567890189"
         first_account.balance = Decimal(random.uniform(0, 150)).quantize(Decimal(".01"))
         first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
@@ -259,9 +260,10 @@ class FakeBankModule(Module, CapBank):
     def fill_account(self, account, fields):
         """
         Fills the empty fields of an account.
+
+        Must be defined even if we don't do anything about it.
         """
-        if "iban" in fields and empty(account.iban):
-            account.iban = "Filled Iban"
+
         return account
 
     OBJECTS = {Account: fill_account}

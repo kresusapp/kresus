@@ -142,8 +142,7 @@
             "balance_desc": "Bu grafik, belirli bir zamanda hesabınızın bakiyesini ne olduğunu gösterir. Bu, örneğin her zaman aynı dönemde kritik bir seviyeye ulaşıp ulaşmadığınızı görmek için kullanışlıdır",
             "by_category": "kategoriye göre",
             "by_category_desc": "Bu grafik, her kategori için ne kadar harcadığınızı veya kazandığınızı aydan aya gösterir. Bu, bir kategoride ayda ne kadar harcadığınızı ve zaman içinde nasıl geliştiğini hızlı bir şekilde görmek için kullanışlıdır.",
-            "differences_all": "Hareketler (tüm hesaplar)",
-            "differences_all_desc": "Bu grafik, aylık olarak, seçtiğiniz tüm banka erişim hesaplarına ne kadar harcadığınızı, kazandığınızı ve ayırdığınızı gösterir. Bu, tasarruflarınızın son aylarda nasıl geliştiğini görmek için kullanışlıdır: her ay daha fazla tasarruf ettiniz mi?",
+            "differences": "Hareketler",
             "spent": "Harcanan",
             "received": "Gelen",
             "saved": "Biriken",
@@ -549,10 +548,8 @@
             "amount": "Miktar",
             "category": "Kategori",
             "submit": "Oluştur",
-            "add_transaction": "%{account} hesabı için işlem oluştur",
             "type": "Tür",
             "date": "Tarih",
-            "description": "%{account} hesabı için bir işlem oluşturmak üzeresiniz. Yanlış oluşturulmuş bir işlemi silmek istiyorsanız, bu işlemin ayrıntılarını işlemler listesinde açın ve ardından \"sil\"e tıklayın.",
             "warning": "Hesabınızı oluşturmadan önce güncel olduğundan emin olun. Bu işlemi bankanızdan içe aktarılacak bir işlem beklentisiyle oluşturuyorsanız, bunları manuel olarak birleştirmeniz gerekebileceğini lütfen unutmayın."
         },
         "woobinstallreadme": {

@@ -34,11 +34,12 @@ let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedR
     static async all(userId) {
         return await AppliedRecurringTransaction_1.repo().find({ where: { userId } });
     }
-    static async find(userId, accountId, month, year) {
+    static async find(userId, accountId, recurringTransactionId, month, year) {
         return await AppliedRecurringTransaction_1.repo().findOne({
             where: {
                 userId,
                 accountId,
+                recurringTransactionId,
                 month,
                 year,
             },
@@ -51,8 +52,8 @@ let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedR
             year,
         });
     }
-    static async exists(userId, accountId, month, year) {
-        const found = await AppliedRecurringTransaction_1.find(userId, accountId, month, year);
+    static async exists(userId, accountId, recurringTransactionId, month, year) {
+        const found = await AppliedRecurringTransaction_1.find(userId, accountId, recurringTransactionId, month, year);
         return !!found;
     }
     static async create(userId, attributes) {

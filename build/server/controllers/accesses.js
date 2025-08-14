@@ -23,7 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAndFetchAccounts = exports.update = exports.poll = exports.fetchTransactions = exports.fetchAccountsAndTransactions = exports.create = exports.createAndRetrieveData = exports.extractUserActionFields = exports.deleteSession = exports.destroy = exports.destroyWithData = exports.preloadAccess = void 0;
+exports.preloadAccess = preloadAccess;
+exports.destroyWithData = destroyWithData;
+exports.destroy = destroy;
+exports.deleteSession = deleteSession;
+exports.extractUserActionFields = extractUserActionFields;
+exports.createAndRetrieveData = createAndRetrieveData;
+exports.create = create;
+exports.fetchAccountsAndTransactions = fetchAccountsAndTransactions;
+exports.fetchTransactions = fetchTransactions;
+exports.poll = poll;
+exports.update = update;
+exports.updateAndFetchAccounts = updateAndFetchAccounts;
 const models_1 = require("../models");
 const accounts_manager_1 = __importStar(require("../lib/accounts-manager"));
 const poller_1 = require("../lib/poller");
@@ -49,14 +60,13 @@ async function preloadAccess(req, res, nextHandler, accessId) {
         (0, helpers_1.asyncErr)(res, err, 'when finding bank access');
     }
 }
-exports.preloadAccess = preloadAccess;
 async function destroyWithData(userId, access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
     await models_1.Access.destroy(userId, access.id);
     await AccountController.fixupDefaultAccount(userId);
+    await models_1.View.destroyViewsWithoutAccounts(userId);
     log.info('Done!');
 }
-exports.destroyWithData = destroyWithData;
 // Destroy a given access, including accounts, alerts and transactions.
 async function destroy(req, res) {
     try {
@@ -71,7 +81,6 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when destroying an access');
     }
 }
-exports.destroy = destroy;
 async function deleteSession(req, res) {
     try {
         const { user: { id: userId }, } = req;
@@ -84,13 +93,11 @@ async function deleteSession(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting an access session');
     }
 }
-exports.deleteSession = deleteSession;
 function extractUserActionFields(body) {
     const fields = (body.userActionFields || null);
     delete body.userActionFields;
     return fields;
 }
-exports.extractUserActionFields = extractUserActionFields;
 async function createAndRetrieveData(userId, params) {
     const error = (0, validators_1.hasMissingField)(params, ['vendorId', 'login', 'password']) ||
         (0, validators_1.hasForbiddenField)(params, [
@@ -109,17 +116,19 @@ async function createAndRetrieveData(userId, params) {
     let access = null;
     try {
         if (userActionFields !== null) {
-            access = await models_1.Access.byCredentials(userId, {
+            // The access must exist, as this is a second step of a 2FA; we don't have access (heh)
+            // to the access id, so use the uuid and login as unique identifiers.
+            access = (0, helpers_1.unwrap)(await models_1.Access.byCredentials(userId, {
                 uuid: params.vendorId,
                 login: params.login,
-            });
+            }));
         }
         else {
             access = await models_1.Access.create(userId, params);
         }
         const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
             addNewAccounts: true,
-            updateProvider: false,
+            updateProvider: false, // TODO infer from setting?
             isInteractive: true,
             userActionFields,
         });
@@ -142,6 +151,7 @@ async function createAndRetrieveData(userId, params) {
                 if (accounts.length === 0) {
                     log.info(`Cleaning up incomplete access with id ${prevAccess.id}`);
                     await models_1.Access.destroy(userId, prevAccess.id);
+                    await models_1.View.destroyViewsWithoutAccounts(userId);
                 }
             });
             return accountResponse;
@@ -152,11 +162,14 @@ async function createAndRetrieveData(userId, params) {
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
+        // New views have automatically been created along with accounts.
+        const views = await models_1.View.all(userId);
         return {
             kind: 'value',
             value: {
                 accessId: access.id,
                 accounts,
+                views,
                 newTransactions,
                 label: (0, bank_vendors_1.bankVendorByUuid)(access.vendorId).name,
             },
@@ -168,12 +181,12 @@ async function createAndRetrieveData(userId, params) {
         if (access !== null) {
             log.info('\tdeleting access...');
             await models_1.Access.destroy(userId, access.id);
+            await models_1.View.destroyViewsWithoutAccounts(userId);
         }
         // Rethrow the error
         throw err;
     }
 }
-exports.createAndRetrieveData = createAndRetrieveData;
 // Creates a new bank access (expecting at least (vendorId / login /
 // password)), and retrieves its accounts and transactions.
 async function create(req, res) {
@@ -194,13 +207,12 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating a bank access');
     }
 }
-exports.create = create;
-// Fetch accounts, including new accounts, and transactions using the backend and
-// return both to the client.
-async function fetchAccountsAndTransactions(req, res, 
+// Do not use this method as a controller directly: express will pass a `next` middleware as third
+// argument, and `focusOnTransactionsFetch` will never default to false.
+const _fetchAccountsAndTransactions = async (req, res, 
 // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
 // nor should we create new accounts, nor should we ignore the last fetch date.
-focusOnTransactionsFetch = false) {
+focusOnTransactionsFetch = false) => {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -220,7 +232,7 @@ focusOnTransactionsFetch = false) {
         try {
             accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
                 addNewAccounts: focusOnTransactionsFetch === false,
-                updateProvider: false,
+                updateProvider: false, // TODO shouldn't this be inferred from the settings?
                 isInteractive: true,
                 userActionFields,
             });
@@ -240,22 +252,28 @@ focusOnTransactionsFetch = false) {
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
+        // New views have automatically been created along with accounts.
+        const views = await models_1.View.all(userId);
         res.status(200).json({
             accounts,
+            views,
             newTransactions,
         });
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when fetching accounts and transactions');
     }
+};
+// Fetch accounts, including new accounts, and transactions using the backend and
+// return both to the client.
+async function fetchAccountsAndTransactions(req, res) {
+    return _fetchAccountsAndTransactions(req, res);
 }
-exports.fetchAccountsAndTransactions = fetchAccountsAndTransactions;
 // Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
 // Does not add new found accounts.
 async function fetchTransactions(req, res) {
-    return fetchAccountsAndTransactions(req, res, true);
+    return _fetchAccountsAndTransactions(req, res, true);
 }
-exports.fetchTransactions = fetchTransactions;
 // Fetch all the transactions / accounts for all the accesses, as is done during
 // any regular poll.
 async function poll(req, res) {
@@ -274,7 +292,6 @@ async function poll(req, res) {
         });
     }
 }
-exports.poll = poll;
 // Updates a bank access.
 async function update(req, res) {
     try {
@@ -299,7 +316,6 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating bank access');
     }
 }
-exports.update = update;
 async function updateAndFetchAccounts(req, res) {
     try {
         const { id: userId } = req.user;
@@ -340,10 +356,9 @@ async function updateAndFetchAccounts(req, res) {
         req.preloaded.access = await models_1.Access.update(userId, access.id, attrs);
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
-        await fetchAccountsAndTransactions(req, res);
+        await _fetchAccountsAndTransactions(req, res);
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when updating and fetching bank access');
     }
 }
-exports.updateAndFetchAccounts = updateAndFetchAccounts;

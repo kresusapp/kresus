@@ -142,8 +142,7 @@
             "balance_desc": "Este gráfico le muestra el saldo de su cuenta en un momento dado. Esto es útil, por ejemplo, para ver si se alcanza un nivel crítico siempre en el mismo periodo.",
             "by_category": "por categoría",
             "by_category_desc": "Este gráfico le muestra mes a mes cuánto ha gastado o ganado en cada categoría. Esto es útil para obtener una visión rápida de cuánto gasta en una categoría por mes, y cómo ha evolucionado con el tiempo.",
-            "differences_all": "diferencias",
-            "differences_all_desc": "Este gráfico muestra, por mes, cuánto gastaste, ganado y reservado en todas las cuentas de acceso bancario actualmente seleccionado. Esto es útil para ver cómo evolucionaron sus ahorros durante los últimos meses: ¿has ahorrado más  ?",
+            "differences": "diferencias",
             "spent": "Gastado",
             "received": "Recibido",
             "saved": "Ahorrado",
@@ -553,10 +552,10 @@
             "amount": "Monto",
             "category": "categoría",
             "submit": "Crear",
-            "add_transaction": "Crear una transacción para la cuenta %{account}",
+            "add_transaction": "Crear una transacción",
             "type": "Type",
             "date": "Date",
-            "description": "Está a punto de crear una transacción para la cuenta %{account}. Si desea eliminar una operación mal creada, abra los detalles de esta operación en la lista de operaciones y haga clic en \"Suprimir\".",
+            "description": "Está a punto de crear una transacción. Si desea eliminar una operación mal creada, abra los detalles de esta operación en la lista de operaciones y haga clic en \"Suprimir\".",
             "warning": "Asegúrese de que su cuenta está actualizada antes de crearla. Si está creando esta transacción en previsión de una transacción importada desde su banco, tenga en cuenta que puede tener que fusionarlas manualmente."
         },
         "woobinstallreadme": {

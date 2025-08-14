@@ -32,6 +32,10 @@
         "license": "Apache-2.0",
         "website": "https://log4js-node.github.io/log4js-node/"
     },
+    "micro-memoize": {
+        "license": "MIT",
+        "website": "https://github.com/planttheidea/micro-memoize#readme"
+    },
     "moment": {
         "license": "MIT",
         "website": "https://momentjs.com"
@@ -82,7 +86,7 @@
     },
     "@types/errorhandler": {
         "license": "MIT",
-        "website": null
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/errorhandler"
     },
     "@types/express": {
         "license": "MIT",
@@ -220,10 +224,6 @@
         "license": "MIT",
         "website": "https://lodash.com/"
     },
-    "micro-memoize": {
-        "license": "MIT",
-        "website": "https://github.com/planttheidea/micro-memoize#readme"
-    },
     "mocha": {
         "license": "MIT",
         "website": "https://mochajs.org/"
@@ -270,7 +270,7 @@
     },
     "react-router-dom": {
         "license": "MIT",
-        "website": "https://reactrouter.com/"
+        "website": null
     },
     "react-select": {
         "license": "MIT",

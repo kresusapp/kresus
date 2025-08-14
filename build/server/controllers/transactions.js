@@ -1,13 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.create = exports.merge = exports.update = exports.preloadOtherTransaction = exports.preloadTransaction = void 0;
+exports.preloadTransaction = preloadTransaction;
+exports.preloadOtherTransaction = preloadOtherTransaction;
+exports.update = update;
+exports.merge = merge;
+exports.create = create;
+exports.destroy = destroy;
 const models_1 = require("../models");
 const transaction_types_1 = require("../lib/transaction-types");
 const helpers_1 = require("../helpers");
-async function preload(varName, req, res, nextHandler, transactionID) {
+async function preload(varName, req, res, nextHandler, transactionId) {
     const { id: userId } = req.user;
     try {
-        const transaction = await models_1.Transaction.find(userId, transactionID);
+        const transaction = await models_1.Transaction.find(userId, transactionId);
         if (!transaction) {
             throw new helpers_1.KError('bank transaction not found', 404);
         }
@@ -19,14 +24,12 @@ async function preload(varName, req, res, nextHandler, transactionID) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a transaction');
     }
 }
-async function preloadTransaction(req, res, nextHandler, transactionID) {
-    await preload('transaction', req, res, nextHandler, transactionID);
+async function preloadTransaction(req, res, nextHandler, transactionId) {
+    await preload('transaction', req, res, nextHandler, transactionId);
 }
-exports.preloadTransaction = preloadTransaction;
-async function preloadOtherTransaction(req, res, nextHandler, otherTransactionID) {
-    await preload('otherTransaction', req, res, nextHandler, otherTransactionID);
+async function preloadOtherTransaction(req, res, nextHandler, othertransactionId) {
+    await preload('otherTransaction', req, res, nextHandler, othertransactionId);
 }
-exports.preloadOtherTransaction = preloadOtherTransaction;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
@@ -90,7 +93,6 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating attributes of transaction');
     }
 }
-exports.update = update;
 async function merge(req, res) {
     try {
         const { id: userId } = req.user;
@@ -115,7 +117,6 @@ async function merge(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when merging two transactions');
     }
 }
-exports.merge = merge;
 // Create a new transaction.
 async function create(req, res) {
     try {
@@ -155,7 +156,6 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating transaction for a bank account');
     }
 }
-exports.create = create;
 // Delete a transaction
 async function destroy(req, res) {
     try {
@@ -176,4 +176,3 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting transaction');
     }
 }
-exports.destroy = destroy;

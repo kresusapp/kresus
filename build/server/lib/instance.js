@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfigGhostSettings = exports.getAll = void 0;
+exports.ConfigGhostSettings = void 0;
+exports.getAll = getAll;
 const woob_1 = require("../providers/woob");
 const helpers_1 = require("../helpers");
 const instance_1 = require("../shared/instance");
@@ -28,14 +29,13 @@ async function getAll() {
     values[instance_1.DEV_ENV] = String((process.env.NODE_ENV || 'development') !== 'production');
     return values;
 }
-exports.getAll = getAll;
 // A list of all the settings that are implied at runtime and should not be
 // saved into the database.
 // *Never* ever remove a name from this list, since these are used also to
 // know which settings shouldn't be imported or exported.
 exports.ConfigGhostSettings = new Set([
-    'weboob-version',
-    'weboob-installed',
+    'weboob-version', // legit "weboob": this is a ghost setting
+    'weboob-installed', // legit "weboob": this is a ghost setting
     'standalone-mode',
     'url-prefix',
     'emails-enabled',

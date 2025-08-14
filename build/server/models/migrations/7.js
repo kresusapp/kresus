@@ -8,7 +8,9 @@ const __1 = require("..");
 // during the import, so that has to be manually handled when importing.
 class RemoveDuplicateBudgets1608817776804 {
     async up(q) {
-        const allBudgets = await q.manager.find(__1.Budget);
+        const allBudgets = await q.manager.find(__1.Budget, {
+            select: ['id', 'userId', 'year', 'month', 'categoryId'],
+        });
         const setOfUniqueBudgetKeys = new Set();
         const budgetIdsToDelete = [];
         // Identify duplicate budget entries.

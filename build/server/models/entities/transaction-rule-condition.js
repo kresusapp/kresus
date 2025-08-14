@@ -48,8 +48,8 @@ let TransactionRuleCondition = TransactionRuleCondition_1 = class TransactionRul
         return await TransactionRuleCondition_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
-        const alert = TransactionRuleCondition_1.repo().create({ ...attributes, userId });
-        return await TransactionRuleCondition_1.repo().save(alert);
+        const condition = TransactionRuleCondition_1.repo().create({ ...attributes, userId });
+        return await TransactionRuleCondition_1.repo().save(condition);
     }
     static async destroy(userId, conditionId) {
         await TransactionRuleCondition_1.repo().delete({ id: conditionId, userId });

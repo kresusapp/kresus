@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBanks = void 0;
+exports.updateBanks = updateBanks;
 const __1 = require("../");
 const helpers_1 = require("../../helpers");
 const log = (0, helpers_1.makeLogger)('models/data-migrations');
@@ -21,4 +21,3 @@ async function updateBanks(userId, manager) {
     }, { vendorId: 'bnp' });
     log.info('Finished running data migration on banks (2021-08-14)');
 }
-exports.updateBanks = updateBanks;

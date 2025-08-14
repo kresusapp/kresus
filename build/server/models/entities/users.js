@@ -13,6 +13,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const __1 = require("..");
 let User = User_1 = class User {
+    constructor() {
+        // True if the user can see server logs, etc.
+        this.isAdmin = false;
+    }
     static repo() {
         if (User_1.REPO === null) {
             User_1.REPO = (0, __1.getRepository)(User_1);
@@ -26,6 +30,9 @@ let User = User_1 = class User {
     }
     static async find(userId) {
         return await User_1.repo().findOneBy({ id: userId });
+    }
+    static async findByLogin(login) {
+        return await User_1.repo().findOneBy({ login });
     }
     static async all() {
         return await User_1.repo().find();
@@ -43,6 +50,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], User.prototype, "login", void 0);
+__decorate([
+    (0, typeorm_1.Column)('boolean', { default: false }),
+    __metadata("design:type", Object)
+], User.prototype, "isAdmin", void 0);
 User = User_1 = __decorate([
     (0, typeorm_1.Entity)('user')
 ], User);

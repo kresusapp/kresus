@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.swapPositions = exports.update = exports.create = exports.all = exports.preloadOther = exports.preload = exports.conditionTypesList = void 0;
+exports.conditionTypesList = void 0;
+exports.preload = preload;
+exports.preloadOther = preloadOther;
+exports.all = all;
+exports.create = create;
+exports.update = update;
+exports.swapPositions = swapPositions;
+exports.destroy = destroy;
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 const validators_1 = require("../shared/validators");
@@ -23,7 +30,6 @@ async function preload(req, res, nextHandler, id) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a rule');
     }
 }
-exports.preload = preload;
 async function preloadOther(req, res, nextHandler, id) {
     try {
         const { id: userId } = req.user;
@@ -38,7 +44,6 @@ async function preloadOther(req, res, nextHandler, id) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a rule');
     }
 }
-exports.preloadOther = preloadOther;
 async function all(req, res) {
     try {
         const userId = req.user.id;
@@ -49,7 +54,6 @@ async function all(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when retrieving rules');
     }
 }
-exports.all = all;
 function checkDependencies(actions, conditions, allowIds) {
     const extraFields = allowIds ? ['id'] : [];
     let error;
@@ -106,7 +110,6 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating a rule');
     }
 }
-exports.create = create;
 // Can only update actions/conditions that were already inserted into the
 // database. Doesn't allow removing or adding new actions and conditions (yet).
 async function update(req, res) {
@@ -155,7 +158,6 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating a rule');
     }
 }
-exports.update = update;
 async function swapPositions(req, res) {
     try {
         const { id: userId } = req.user;
@@ -173,7 +175,6 @@ async function swapPositions(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting a rule');
     }
 }
-exports.swapPositions = swapPositions;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
@@ -185,4 +186,3 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting a rule');
     }
 }
-exports.destroy = destroy;

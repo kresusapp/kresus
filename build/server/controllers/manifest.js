@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getManifest = void 0;
+exports.getManifest = getManifest;
 const models_1 = require("../models");
 async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';
@@ -61,7 +61,6 @@ async function getManifest(req, res) {
     });
     /* eslint-enable */
 }
-exports.getManifest = getManifest;
 const routes = {
     manifest: {
         get: getManifest,

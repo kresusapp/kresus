@@ -37,6 +37,18 @@ let RecurringTransaction = RecurringTransaction_1 = class RecurringTransaction {
         }
         return /^[1-9][0-2]?(?:;[1-9][0-2]?)*$/.test(list);
     }
+    // Returns a non cryptographically-secure hash, for quick comparisons.
+    static easyHash(rt) {
+        (0, helpers_1.assert)(typeof rt.accountId !== 'undefined', 'must have accountId at least');
+        (0, helpers_1.assert)(typeof rt.label !== 'undefined', 'must have label at least');
+        (0, helpers_1.assert)(typeof rt.dayOfMonth !== 'undefined', 'must have dayOfMonth at least');
+        (0, helpers_1.assert)(typeof rt.listOfMonths !== 'undefined', 'must have listOfMonths at least');
+        let s = `${rt.accountId}-${rt.label}-${rt.dayOfMonth}-${rt.listOfMonths}`;
+        if (rt.type) {
+            s += rt.type;
+        }
+        return s;
+    }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
         return RecurringTransaction_1.repo().create(args);

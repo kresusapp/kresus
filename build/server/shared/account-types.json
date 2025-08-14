@@ -78,5 +78,45 @@
     {
         "woob_id": 19,
         "name": "account-type.revolving_credit"
+    },
+    {
+        "woob_id": 20,
+        "name": "account-type.per"
+    },
+    {
+        "woob_id": 21,
+        "name": "account-type.real_estate"
+    },
+    {
+        "woob_id": 22,
+        "name": "account-type.crowdlending"
+    },
+    {
+        "woob_id": 23,
+        "name": "account-type.ldds"
+    },
+    {
+        "woob_id": 24,
+        "name": "account-type.pel"
+    },
+    {
+        "woob_id": 25,
+        "name": "account-type.csl"
+    },
+    {
+        "woob_id": 26,
+        "name": "account-type.cel"
+    },
+    {
+        "woob_id": 27,
+        "name": "account-type.cat"
+    },
+    {
+        "woob_id": 28,
+        "name": "account-type.livreta"
+    },
+    {
+        "woob_id": 29,
+        "name": "account-type.livretb"
     }
 ]

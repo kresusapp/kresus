@@ -3,7 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obfuscateEmails = exports.obfuscateKeywords = exports.obfuscatePasswords = exports.cleanData = void 0;
+exports.cleanData = cleanData;
+exports.obfuscatePasswords = obfuscatePasswords;
+exports.obfuscateKeywords = obfuscateKeywords;
+exports.obfuscateEmails = obfuscateEmails;
 const regex_escape_1 = __importDefault(require("regex-escape"));
 const helpers_1 = require("../helpers");
 const instance_1 = require("../lib/instance");
@@ -150,7 +153,6 @@ function cleanData(world) {
     }
     return world;
 }
-exports.cleanData = cleanData;
 function obfuscatePasswords(string, passwords) {
     // Prevents the application of the regexp s//*******/g
     if (!passwords.size) {
@@ -160,7 +162,6 @@ function obfuscatePasswords(string, passwords) {
     // Always return a fixed width string
     return string.replace(new RegExp(`(${regex})`, 'gm'), '********');
 }
-exports.obfuscatePasswords = obfuscatePasswords;
 function obfuscateKeywords(string, keywords) {
     // Prevents the application of the regexp s//*******/g
     if (!keywords.size) {
@@ -169,7 +170,6 @@ function obfuscateKeywords(string, keywords) {
     const regex = [...keywords].map(k => (0, regex_escape_1.default)(`${k}`)).join('|');
     return string.replace(new RegExp(`(${regex})`, 'gm'), (_all, keyword) => keyword.substr(-3).padStart(keyword.length, '*'));
 }
-exports.obfuscateKeywords = obfuscateKeywords;
 function obfuscateEmails(string) {
     // Prevents the application of the regexp s//*******/g
     if (!string) {
@@ -179,4 +179,3 @@ function obfuscateEmails(string) {
     // would be a mess and slow.
     return string.replace(/[\w+.]+@\w+\.\w+/gim, '*******@****.***');
 }
-exports.obfuscateEmails = obfuscateEmails;

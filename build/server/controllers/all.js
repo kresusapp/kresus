@@ -3,7 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testing = exports.importOFX_ = exports.import_ = exports.importData = exports.parseDate = exports.export_ = exports.all = exports.registerStartupTask = void 0;
+exports.testing = void 0;
+exports.registerStartupTask = registerStartupTask;
+exports.all = all;
+exports.export_ = export_;
+exports.parseDate = parseDate;
+exports.importData = importData;
+exports.import_ = import_;
+exports.importOFX_ = importOFX_;
 const crypto_1 = __importDefault(require("crypto"));
 const models_1 = require("../models");
 const data_migrations_1 = __importDefault(require("../models/data-migrations"));
@@ -16,6 +23,8 @@ const settings_1 = require("../../shared/settings");
 const helpers_3 = require("./helpers");
 const instance_2 = require("./instance");
 const ofx_1 = require("./ofx");
+const diff_accounts_1 = __importDefault(require("../lib/diff-accounts"));
+const diff_transactions_1 = __importDefault(require("../lib/diff-transactions"));
 const log = (0, helpers_1.makeLogger)('controllers/all');
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 // Startup tasks are cleanup tasks that will be run the next time a user will run the /all initial
@@ -26,7 +35,6 @@ function registerStartupTask(userId, f) {
     STARTUP_TASKS[userId] = STARTUP_TASKS[userId] || [];
     STARTUP_TASKS[userId].push(f);
 }
-exports.registerStartupTask = registerStartupTask;
 // Run startup tasks for the user, if any.
 async function runStartupTasks(userId) {
     if (STARTUP_TASKS[userId]) {
@@ -46,6 +54,8 @@ async function getAllData(userId, options = {}) {
         transactions: [],
         settings: [],
         instance: {},
+        recurringTransactions: [],
+        views: [],
     };
     const accesses = await models_1.Access.all(userId);
     for (const access of accesses) {
@@ -73,12 +83,13 @@ async function getAllData(userId, options = {}) {
     ret.categories = await models_1.Category.all(userId);
     ret.transactions = await models_1.Transaction.all(userId);
     ret.settings = await models_1.Setting.all(userId);
+    ret.recurringTransactions = await models_1.RecurringTransaction.all(userId);
+    ret.views = await models_1.View.all(userId);
     if (isExport) {
         ret.budgets = await models_1.Budget.all(userId);
         // This fetches the associated conditions and actions data, so no need
         // to join explicitly here.
         ret.transactionRules = await models_1.TransactionRule.allOrdered(userId);
-        ret.recurringTransactions = await models_1.RecurringTransaction.all(userId);
         // We only need to export the applied recurring transactions from the current month since
         // the recurring transactions won't be created for the past at next poll.
         const now = new Date();
@@ -86,6 +97,10 @@ async function getAllData(userId, options = {}) {
     }
     else {
         ret.instance = await (0, instance_1.getAll)();
+        const user = await models_1.User.find(userId);
+        if (user) {
+            ret.user = user;
+        }
     }
     if (isExport || (0, helpers_1.isEmailEnabled)() || (0, helpers_1.isAppriseApiEnabled)()) {
         ret.alerts = await models_1.Alert.all(userId);
@@ -110,7 +125,6 @@ async function all(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when loading all data');
     }
 }
-exports.all = all;
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 function encryptData(data, passphrase) {
@@ -181,7 +195,6 @@ async function export_(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when exporting data');
     }
 }
-exports.export_ = export_;
 function applyRenamings(model) {
     if (typeof model.renamings === 'undefined') {
         return obj => obj;
@@ -220,9 +233,15 @@ function parseDate(date) {
     }
     return null;
 }
-exports.parseDate = parseDate;
+// Import the given data from the `world` object, created by interpreting the JSON created from a
+// call to `export_()` in this same file.
+//
+// If `dontCreateAccess` is true, it is assumed that the access id refers to a valid access that is
+// known in the database. Otherwise, then the access is created.
+//
 // Note: destroy the input `world` argument by changing its fields in place.
-async function importData(userId, world, inPlace) {
+async function importData(userId, world, dontCreateAccess) {
+    var _a;
     world.accesses = (world.accesses || []).map(applyRenamings(models_1.Access));
     world.accounts = (world.accounts || []).map(applyRenamings(models_1.Account));
     world.alerts = (world.alerts || []).map(applyRenamings(models_1.Alert));
@@ -234,6 +253,7 @@ async function importData(userId, world, inPlace) {
     world.transactionRules = world.transactionRules || [];
     world.recurringTransactions = world.recurringTransactions || [];
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
+    world.views = world.views || [];
     // Static data.
     // Keep backward compat with 'operationtypes'.
     world.transactiontypes = world.transactiontypes || world.operationtypes || [];
@@ -252,6 +272,7 @@ async function importData(userId, world, inPlace) {
         rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
+        views:           ${world.views.length}
     `);
     log.info('Import accesses...');
     const accessMap = {};
@@ -259,6 +280,21 @@ async function importData(userId, world, inPlace) {
         const accessId = access.id;
         delete access.id;
         delete access.userId;
+        // Try to match the vendor id and login against an existing pair in the database.
+        const foundKnown = await models_1.Access.byCredentials(userId, {
+            uuid: access.vendorId,
+            login: access.login,
+        });
+        if (foundKnown !== null) {
+            // The access was already known: don't reimport it.
+            accessMap[accessId] = {
+                id: foundKnown.id,
+                wasKnown: true,
+                vendorId: foundKnown.vendorId,
+            };
+            log.info(`Ignoring import of access ${access.vendorId} (${access.login}) as it already exists.`);
+            continue;
+        }
         const sanitizedCustomFields = [];
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
@@ -281,12 +317,16 @@ async function importData(userId, world, inPlace) {
             sanitizedCustomFields.push({ name, value });
         }
         access.fields = sanitizedCustomFields;
-        if (inPlace) {
-            accessMap[accessId] = accessId;
+        if (dontCreateAccess) {
+            // The access id given from the `world` object is valid, according to this function's
+            // contract, so the mapping doesn't need to redirect to another access we created.
+            accessMap[accessId] = { id: accessId, wasKnown: true };
+            log.info(`Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`);
         }
         else {
             const created = await models_1.Access.create(userId, access);
-            accessMap[accessId] = created.id;
+            accessMap[accessId] = { id: created.id, wasKnown: false };
+            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
         }
     }
     log.info('Done.');
@@ -299,12 +339,15 @@ async function importData(userId, world, inPlace) {
             continue;
         }
         const accountId = account.id;
-        delete account.id;
-        delete account.userId;
+        // Create a copy of the account. We should use structuredClone but for some reasons our
+        // tests are passing models instead of literal objects.
+        const accountCopy = JSON.parse(JSON.stringify(account));
+        delete accountCopy.id;
+        delete accountCopy.userId;
         // For an initial import which does not come from Kresus (ex: a
         // handmade JSON file), there might be no lastCheckDate.
-        account.lastCheckDate = parseDate(account.lastCheckDate);
-        if (account.lastCheckDate === null) {
+        accountCopy.lastCheckDate = parseDate(accountCopy.lastCheckDate);
+        if (accountCopy.lastCheckDate === null) {
             let latestOpDate = null;
             if (world.transactions) {
                 const accountOps = world.transactions.filter((op) => op.accountId === accountId);
@@ -315,12 +358,62 @@ async function importData(userId, world, inPlace) {
                     }
                 }
             }
-            account.lastCheckDate = latestOpDate || new Date();
+            accountCopy.lastCheckDate = latestOpDate || new Date();
         }
-        account.accessId = accessMap[account.accessId];
-        const created = await models_1.Account.create(userId, account);
+        // If the access containing this account was known, then try to match this account against
+        // one known in the database.
+        const accessRemap = accessMap[accountCopy.accessId];
+        accountCopy.accessId = accessRemap === null || accessRemap === void 0 ? void 0 : accessRemap.id;
+        if (accessRemap === null || accessRemap === void 0 ? void 0 : accessRemap.wasKnown) {
+            const knownAccounts = await models_1.Account.byAccess(userId, { id: accessRemap.id });
+            if (typeof knownAccounts !== 'undefined') {
+                const vendorId = (_a = accessRemap.vendorId) !== null && _a !== void 0 ? _a : undefined;
+                const diffResult = (0, diff_accounts_1.default)(knownAccounts, [accountCopy], vendorId);
+                // There can be at most one perfect match, since we provided only one account.
+                if (diffResult.perfectMatches.length === 1) {
+                    const firstMatchPair = diffResult.perfectMatches[0];
+                    const knownAccount = firstMatchPair[0];
+                    // The account was found as a perfect match: do not import it, and reuse it
+                    // instead.
+                    accountIdToAccount.set(accountId, knownAccount.id);
+                    vendorToOwnAccountId.set(accountCopy.vendorAccountId, knownAccount.id);
+                    log.info(`Ignoring import of account ${accountCopy.label} (${accountCopy.vendorAccountId}) as it already exists.`);
+                    continue;
+                }
+            }
+        }
+        log.info(`Importing new unknown account ${accountCopy.label} (${accountCopy.vendorAccountId}).`);
+        const created = await models_1.Account.create(userId, accountCopy);
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
+    }
+    log.info('Done.');
+    log.info('Import views...');
+    const viewsMap = {};
+    for (const view of world.views) {
+        const viewId = view.id;
+        delete view.id;
+        if (!view.createdByUser) {
+            log.warn('Ignoring view not created by user:\n', view);
+            continue;
+        }
+        const viewAccounts = [];
+        for (const viewAcc of view.accounts) {
+            if (typeof viewAcc.accountId !== 'undefined' &&
+                accountIdToAccount.has(viewAcc.accountId)) {
+                viewAcc.accountId = accountIdToAccount.get(viewAcc.accountId);
+                viewAccounts.push(viewAcc);
+            }
+            else {
+                log.warn('Ignoring account in view:\n', view);
+            }
+        }
+        if (viewAccounts.length === 0) {
+            log.warn('Ignoring view without accounts:\n', view);
+            continue;
+        }
+        const created = await models_1.View.create(userId, Object.assign(view, { accounts: viewAccounts }));
+        viewsMap[viewId] = created.id;
     }
     log.info('Done.');
     log.info('Import categories...');
@@ -345,13 +438,59 @@ async function importData(userId, world, inPlace) {
     }
     log.info('Done.');
     log.info('Import budgets...');
-    const makeBudgetKey = (b) => `${b.categoryId}-${b.year}-${b.month}`;
+    const makeBudgetKey = (b) => `${b.viewId}-${b.categoryId}-${b.year}-${b.month}`;
     const existingBudgets = await models_1.Budget.all(userId);
     const existingBudgetsMap = new Map();
     for (const budget of existingBudgets) {
         existingBudgetsMap.set(makeBudgetKey(budget), budget);
     }
+    let defaultViewId = -1;
+    let lookForDefaultView = true;
     for (const importedBudget of world.budgets) {
+        if (typeof importedBudget.viewId !== 'number') {
+            if (defaultViewId === -1 && lookForDefaultView) {
+                // For budgets pre-existing views, there is no viewId set. We need to retrieve
+                // it from the defaultAccountId (the one imported) or the first account imported.
+                const defaultAccountImportedSetting = world.settings.find((setting) => setting && setting.key === settings_1.DEFAULT_ACCOUNT_ID);
+                let defaultImportedAccountId;
+                if (defaultAccountImportedSetting) {
+                    defaultImportedAccountId = accountIdToAccount.get(defaultAccountImportedSetting.value);
+                }
+                else {
+                    // Find the first checking account otherwise the first account.
+                    const bestGuessAccountFromImport = world.accounts.find((acc) => acc.type === 'account-type.checking') ||
+                        world.accounts[0];
+                    defaultImportedAccountId = accountIdToAccount.get(bestGuessAccountFromImport.id);
+                }
+                if (typeof defaultImportedAccountId === 'number') {
+                    const allViews = await models_1.View.all(userId);
+                    const defaultAccountAssociatedView = allViews.find(view => {
+                        return (view.accounts.length === 1 &&
+                            view.accounts[0].accountId === defaultImportedAccountId);
+                    });
+                    if (defaultAccountAssociatedView) {
+                        defaultViewId = defaultAccountAssociatedView.id;
+                    }
+                    else {
+                        lookForDefaultView = false;
+                    }
+                }
+                else {
+                    lookForDefaultView = false;
+                }
+            }
+            if (defaultViewId === -1) {
+                // We don't know what to do with this budget without any account/view
+                // to associate it with.
+                log.warn('No view to associate a budget with, skipping budget import…');
+                continue;
+            }
+            // Set the default view id as the budget's viewId.
+            importedBudget.viewId = defaultViewId;
+        }
+        else {
+            importedBudget.viewId = viewsMap[importedBudget.viewId];
+        }
         // Note the order here: first map to the actual category id, so the
         // map lookup thereafter uses an existing category id.
         importedBudget.categoryId = categoryMap[importedBudget.categoryId];
@@ -382,93 +521,102 @@ async function importData(userId, world, inPlace) {
         importedTypesMap.set(type.id.toString(), type.name);
     }
     log.info('Import transactions...');
-    const skipTransactions = [];
+    const newByAccountId = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
-        const op = world.transactions[i];
-        op.date = parseDate(op.date);
-        op.debitDate = parseDate(op.debitDate);
-        op.importDate = parseDate(op.importDate);
-        if (op.date === null) {
-            log.warn('Ignoring transaction without date\n', op);
-            skipTransactions.push(i);
+        const tr = world.transactions[i];
+        tr.date = parseDate(tr.date);
+        tr.debitDate = parseDate(tr.debitDate);
+        tr.importDate = parseDate(tr.importDate);
+        if (tr.date === null) {
+            log.warn('Ignoring transaction without date\n', tr);
             continue;
         }
-        if (typeof op.amount !== 'number' || isNaN(op.amount)) {
-            log.warn('Ignoring transaction without valid amount\n', op);
-            skipTransactions.push(i);
+        if (typeof tr.amount !== 'number' || isNaN(tr.amount)) {
+            log.warn('Ignoring transaction without valid amount\n', tr);
             continue;
         }
         // Map transaction to account.
-        if (typeof op.accountId !== 'undefined') {
-            if (!accountIdToAccount.has(op.accountId)) {
-                log.warn('Ignoring orphan transaction:\n', op);
-                skipTransactions.push(i);
+        if (typeof tr.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(tr.accountId)) {
+                log.warn('Ignoring orphan transaction:\n', tr);
                 continue;
             }
-            op.accountId = accountIdToAccount.get(op.accountId);
+            tr.accountId = accountIdToAccount.get(tr.accountId);
         }
         else {
-            if (!vendorToOwnAccountId.has(op.bankAccount)) {
-                log.warn('Ignoring orphan transaction:\n', op);
-                skipTransactions.push(i);
+            if (!vendorToOwnAccountId.has(tr.bankAccount)) {
+                log.warn('Ignoring orphan transaction:\n', tr);
                 continue;
             }
-            op.accountId = vendorToOwnAccountId.get(op.bankAccount);
+            tr.accountId = vendorToOwnAccountId.get(tr.bankAccount);
         }
         // Remove bankAccount as the transaction is now linked to account with accountId prop.
-        delete op.bankAccount;
-        const categoryId = op.categoryId;
+        delete tr.bankAccount;
+        const categoryId = tr.categoryId;
         if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
-                log.warn('Unknown category, unsetting for transaction:\n', op);
+                log.warn('Unknown category, unsetting for transaction:\n', tr);
             }
-            op.categoryId = categoryMap[categoryId];
+            tr.categoryId = categoryMap[categoryId];
         }
         // Set transaction type base on transactionId.
         // (Maintain 'operation' in name, as it's a deprecated field.)
-        if (typeof op.operationTypeID !== 'undefined') {
-            const key = op.operationTypeID.toString();
+        if (typeof tr.operationTypeID !== 'undefined') {
+            const key = tr.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
-                op.type = importedTypesMap.get(key);
+                tr.type = importedTypesMap.get(key);
             }
             else {
-                op.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
+                tr.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
             }
-            delete op.operationTypeID;
+            delete tr.operationTypeID;
         }
         // If there is no import date, set it to now.
-        if (op.importDate === null) {
-            op.importDate = new Date();
+        if (tr.importDate === null) {
+            tr.importDate = new Date();
         }
         // If there is no label use the rawLabel, and vice-versa.
-        if (typeof op.label === 'undefined') {
-            op.label = op.rawLabel;
+        if (typeof tr.label === 'undefined') {
+            tr.label = tr.rawLabel;
         }
-        if (typeof op.rawLabel === 'undefined') {
-            op.rawLabel = op.label;
+        if (typeof tr.rawLabel === 'undefined') {
+            tr.rawLabel = tr.label;
         }
-        if (typeof op.label === 'undefined' && typeof op.rawLabel === 'undefined') {
-            log.warn('Ignoring transaction without label/rawLabel:\n', op);
-            skipTransactions.push(i);
+        if (typeof tr.label === 'undefined' && typeof tr.rawLabel === 'undefined') {
+            log.warn('Ignoring transaction without label/rawLabel:\n', tr);
             continue;
         }
         // Consider that old imports have the type set by the user, to have a consistent behaviour
         // with the migration.
-        if (typeof op.isUserDefinedType === 'undefined') {
-            op.isUserDefinedType = true;
+        if (typeof tr.isUserDefinedType === 'undefined') {
+            tr.isUserDefinedType = true;
         }
         // Remove contents of deprecated fields, if there were any.
-        delete op.attachments;
-        delete op.binary;
-        delete op.id;
-        delete op.userId;
+        delete tr.attachments;
+        delete tr.binary;
+        delete tr.id;
+        delete tr.userId;
+        // Add the transaction to its account group.
+        const accountGroup = newByAccountId.get(tr.accountId) || [];
+        accountGroup.push(tr);
+        newByAccountId.set(tr.accountId, accountGroup);
     }
-    if (skipTransactions.length) {
-        for (let i = skipTransactions.length - 1; i >= 0; i--) {
-            world.transactions.splice(skipTransactions[i], 1);
+    for (const [accountId, provided] of newByAccountId) {
+        const known = await models_1.Transaction.byAccount(userId, accountId);
+        const diffResult = (0, diff_transactions_1.default)(known, provided);
+        // Ignore perfect matches and knownOrphans. Only import the "provider" (import) orphans
+        // and the duplicate candidates, since we're not too sure about those.
+        const transactions = diffResult.providerOrphans;
+        const candidates = diffResult.duplicateCandidates.map(pair => pair[1]);
+        transactions.push(...candidates);
+        if (transactions.length > 0) {
+            log.info(`Importing ${transactions.length} transactions for account ${accountId}.`);
+            await models_1.Transaction.bulkCreate(userId, transactions);
+        }
+        else {
+            log.info(`No transactions to import for account ${accountId}.`);
         }
     }
-    await models_1.Transaction.bulkCreate(userId, world.transactions);
     log.info('Done.');
     log.info('Import settings...');
     for (const setting of world.settings) {
@@ -501,6 +649,7 @@ async function importData(userId, world, inPlace) {
     }
     log.info('Done.');
     log.info('Import alerts...');
+    const existingAlerts = await models_1.Alert.all(userId);
     for (const a of world.alerts) {
         // Map alert to account.
         if (typeof a.accountId !== 'undefined') {
@@ -516,6 +665,21 @@ async function importData(userId, world, inPlace) {
                 continue;
             }
             a.accountId = vendorToOwnAccountId.get(a.bankAccount);
+        }
+        // Don't reimport an existing similar alert.
+        let foundDuplicate = false;
+        for (const known of existingAlerts) {
+            if (known.accountId === a.accountId &&
+                known.type === a.type &&
+                known.frequency === a.frequency &&
+                known.limit === a.limit &&
+                known.order === a.order) {
+                foundDuplicate = true;
+                break;
+            }
+        }
+        if (foundDuplicate) {
+            continue;
         }
         // Remove bankAccount as the alert is now linked to account with accountId prop.
         delete a.bankAccount;
@@ -578,6 +742,12 @@ async function importData(userId, world, inPlace) {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
+    const recurringTransactionsMap = new Map();
+    const existingRecurringTransactionsHashMap = new Map();
+    const existingRecurringTransactions = await models_1.RecurringTransaction.all(userId);
+    existingRecurringTransactions.forEach(rt => {
+        existingRecurringTransactionsHashMap.set(models_1.RecurringTransaction.easyHash(rt), rt.id);
+    });
     for (let i = 0; i < world.recurringTransactions.length; i++) {
         const rt = world.recurringTransactions[i];
         if (typeof rt.amount !== 'number' || isNaN(rt.amount)) {
@@ -588,7 +758,6 @@ async function importData(userId, world, inPlace) {
         if (typeof rt.accountId !== 'undefined') {
             if (!accountIdToAccount.has(rt.accountId)) {
                 log.warn('Ignoring orphan recurring transaction:\n', rt);
-                skipTransactions.push(i);
                 continue;
             }
             rt.accountId = accountIdToAccount.get(rt.accountId);
@@ -597,9 +766,15 @@ async function importData(userId, world, inPlace) {
             log.warn('Ignoring recurring transaction without label/rawLabel:\n', rt);
             continue;
         }
-        const exists = await models_1.RecurringTransaction.exists(userId, rt.id);
-        if (!exists) {
-            await models_1.RecurringTransaction.create(userId, rt);
+        const hash = models_1.RecurringTransaction.easyHash(rt);
+        const exists = existingRecurringTransactionsHashMap.has(hash);
+        if (exists) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            recurringTransactionsMap.set(rt.id, existingRecurringTransactionsHashMap.get(hash));
+        }
+        else {
+            const created = await models_1.RecurringTransaction.create(userId, rt);
+            recurringTransactionsMap.set(rt.id, created.id);
         }
     }
     for (let i = 0; i < world.appliedRecurringTransactions.length; i++) {
@@ -608,13 +783,14 @@ async function importData(userId, world, inPlace) {
         if (art.year !== currentYear || art.month !== currentMonth) {
             continue;
         }
-        if (!accountIdToAccount.has(art.accountId)) {
+        if (!accountIdToAccount.has(art.accountId) ||
+            !recurringTransactionsMap.has(art.recurringTransactionId)) {
             log.warn('Ignoring orphan applied recurring transaction:\n', art);
-            skipTransactions.push(i);
             continue;
         }
         art.accountId = accountIdToAccount.get(art.accountId);
-        const exists = await models_1.AppliedRecurringTransaction.exists(userId, art.accountId, art.month, art.year);
+        art.recurringTransactionId = recurringTransactionsMap.get(art.recurringTransactionId);
+        const exists = await models_1.AppliedRecurringTransaction.exists(userId, art.accountId, art.recurringTransactionId, art.month, art.year);
         if (!exists) {
             await models_1.AppliedRecurringTransaction.create(userId, art);
         }
@@ -624,7 +800,6 @@ async function importData(userId, world, inPlace) {
     await (0, data_migrations_1.default)(userId);
     log.info('Done.');
 }
-exports.importData = importData;
 async function import_(req, res) {
     try {
         const { id: userId } = req.user;
@@ -665,14 +840,13 @@ async function import_(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when importing data');
     }
 }
-exports.import_ = import_;
 async function importOFX_(req, res) {
     try {
         const { id: userId } = req.user;
         log.info('Parsing OFX file...');
         const userData = JSON.parse(req.body);
         const convertedData = await (0, ofx_1.ofxToKresus)(userData.data);
-        let inPlace = false;
+        let dontCreateAccess = false;
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {
             // Make sure the access exists.
@@ -682,9 +856,9 @@ async function importOFX_(req, res) {
             // Replace the accessId in the converted data by this one.
             convertedData.accesses[0].id = userData.accessId;
             convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
-            inPlace = true;
+            dontCreateAccess = true;
         }
-        await importData(userId, convertedData, inPlace);
+        await importData(userId, convertedData, dontCreateAccess);
         log.info('Import finished with success!');
         res.status(200).end();
     }
@@ -692,7 +866,6 @@ async function importOFX_(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when importing data');
     }
 }
-exports.importOFX_ = importOFX_;
 exports.testing = {
     ofxToKresus: ofx_1.ofxToKresus,
     encryptData,

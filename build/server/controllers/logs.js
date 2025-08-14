@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clearLogs = exports.getLogs = void 0;
+exports.getLogs = getLogs;
+exports.clearLogs = clearLogs;
 const fs_1 = __importDefault(require("fs"));
 const util_1 = require("util");
 const models_1 = require("../models");
@@ -14,6 +15,11 @@ const writeFile = (0, util_1.promisify)(fs_1.default.writeFile);
 async function getLogs(req, res) {
     try {
         const { id: userId } = req.user;
+        const user = await models_1.User.find(userId);
+        if (!user || !user.isAdmin) {
+            res.status(403).end();
+            return;
+        }
         let logs = await readFile(process.kresus.logFilePath, 'utf-8');
         const sensitiveKeywords = new Set();
         const passwords = new Set();
@@ -53,9 +59,14 @@ async function getLogs(req, res) {
         (0, helpers_1.asyncErr)(res, err, `when reading logs from ${process.kresus.logFilePath}`);
     }
 }
-exports.getLogs = getLogs;
-async function clearLogs(_req, res) {
+async function clearLogs(req, res) {
     try {
+        const { id: userId } = req.user;
+        const user = await models_1.User.find(userId);
+        if (!user || !user.isAdmin) {
+            res.status(403).end();
+            return;
+        }
         await writeFile(process.kresus.logFilePath, '');
         res.status(200).end();
     }
@@ -63,4 +74,3 @@ async function clearLogs(_req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when clearing logs');
     }
 }
-exports.clearLogs = clearLogs;

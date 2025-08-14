@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setLogFilePath = void 0;
+exports.setLogFilePath = setLogFilePath;
 const log4js_1 = __importDefault(require("log4js"));
 const loggerConfig = {
     appenders: {
@@ -34,7 +34,6 @@ function setLogFilePath(path) {
     loggerConfig.categories.default.appenders.push('app');
     log4js_1.default.configure(loggerConfig);
 }
-exports.setLogFilePath = setLogFilePath;
 class Logger {
     constructor(prefix) {
         this.prefix = prefix;

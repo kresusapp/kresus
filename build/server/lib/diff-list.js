@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = makeDiff;
 function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, parentId) {
     const scoreMatrix = [];
     for (let i = 0; i < knowns.length; i++) {
@@ -92,4 +93,3 @@ function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
         };
     };
 }
-exports.default = makeDiff;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setDefaultRealBalance = void 0;
+exports.setDefaultRealBalance = setDefaultRealBalance;
 /* eslint new-cap: ["error", { "capIsNewExceptions": ["In", "Not"] }]*/
 const typeorm_1 = require("typeorm");
 const __1 = require("..");
@@ -27,7 +27,7 @@ async function setDefaultRealBalance(userId, manager) {
     if (accesses.length > 0) {
         const accessesIds = accesses.map(acc => acc.id);
         const accounts = await manager.find(__1.Account, {
-            select: ['initialBalance', 'id', 'userId', 'type'],
+            select: ['initialBalance', 'id', 'userId', 'type'], // type is used in Account::computeBalance
             where: {
                 accessId: (0, typeorm_1.In)(accessesIds),
                 ...userCondition,
@@ -44,4 +44,3 @@ async function setDefaultRealBalance(userId, manager) {
     }
     log.info('Finished running data migration on disabled banks (resetting balance)');
 }
-exports.setDefaultRealBalance = setDefaultRealBalance;

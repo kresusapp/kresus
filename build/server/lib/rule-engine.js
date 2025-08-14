@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCategorizeRules = void 0;
+exports.default = applyRules;
+exports.updateCategorizeRules = updateCategorizeRules;
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 function match(conditions, transaction) {
@@ -70,7 +71,6 @@ function applyRules(rules, transactions) {
         }
     }
 }
-exports.default = applyRules;
 async function updateCategorizeRules(userId, prevCategoryId, newCategoryId) {
     const rules = await models_1.TransactionRule.getCategorizeRules(userId, prevCategoryId);
     for (const rule of rules) {
@@ -96,4 +96,3 @@ async function updateCategorizeRules(userId, prevCategoryId, newCategoryId) {
         }
     }
 }
-exports.updateCategorizeRules = updateCategorizeRules;

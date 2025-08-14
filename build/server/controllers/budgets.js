@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.getByYearAndMonth = void 0;
+exports.getByYearAndMonth = getByYearAndMonth;
+exports.update = update;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
@@ -21,7 +22,11 @@ async function createBudget(userId, budget) {
 async function getByYearAndMonth(req, res) {
     try {
         const { id: userId } = req.user;
-        const { year: yearStr, month: monthStr } = req.params;
+        const { viewId: viewIdStr, year: yearStr, month: monthStr } = req.params;
+        const viewId = Number.parseInt(viewIdStr, 10);
+        if (Number.isNaN(viewId)) {
+            throw new helpers_1.KError('Invalid viewId parameter', 400);
+        }
         const year = Number.parseInt(yearStr, 10);
         if (Number.isNaN(year)) {
             throw new helpers_1.KError('Invalid year parameter', 400);
@@ -30,7 +35,7 @@ async function getByYearAndMonth(req, res) {
         if (Number.isNaN(month) || month < 0 || month > 11) {
             throw new helpers_1.KError('Invalid month parameter', 400);
         }
-        const budgets = await models_1.Budget.byYearAndMonth(userId, year, month);
+        const budgets = await models_1.Budget.byYearAndMonth(userId, viewId, year, month);
         // Ensure there is a budget for each category.
         const categories = await models_1.Category.all(userId);
         for (const cat of categories) {
@@ -38,7 +43,7 @@ async function getByYearAndMonth(req, res) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
                 // able to sort by creation/update order).
-                const sameCategoryBudgets = await models_1.Budget.byCategory(userId, cat.id);
+                const sameCategoryBudgets = await models_1.Budget.byCategory(userId, viewId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
                 let threshold = null;
@@ -51,6 +56,7 @@ async function getByYearAndMonth(req, res) {
                     }
                 }
                 const budget = await createBudget(userId, {
+                    viewId,
                     year,
                     month,
                     categoryId: cat.id,
@@ -60,6 +66,7 @@ async function getByYearAndMonth(req, res) {
             }
         }
         res.status(200).json({
+            viewId,
             year,
             month,
             budgets,
@@ -69,16 +76,17 @@ async function getByYearAndMonth(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when loading budgets by year/month');
     }
 }
-exports.getByYearAndMonth = getByYearAndMonth;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
         const params = req.body;
-        const { year: yearStr, month: monthStr, budgetCatId } = req.params;
+        const { viewId: viewIdStr, year: yearStr, month: monthStr, budgetCatId } = req.params;
+        const viewId = Number.parseInt(viewIdStr, 10);
         const year = Number.parseInt(yearStr, 10);
         const month = Number.parseInt(monthStr, 10);
         const categoryId = Number.parseInt(budgetCatId, 10);
         const error = (0, validators_1.checkBudget)({
+            viewId,
             year,
             month,
             threshold: params.threshold,
@@ -86,11 +94,10 @@ async function update(req, res) {
         if (error) {
             throw new helpers_1.KError(error, 400);
         }
-        const newBudget = models_1.Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
+        const newBudget = await models_1.Budget.findAndUpdate(userId, viewId, categoryId, year, month, params.threshold);
         res.status(200).json(newBudget);
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when updating a budget');
     }
 }
-exports.update = update;

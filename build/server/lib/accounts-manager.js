@@ -34,7 +34,7 @@ async function mergeAccounts(userId, known, provided) {
         currency: provided.currency,
         type: provided.type,
         balance: (_a = provided.balance) !== null && _a !== void 0 ? _a : known.balance,
-        isOrphan: false,
+        isOrphan: false, // merging accounts means we don't have an orphan
         gracePeriod: Math.max((_b = provided.gracePeriod) !== null && _b !== void 0 ? _b : 0, known.gracePeriod), // use maximum grace period by default
     };
     await models_1.Account.update(userId, known.id, newProps);
@@ -678,6 +678,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (found && found.value === `${sourceAccount.id}`) {
             await models_1.Setting.update(userId, found.id, { value: `${targetAccount.id}` });
         }
+        await models_1.View.destroyViewsWithoutAccounts(userId);
         return true;
     }
 }

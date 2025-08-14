@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.amountAndLabelAndDateMatch = void 0;
+exports.amountAndLabelAndDateMatch = amountAndLabelAndDateMatch;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const diff_list_1 = __importDefault(require("./diff-list"));
@@ -19,7 +19,6 @@ function amountAndLabelAndDateMatch(known, provided) {
         oldRawLabel === newRawLabel &&
         oldMoment.isSame(newMoment, 'day'));
 }
-exports.amountAndLabelAndDateMatch = amountAndLabelAndDateMatch;
 function isPerfectMatch(known, provided) {
     return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
 }

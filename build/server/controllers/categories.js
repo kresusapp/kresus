@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.destroyOneCategory = exports.update = exports.create = exports.createOneCategory = exports.preloadCategory = void 0;
+exports.preloadCategory = preloadCategory;
+exports.createOneCategory = createOneCategory;
+exports.create = create;
+exports.update = update;
+exports.destroyOneCategory = destroyOneCategory;
+exports.destroy = destroy;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
@@ -20,7 +25,6 @@ async function preloadCategory(req, res, nextHandler, id) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a category');
     }
 }
-exports.preloadCategory = preloadCategory;
 async function createOneCategory(userId, pod) {
     const error = (0, validators_1.hasForbiddenOrMissingField)(pod, ['label', 'color']);
     if (error) {
@@ -28,7 +32,6 @@ async function createOneCategory(userId, pod) {
     }
     return await models_1.Category.create(userId, pod);
 }
-exports.createOneCategory = createOneCategory;
 async function create(req, res) {
     try {
         const { id: userId } = req.user;
@@ -39,7 +42,6 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating category');
     }
 }
-exports.create = create;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
@@ -55,7 +57,6 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating a category');
     }
 }
-exports.update = update;
 async function destroyOneCategory(userId, formerId, replaceById) {
     if (replaceById !== null) {
         log.debug(`Replacing category ${formerId} by ${replaceById}...`);
@@ -74,7 +75,6 @@ async function destroyOneCategory(userId, formerId, replaceById) {
     await (0, rule_engine_1.updateCategorizeRules)(userId, formerId, replaceById);
     await models_1.Category.destroy(userId, formerId);
 }
-exports.destroyOneCategory = destroyOneCategory;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
@@ -91,4 +91,3 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting a category');
     }
 }
-exports.destroy = destroy;

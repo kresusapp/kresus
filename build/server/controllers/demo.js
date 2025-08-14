@@ -3,7 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.disable = exports.enable = exports.setupDemoMode = void 0;
+exports.setupDemoMode = setupDemoMode;
+exports.enable = enable;
+exports.disable = disable;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const default_categories_json_1 = __importDefault(require("../shared/default-categories.json"));
@@ -40,7 +42,6 @@ async function setupDemoMode(userId) {
     }
     return data;
 }
-exports.setupDemoMode = setupDemoMode;
 async function enable(req, res) {
     try {
         const { id: userId } = req.user;
@@ -59,7 +60,6 @@ async function enable(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when enabling demo mode');
     }
 }
-exports.enable = enable;
 async function disable(req, res) {
     try {
         const { id: userId } = req.user;
@@ -85,4 +85,3 @@ async function disable(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when disabling demo mode');
     }
 }
-exports.disable = disable;

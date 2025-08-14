@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.destroy = exports.create = exports.loadAlert = void 0;
+exports.loadAlert = loadAlert;
+exports.create = create;
+exports.destroy = destroy;
+exports.update = update;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
@@ -19,7 +22,6 @@ async function loadAlert(req, res, nextHandler, alertId) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading alert');
     }
 }
-exports.loadAlert = loadAlert;
 async function create(req, res) {
     try {
         const { id: userId } = req.user;
@@ -44,7 +46,6 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating an alert');
     }
 }
-exports.create = create;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
@@ -55,7 +56,6 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting a bank alert');
     }
 }
-exports.destroy = destroy;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
@@ -76,4 +76,3 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating a bank alert');
     }
 }
-exports.update = update;

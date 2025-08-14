@@ -5,7 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.validatePassword = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = exports.translate = exports.localeComparator = exports.setupTranslator = exports.getDefaultEnglishTranslator = exports.maybeHas = void 0;
+exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = void 0;
+exports.maybeHas = maybeHas;
+exports.getDefaultEnglishTranslator = getDefaultEnglishTranslator;
+exports.setupTranslator = setupTranslator;
+exports.localeComparator = localeComparator;
+exports.translate = translate;
+exports.validatePassword = validatePassword;
+const micro_memoize_1 = __importDefault(require("micro-memoize"));
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
@@ -27,7 +34,6 @@ const dates_1 = require("./dates");
 function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
-exports.maybeHas = maybeHas;
 function unwrap(x) {
     if (typeof x === 'undefined') {
         throw new Error('Expected variable to be defined');
@@ -85,7 +91,6 @@ function getDefaultEnglishTranslator() {
         localeCompare: makeLocaleComparator('en'),
     };
 }
-exports.getDefaultEnglishTranslator = getDefaultEnglishTranslator;
 // Sets up the given locale so localeComparator/translate can be used.
 function setupTranslator(locale) {
     let localeFile = null;
@@ -119,18 +124,15 @@ function setupTranslator(locale) {
         localeCompare: makeLocaleComparator(checkedLocale),
     };
 }
-exports.setupTranslator = setupTranslator;
 // Compares two strings according to the locale's defined order. setupTranslator must have been
-// called beforehands.
+// called beforehand.
 function localeComparator(i18n, a, b) {
     return i18n.localeCompare(a, b);
 }
-exports.localeComparator = localeComparator;
-// Translates a string into the given locale. setupTranslator must have been called beforehands.
+// Translates a string into the given locale. setupTranslator must have been called beforehand.
 function translate(i18n, format, bindings = null) {
     return i18n.translate(format, bindings);
 }
-exports.translate = translate;
 // Example: Lun. 25
 const toShortDayMonthString = (date) => (0, moment_1.default)(date).format('ddd DD');
 // Example: 02/25/2019
@@ -161,7 +163,7 @@ exports.currency = {
         }
         return found.symbol;
     },
-    makeFormat: (c) => {
+    makeFormat: (0, micro_memoize_1.default)((c) => {
         const found = (0, currency_formatter_1.findCurrency)(c);
         if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
@@ -171,7 +173,7 @@ exports.currency = {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return (0, currency_formatter_1.format)(am, { code: c });
         };
-    },
+    }),
 };
 exports.UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 exports.UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
@@ -182,7 +184,6 @@ const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 function validatePassword(password) {
     return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
-exports.validatePassword = validatePassword;
 exports.DEFERRED_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.deferred_card'));
 exports.TRANSACTION_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.card'));
 exports.INTERNAL_TRANSFER_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.internal_transfer'));

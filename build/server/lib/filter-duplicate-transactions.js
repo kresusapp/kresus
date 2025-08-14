@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = filterDuplicateTransactions;
 const moment_1 = __importDefault(require("moment"));
 const diff_transactions_1 = require("./diff-transactions");
 const helpers_1 = require("../helpers");
@@ -29,9 +30,25 @@ function filterDuplicateTransactions(duplicates) {
             toCreate.push(provided);
             continue;
         }
+        // We expect the polled/provided transactions to replace any known transaction created by the user
+        // or through the recurring transaction system and reset these flags to false, unless both
+        // transactions have it enabled.
+        const updateBase = {};
+        if (!!known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
+            updateBase.isRecurrentTransaction = false;
+        }
+        if (!!known.createdByUser && !provided.createdByUser) {
+            updateBase.createdByUser = false;
+        }
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === helpers_1.UNKNOWN_TRANSACTION_TYPE && provided.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE) {
-            toUpdate.push({ known, update: { type: provided.type } });
+            toUpdate.push({
+                known,
+                update: {
+                    ...updateBase,
+                    type: provided.type,
+                },
+            });
             continue;
         }
         // The transaction type which was "deferred_card", is now "card", and the debitDate is now
@@ -40,7 +57,17 @@ function filterDuplicateTransactions(duplicates) {
             known.type === helpers_1.DEFERRED_CARD_TYPE.name &&
             provided.type === helpers_1.TRANSACTION_CARD_TYPE.name &&
             (0, moment_1.default)(known.debitDate).isSameOrBefore(today, 'day')) {
-            toUpdate.push({ known, update: { type: helpers_1.TRANSACTION_CARD_TYPE.name } });
+            toUpdate.push({
+                known,
+                update: {
+                    ...updateBase,
+                    type: helpers_1.TRANSACTION_CARD_TYPE.name,
+                },
+            });
+            continue;
+        }
+        if (Object.keys(updateBase).length > 0) {
+            toUpdate.push({ known, update: updateBase });
             continue;
         }
         // If the known type was set by the user, consider the provided and the
@@ -60,4 +87,3 @@ function filterDuplicateTransactions(duplicates) {
         toCreate,
     };
 }
-exports.default = filterDuplicateTransactions;

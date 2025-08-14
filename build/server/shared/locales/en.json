@@ -165,8 +165,8 @@
             "balance_desc": "This chart shows you what was the balance at a given moment. This is useful for example to see if you always hit a critical level around the same period.",
             "by_category": "by category",
             "by_category_desc": "This chart shows you month by month how much you spent or earned for each category. It is useful to have a quick glance at how much you spend in a category by month, and how it evolved over time.",
-            "differences_all": "differences",
-            "differences_all_desc": "This chart shows you by month how much you spent, earned and saved over all the accounts of the currently selected bank access. This is useful to see how your savings evolved during the last months: did you save more each month?",
+            "differences": "differences",
+            "differences_desc": "This chart shows you by month how much you spent, earned and saved over the accounts of the current view. This is useful to see how your savings evolved during the last months: did you save more each month?",
             "spent": "Spent",
             "received": "Received",
             "saved": "Saved",
@@ -268,7 +268,8 @@
             "dashboard": "Dashboard",
             "transactions": "Transactions",
             "rules": "Auto categorization",
-            "recurring-transactions": "Recurring transactions"
+            "recurring-transactions": "Recurring transactions",
+            "views": "Views"
         },
         "transactions": {
             "amount": "Amount",
@@ -326,6 +327,7 @@
             "period": "Period",
             "show_empty_budgets": "Show empty budgets",
             "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
+            "only_empty_budgets_warning": "There are some budgets hidden since they have no threshold nor transaction. Edit your parameter to display it.",
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_transactions": "Jump to matching transactions",
@@ -538,6 +540,23 @@
                 "send_test_notification_success": "The test notification was successfully sent.",
                 "send_test_notification_error": "Error when trying to send test notification: %{error}",
                 "notifications_not_enabled": "Notifications haven't been enabled by your administrator. Thus, it is not possible to set any notification alerts at this time."
+            },
+            "views": {
+                "title": "Custom views",
+                "none": "You have no custom views yet.",
+                "manage": "Manage views",
+                "back_to_views_list": "Go back to the views list",
+                "new": "Create a view",
+                "edit": "Edit a view",
+                "label": "View label",
+                "accounts": "List of accounts",
+                "creation_success": "View successfully created!",
+                "creation_error": "Error when creating the view: %{err}",
+                "creation_form_title": "Create a new view",
+                "edition_form_title": "Edit a view",
+                "edit_success": "View successfully edited!",
+                "edit_error": "Error when editing the view: %{err}",
+                "delete_confirmation": "Confirm deletion of %{label}?"
             }
         },
         "similarity": {
@@ -614,14 +633,15 @@
             "hours": "hours"
         },
         "addtransaction": {
+            "account": "Account",
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
             "submit": "Create",
-            "add_transaction": "Create a transaction for the account %{account}",
+            "add_transaction": "Create a transaction",
             "type": "Type",
             "date": "Date",
-            "description": "You're about to create a transaction for account %{account}. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
+            "description": "You're about to create a transaction. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
             "warning": "Make sure your account is synced before creating it. If you are creating a transaction in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported.",
             "recurring_transaction": "Is this a transaction that occurs frequently? Kresus can create it automatically for you",
             "recurring_transaction_create": "add a recurring transaction"
@@ -706,6 +726,7 @@
             "no_rules": "You haven't set any rules yet!"
         },
         "recurring_transactions": {
+            "select_account": "Select the account for which you want to see the recurring transactions:",
             "list": "List of account's recurring transactions",
             "new": "New recurring transaction",
             "none": "You haven't set any recurring transaction for this account yet!",
@@ -715,7 +736,9 @@
             "every": "Every",
             "all": "All",
             "several": "Several",
+            "missing_month": "At least one month should be selected",
             "creation_success": "Successfully created recurring transaction!",
+            "edition_success": "Successfully edited recurring transaction!",
             "delete": "Remove recurring transaction",
             "delete_confirm": "Are you sure you want to remove this recurring transaction?",
             "delete_success": "The recurring transaction has been successfully deleted!",

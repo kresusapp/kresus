@@ -42,8 +42,8 @@ let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleActio
         return await TransactionRuleAction_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
-        const alert = TransactionRuleAction_1.repo().create({ ...attributes, userId });
-        return await TransactionRuleAction_1.repo().save(alert);
+        const action = TransactionRuleAction_1.repo().create({ ...attributes, userId });
+        return await TransactionRuleAction_1.repo().save(action);
     }
     static async destroy(userId, actionId) {
         await TransactionRuleAction_1.repo().delete({ id: actionId, userId });

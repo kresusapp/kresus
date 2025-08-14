@@ -23,7 +23,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testing = exports.updateModules = exports.getVersion = exports._ = exports.SOURCE_NAME = exports.fetchTransactions = exports.fetchAccounts = void 0;
+exports.testing = exports._ = exports.SOURCE_NAME = void 0;
+exports.fetchAccounts = fetchAccounts;
+exports.fetchTransactions = fetchTransactions;
+exports.getVersion = getVersion;
+exports.updateModules = updateModules;
 const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 const helpers_1 = require("../../helpers");
@@ -310,7 +314,6 @@ async function fetchAccounts({ access, debug, update, isInteractive, userActionF
         userActionFields,
     }, sessionManager, access);
 }
-exports.fetchAccounts = fetchAccounts;
 async function fetchTransactions({ access, debug, fromDate, isInteractive, userActionFields }, sessionManager) {
     return await _fetchHelper(CallWoobCommand.Transactions, {
         ...defaultOptions(),
@@ -320,7 +323,6 @@ async function fetchTransactions({ access, debug, fromDate, isInteractive, userA
         userActionFields,
     }, sessionManager, access);
 }
-exports.fetchTransactions = fetchTransactions;
 exports.SOURCE_NAME = 'woob';
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
@@ -349,12 +351,10 @@ async function getVersion(forceFetch = false) {
     }
     return cachedVersion;
 }
-exports.getVersion = getVersion;
 // Can throw.
 async function updateModules() {
     await callWoob(CallWoobCommand.Test, { ...defaultOptions(), forceUpdate: true }, null);
 }
-exports.updateModules = updateModules;
 exports.testing = {
     callWoob,
     CallWoobCommand,

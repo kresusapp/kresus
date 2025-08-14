@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkBudget = exports.checkAlert = exports.hasForbiddenOrMissingField = exports.hasForbiddenField = exports.hasMissingField = void 0;
+exports.hasMissingField = hasMissingField;
+exports.hasForbiddenField = hasForbiddenField;
+exports.hasForbiddenOrMissingField = hasForbiddenOrMissingField;
+exports.checkAlert = checkAlert;
+exports.checkBudget = checkBudget;
 // Checks that the given object has at least all the properties which names are listed in
 // allowedFieldNames.
 // Returns an error description if a property is missing, or null if all the properties exist.
@@ -12,7 +16,6 @@ function hasMissingField(object, allowedFieldNames) {
     }
     return null;
 }
-exports.hasMissingField = hasMissingField;
 // Checks that the given object properties belong to the list of allowedFieldNames.
 // Returns an error description if a property is not allowed,
 // or null if all the properties of the object are allowed.
@@ -24,13 +27,11 @@ function hasForbiddenField(object, allowedFieldNames) {
     }
     return null;
 }
-exports.hasForbiddenField = hasForbiddenField;
 // Checks that the fields in object exactly match those provided by
 // allowedFieldNames. Returns an error description if there's one, or null otherwise.
 function hasForbiddenOrMissingField(object, allowedFieldNames) {
     return (hasMissingField(object, allowedFieldNames) || hasForbiddenField(object, allowedFieldNames));
 }
-exports.hasForbiddenOrMissingField = hasForbiddenOrMissingField;
 function checkAlert(alert) {
     if (alert.type === 'report') {
         if (typeof alert.frequency !== 'string' ||
@@ -51,8 +52,10 @@ function checkAlert(alert) {
     }
     return null;
 }
-exports.checkAlert = checkAlert;
 function checkBudget(budget) {
+    if (Number.isNaN(budget.viewId)) {
+        return 'invalid budget viewId';
+    }
     if (Number.isNaN(budget.year) || budget.year < 1) {
         return 'invalid budget year';
     }
@@ -64,4 +67,3 @@ function checkBudget(budget) {
     }
     return null;
 }
-exports.checkBudget = checkBudget;

@@ -3,7 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.currencyFormatter = exports.makeUrlPrefixRegExp = exports.checkMinimalWoobVersion = exports.normalizeVersion = exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.errorRequiresUserAction = exports.asyncErr = exports.getErrorCode = exports.KError = exports.displayLabel = exports.unwrap = exports.assert = exports.panic = exports.makeLogger = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.KError = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.makeLogger = makeLogger;
+exports.panic = panic;
+exports.assert = assert;
+exports.unwrap = unwrap;
+exports.displayLabel = displayLabel;
+exports.getErrorCode = getErrorCode;
+exports.asyncErr = asyncErr;
+exports.errorRequiresUserAction = errorRequiresUserAction;
+exports.normalizeVersion = normalizeVersion;
+exports.checkMinimalWoobVersion = checkMinimalWoobVersion;
+exports.makeUrlPrefixRegExp = makeUrlPrefixRegExp;
+exports.currencyFormatter = currencyFormatter;
 const semver_1 = __importDefault(require("semver"));
 const helpers_1 = require("./shared/helpers");
 Object.defineProperty(exports, "has", { enumerable: true, get: function () { return helpers_1.maybeHas; } });
@@ -25,20 +37,17 @@ const logger_1 = __importDefault(require("./lib/logger"));
 function makeLogger(prefix) {
     return new logger_1.default(prefix);
 }
-exports.makeLogger = makeLogger;
 const log = makeLogger('helpers');
 function panic(wat) {
     const text = `Assertion error: ${wat}\n${new Error().stack}`;
     log.error(text);
     throw new Error(text);
 }
-exports.panic = panic;
 function assert(x, wat) {
     if (!x) {
         panic(wat);
     }
 }
-exports.assert = assert;
 function unwrap(x) {
     if (typeof x === 'undefined') {
         panic('Expected variable to be defined');
@@ -48,11 +57,9 @@ function unwrap(x) {
     }
     return x;
 }
-exports.unwrap = unwrap;
 function displayLabel({ label, customLabel, }) {
     return customLabel || label;
 }
-exports.displayLabel = displayLabel;
 class KError extends Error {
     constructor(msg = 'Internal server error', statusCode = 500, errCode = null, shortMessage = null) {
         super();
@@ -102,7 +109,6 @@ function getErrorCode(name) {
     }
     throw new KError('Unknown error code!');
 }
-exports.getErrorCode = getErrorCode;
 function asyncErr(res, err, context) {
     let statusCode = 500;
     let errCode = null;
@@ -122,7 +128,6 @@ function asyncErr(res, err, context) {
     });
     return false;
 }
-exports.asyncErr = asyncErr;
 function errorRequiresUserAction(err) {
     return (err.errCode === getErrorCode('INVALID_PASSWORD') ||
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
@@ -131,7 +136,6 @@ function errorRequiresUserAction(err) {
         err.errCode === getErrorCode('ACTION_NEEDED') ||
         err.errCode === getErrorCode('REQUIRES_INTERACTIVE'));
 }
-exports.errorRequiresUserAction = errorRequiresUserAction;
 // Minimum hour of the day at which the automatic poll can occur.
 exports.POLLER_START_LOW_HOUR = 2;
 // Maximum hour of the day at which the automatic poll can occur.
@@ -177,7 +181,6 @@ function normalizeVersion(version) {
     });
     return digits.join('.');
 }
-exports.normalizeVersion = normalizeVersion;
 function checkMinimalWoobVersion(version) {
     const actualVersion = normalizeVersion(version);
     const expectedVersion = normalizeVersion(helpers_1.MIN_WOOB_VERSION);
@@ -185,11 +188,9 @@ function checkMinimalWoobVersion(version) {
         expectedVersion !== null &&
         semver_1.default.gte(actualVersion, expectedVersion));
 }
-exports.checkMinimalWoobVersion = checkMinimalWoobVersion;
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }
-exports.makeUrlPrefixRegExp = makeUrlPrefixRegExp;
 const currencyFormatterCache = {};
 function currencyFormatter(someCurrency) {
     if (typeof currencyFormatterCache[someCurrency] === 'undefined') {
@@ -197,4 +198,3 @@ function currencyFormatter(someCurrency) {
     }
     return currencyFormatterCache[someCurrency];
 }
-exports.currencyFormatter = currencyFormatter;

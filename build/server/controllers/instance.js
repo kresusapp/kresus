@@ -26,7 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isDemoEnabled = exports.isDemoForced = exports.testNotification = exports.testEmail = exports.updateWoob = exports.getWoobVersion = void 0;
+exports.getWoobVersion = getWoobVersion;
+exports.updateWoob = updateWoob;
+exports.testEmail = testEmail;
+exports.testNotification = testNotification;
+exports.isDemoForced = isDemoForced;
+exports.isDemoEnabled = isDemoEnabled;
 const models_1 = require("../models");
 const woob = __importStar(require("../providers/woob"));
 const emailer_1 = __importDefault(require("../lib/emailer"));
@@ -49,7 +54,6 @@ async function getWoobVersion(_req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when getting woob version');
     }
 }
-exports.getWoobVersion = getWoobVersion;
 async function updateWoob(_req, res) {
     try {
         await woob.updateModules();
@@ -59,7 +63,6 @@ async function updateWoob(_req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating woob');
     }
 }
-exports.updateWoob = updateWoob;
 async function testEmail(req, res) {
     try {
         const { id: userId } = req.user;
@@ -80,7 +83,6 @@ async function testEmail(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when trying to send an email');
     }
 }
-exports.testEmail = testEmail;
 async function testNotification(req, res) {
     try {
         const { id: userId } = req.user;
@@ -95,12 +97,9 @@ async function testNotification(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when trying to send a notification');
     }
 }
-exports.testNotification = testNotification;
 function isDemoForced() {
     return process.kresus.forceDemoMode === true;
 }
-exports.isDemoForced = isDemoForced;
 async function isDemoEnabled(userId) {
     return isDemoForced() || (await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.DEMO_MODE));
 }
-exports.isDemoEnabled = isDemoEnabled;

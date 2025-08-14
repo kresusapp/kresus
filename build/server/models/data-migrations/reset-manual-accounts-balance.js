@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetManualBankAccountsBalance = void 0;
+exports.resetManualBankAccountsBalance = resetManualBankAccountsBalance;
 /* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
 const typeorm_1 = require("typeorm");
 const __1 = require("..");
@@ -31,4 +31,3 @@ async function resetManualBankAccountsBalance(userId, manager) {
     }
     log.info('Finished running data migration on manual bank (resetting balance)');
 }
-exports.resetManualBankAccountsBalance = resetManualBankAccountsBalance;

@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testing = exports.ofxToKresus = exports.parseOfxDate = void 0;
+exports.testing = void 0;
+exports.parseOfxDate = parseOfxDate;
+exports.ofxToKresus = ofxToKresus;
 const ofx_js_1 = require("ofx-js");
 const helpers_1 = require("../helpers");
 const manual_1 = require("../providers/manual");
@@ -8,27 +10,27 @@ const log = (0, helpers_1.makeLogger)('controllers/ofx');
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
     SAVINGS: 'account-type.savings',
-    CREDITLINE: 'account-type.loan',
-    MONEYMRKT: 'account-type.unknown',
+    CREDITLINE: 'account-type.loan', // line of credit
+    MONEYMRKT: 'account-type.unknown', // money market
     CD: 'account-type.unknown', // certificate of deposit
 };
 const transactionsTypesMap = {
     CREDIT: 'type.card',
     DEBIT: 'type.card',
-    INT: 'type.bankfee',
-    DIV: 'type.bankfee',
+    INT: 'type.bankfee', // Interest earned or paid (depends on signage of amount)
+    DIV: 'type.bankfee', // Dividend
     FEE: 'type.bankfee',
     SRVCHG: 'type.bankfee',
     DEP: 'type.cash_deposit',
-    ATM: 'type.withdrawal',
-    POS: 'type.card',
+    ATM: 'type.withdrawal', // ATM debit or credit (depends on signage of amount)
+    POS: 'type.card', // Point of sale debit or credit (depends on signage of amount)
     XFER: 'type.transfer',
     CHECK: 'type.check',
     PAYMENT: 'type.card',
-    CASH: 'type.withdrawal',
+    CASH: 'type.withdrawal', // Actually an electronic payment
     DIRECTDEP: 'type.withdrawal',
     DIRECTDEBIT: 'type.cash_deposit',
-    REPEATPMT: 'type.card',
+    REPEATPMT: 'type.card', // Repeating payment/standing order
     OTHER: 'type.unknown',
     HOLD: 'type.unknown',
 };
@@ -73,8 +75,8 @@ function parseOfxDate(date) {
     }
     return null;
 }
-exports.parseOfxDate = parseOfxDate;
 async function ofxToKresus(ofx) {
+    var _a;
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
     let data = null;
     try {
@@ -113,8 +115,8 @@ async function ofxToKresus(ofx) {
             throw new helpers_1.KError('Cannot find account id in OFX file.');
         }
         const accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
-        const balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
-        let accountTransactions = account.BANKTRANLIST.STMTTRN;
+        const balance = parseFloat((_a = account.AVAILBAL) === null || _a === void 0 ? void 0 : _a.BALAMT) || 0;
+        let accountTransactions = account.BANKTRANLIST ? account.BANKTRANLIST.STMTTRN : [];
         if (!(accountTransactions instanceof Array)) {
             accountTransactions = [accountTransactions];
         }
@@ -174,7 +176,6 @@ async function ofxToKresus(ofx) {
         transactions,
     };
 }
-exports.ofxToKresus = ofxToKresus;
 exports.testing = {
     parseOfxDate,
 };

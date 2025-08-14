@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.accountTypeNameToId = exports.accountTypeIdToName = void 0;
+exports.accountTypeIdToName = accountTypeIdToName;
+exports.accountTypeNameToId = accountTypeNameToId;
 const helpers_1 = require("../helpers");
 const account_types_json_1 = __importDefault(require("../shared/account-types.json"));
 const log = (0, helpers_1.makeLogger)('lib/account-types');
@@ -24,7 +25,6 @@ function accountTypeIdToName(externalId) {
     }
     return AccountTypeToName.get(externalIdStr);
 }
-exports.accountTypeIdToName = accountTypeIdToName;
 // Returns the external id associated to the account type name, or -1 if not found.
 function accountTypeNameToId(name) {
     const id = account_types_json_1.default.find(type => type.name === name);
@@ -33,4 +33,3 @@ function accountTypeNameToId(name) {
     }
     return id.woob_id;
 }
-exports.accountTypeNameToId = accountTypeNameToId;

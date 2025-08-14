@@ -11,6 +11,18 @@ const models_1 = require("../models");
 const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('emailer');
 class Emailer {
+    forceReinit(recipientEmail) {
+        this.toEmail = recipientEmail;
+    }
+    async ensureInit(userId) {
+        if (this.toEmail) {
+            return;
+        }
+        log.info('Reinitializing email recipient...');
+        const recipientEmail = (await models_1.Setting.findOrCreateDefault(userId, settings_1.EMAIL_RECIPIENT)).value;
+        this.forceReinit(recipientEmail);
+        log.info('Done!');
+    }
     constructor() {
         this.fromEmail = null;
         this.toEmail = null;
@@ -48,18 +60,6 @@ class Emailer {
             }
         }
         this.transport = nodemailer_1.default.createTransport(nodeMailerConfig);
-    }
-    forceReinit(recipientEmail) {
-        this.toEmail = recipientEmail;
-    }
-    async ensureInit(userId) {
-        if (this.toEmail) {
-            return;
-        }
-        log.info('Reinitializing email recipient...');
-        const recipientEmail = (await models_1.Setting.findOrCreateDefault(userId, settings_1.EMAIL_RECIPIENT)).value;
-        this.forceReinit(recipientEmail);
-        log.info('Done!');
     }
     // Internal method.
     _send(opts) {

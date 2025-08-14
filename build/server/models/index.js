@@ -26,7 +26,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initModels = exports.getManager = exports.getRepository = exports.setupOrm = exports.AppliedRecurringTransaction = exports.RecurringTransaction = exports.User = exports.TransactionRuleCondition = exports.TransactionRuleAction = exports.TransactionRule = exports.Transaction = exports.Setting = exports.Category = exports.Budget = exports.Alert = exports.Account = exports.AccessField = exports.Access = void 0;
+exports.View = exports.AppliedRecurringTransaction = exports.RecurringTransaction = exports.User = exports.TransactionRuleCondition = exports.TransactionRuleAction = exports.TransactionRule = exports.Transaction = exports.Setting = exports.Category = exports.Budget = exports.Alert = exports.Account = exports.AccessField = exports.Access = void 0;
+exports.setupOrm = setupOrm;
+exports.getRepository = getRepository;
+exports.getManager = getManager;
+exports.initModels = initModels;
 const path = __importStar(require("path"));
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../helpers");
@@ -58,6 +62,8 @@ const recurring_transactions_1 = __importDefault(require("./entities/recurring-t
 exports.RecurringTransaction = recurring_transactions_1.default;
 const applied_recurring_transactions_1 = __importDefault(require("./entities/applied-recurring-transactions"));
 exports.AppliedRecurringTransaction = applied_recurring_transactions_1.default;
+const views_1 = __importDefault(require("./entities/views"));
+exports.View = views_1.default;
 const log = (0, helpers_1.makeLogger)('models/index');
 let dataSource;
 function makeOrmConfig() {
@@ -101,6 +107,8 @@ async function setupOrm() {
         migrationsRun: true,
         // Entity models.
         entities: [path.join(__dirname, 'entities/*')],
+        // Subscribers.
+        subscribers: [path.join(__dirname, 'subscribers/*')],
         // Migration files.
         migrations: [path.join(__dirname, 'migrations/*')],
         // Use one transaction by migration, avoiding issues on promises hanging after alter table.
@@ -114,21 +122,18 @@ async function setupOrm() {
     log.info('database is ready');
     return dataSource;
 }
-exports.setupOrm = setupOrm;
 function getRepository(x) {
     if (dataSource === null || typeof dataSource === 'undefined') {
         (0, helpers_1.panic)('Expected data source to be initialized');
     }
     return dataSource.getRepository(x);
 }
-exports.getRepository = getRepository;
 function getManager() {
     if (dataSource === null || typeof dataSource === 'undefined') {
         (0, helpers_1.panic)('Expected data source to be initialized');
     }
     return dataSource.manager;
 }
-exports.getManager = getManager;
 async function initModels() {
     dataSource = await setupOrm();
     let userId;
@@ -147,8 +152,8 @@ async function initModels() {
         if (!users.length) {
             const { login } = process.kresus.user;
             (0, helpers_1.assert)(!!login, 'There should be a default login set!');
-            log.info('Creating default user...');
-            user = await users_1.default.create({ login });
+            log.info('Creating default user as administrator...');
+            user = await users_1.default.create({ login, isAdmin: true });
         }
         else if (users.length > 1) {
             throw new Error('Several users in database but no user ID provided. Please provide a user ID');
@@ -161,4 +166,3 @@ async function initModels() {
     process.kresus.user.id = userId;
     log.info(`User has id ${userId}`);
 }
-exports.initModels = initModels;

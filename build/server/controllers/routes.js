@@ -41,6 +41,7 @@ const transactions = __importStar(require("./transactions"));
 const rules = __importStar(require("./rules"));
 const settings = __importStar(require("./settings"));
 const recurringTransactions = __importStar(require("./recurring-transactions"));
+const views = __importStar(require("./views"));
 const namespace = 'api';
 const routes = {
     // Initialization.
@@ -114,24 +115,24 @@ const routes = {
     transactions: {
         post: transactions.create,
     },
-    transactionID: {
+    transactionId: {
         param: transactions.preloadTransaction,
     },
-    otherTransactionID: {
+    otherTransactionId: {
         param: transactions.preloadOtherTransaction,
     },
-    'transactions/:transactionID': {
+    'transactions/:transactionId': {
         put: transactions.update,
         delete: transactions.destroy,
     },
-    'transactions/:transactionID/mergeWith/:otherTransactionID': {
+    'transactions/:transactionId/mergeWith/:otherTransactionId': {
         put: transactions.merge,
     },
     // Budgets
-    'budgets/:year/:month': {
+    'budgets/:viewId/:year/:month': {
         get: budgets.getByYearAndMonth,
     },
-    'budgets/:budgetCatId/:year/:month': {
+    'budgets/:viewId/:budgetCatId/:year/:month': {
         put: budgets.update,
     },
     // Settings
@@ -192,12 +193,23 @@ const routes = {
         post: recurringTransactions.create,
         get: recurringTransactions.getByAccountId,
     },
-    recurringTransactionID: {
+    recurringTransactionId: {
         param: recurringTransactions.preload,
     },
-    'recurringTransactions/:recurringTransactionID': {
+    'recurringTransactions/:recurringTransactionId': {
         delete: recurringTransactions.destroy,
         put: recurringTransactions.update,
+    },
+    // Views
+    views: {
+        post: views.create,
+    },
+    viewId: {
+        param: views.preloadView,
+    },
+    'views/:viewId': {
+        put: views.update,
+        delete: views.destroy,
     },
 };
 const exportedRoutes = {};

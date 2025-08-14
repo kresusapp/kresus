@@ -112,7 +112,7 @@ let Access = Access_1 = class Access {
             where: { userId, vendorId, login },
             relations: ['fields'],
         });
-        return (0, helpers_1.unwrap)(found);
+        return found;
     }
 };
 Access.REPO = null;

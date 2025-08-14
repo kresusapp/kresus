@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendTestNotification = void 0;
+exports.sendTestNotification = sendTestNotification;
 const https = __importStar(require("https"));
 const http = __importStar(require("http"));
 const util_1 = require("util");
@@ -175,5 +175,4 @@ async function sendTestNotification(userId, appriseUrl) {
         await notifier.sendTestNotification(userId, appriseUrl);
     }
 }
-exports.sendTestNotification = sendTestNotification;
 exports.default = getNotifier;

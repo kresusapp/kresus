@@ -3,7 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mergeInto = exports.resyncBalance = exports.destroy = exports.update = exports.destroyWithTransactions = exports.fixupDefaultAccount = exports.preloadTargetAccount = exports.preloadAccount = void 0;
+exports.preloadAccount = preloadAccount;
+exports.preloadTargetAccount = preloadTargetAccount;
+exports.fixupDefaultAccount = fixupDefaultAccount;
+exports.destroyWithTransactions = destroyWithTransactions;
+exports.update = update;
+exports.destroy = destroy;
+exports.resyncBalance = resyncBalance;
+exports.mergeInto = mergeInto;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const settings_1 = require("../../shared/settings");
@@ -13,10 +20,10 @@ const instance_1 = require("./instance");
 const accesses_1 = require("./accesses");
 const log = (0, helpers_1.makeLogger)('controllers/accounts');
 // Prefills the @account field with a queried bank account.
-async function preloadAccount(req, res, nextHandler, accountID) {
+async function preloadAccount(req, res, nextHandler, accountId) {
     try {
         const { id: userId } = req.user;
-        const account = await models_1.Account.find(userId, accountID);
+        const account = await models_1.Account.find(userId, accountId);
         if (!account) {
             throw new helpers_1.KError('Bank account not found', 404);
         }
@@ -30,12 +37,11 @@ async function preloadAccount(req, res, nextHandler, accountID) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a bank account');
     }
 }
-exports.preloadAccount = preloadAccount;
 // Prefills the @targetAccount field with a queried bank account.
-async function preloadTargetAccount(req, res, nextHandler, targetAccountID) {
+async function preloadTargetAccount(req, res, nextHandler, targetAccountId) {
     try {
         const { id: userId } = req.user;
-        const account = await models_1.Account.find(userId, targetAccountID);
+        const account = await models_1.Account.find(userId, targetAccountId);
         if (!account) {
             throw new helpers_1.KError('Bank account not found', 404);
         }
@@ -49,7 +55,6 @@ async function preloadTargetAccount(req, res, nextHandler, targetAccountID) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a target bank account');
     }
 }
-exports.preloadTargetAccount = preloadTargetAccount;
 async function fixupDefaultAccount(userId) {
     const found = await models_1.Setting.findOrCreateDefault(userId, settings_1.DEFAULT_ACCOUNT_ID);
     if (found && found.value !== '') {
@@ -61,7 +66,6 @@ async function fixupDefaultAccount(userId) {
         }
     }
 }
-exports.fixupDefaultAccount = fixupDefaultAccount;
 // Destroy an account and all its transactions, alerts, and accesses if no other
 // accounts are bound to this access.
 async function destroyWithTransactions(userId, account) {
@@ -69,13 +73,13 @@ async function destroyWithTransactions(userId, account) {
     log.info(`\t-> Destroy account ${account.label}`);
     await models_1.Account.destroy(userId, account.id);
     await fixupDefaultAccount(userId);
+    await models_1.View.destroyViewsWithoutAccounts(userId);
     const accounts = await models_1.Account.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
         await models_1.Access.destroy(userId, account.accessId);
     }
 }
-exports.destroyWithTransactions = destroyWithTransactions;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
@@ -97,7 +101,6 @@ async function update(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when updating an account');
     }
 }
-exports.update = update;
 // Delete account, transactions and alerts.
 async function destroy(req, res) {
     try {
@@ -112,7 +115,6 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when destroying an account');
     }
 }
-exports.destroy = destroy;
 async function resyncBalance(req, res) {
     try {
         const { id: userId } = req.user;
@@ -132,7 +134,6 @@ async function resyncBalance(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when getting balance of a bank account');
     }
 }
-exports.resyncBalance = resyncBalance;
 async function mergeInto(req, res) {
     try {
         const { id: userId } = req.user;
@@ -155,4 +156,3 @@ async function mergeInto(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when merging accounts');
     }
 }
-exports.mergeInto = mergeInto;

@@ -1,13 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.update = exports.create = exports.getByAccountId = exports.preload = void 0;
+exports.preload = preload;
+exports.getByAccountId = getByAccountId;
+exports.create = create;
+exports.update = update;
+exports.destroy = destroy;
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 const validators_1 = require("../shared/validators");
-async function preload(req, res, nextHandler, recurringTransactionID) {
+async function preload(req, res, nextHandler, recurringTransactionId) {
     try {
         const { id: userId } = req.user;
-        const recurringTransaction = await models_1.RecurringTransaction.find(userId, recurringTransactionID);
+        const recurringTransaction = await models_1.RecurringTransaction.find(userId, recurringTransactionId);
         if (!recurringTransaction) {
             throw new helpers_1.KError('Recurring Transaction not found', 404);
         }
@@ -18,7 +22,6 @@ async function preload(req, res, nextHandler, recurringTransactionID) {
         (0, helpers_1.asyncErr)(res, err, 'when preloading a recurringTransaction');
     }
 }
-exports.preload = preload;
 async function getByAccountId(req, res) {
     try {
         const userId = req.user.id;
@@ -37,7 +40,6 @@ async function getByAccountId(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when retrieving recurringTransactions');
     }
 }
-exports.getByAccountId = getByAccountId;
 async function create(req, res) {
     try {
         const userId = req.user.id;
@@ -69,19 +71,17 @@ async function create(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when creating a recurringTransaction');
     }
 }
-exports.create = create;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
         const { recurringTransaction } = req.preloaded;
-        const newRecurringTransaction = await models_1.RecurringTransaction.update(userId, recurringTransaction.id, req.body);
-        res.status(200).json(newRecurringTransaction);
+        const newAccountRecurringTransaction = await models_1.RecurringTransaction.update(userId, recurringTransaction.id, req.body);
+        res.status(200).json(newAccountRecurringTransaction);
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when updating a recurringTransaction');
     }
 }
-exports.update = update;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
@@ -93,4 +93,3 @@ async function destroy(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when deleting a recurringTransaction');
     }
 }
-exports.destroy = destroy;

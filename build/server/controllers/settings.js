@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.save = void 0;
+exports.save = save;
 const models_1 = require("../models");
 const emailer_1 = __importDefault(require("../lib/emailer"));
 const notifications_1 = __importDefault(require("../lib/notifications"));
@@ -51,4 +51,3 @@ async function save(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when saving a setting');
     }
 }
-exports.save = save;

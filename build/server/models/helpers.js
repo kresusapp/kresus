@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.foreignKeyUserId = exports.foreignKey = exports.idColumn = exports.bulkDelete = exports.bulkInsert = exports.datetimeType = exports.DatetimeType = exports.ForceNumericColumn = exports.mergeWith = void 0;
+exports.DatetimeType = exports.ForceNumericColumn = void 0;
+exports.mergeWith = mergeWith;
+exports.datetimeType = datetimeType;
+exports.bulkInsert = bulkInsert;
+exports.bulkDelete = bulkDelete;
+exports.idColumn = idColumn;
+exports.foreignKey = foreignKey;
+exports.foreignKeyUserId = foreignKeyUserId;
 const helpers_1 = require("../helpers");
 const log = (0, helpers_1.makeLogger)('models/helpers');
 const hasCategory = (op) => op.categoryId !== null;
@@ -59,7 +66,6 @@ function mergeWith(target, other) {
     }
     return update;
 }
-exports.mergeWith = mergeWith;
 // A hack to make sure that a value read from the database is coerced into a
 // number, if it's not it in the first place. Useful to support postgres's
 // numerical type which returns a string.
@@ -92,7 +98,6 @@ exports.DatetimeType = Date;
 function datetimeType(queryRunner) {
     return queryRunner.connection.driver.normalizeType({ type: Date });
 }
-exports.datetimeType = datetimeType;
 // sqlite can't use more than 999 variables in a single query. If an entity has
 // N fields, then we can't insert more than 999/N entities at once; in this
 // case, we need to split up the batches into smaller ones.
@@ -102,7 +107,9 @@ const LOW_NUM_ENTITIES_IN_BATCH = 50;
 // The same issue happens with postgres which can't bind more than 64K features at once.
 const NUM_ENTITIES_IN_BATCH = 1000;
 // Note: doesn't return the inserted entities.
-async function bulkInsert(repository, entities) {
+async function bulkInsert(repository, 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+entities) {
     // Do not call `repository.insert` without actual entities, that will generate an empty insert
     // query and throw an error.
     // See https://github.com/typeorm/typeorm/issues/3111
@@ -121,7 +128,6 @@ async function bulkInsert(repository, entities) {
         remaining = nextRemaining;
     }
 }
-exports.bulkInsert = bulkInsert;
 async function bulkDelete(repository, ids) {
     if (ids.length === 0) {
         return;
@@ -138,7 +144,6 @@ async function bulkDelete(repository, ids) {
         remaining = nextRemaining;
     }
 }
-exports.bulkDelete = bulkDelete;
 function idColumn() {
     return {
         name: 'id',
@@ -148,7 +153,6 @@ function idColumn() {
         generationStrategy: 'increment',
     };
 }
-exports.idColumn = idColumn;
 function foreignKey(constraintName, columnName, referencedTableName, referencedColumnName, cascadeOpts = {
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION',
@@ -161,8 +165,6 @@ function foreignKey(constraintName, columnName, referencedTableName, referencedC
         ...cascadeOpts,
     };
 }
-exports.foreignKey = foreignKey;
 function foreignKeyUserId(tableName) {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
-exports.foreignKeyUserId = foreignKeyUserId;

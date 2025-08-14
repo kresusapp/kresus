@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetTranslator = exports.getTranslator = void 0;
+exports.getTranslator = getTranslator;
+exports.resetTranslator = resetTranslator;
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 const helpers_2 = require("../shared/helpers");
@@ -22,9 +23,7 @@ async function getTranslator(userId) {
     }
     return (0, helpers_1.unwrap)(USER_TO_TRANSLATOR.get(userId));
 }
-exports.getTranslator = getTranslator;
 function resetTranslator(userId, locale) {
     ensureSharedTranslator(locale);
     USER_TO_TRANSLATOR.set(userId, (0, helpers_1.unwrap)(LOCALE_ID_TO_TRANSLATOR.get(locale)));
 }
-exports.resetTranslator = resetTranslator;

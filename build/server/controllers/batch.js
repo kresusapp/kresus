@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
+exports.run = run;
 const helpers_1 = require("../helpers");
 const categories_1 = require("./categories");
 const batch_1 = require("../shared/api/batch");
@@ -62,4 +62,3 @@ async function run(req, res) {
         (0, helpers_1.asyncErr)(res, err, 'when handling batch operations');
     }
 }
-exports.run = run;

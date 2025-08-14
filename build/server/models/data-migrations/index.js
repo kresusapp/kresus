@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = runDataMigrations;
 const __1 = require("..");
 const banks_20200414_1 = require("./banks-20200414");
 const banks_20210526_1 = require("./banks-20210526");
@@ -25,4 +26,3 @@ async function runDataMigrations(userId) {
         await migration(userId, manager);
     }
 }
-exports.default = runDataMigrations;
