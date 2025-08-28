@@ -10,9 +10,7 @@ import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
 import { BackLink, Switch, Form } from '../ui';
-import PasswordInput from '../ui/password-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import ValidableInputText from '../ui/validated-text-input';
 import DisplayIf from '../ui/display-if';
 import TextInput from '../ui/text-input';
 
@@ -52,6 +50,10 @@ export const areCustomFieldsValid = (bankDesc: Bank, customFieldValues: CustomFi
         }
     }
     return true;
+};
+
+export const customFieldsContainCredentials = (customFieldValues: CustomFieldMap) => {
+    return !!customFieldValues.login && !!customFieldValues.password;
 };
 
 function bankCustomFieldsMapBuilder(bankDesc: Bank): CustomFieldMap | null {
@@ -115,24 +117,6 @@ const NewAccessForm = (props: {
 
     const [bankDesc, setBankDescData] = useState<Bank | null>(forcedBank || null);
 
-    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
-    const [login, setLogin] = useState<string | null>(noCredentials ? 'nocredentials' : null);
-    const [password, setPassword] = useState<string | null>(noCredentials ? 'nocredentials' : null);
-
-    const setBankDesc = useCallback(
-        (desc: Bank | null) => {
-            if (!!desc && desc.noCredentials) {
-                setLogin('nocredentials');
-                setPassword('nocredentials');
-            } else {
-                setLogin(null);
-                setPassword(null);
-            }
-            setBankDescData(desc);
-        },
-        [setLogin, setPassword, setBankDescData]
-    );
-
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
@@ -143,24 +127,30 @@ const NewAccessForm = (props: {
     const [isEmailValid, setIsEmailValid] = useState(!!stateEmailRecipient);
     const [emailRecipient, setEmailRecipient] = useState(stateEmailRecipient);
 
+    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
+
     const dispatch = useKresusDispatch();
     const createAccess = useCallback(
         async (arrayCustomFields: AccessCustomField[]) => {
             assert(bankDesc !== null, 'bank descriptor must be set');
-            assert(login !== null, 'login must be set');
-            assert(password !== null, 'password must be set');
+            assert(
+                arrayCustomFields.some(f => f.name === 'login' && !!f.value),
+                'login must be set'
+            );
+            assert(
+                arrayCustomFields.some(f => f.name === 'password' && !!f.value),
+                'password must be set'
+            );
             return await dispatch(
                 BanksStore.createAccess({
                     uuid: bankDesc.uuid,
-                    login,
-                    password,
                     fields: arrayCustomFields,
                     customLabel,
                     shouldCreateDefaultAlerts: mustCreateDefaultAlerts,
                 })
             ).unwrap();
         },
-        [dispatch, bankDesc, login, password, customLabel, mustCreateDefaultAlerts]
+        [dispatch, bankDesc, customLabel, mustCreateDefaultAlerts]
     );
 
     const saveEmail = useCallback(
@@ -188,21 +178,25 @@ const NewAccessForm = (props: {
                 newFields = bankCustomFieldsMapBuilder(newBankDesc);
             }
 
-            setBankDesc(newBankDesc);
+            setBankDescData(newBankDesc);
             setCustomFields(newFields);
         },
-        [banks, setBankDesc, setCustomFields]
+        [banks, setBankDescData, setCustomFields]
     );
 
     const isFormValid = useCallback(() => {
-        if (!bankDesc || !login || !password) {
+        if (!bankDesc) {
             return false;
         }
         if (mustCreateDefaultAlerts && !isEmailValid) {
             return false;
         }
-        return areCustomFieldsValid(bankDesc, customFields);
-    }, [bankDesc, login, password, mustCreateDefaultAlerts, isEmailValid, customFields]);
+        return (
+            areCustomFieldsValid(bankDesc, customFields) &&
+            (noCredentials ||
+                (customFields !== null && customFieldsContainCredentials(customFields)))
+        );
+    }, [bankDesc, mustCreateDefaultAlerts, isEmailValid, noCredentials, customFields]);
 
     const handleChangeEmail = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -330,20 +324,6 @@ const NewAccessForm = (props: {
                 optional={true}>
                 <TextInput onChange={setCustomLabel} initialValue={props.customBankTitle || ''} />
             </Form.Input>
-
-            <DisplayIf condition={!noCredentials}>
-                <Form.Input id="login-text" label={$t('client.settings.login')}>
-                    <ValidableInputText placeholder="123456789" onChange={setLogin} />
-                </Form.Input>
-
-                <Form.Input id="password-text" label={$t('client.settings.password')}>
-                    <PasswordInput
-                        onChange={setPassword}
-                        className="block"
-                        defaultValue={password}
-                    />
-                </Form.Input>
-            </DisplayIf>
 
             {renderCustomFields(bankDesc, customFields, handleChangeCustomField)}
 

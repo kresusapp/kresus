@@ -58,13 +58,13 @@ export async function fullPoll(userId: number) {
     const accesses = await Access.all(userId);
     for (const access of accesses) {
         try {
-            const { vendorId, login } = access;
+            const { vendorId } = access;
 
             // Don't try to fetch accesses for deprecated modules.
             const staticBank = bankVendorByUuid(vendorId);
             if (!staticBank || staticBank.deprecated) {
                 log.info(
-                    `Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`
+                    `Won't poll, module for bank ”${access.getLabel()}” with vendorId ${vendorId} is deprecated.`
                 );
                 continue;
             }
@@ -106,12 +106,12 @@ export async function fullPoll(userId: number) {
                 );
             } else if (!access.isEnabled() || access.excludeFromPoll) {
                 log.info(
-                    `Won't poll, access from bank ${vendorId} with login ${login} is disabled or shouldn't be polled.`
+                    `Won't poll, access from bank ”${access.getLabel()}” with vendorId ${vendorId} is disabled or shouldn't be polled.`
                 );
             } else {
                 const error = access.fetchStatus;
                 log.info(
-                    `Won't poll, access from bank ${vendorId} with login ${login} last fetch raised: ${error}.`
+                    `Won't poll, access from bank ”${access.getLabel()}” with vendorId ${vendorId} last fetch raised: ${error}.`
                 );
             }
         } catch (err) {

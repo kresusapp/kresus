@@ -12,6 +12,8 @@ import { setupTranslator } from '../../client/helpers';
 
 import banks from '../../shared/banks.json';
 
+import { checkObjectIsSubsetOf } from '../helpers';
+
 // Store adapters.
 const makeAdapter = func => {
     return (state, ...rest) => {
@@ -44,9 +46,13 @@ const dummyAccess = {
     id: 1,
     vendorId: 'manual',
     enabled: true,
-    login: 'login',
     label: 'Fake label',
-    customFields: [],
+    fields: [
+        {
+            name: 'login',
+            value: 'login',
+        },
+    ],
     excludeFromPoll: false,
 };
 
@@ -428,7 +434,11 @@ describe('Access management', () => {
             assert.ok(getAccessIds(newState).includes(dummyAccess.id));
 
             let access = accessById(newState, dummyAccess.id);
-            assert.deepStrictEqual(access.customFields, []);
+            assert.ok(
+                access.customFields.every(f =>
+                    dummyAccess.fields.some(daf => checkObjectIsSubsetOf(f, daf))
+                )
+            );
             assert.deepStrictEqual(access.accountIds, []);
             assert.strictEqual(access.id, dummyAccess.id);
             assert.strictEqual(access.vendorId, dummyAccess.vendorId);

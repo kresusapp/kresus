@@ -41,13 +41,6 @@ export default class Access {
     @Column('varchar')
     vendorId!: string;
 
-    // Credentials to connect to the bank's website.
-    @Column('varchar')
-    login!: string;
-
-    @Column('varchar', { nullable: true, default: null })
-    password: string | null = null;
-
     // Text status indicating whether the last poll was successful or not.
     @Column('varchar', { default: FETCH_STATUS_SUCCESS })
     fetchStatus: string = FETCH_STATUS_SUCCESS;
@@ -70,13 +63,20 @@ export default class Access {
 
     // Entity methods.
 
+    // Helper to get a field value by name
+    getFieldValue(fieldName: string): string | null {
+        const field = this.fields?.find(f => f.name === fieldName);
+        return field?.value ?? null;
+    }
+
     hasPassword(): boolean {
-        return typeof this.password === 'string' && this.password.length > 0;
+        const password = this.getFieldValue('password');
+        return typeof password === 'string' && password.length > 0;
     }
 
     // Is the access enabled?
     isEnabled(): boolean {
-        return this.password !== null;
+        return this.getFieldValue('password') !== null;
     }
 
     // Returns a cleaned up label for this access.
@@ -171,12 +171,11 @@ export default class Access {
 
     static async byCredentials(
         userId: number,
-        { uuid: vendorId, login }: { uuid: string; login: string }
+        { uuid, login }: { uuid: string; login: string }
     ): Promise<Access | null> {
-        const found = await Access.repo().findOne({
-            where: { userId, vendorId, login },
-            relations: ['fields'],
-        });
-        return found;
+        const accesses = await Access.byVendorId(userId, { uuid });
+
+        // Find the one with the matching login field
+        return accesses.find(access => access.getFieldValue('login') === login) || null;
     }
 }

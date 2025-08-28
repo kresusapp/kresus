@@ -32,12 +32,16 @@ describe('export', () => {
             {
                 id: 0,
                 vendorId: 'manual',
+                session: '{}',
+                // Should be migrated to fields, but legacy fields should be handled anyway.
                 login: 'whatever-manual-acc--does-not-care',
                 password: 'strongestpassindaworld',
-                session: '{}',
             },
         ],
     };
+
+    // Extract it now as the field will be removed on import during the migration to fields.
+    const expectedPassword = world.accesses[0].password;
 
     it('should run the import properly', async () => {
         await importData(USER_ID, world);
@@ -46,22 +50,27 @@ describe('export', () => {
         assert.strictEqual(accesses.length, world.accesses.length);
         assert.strictEqual(accesses[0].password, world.accesses[0].password);
         assert.strictEqual(accesses[0].session, world.accesses[0].session);
+        assert.ok(
+            accesses[0].fields.some(f => f.name === 'password' && f.value === expectedPassword)
+        );
     });
 
     it('should not export access password/session unless asked', async () => {
         const { accesses } = await exportData(USER_ID);
         assert.strictEqual(accesses.length, world.accesses.length);
         for (const access of accesses) {
-            assert.ok(!('password' in access));
             assert.ok(!('session' in access));
+            assert.ok(!access.fields.some(f => f.name === 'password'));
         }
     });
 
     it('should export access password/session if asked', async () => {
         const { accesses } = await exportData(USER_ID, { isExport: true, cleanPassword: false });
         assert.strictEqual(accesses.length, world.accesses.length);
-        assert.strictEqual(accesses[0].password, world.accesses[0].password);
         assert.strictEqual(accesses[0].session, world.accesses[0].session);
+        assert.ok(
+            accesses[0].fields.some(f => f.name === 'password' && f.value === expectedPassword)
+        );
     });
 
     it('should not return sessions if not an export (API call)', async () => {

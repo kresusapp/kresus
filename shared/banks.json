@@ -1,18 +1,48 @@
 [
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Abeille Assurances",
         "uuid": "abeilleassurances"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Association française d'épargne et de retraite",
         "uuid": "afer"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Allianz Banque",
         "uuid": "allianzbanque"
@@ -20,6 +50,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "username",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "code_file",
                 "type": "text"
@@ -35,6 +73,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "American Express",
         "uuid": "americanexpress"
@@ -42,6 +90,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "ee",
                 "name": "website",
@@ -72,18 +128,48 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Apivie",
         "uuid": "apivie"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "AXA Banque",
         "uuid": "axabanque"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Accord",
         "uuid": "banqueaccord"
@@ -91,6 +177,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "cdetab",
                 "type": "select",
@@ -152,6 +246,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Européenne Crédit Mutuel",
         "uuid": "becm"
@@ -159,6 +263,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "birthdate",
                 "type": "text"
@@ -170,6 +282,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Binck",
         "uuid": "binck"
@@ -177,6 +299,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "digital_key",
                 "optional": true,
@@ -231,6 +361,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "default": "1",
                 "name": "type",
                 "optional": true,
@@ -255,6 +393,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "default": "personeo",
                 "name": "website",
                 "type": "select",
@@ -276,12 +422,37 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Bourse direct",
         "uuid": "boursedirect"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
+                "name": "identity",
+                "optional": true,
+                "type": "text"
+            }
+        ],
         "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
@@ -289,6 +460,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "par",
                 "name": "website",
@@ -313,6 +492,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "name": "accnum",
                 "optional": true,
                 "type": "text"
@@ -335,6 +522,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "auth_type",
                 "type": "select",
@@ -369,6 +564,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Crédit Agricole - Épargne Longue des Salariés",
         "uuid": "caels"
@@ -376,6 +581,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "auth_type",
                 "type": "select",
@@ -410,12 +623,32 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "AXA Épargne Salariale",
         "uuid": "capeasi"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Carrefour Banque",
         "uuid": "carrefourbanque"
@@ -423,6 +656,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "security_code",
                 "type": "password"
@@ -449,18 +690,48 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "CIC",
         "uuid": "cic"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "CIC Épargne Salariale",
         "uuid": "cices"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "username",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Citibank",
         "uuid": "citibank"
@@ -468,6 +739,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "par",
                 "name": "website",
@@ -490,6 +769,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Crédit Mutuel Épargne Salariale",
         "uuid": "cmes"
@@ -497,6 +786,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "par",
                 "name": "website",
@@ -519,6 +816,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Courtois",
         "uuid": "courtois"
@@ -526,6 +833,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "website",
                 "type": "select",
@@ -697,6 +1012,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "name": "auth_type",
                 "type": "select",
                 "values": [
@@ -731,6 +1054,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "www.credit-du-nord.fr",
                 "name": "website",
@@ -777,36 +1108,96 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Crédit du Nord Épargne Salariale",
         "uuid": "creditdunordpee"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Crédit Mutuel",
         "uuid": "creditmutuel"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "De giro",
         "uuid": "degiro"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Delubac & Cie",
         "uuid": "delubac"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "HSBC Épargne Salariale",
         "uuid": "erehsbc"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Société Générale Épargne Salariale",
         "uuid": "esalia"
@@ -814,6 +1205,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "foobar",
                 "optional": true,
@@ -846,48 +1245,128 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Federal Finance Épargne Salariale",
         "uuid": "federalfinancees"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Fortuneo",
         "uuid": "fortuneo"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Gan Assurances",
         "uuid": "ganassurances"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Gan Patrimoine",
         "uuid": "ganpatrimoine"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Gan Prévoyance",
         "uuid": "ganprevoyance"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "GMF",
         "uuid": "gmf"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Groupama Épargne Salariale",
         "uuid": "groupamaes"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Helios is a neobank which excludes fossil fuels from its investments.",
         "uuid": "helios"
@@ -895,6 +1374,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "digital_key",
                 "optional": true,
@@ -934,6 +1421,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "name": "secret",
                 "placeholderKey": "client.settings.secret_placeholder",
                 "type": "password"
@@ -945,6 +1440,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Humanis Épargne Salariale",
         "uuid": "humanis"
@@ -952,6 +1457,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "birthday",
                 "placeholderKey": "client.settings.birthday_placeholder",
@@ -964,12 +1477,32 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Kiwibank",
         "uuid": "kiwibank"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Kolb",
         "uuid": "kolb"
@@ -977,6 +1510,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "www.credit-du-nord.fr",
                 "name": "website",
@@ -1025,6 +1566,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "default": "par",
                 "name": "website",
                 "type": "select",
@@ -1054,66 +1603,176 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "username",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Lita is an investment platform that allows you to contribute financially to sustainable, ecological, social and/or solidarity projects.",
         "uuid": "lita"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Ma French Bank",
         "uuid": "mafrenchbank"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Milleis",
         "uuid": "milleis"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "MyEdenRed",
         "uuid": "myedenred"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Bank N26",
         "uuid": "n26"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Nalo",
         "uuid": "nalo"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "La Nef",
         "uuid": "nef"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Nuger",
         "uuid": "nuger"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "username",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Primonial REIM",
         "uuid": "primonialreim"
@@ -1121,6 +1780,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "www.credit-du-nord.fr",
                 "name": "website",
@@ -1167,6 +1834,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Roblox",
         "uuid": "roblox"
@@ -1174,6 +1851,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "www.credit-du-nord.fr",
                 "name": "website",
@@ -1222,6 +1907,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "default": "par",
                 "name": "website",
                 "type": "select",
@@ -1249,6 +1942,14 @@
         "backend": "woob",
         "customFields": [
             {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
+            {
                 "default": "titulaire",
                 "name": "website",
                 "type": "select",
@@ -1270,6 +1971,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Spirica",
         "uuid": "spirica"
@@ -1277,6 +1988,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "broker",
                 "type": "select",
@@ -1306,6 +2025,16 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Swile",
         "uuid": "swile"
@@ -1313,6 +2042,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "name": "domain",
                 "optional": true,
@@ -1326,6 +2063,14 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "www.credit-du-nord.fr",
                 "name": "website",
@@ -1372,36 +2117,96 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Themis",
         "uuid": "themisbanque"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Tiime",
         "uuid": "tiime"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Banque Transatlantique épargne salariale",
         "uuid": "transatplan"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "username",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Victoria's Secret Angel Card",
         "uuid": "vicseccard"
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Yomoni",
         "uuid": "yomoni"
     },
     {
         "backend": "demo",
+        "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            }
+        ],
         "deprecated": false,
         "name": "Demo bank",
         "uuid": "demo"
@@ -1409,6 +2214,14 @@
     {
         "backend": "manual",
         "customFields": [
+            {
+                "name": "login",
+                "type": "text"
+            },
+            {
+                "name": "password",
+                "type": "password"
+            },
             {
                 "default": "EUR",
                 "name": "currency",

@@ -18,9 +18,11 @@ describe('Models helpers', () => {
         it('The entities should be removed from the database', async () => {
             // This should work for any repository but let's test the Access repository at least.
             const dummyAccessData = {
-                login: 'login',
-                password: 'password',
                 vendorId: 'gnagnagna',
+                fields: [
+                    { name: 'login', value: 'login' },
+                    { name: 'password', value: 'password' },
+                ],
             };
 
             const accessesIds = [];

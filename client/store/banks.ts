@@ -295,8 +295,6 @@ export const mergeTransactions = createAsyncThunk(
 // Creates a new access.
 type AccessParams = {
     uuid: string;
-    login: string;
-    password: string;
     fields: AccessCustomField[];
     customLabel: string | null;
     shouldCreateDefaultAlerts: boolean;
@@ -304,22 +302,15 @@ type AccessParams = {
 export const createAccess = createAsyncThunk(
     'banks/createAccess',
     async (params: AccessParams, { dispatch, getState }) => {
-        const { uuid, login, password, fields, customLabel } = params;
-        let results = await backend.createAccess(uuid, login, password, fields, customLabel);
+        const { uuid, fields, customLabel } = params;
+        let results = await backend.createAccess(uuid, fields, customLabel);
 
         const defaultCurrency = (getState() as any).banks.defaultCurrency;
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
             const userActionFields = await userAction;
-            results = await backend.createAccess(
-                uuid,
-                login,
-                password,
-                fields,
-                customLabel,
-                userActionFields
-            );
+            results = await backend.createAccess(uuid, fields, customLabel, userActionFields);
         }
 
         if (params.shouldCreateDefaultAlerts) {
@@ -441,26 +432,20 @@ export const updateAndFetchAccess = createAsyncThunk(
     async (
         params: {
             accessId: number;
-            login: string;
-            password: string;
             customFields: AccessCustomField[];
         },
         { dispatch }
     ) => {
-        const { accessId, login, password, customFields } = params;
-        const newFields = {
-            login,
-            customFields,
-        };
+        const { accessId, customFields } = params;
 
-        let results = await backend.updateAndFetchAccess(accessId, { password, ...newFields });
+        let results = await backend.updateAndFetchAccess(accessId, { customFields });
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
             const userActionFields = await userAction;
             results = await backend.updateAndFetchAccess(
                 accessId,
-                { password, ...newFields },
+                { customFields },
                 userActionFields
             );
         }
@@ -471,7 +456,7 @@ export const updateAndFetchAccess = createAsyncThunk(
                 accessId,
             },
             newFields: {
-                ...newFields,
+                customFields,
                 enabled: true,
             },
         };
@@ -1073,14 +1058,13 @@ const banksSlice = createSlice({
     extraReducers: builder => {
         builder
             .addCase(createAccess.fulfilled, (state, action) => {
-                const { uuid, login, fields, customLabel } = action.meta.arg;
+                const { uuid, fields, customLabel } = action.meta.arg;
                 const { accessId, label, accounts, newTransactions, excludeFromPoll } =
                     action.payload;
 
                 const access = {
                     id: accessId,
                     vendorId: uuid,
-                    login,
                     fields,
                     label,
                     customLabel,

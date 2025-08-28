@@ -19,13 +19,25 @@ const { callWoob, defaultOptions, CallWoobCommand } = testing;
 
 const VALID_FAKE_ACCESS = {
     vendorId: 'fakewoobbank',
-    password: 'password',
-    login: 'noerror',
     fields: [
+        { name: 'login', value: 'noerror' },
+        { name: 'password', value: 'password' },
         { name: 'website', value: 'par' },
         { name: 'foobar', value: 'toto' },
         { name: 'secret', value: 'topsikret' },
     ],
+};
+
+const setAccessField = (access, fieldName, fieldValue) => {
+    const copy = structuredClone(access);
+    let field = copy.fields.find(f => f.name === fieldName);
+    if (field) {
+        field.value = fieldValue;
+    } else {
+        copy.fields.push({ name: fieldName, value: fieldValue });
+    }
+
+    return copy;
 };
 
 // A simple class implementing a dummy SessionManager.
@@ -94,9 +106,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'unknown',
-                    login: 'login',
-                    password: 'password',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'password' },
+                    ],
                 },
                 new TestSession()
             );
@@ -109,9 +122,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    login: 'login',
-                    password: '',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: '' },
+                    ],
                 },
                 new TestSession()
             );
@@ -124,9 +138,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'password',
-                    login: '',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: '' },
+                        { name: 'password', value: 'password' },
+                    ],
                 },
                 new TestSession()
             );
@@ -139,9 +154,11 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [{ name: 'field' }],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                        { name: 'field' },
+                    ],
                 },
                 new TestSession()
             );
@@ -154,9 +171,11 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [{ value: 'field' }],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                        { value: 'field' },
+                    ],
                 },
                 new TestSession()
             );
@@ -169,9 +188,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                    ],
                 },
                 new TestSession()
             );
@@ -184,9 +204,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                    ],
                 },
                 new TestSession()
             );
@@ -197,7 +218,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'invalidpassword' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'invalidpassword'),
                 new TestSession()
             );
             checkError(result, INVALID_PASSWORD);
@@ -206,7 +227,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'expiredpassword' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'expiredpassword'),
                 new TestSession()
             );
             checkError(result, EXPIRED_PASSWORD);
@@ -215,7 +236,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'actionneeded' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'actionneeded'),
                 new TestSession()
             );
             checkError(result, ACTION_NEEDED);
@@ -224,9 +245,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command, the configured auth method is not supported should raise "AUTH_METHOD_NYI"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, {
-                    login: 'authmethodnotimplemented',
-                }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'authmethodnotimplemented'),
                 new TestSession()
             );
             checkError(result, AUTH_METHOD_NYI);
@@ -237,7 +256,7 @@ async function makeDefectSituation(command) {
 
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: '2fa' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa'),
                 sessionManager
             );
 
@@ -260,7 +279,7 @@ async function makeDefectSituation(command) {
                 command,
                 woobOptions,
                 sessionManager,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: '2fa' })
+                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
             );
 
             assert.ok(woobResponse);
@@ -344,9 +363,7 @@ describe('Testing kresus/woob integration', function () {
             it('call "transactions" with a password containing special characters should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        password: 'a`&/.:\'?!#>b"',
-                    }),
+                    setAccessField(VALID_FAKE_ACCESS, 'password', 'a`&/.:\'?!#>b"'),
                     new TestSession()
                 );
 
@@ -366,9 +383,7 @@ describe('Testing kresus/woob integration', function () {
             it('call "transactions" with a password containing only spaces should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        password: '     ',
-                    }),
+                    setAccessField(VALID_FAKE_ACCESS, 'password', '     '),
                     new TestSession()
                 );
 
@@ -418,10 +433,9 @@ describe('Testing kresus/woob integration', function () {
                 assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Accounts,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
+
+                    Object.assign(setAccessField(VALID_FAKE_ACCESS, 'login', 'session'), {
                         id: 'accessId',
-                        login: 'session',
-                        password: 'password',
                     }),
                     session
                 );
@@ -436,11 +450,14 @@ describe('Testing kresus/woob integration', function () {
                 assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        id: 'accessId',
-                        login: 'session',
-                        password: 'password2',
-                    }),
+                    Object.assign(
+                        setAccessField(
+                            setAccessField(VALID_FAKE_ACCESS, 'login', 'session'),
+                            'password',
+                            'password2'
+                        ),
+                        { id: 'accessId' }
+                    ),
                     session
                 );
 

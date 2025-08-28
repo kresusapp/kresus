@@ -33,8 +33,10 @@ export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDa
 
     const response = await createAndRetrieveAccessData(userId, {
         vendorId: 'demo',
-        login: 'mylogin',
-        password: 'couldnotcareless',
+        fields: [
+            { name: 'login', value: 'mylogin' },
+            { name: 'password', value: 'couldnotcareless' },
+        ],
         customLabel: 'Demo bank',
     });
 

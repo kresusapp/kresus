@@ -5,10 +5,21 @@ import { AccessField, Access } from '../../server/models';
 import { checkObjectIsSubsetOf } from '../helpers';
 
 describe('Access model API', () => {
-    let accessWithoutFields = {
-        login: 'login',
-        password: 'password',
+    let accessWithMinimalFields = {
         vendorId: 'gnagnagna',
+        fields: [
+            { name: 'login', value: 'login' },
+            { name: 'password', value: 'password' },
+        ],
+    };
+
+    let accessWithAdditionalFields = {
+        vendorId: accessWithMinimalFields.vendorId,
+        fields: [
+            ...accessWithMinimalFields.fields,
+            { name: 'name', value: 'toto' },
+            { name: 'website', value: 'other' },
+        ],
     };
 
     let USER_ID = null;
@@ -26,49 +37,50 @@ describe('Access model API', () => {
         let allAccesses, allFields;
 
         it('The access should be in the database', async () => {
-            await Access.create(USER_ID, accessWithoutFields);
+            await Access.create(USER_ID, accessWithMinimalFields);
             allAccesses = await Access.all(USER_ID);
 
             assert.strictEqual(allAccesses.length, 1);
-            assert.ok(checkObjectIsSubsetOf(accessWithoutFields, allAccesses[0]));
+            assert.ok(checkObjectIsSubsetOf(accessWithMinimalFields, allAccesses[0]));
 
             allFields = await AccessField.all(USER_ID);
-            assert.strictEqual(allFields.length, 0);
+            assert.strictEqual(allFields.length, accessWithMinimalFields.fields.length);
         });
 
-        let fields = [
-            { name: 'name', value: 'toto' },
-            { name: 'website', value: 'other' },
-        ];
-        let accessWithFields = { ...accessWithoutFields, fields };
-
         it('The access and the fields should be in the database', async () => {
-            let accessWithoutFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
+            await Access.create(USER_ID, accessWithAdditionalFields);
 
             allAccesses = await Access.all(USER_ID);
             allFields = await AccessField.all(USER_ID);
 
             assert.strictEqual(allAccesses.length, 2);
-            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithFields, acc)));
-            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
+            assert.ok(
+                allAccesses.some(acc => checkObjectIsSubsetOf(accessWithAdditionalFields, acc))
+            );
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithMinimalFields, acc)));
 
-            assert.strictEqual(allFields.length, 2);
-            for (let field of allFields) {
-                assert.strictEqual(field.accessId, accessWithoutFieldsId);
-                assert.ok(fields.some(f => checkObjectIsSubsetOf(field, f)));
-            }
+            assert.strictEqual(
+                allFields.length,
+                accessWithMinimalFields.fields.length + accessWithAdditionalFields.fields.length
+            );
+
+            assert.ok(
+                accessWithAdditionalFields.fields.every(f =>
+                    allFields.some(af => checkObjectIsSubsetOf(f, af))
+                )
+            );
         });
 
         it('should not use a provided userId when creating a new entity', async () => {
             const rogueAccess = {
-                ...accessWithoutFields,
+                ...accessWithMinimalFields,
                 userId: 42,
             };
             await Access.create(USER_ID, rogueAccess);
             allAccesses = await Access.all(USER_ID);
 
             assert.strictEqual(allAccesses.length, 3);
-            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithMinimalFields, acc)));
 
             let answer = await Access.all(42);
             assert.strictEqual(answer.length, 0);
@@ -81,35 +93,38 @@ describe('Access model API', () => {
             await AccessField.destroyAll(USER_ID);
         });
 
-        let fields = [
-            { name: 'name', value: 'toto' },
-            { name: 'website', value: 'other' },
-        ];
-        let accessWithFields = { ...accessWithoutFields, fields };
-
-        let allAccesses, allFields, accessWithFieldsId;
+        let allAccesses, allFields, accessWithAdditionalFieldsId;
 
         it('The access should be in the database', async () => {
-            await Access.create(USER_ID, accessWithoutFields);
-            accessWithFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
+            await Access.create(USER_ID, accessWithMinimalFields);
+            accessWithAdditionalFieldsId = (
+                await Access.create(USER_ID, accessWithAdditionalFields)
+            ).id;
             allAccesses = await Access.all(USER_ID);
             allFields = await AccessField.all(USER_ID);
 
             assert.strictEqual(allAccesses.length, 2);
-            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithFields, acc)));
-            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithMinimalFields, acc)));
+            assert.ok(
+                allAccesses.some(acc => checkObjectIsSubsetOf(accessWithAdditionalFields, acc))
+            );
 
-            assert.strictEqual(allFields.length, 2);
-            for (let field of allFields) {
-                assert.ok(fields.some(f => checkObjectIsSubsetOf(field, f)));
-            }
+            assert.strictEqual(
+                allFields.length,
+                accessWithAdditionalFields.fields.length + accessWithMinimalFields.fields.length
+            );
+            assert.ok(
+                accessWithAdditionalFields.fields.every(f =>
+                    allFields.some(af => checkObjectIsSubsetOf(af, f))
+                )
+            );
         });
 
         it('The access should be deleted', async () => {
-            await Access.destroy(USER_ID, accessWithFieldsId);
+            await Access.destroy(USER_ID, accessWithAdditionalFieldsId);
 
             allFields = await AccessField.all(USER_ID);
-            assert.strictEqual(allFields.length, 0);
+            assert.strictEqual(allFields.length, accessWithMinimalFields.fields.length);
 
             allAccesses = await Access.all(USER_ID);
             assert.strictEqual(allAccesses.length, 1);

@@ -94,11 +94,9 @@ export async function createAndRetrieveData(
     params: Record<string, unknown>
 ): Promise<UserActionOrValue<CreateAndRetrieveDataResult>> {
     const error =
-        hasMissingField(params, ['vendorId', 'login', 'password']) ||
+        hasMissingField(params, ['vendorId', 'fields']) ||
         hasForbiddenField(params, [
             'vendorId',
-            'login',
-            'password',
             'fields',
             'customLabel',
             'userActionFields',
@@ -108,6 +106,8 @@ export async function createAndRetrieveData(
         throw new KError(`when creating a new access: ${error}`, 400);
     }
 
+    assert(Array.isArray(params.fields), 'fields should be an array');
+    const accessLogin = params.fields.find(f => f.name === 'login')?.value || '';
     const userActionFields = extractUserActionFields(params as Record<string, string>);
 
     let access: Access | null = null;
@@ -118,7 +118,7 @@ export async function createAndRetrieveData(
             access = unwrap(
                 await Access.byCredentials(userId, {
                     uuid: params.vendorId as string,
-                    login: params.login as string,
+                    login: accessLogin,
                 })
             );
         } else {
@@ -348,7 +348,11 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
         }
 
         if (attrs.enabled === false) {
-            attrs.password = null;
+            // Clear the password AccessField to disable the access.
+            const passwordField = access.fields.find(f => f.name === 'password');
+            if (passwordField) {
+                await AccessField.destroy(userId, passwordField.id);
+            }
             delete attrs.enabled;
         }
 

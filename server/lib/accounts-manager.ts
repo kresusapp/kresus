@@ -192,7 +192,9 @@ async function pollAccounts(
         throw new KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
+    log.info(
+        `Retrieve all accounts from access ”${access.getLabel()}” with vendorId ${access.vendorId}`
+    );
 
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 

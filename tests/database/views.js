@@ -14,9 +14,11 @@ describe('Views database CRUD tests', () => {
         await View.destroyAll(USER_ID);
 
         classicAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         livretA = await Account.create(USER_ID, {
@@ -128,9 +130,11 @@ describe('Views database CRUD tests', () => {
         // Create another user with some accounts.
         let otherUser = await User.create({ login: 'nico' });
         let otherUserAccess = await Access.create(otherUser.id, {
-            login: 'login-of-nico',
-            password: 'bnjbvr4ever',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login-of-nico' },
+                { name: 'password', value: 'bnjbvr4ever' },
+            ],
         });
         await Account.create(otherUser.id, {
             accessId: otherUserAccess.id,

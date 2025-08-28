@@ -1,5 +1,5 @@
-/* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
-import { EntityManager, In } from 'typeorm';
+/* eslint new-cap: ["error", { "capIsNewExceptions": ["In", "Not"] }]*/
+import { EntityManager, In, Not } from 'typeorm';
 
 import { Access, AccessField } from '../';
 import { makeLogger } from '../../helpers';
@@ -30,6 +30,9 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
         await manager.delete(AccessField, {
             accessId: In(accesses.map(acc => acc.id)),
             ...userCondition,
+
+            // Once login is migrated from Access to AccessField, we want to keep it.
+            name: Not(In(['login', 'password'])),
         });
 
         // Migrate cmmc to creditmutuel.

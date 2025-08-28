@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import {
     Access,
+    AccessField,
     Account,
     Alert,
     Budget,
@@ -68,8 +69,15 @@ describe('import', () => {
             {
                 id: 0,
                 vendorId: 'manual',
-                login: 'whatever-manual-acc--does-not-care',
                 customLabel: 'Optional custom label',
+                fields: [
+                    // Do not set the login as an access property for testing purposes, this would
+                    // be removed in Access.cast.
+                    {
+                        name: 'login',
+                        value: 'whatever-manual-acc--does-not-care',
+                    },
+                ],
             },
         ],
 
@@ -464,10 +472,9 @@ describe('import', () => {
             await importData(USER_ID, data);
             let accesses = await Access.all(USER_ID);
             assert.strictEqual(accesses.length, 1);
-            assert.strictEqual(accesses[0].fields.length, 1);
-            let field = accesses[0].fields[0];
-            assert.strictEqual(field.name, validField.name);
-            assert.strictEqual(field.value, validField.value);
+            assert.strictEqual(accesses[0].fields.length, 2 /* login was migrated to a field */);
+
+            assert.ok(accesses[0].fields.some(f => f.name === 'valid' && f.value === 'valid'));
         });
 
         it('views without valid accounts should be ignored', async () => {
@@ -651,10 +658,8 @@ describe('import', () => {
             let accesses = await Access.all(USER_ID);
             assert.strictEqual(accesses.length, 1);
             assert.ok(!accesses[0].customFields);
-            assert.strictEqual(accesses[0].fields.length, 1);
-            let field = accesses[0].fields[0];
-            assert.strictEqual(field.name, fields[0].name);
-            assert.strictEqual(field.value, fields[0].value);
+            assert.strictEqual(accesses[0].fields.length, 2);
+            assert.ok(accesses[0].fields.some(f => f.name === 'valid' && f.value === 'valid'));
         });
 
         it("shouldn't use user-provided userId", async () => {
@@ -848,6 +853,10 @@ describe('import', () => {
             {
                 let accesses = await Access.all(USER_ID);
                 assert.strictEqual(accesses.length, 1);
+
+                let accessesFields = await AccessField.all(USER_ID);
+                assert.strictEqual(accessesFields.length, 1 /* login */);
+
                 let accounts = await Account.all(USER_ID);
                 assert.strictEqual(accounts.length, 2);
                 let transactions = await Transaction.all(USER_ID);
@@ -987,8 +996,11 @@ describe('Data migrations', () => {
                 {
                     id: 0,
                     vendorId: 'boursorama',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'device',
                             value: 'whatever',
@@ -1003,8 +1015,11 @@ describe('Data migrations', () => {
                 {
                     id: 1,
                     vendorId: 'cmmc',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'website',
                             value: 'par',
@@ -1015,8 +1030,11 @@ describe('Data migrations', () => {
                 {
                     id: 2,
                     vendorId: 'ganassurances',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'website',
                             value: 'espaceclient.ganassurances.fr',
@@ -1027,8 +1045,11 @@ describe('Data migrations', () => {
                 {
                     id: 3,
                     vendorId: 'manual',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'test',
                             value: 'whatever',
@@ -1043,10 +1064,13 @@ describe('Data migrations', () => {
         const actualAccesses = await Access.all(USER_ID);
         assert.strictEqual(actualAccesses.length, data.accesses.length);
 
-        assert.strictEqual(actualAccesses[0].fields.length, 0);
-        assert.strictEqual(actualAccesses[1].fields.length, 0);
-        assert.strictEqual(actualAccesses[2].fields.length, 0);
-        assert.strictEqual(actualAccesses[3].fields.length, 1);
+        // Remove All The Fields but 'login'!
+        assert.strictEqual(actualAccesses[0].fields.length, 1);
+        assert.strictEqual(actualAccesses[1].fields.length, 1);
+        assert.strictEqual(actualAccesses[2].fields.length, 1);
+
+        // Remain untouched for unrelated accesses.
+        assert.strictEqual(actualAccesses[3].fields.length, 2);
     });
 
     it('should rename cmmc vendor to creditmutuel', async () => {
@@ -1068,8 +1092,11 @@ describe('Data migrations', () => {
                 {
                     id: 0,
                     vendorId: 'creditcooperatif',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'auth_type',
                             value: 'particular',
@@ -1080,8 +1107,11 @@ describe('Data migrations', () => {
                 {
                     id: 1,
                     vendorId: 'btpbanque',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'auth_type',
                             value: 'strong',
@@ -1092,8 +1122,11 @@ describe('Data migrations', () => {
                 {
                     id: 2,
                     vendorId: 'bred',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'website',
                             value: 'bred',
@@ -1104,8 +1137,11 @@ describe('Data migrations', () => {
                 {
                     id: 3,
                     vendorId: 'manual',
-                    login: 'whatever-manual-acc--does-not-care',
                     fields: [
+                        {
+                            name: 'login',
+                            value: 'whatever-manual-acc--does-not-care',
+                        },
                         {
                             name: 'test',
                             value: 'whatever',
@@ -1120,13 +1156,13 @@ describe('Data migrations', () => {
         const actualAccesses = await Access.all(USER_ID);
         assert.strictEqual(actualAccesses.length, data.accesses.length);
 
-        // Remove All The Fields!
-        assert.strictEqual(actualAccesses[0].fields.length, 0);
-        assert.strictEqual(actualAccesses[1].fields.length, 0);
-        assert.strictEqual(actualAccesses[2].fields.length, 0);
+        // Remove All The Fields but 'login'!
+        assert.strictEqual(actualAccesses[0].fields.length, 1);
+        assert.strictEqual(actualAccesses[1].fields.length, 1);
+        assert.strictEqual(actualAccesses[2].fields.length, 1);
 
         // But not the fields of unrelated accesses.
-        assert.strictEqual(actualAccesses[3].fields.length, 1);
+        assert.strictEqual(actualAccesses[3].fields.length, 2);
     });
 
     it('should rename bnporc to bnp', async () => {

@@ -33,6 +33,8 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
         });
 
         // Also clear the password to force the user to update.
+        // Disabled due to credentials migration to access fields.
+        /*
         await manager.update(
             Access,
             {
@@ -41,6 +43,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
             },
             { password: null }
         );
+        */
     }
 
     log.info('Finished running data migration on banks (2024-05-02)');

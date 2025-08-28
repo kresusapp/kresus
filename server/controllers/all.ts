@@ -107,7 +107,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         });
 
         if (cleanPassword) {
-            delete clientAccess.password;
+            clientAccess.fields = clientAccess.fields.filter(f => f.name !== 'password');
             delete clientAccess.session;
         }
 
@@ -432,27 +432,6 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         delete access.id;
         delete access.userId;
 
-        // Try to match the vendor id and login against an existing pair in the database.
-        const foundKnown: Access | null = await Access.byCredentials(userId, {
-            uuid: access.vendorId,
-            login: access.login,
-        });
-
-        if (foundKnown !== null) {
-            // The access was already known: don't reimport it.
-            accessMap[accessId] = {
-                id: foundKnown.id,
-                wasKnown: true,
-                vendorId: foundKnown.vendorId,
-            };
-            log.info(
-                `Ignoring import of access ${access.vendorId} (${access.login}) as it already exists.`
-            );
-            continue;
-        }
-
-        const sanitizedCustomFields: { name: string; value: string }[] = [];
-
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
             try {
@@ -462,14 +441,46 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             }
         }
 
-        for (const { name, value } of access.fields || []) {
+        if (!(access.fields instanceof Array)) {
+            access.fields = [];
+        }
+
+        // Support legacy 'login' and 'password' values.
+        if (access.login) {
+            if (
+                !access.fields.some(
+                    (f: unknown) => typeof f === 'object' && f && 'name' in f && f.name === 'login'
+                )
+            ) {
+                access.fields.push({ name: 'login', value: access.login });
+            }
+
+            delete access.login;
+        }
+
+        if (access.password) {
+            if (
+                !access.fields.some(
+                    (f: unknown) =>
+                        typeof f === 'object' && f && 'name' in f && f.name === 'password'
+                )
+            ) {
+                access.fields.push({ name: 'password', value: access.password });
+            }
+
+            delete access.password;
+        }
+
+        const sanitizedCustomFields: { name: string; value: string }[] = [];
+
+        for (const { name, value } of access.fields) {
             if (typeof name !== 'string') {
-                log.warn('Ignoring customField because of non-string "name" property.');
+                log.warn('Ignoring access field because of non-string "name" property.');
                 continue;
             }
             if (typeof value !== 'string') {
                 log.warn(
-                    `Ignoring custom field for key ${name} because of non-string "value" property`
+                    `Ignoring access field for key ${name} because of non-string "value" property`
                 );
                 continue;
             }
@@ -478,17 +489,48 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
 
         access.fields = sanitizedCustomFields;
 
+        const accessLogin = sanitizedCustomFields.find(f => f.name === 'login');
+
+        // Try to match the vendor id and login against an existing pair in the database.
+        const foundKnown: Access | null = accessLogin
+            ? await Access.byCredentials(userId, {
+                  uuid: access.vendorId,
+                  login: accessLogin.value,
+              })
+            : null;
+
+        if (foundKnown !== null) {
+            // The access was already known: don't reimport it.
+            accessMap[accessId] = {
+                id: foundKnown.id,
+                wasKnown: true,
+                vendorId: foundKnown.vendorId,
+            };
+            log.info(
+                `Ignoring import of access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }) as it already exists.`
+            );
+            continue;
+        }
+
         if (dontCreateAccess) {
             // The access id given from the `world` object is valid, according to this function's
             // contract, so the mapping doesn't need to redirect to another access we created.
             accessMap[accessId] = { id: accessId, wasKnown: true };
             log.info(
-                `Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`
+                `Not creating new known access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }) because it's explicitly marked as known.`
             );
         } else {
             const created = await Access.create(userId, access);
             accessMap[accessId] = { id: created.id, wasKnown: false };
-            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
+            log.info(
+                `Creating new unknown access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }).`
+            );
         }
     }
     log.info('Done.');

@@ -5,28 +5,18 @@ import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
-import {
-    assert,
-    translate as $t,
-    notify,
-    displayLabel,
-    assertNotNull,
-    assertDefined,
-} from '../../helpers';
+import { assert, translate as $t, notify, displayLabel, assertDefined } from '../../helpers';
 
-import {
-    BackLink,
-    Form,
-    Popconfirm,
-    Switch,
-    UncontrolledTextInput,
-    ValidatedTextInput,
-} from '../ui';
-import PasswordInput from '../ui/password-input';
+import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
+
 import DisplayIf from '../ui/display-if';
 
 import CustomBankField from './custom-bank-field';
-import { areCustomFieldsValid, CustomFieldMap } from './new-access-form';
+import {
+    areCustomFieldsValid,
+    customFieldsContainCredentials,
+    CustomFieldMap,
+} from './new-access-form';
 import URL from './urls';
 import { useNotifyError, useSyncError } from '../../hooks';
 import {
@@ -63,10 +53,11 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         return fields;
     });
 
-    const [login, setLogin] = useState<string | null>(access.login);
-    const [password, setPassword] = useState<string | null>(null);
+    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
 
-    const isFormValid = !!login && !!password && areCustomFieldsValid(bankDesc, customFields);
+    const isFormValid =
+        areCustomFieldsValid(bankDesc, customFields) &&
+        (noCredentials || customFieldsContainCredentials(customFields));
 
     const onSyncAccounts = useSyncError(
         useCallback(async () => {
@@ -89,18 +80,24 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
     const updateAndFetchAccessCb = useCallback(
         (customFieldsArray: AccessCustomField[]) => {
-            assertNotNull(login);
-            assertNotNull(password);
+            if (!noCredentials) {
+                assert(
+                    customFieldsArray.some(f => f.name === 'login' && !!f.value),
+                    'login must be set'
+                );
+                assert(
+                    customFieldsArray.some(f => f.name === 'password' && !!f.value),
+                    'password must be set'
+                );
+            }
             return dispatch(
                 BanksStore.updateAndFetchAccess({
                     accessId,
-                    login,
-                    password,
                     customFields: customFieldsArray,
                 })
             ).unwrap();
         },
-        [login, password, accessId, dispatch]
+        [accessId, noCredentials, dispatch]
     );
 
     const onSubmit = useSyncError(
@@ -186,18 +183,6 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
                     <h4>{$t('client.settings.connection_parameters')}</h4>
                 </DisplayIf>
-
-                <Form.Input id="login-text" label={$t('client.settings.login')}>
-                    <ValidatedTextInput
-                        placeholder="123456789"
-                        onChange={setLogin}
-                        initialValue={login}
-                    />
-                </Form.Input>
-
-                <Form.Input id="password-text" label={$t('client.settings.password')}>
-                    <PasswordInput onChange={setPassword} className="block" autoFocus={true} />
-                </Form.Input>
 
                 <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
                     {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (

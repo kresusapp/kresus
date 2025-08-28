@@ -126,7 +126,7 @@ MOCK_MODULES = [
     ),
 ]
 
-NEEDS_PLACEHOLDER = ["secret", "birthday"]
+NEEDS_PLACEHOLDER = ["login", "secret", "birthday"]
 
 # List of transient fields in case the module does not use `ValueTransient`
 IGNORE_FIELDS_LIST = [
@@ -203,10 +203,6 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
 
     config = module.config.items()
     for key, value in config:
-        # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
-        if key in ("login", "username", "password"):
-            continue
-
         # We don't want transient items (mainly used for 2FA).
         if isinstance(value, ValueTransient):
             continue
@@ -254,7 +250,20 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
         fields.append(field)
 
     if fields:
-        fields.sort(key=lambda field: field["name"])
+        fields.sort(
+            key=lambda field: (
+                (
+                    0
+                    if field["name"] == "login"
+                    else (
+                        1
+                        if field["name"] == "username"
+                        else 2 if field["name"] == "password" else 3
+                    )
+                ),
+                field["name"],
+            )
+        )
         kresus_module["customFields"] = fields
 
     return kresus_module

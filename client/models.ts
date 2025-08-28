@@ -73,9 +73,6 @@ export type Access = {
     // Whether the backend provider is deprecated or not.
     isBankVendorDeprecated: boolean;
 
-    // The login to connect to the bank website.
-    login: string;
-
     // The extra fields required to connect to the bank website.
     customFields: AccessCustomField[];
 
@@ -106,7 +103,7 @@ export const createValidAccess = (arg: any, banks: Bank[]): Access => {
     // Keep in sync with `createAccess` reducer.
     assertHas(arg, 'id');
     assertHas(arg, 'vendorId');
-    assertHas(arg, 'login');
+    assert(arg.fields instanceof Array, 'fields must be an array');
     assertHas(arg, 'enabled');
     assertHas(arg, 'label');
     assertHas(arg, 'excludeFromPoll');
@@ -115,38 +112,29 @@ export const createValidAccess = (arg: any, banks: Bank[]): Access => {
     const staticBank = banks.find(b => b.uuid === arg.vendorId);
     assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${arg.vendorId}`);
 
-    assert(
-        !maybeHas(arg, 'fields') || arg.fields instanceof Array,
-        'custom fields must be an array or not be there at all'
-    );
-
     let accessCustomFields: AccessCustomField[] = [];
+    const customFields = arg.fields as { name: string; value: string }[];
 
-    if (maybeHas(arg, 'fields')) {
-        const customFields = arg.fields as { name: string; value: string }[];
-
-        // This loop adds the type to the custom field instance.
-        const fields: AccessCustomField[] = [];
-        for (const field of customFields) {
-            const customField: CustomFieldDescriptor | undefined = staticBank.customFields.find(
-                f => f.name === field.name
-            );
-            if (typeof customField === 'undefined') {
-                debug(`Custom field ${field.name} isn't needed anymore for bank ${arg.vendorId}`);
-                continue;
-            }
-            fields.push({
-                ...field,
-                type: customField.type,
-            });
+    // This loop adds the type to the custom field instance.
+    const fields: AccessCustomField[] = [];
+    for (const field of customFields) {
+        const customField: CustomFieldDescriptor | undefined = staticBank.customFields.find(
+            f => f.name === field.name
+        );
+        if (typeof customField === 'undefined') {
+            debug(`Custom field ${field.name} isn't needed anymore for bank ${arg.vendorId}`);
+            continue;
         }
-        accessCustomFields = fields;
+        fields.push({
+            ...field,
+            type: customField.type,
+        });
     }
+    accessCustomFields = fields;
 
     return {
         id: arg.id,
         vendorId: arg.vendorId,
-        login: arg.login,
         enabled: arg.enabled,
         label: arg.label,
         customLabel: (maybeHas(arg, 'customLabel') && arg.customLabel) || null,

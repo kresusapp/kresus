@@ -168,16 +168,12 @@ export function exportInstance(maybePassword?: string) {
 // /api/accesses
 export function createAccess(
     vendorId: string,
-    login: string,
-    password: string,
     customFields: AccessCustomField[],
     customLabel: string | null,
     userActionFields: FinishUserActionFields | null = null
 ) {
     const data = {
         vendorId,
-        login,
-        password,
         customLabel,
         fields: customFields,
         // TODO would be nice to separate the access' fields from the user action fields.
@@ -197,8 +193,6 @@ export function updateAccess(accessId: number, update: Partial<Access>) {
 export function updateAndFetchAccess(
     accessId: number,
     access: {
-        login: string;
-        password: string;
         customFields: AccessCustomField[];
     },
     userActionFields: FinishUserActionFields | null = null

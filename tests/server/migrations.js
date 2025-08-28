@@ -7,6 +7,9 @@ import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../serve
 import { AddViews1734262035140 as AddViewsMigration } from '../../server/models/migrations/23';
 import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
 import { AddViewIdInBudget1737381056464 as AddViewIdInBudgetMigration } from '../../server/models/migrations/25';
+import { MoveLoginPasswordToFields1756391927839 as MoveLoginPasswordToFields } from '../../server/models/migrations/27';
+
+import { checkObjectIsSubsetOf } from '../helpers';
 
 async function cleanAll(userId) {
     await Budget.destroyAll(userId);
@@ -76,9 +79,11 @@ describe('migrations', () => {
 
         // Then an account, that will create an associated view, mandatory since migration 24.
         const someAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'whatever' },
+            ],
         });
 
         await Account.create(USER_ID, {
@@ -137,9 +142,11 @@ describe('migrations', () => {
 
     it('should run migration 13 (setting default bank accounts balance) properly', async () => {
         const manualAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'manual',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         const manualAccount = await Account.create(USER_ID, {
@@ -152,9 +159,11 @@ describe('migrations', () => {
         });
 
         const classicAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         const classicAccount = await Account.create(USER_ID, {
@@ -267,9 +276,11 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         const someAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         // First with account but none of type 'account-type.savings'.
@@ -332,5 +343,89 @@ describe('migrations', () => {
         );
 
         assert.strictEqual(bestGuessId, -1);
+    });
+
+    describe('should run migration 27', async () => {
+        beforeEach(async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+
+            await queryRunner.query('DELETE FROM access_fields');
+            await queryRunner.query('DELETE FROM access');
+        });
+
+        it('and move login & password fields to access fields on "up"', async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+            const migration = new MoveLoginPasswordToFields();
+
+            // First migrate down to allow login/password properties in access table.
+            await migration.down(queryRunner);
+
+            // Insert test data
+            const createdAccessId = await queryRunner.query(
+                `INSERT INTO access (userId, vendorId, login, password) VALUES (${USER_ID}, 'fakeVendorId', 'foo', 'bar')`
+            );
+
+            if (typeof createdAccessId !== 'number') {
+                throw new Error('createdAccessId should be a number (in SQLite)');
+            }
+
+            // Create an account
+            await queryRunner.query(
+                `INSERT INTO account (userId, accessId, vendorAccountId, type, importDate, initialBalance, lastCheckDate, label, excludeFromBalance, isOrphan, gracePeriod) VALUES
+                (${USER_ID}, ${createdAccessId}, 'fakeAccountVendorId', 'account-type.unknown', '2015-11-20 07:42:39', 0, 0, "Some label", 0, false, 0)`
+            );
+
+            await migration.up(queryRunner);
+
+            // Check access_field
+            const fields = await queryRunner.query(
+                `SELECT name, value FROM access_fields WHERE accessId = ${createdAccessId}`
+            );
+            assert.strictEqual(fields.length, 2);
+            assert.ok(fields.some(f => f.name === 'login' && f.value === 'foo'));
+            assert.ok(fields.some(f => f.name === 'password' && f.value === 'bar'));
+
+            // Check columns are dropped
+            const table = await queryRunner.getTable('access');
+            const columnNames = table.columns.map(c => c.name);
+            assert.ok(!columnNames.includes('login'));
+            assert.ok(!columnNames.includes('password'));
+
+            // Check accounts still exist (sqlite drops tables when altering them, deleting data
+            // by cascade)
+            const accounts = await queryRunner.query('SELECT * FROM account');
+            assert.strictEqual(accounts.length, 1);
+        });
+
+        it('and restore login and password from access_fields on "down"', async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+            const migration = new MoveLoginPasswordToFields();
+
+            // Prepare access and access_field
+            await queryRunner.query(
+                `INSERT INTO access (id, userId, vendorId) VALUES (2, ${USER_ID}, 'fakeVendorId')`
+            );
+            await queryRunner.query(
+                `INSERT INTO access_fields (accessId, userId, name, value) VALUES (2, ${USER_ID}, 'login', 'baz'), (2, ${USER_ID}, 'password', 'qux')`
+            );
+
+            await migration.down(queryRunner);
+
+            // Check access table
+            const access = await queryRunner.query(
+                'SELECT login, password FROM access WHERE id = 2'
+            );
+            assert.strictEqual(access.length, 1);
+            assert.ok(checkObjectIsSubsetOf({ login: 'baz', password: 'qux' }, access[0]));
+
+            // Check fields are deleted
+            const fields = await queryRunner.query(
+                'SELECT * FROM access_fields WHERE accessId = 2'
+            );
+            assert.strictEqual(fields.length, 0);
+        });
     });
 });
