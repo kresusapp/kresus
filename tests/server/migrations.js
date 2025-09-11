@@ -4,6 +4,7 @@ import { Access, Account, Budget, Category, User, Transaction } from '../../serv
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
 import { UniqueBudget1608817798703 as BudgetsConstraintMigration } from '../../server/models/migrations/8';
 import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../server/models/migrations/13';
+import { AddViews1734262035140 as AddViewsMigration } from '../../server/models/migrations/23';
 import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
 import { AddViewIdInBudget1737381056464 as AddViewIdInBudgetMigration } from '../../server/models/migrations/25';
 
@@ -195,6 +196,53 @@ describe('migrations', () => {
             where: { userId: USER_ID, id: classicAccount.id },
         });
         account.balance.should.equal(376.5);
+    });
+
+    it('should run migration 23 and create views for existing accounts', async () => {
+        const connection = Account.repo().manager.connection;
+        const queryRunner = connection.createQueryRunner();
+
+        // Clean up tables if needed
+        await queryRunner.query('DELETE FROM "view-accounts"');
+        await queryRunner.query('DELETE FROM "view"');
+
+        // Create an account to ensure at least one exists
+        const someAccess = await Access.create(USER_ID, {
+            login: 'login',
+            password: 'password',
+            vendorId: 'whatever',
+        });
+
+        const account = await Account.create(USER_ID, {
+            accessId: someAccess.id,
+            vendorAccountId: 123456,
+            label: 'Test account',
+            initialBalance: 0,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        // Run migration 23
+        const migration = new AddViewsMigration();
+
+        // Revert it first
+        await migration.down(queryRunner);
+
+        // Then apply it again
+        await migration.up(queryRunner);
+
+        // Check that at least one view exists
+        const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = $1', [
+            USER_ID,
+        ]);
+        views.length.should.be.above(0);
+
+        // Check that the view-accounts link exists
+        const viewAccounts = await queryRunner.query(
+            'SELECT * FROM "view-accounts" WHERE "accountId" = $1',
+            [account.id]
+        );
+        viewAccounts.length.should.be.above(0);
     });
 
     it('should run migration 24 (adding isAdmin field to user model & set current users as admin) properly', async () => {
