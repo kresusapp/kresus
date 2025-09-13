@@ -53,13 +53,13 @@ RUN cd /home/user && \
 
 WORKDIR /home/user/app
 
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-ENV HOST 0.0.0.0
-ENV KRESUS_DIR /home/user/data
-ENV NODE_ENV production
-ENV KRESUS_PYTHON_EXEC python3
-ENV IS_NIGHTLY 1
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV HOST=0.0.0.0
+ENV KRESUS_DIR=/home/user/data
+ENV NODE_ENV=production
+ENV KRESUS_PYTHON_EXEC=python3
+ENV IS_NIGHTLY=1
 
 VOLUME /home/user/data
 

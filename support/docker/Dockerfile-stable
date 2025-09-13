@@ -44,12 +44,12 @@ RUN yarn global add node-gyp
 RUN yarn global add kresus --prefix /home/user/app --production;
 
 # Run server.
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-ENV HOST 0.0.0.0
-ENV KRESUS_DIR /home/user/data
-ENV NODE_ENV production
-ENV KRESUS_PYTHON_EXEC python3
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV HOST=0.0.0.0
+ENV KRESUS_DIR=/home/user/data
+ENV NODE_ENV=production
+ENV KRESUS_PYTHON_EXEC=python3
 
 VOLUME /home/user/data
 EXPOSE 9876

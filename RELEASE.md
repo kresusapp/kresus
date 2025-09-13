@@ -3,6 +3,7 @@
 ## Publish on git
 
 - Update the version number in the package.json file on the `main` branch.
+- Push the `main` branch: `git push main`.
 - Checkout the `builds` branch and merge from `main` with `git checkout builds && git pull upstream builds && git merge -X theirs main` (which will always take `main` changes).
 - Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
@@ -17,9 +18,14 @@
 - Just after this on the same branch, run `npm publish` (make sure there are no local files that should not be published and are not ignored by the *.npmignore* file with `npm publish --dry-run`).
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
-  - run Kresus from there with `/tmp/bin/kresus -c /path/to/config.ini`.
+  - run Kresus from there:
+    - If you use sqlite3 for testing, install it there too: `npm -g install --production --prefix sqlite3`
+    - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
+
+*This doesn't need to run from any branch in particular, since the script to build the Docker
+stable image will use the latest version of Kresus pushed to npm.*
 
 - Run `yarn docker:release` (ensure it doesn't use cached images).
 - Test the docker build:
@@ -30,7 +36,8 @@
         - Ctrl+D to exit the bash shell
         - restart the container
     - it's available for testing on port 9876
-- Make sure there is no `config.ini` file in your current directory, otherwise it will be published in the docker image
+- Make sure there is no extra file not specified in the `.gitignore` or `.dockerignore` in your
+  current directory, otherwise it will be published in the docker image.
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
