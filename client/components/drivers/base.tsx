@@ -30,10 +30,6 @@ const memoizedGetBalance = memoize((accounts: Account[]) =>
     accounts.reduce((a, b) => a + b.balance, 0)
 );
 
-const memoizedGetInitialBalance = memoize((accounts: Account[]) =>
-    accounts.reduce((a, b) => a + b.initialBalance, 0)
-);
-
 const memoizedGetLastCheckDate = memoize((accounts: Account[]) => {
     let lastCheckDate: Date = new Date();
     let isFirst = true;
@@ -116,16 +112,6 @@ export class Driver {
         }
 
         return memoizedGetBalance(accounts);
-    }
-
-    getInitialBalance(state: GlobalState, excludeMarkedAccountsFromBalance = false): number {
-        const accounts = this.getAccounts(state);
-
-        if (excludeMarkedAccountsFromBalance) {
-            return memoizedGetInitialBalance(memoizedGetAccountsIncludedInTotalBalance(accounts));
-        }
-
-        return memoizedGetInitialBalance(accounts);
     }
 }
 
