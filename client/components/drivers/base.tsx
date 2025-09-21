@@ -18,20 +18,16 @@ const memoizedGetAccounts = memoize((state: BankStore.BankState, accountIds: num
     return accountIds.map(accountId => BankStore.accountById(state, accountId));
 });
 
+const memoizedGetAccountsIncludedInTotalBalance = memoize((accounts: Account[]) =>
+    accounts.filter(account => !account.excludeFromBalance)
+);
+
 const memoizeGetOutstandingSum = memoize((accounts: Account[]) =>
-    accounts
-        .filter(account => !account.excludeFromBalance)
-        .reduce((a, b) => a + b.outstandingSum, 0)
+    accounts.reduce((a, b) => a + b.outstandingSum, 0)
 );
 
 const memoizedGetBalance = memoize((accounts: Account[]) =>
-    accounts.filter(account => !account.excludeFromBalance).reduce((a, b) => a + b.balance, 0)
-);
-
-const memoizedGetInitialBalance = memoize((accounts: Account[]) =>
-    accounts
-        .filter(account => !account.excludeFromBalance)
-        .reduce((a, b) => a + b.initialBalance, 0)
+    accounts.reduce((a, b) => a + b.balance, 0)
 );
 
 const memoizedGetLastCheckDate = memoize((accounts: Account[]) => {
@@ -98,19 +94,24 @@ export class Driver {
         return memoizedGetLastCheckDate(accounts);
     }
 
-    getOutstandingSum(state: GlobalState): number {
+    getOutstandingSum(state: GlobalState, excludeMarkedAccountsFromBalance = false): number {
         const accounts = this.getAccounts(state);
+
+        if (excludeMarkedAccountsFromBalance) {
+            return memoizeGetOutstandingSum(memoizedGetAccountsIncludedInTotalBalance(accounts));
+        }
+
         return memoizeGetOutstandingSum(accounts);
     }
 
-    getBalance(state: GlobalState): number {
+    getBalance(state: GlobalState, excludeMarkedAccountsFromBalance = false): number {
         const accounts = this.getAccounts(state);
-        return memoizedGetBalance(accounts);
-    }
 
-    getInitialBalance(state: GlobalState): number {
-        const accounts = this.getAccounts(state);
-        return memoizedGetInitialBalance(accounts);
+        if (excludeMarkedAccountsFromBalance) {
+            return memoizedGetBalance(memoizedGetAccountsIncludedInTotalBalance(accounts));
+        }
+
+        return memoizedGetBalance(accounts);
     }
 }
 
