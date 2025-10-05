@@ -1,12 +1,45 @@
 import should from 'should';
 import { QueryFailedError } from 'typeorm';
-import { Budget, Category, View } from '../../server/models';
+import { Access, Budget, Category, View } from '../../server/models';
+import { importData } from '../../server/controllers/all';
 
 describe('Budgets model API', () => {
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+                login: 'whatever-manual-acc--does-not-care',
+                customLabel: 'Optional custom label',
+            },
+        ],
+
+        accounts: [
+            {
+                id: 0,
+                accessId: 0,
+                vendorAccountId: 'manualaccount-randomid',
+                type: 'account-type.checking',
+                initialBalance: 0,
+                label: 'Compte Courant',
+                iban: 'FR4830066645148131544778523',
+                currency: 'EUR',
+                importDate: new Date('2019-01-01:00:00.000Z'),
+            },
+        ],
+    };
+
     let USER_ID = null;
-    before(() => {
+    before(async () => {
         // applyConfig must have already been called.
         USER_ID = process.kresus.user.id;
+
+        await importData(USER_ID, world);
+    });
+
+    after(async () => {
+        await Access.destroyAll(USER_ID);
+        await View.destroyViewsWithoutAccounts(USER_ID);
     });
 
     describe('Duplicates management', () => {
