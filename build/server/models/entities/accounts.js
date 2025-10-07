@@ -138,8 +138,10 @@ let Account = Account_1 = class Account {
     }
     static async update(userId, accountId, attributes) {
         // Do not use Account.repo().update as it would not trigger the AfterUpdate hook.
-        // See https://github.com/typeorm/typeorm/issues/5385
-        const account = (0, helpers_1.unwrap)(await Account_1.find(userId, accountId));
+        // See https://github.com/typeorm/typeorm/issues/5385.
+        // Do not use Account.find as this would set the balance to a computed value, which would
+        // then be saved by the Account.save call.
+        const account = (0, helpers_1.unwrap)(await Account_1.repo().findOne({ where: { userId, id: accountId } }));
         Object.assign(account, attributes);
         await Account_1.repo().save(account);
         return account;
