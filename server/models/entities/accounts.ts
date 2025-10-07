@@ -239,8 +239,10 @@ export default class Account {
         attributes: Partial<Account>
     ): Promise<Account> {
         // Do not use Account.repo().update as it would not trigger the AfterUpdate hook.
-        // See https://github.com/typeorm/typeorm/issues/5385
-        const account = unwrap(await Account.find(userId, accountId));
+        // See https://github.com/typeorm/typeorm/issues/5385.
+        // Do not use Account.find as this would set the balance to a computed value, which would
+        // then be saved by the Account.save call.
+        const account = unwrap(await Account.repo().findOne({ where: { userId, id: accountId } }));
 
         Object.assign(account, attributes);
         await Account.repo().save(account);

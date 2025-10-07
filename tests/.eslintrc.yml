@@ -5,6 +5,7 @@
         "describe": true
         "beforeEach": true
         "before": true
+        "after": true
 
     rules:
         max-nested-callbacks:

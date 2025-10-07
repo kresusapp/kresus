@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { Access, Account } from '../../server/models';
+import { Access, Account, View } from '../../server/models';
 import { importData } from '../../server/controllers/all';
 
 describe('Account model API', () => {
@@ -102,11 +102,12 @@ describe('Account model API', () => {
         USER_ID = process.kresus.user.id;
     });
 
-    describe('Account computeBalance', () => {
-        before(async () => {
-            await Access.destroyAll(USER_ID);
-        });
+    after(async () => {
+        await Access.destroyAll(USER_ID);
+        await View.destroyViewsWithoutAccounts(USER_ID);
+    });
 
+    describe('Account computeBalance', () => {
         it('should return the right amount', async () => {
             await importData(USER_ID, world);
 
@@ -122,6 +123,37 @@ describe('Account model API', () => {
             const result = await account[0].computeBalance(1337);
             const expected = world.transactions.reduce((sum, tr) => sum + tr.amount, 1337);
             result.should.be.approximately(expected, 0.01);
+        });
+    });
+
+    describe('Account update', () => {
+        it('should not override NULL balances', async () => {
+            const access = await Access.create(USER_ID, {
+                login: 'login',
+                password: 'password',
+                vendorId: 'manual',
+            });
+
+            const account = await Account.create(USER_ID, {
+                accessId: access.id,
+                vendorAccountId: 55555,
+                label: 'Whatever',
+                initialBalance: 0,
+                importDate: new Date(),
+                lastCheckDate: 0,
+            });
+
+            // Rename the account
+            await Account.update(USER_ID, account.id, {
+                customLabel: 'Better name',
+            });
+
+            // Account's balance in database should remain NULL
+            const updatedAccount = await Account.repo().findOneBy({
+                userId: USER_ID,
+                id: account.id,
+            });
+            should(updatedAccount.balance).be.null();
         });
     });
 });
