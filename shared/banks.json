@@ -940,19 +940,6 @@
             }
         ],
         "deprecated": false,
-        "name": "HSBC France",
-        "uuid": "hsbc"
-    },
-    {
-        "backend": "woob",
-        "customFields": [
-            {
-                "name": "secret",
-                "placeholderKey": "client.settings.secret_placeholder",
-                "type": "password"
-            }
-        ],
-        "deprecated": false,
         "name": "HSBC Hong Kong",
         "uuid": "hsbchk"
     },
