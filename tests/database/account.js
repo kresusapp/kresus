@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { Access, Account, View } from '../../server/models';
+import { Access, Account } from '../../server/models';
 import { importData } from '../../server/controllers/all';
 
 describe('Account model API', () => {
@@ -104,7 +104,6 @@ describe('Account model API', () => {
 
     after(async () => {
         await Access.destroyAll(USER_ID);
-        await View.destroyViewsWithoutAccounts(USER_ID);
     });
 
     describe('Account computeBalance', () => {

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { Access, Account, Setting, View } from '../models';
+import { Access, Account, Setting } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { hasForbiddenField } from '../shared/validators';
@@ -85,8 +85,6 @@ export async function destroyWithTransactions(userId: number, account: Account) 
     await Account.destroy(userId, account.id);
 
     await fixupDefaultAccount(userId);
-
-    await View.destroyViewsWithoutAccounts(userId);
 
     const accounts = await Account.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {

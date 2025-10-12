@@ -126,10 +126,7 @@ describe('Views database CRUD tests', () => {
         await View.destroy(USER_ID, view.id);
     });
 
-    it('should remove the view when an account is deleted and the view had only one account', async () => {
-        // Destroy compte cheque
-        await Account.destroy(USER_ID, compteCheque.id);
-
+    it('should remove the view when an account is deleted with Account.destroy and the view had only one account', async () => {
         // Create another user with some accounts.
         let otherUser = await User.create({ login: 'nico' });
         let otherUserAccess = await Access.create(otherUser.id, {
@@ -150,8 +147,8 @@ describe('Views database CRUD tests', () => {
         const otherUserViews = await View.all(otherUser.id);
         otherUserViews.length.should.equal(1);
 
-        // Destroy obsolete accounts
-        await View.destroyViewsWithoutAccounts(USER_ID);
+        // Destroy compte cheque
+        await Account.destroy(USER_ID, compteCheque.id);
 
         const views = await View.all(USER_ID);
         views.length.should.equal(4);
@@ -174,6 +171,41 @@ describe('Views database CRUD tests', () => {
 
         // Get rid of the user, which cascades deletion of all their data.
         await User.destroy(otherUser.id);
+    });
+
+    it('should remove the view when an account is deleted by cascade with Access.destroy and the view had only one account', async () => {
+        // Create a new access and account
+        const accessToDestroy = await Access.create(USER_ID, {
+            login: 'access-to-destroy',
+            password: 'bnjbvr4ever',
+            vendorId: 'whatever',
+        });
+        await Account.create(USER_ID, {
+            accessId: accessToDestroy.id,
+            vendorAccountId: 44444,
+            label: 'Account to destroy 1',
+            initialBalance: 300,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        // Destroy the access.
+        await Access.destroy(USER_ID, accessToDestroy.id);
+
+        const views = await View.all(USER_ID);
+        views.length.should.equal(4);
+
+        /**
+         * Should remain:
+         * - view associated to Livret A (automatically).
+         * - view associated to Compte Joint (automatically).
+         * - view 'Look ma, I did this' associated to Livret A only, by user
+         * - view 'Again and again' since it still has one account linked (Livret A)
+         */
+        views.some(v => v.label === livretA.label).should.be.true();
+        views.some(v => v.label === compteJoint.label).should.be.true();
+        views.some(v => v.label === 'Look ma, I did this').should.be.true();
+        views.some(v => v.label === 'Again and again').should.be.true();
     });
 
     it('should rename the associated view when an account is renamed', async () => {
