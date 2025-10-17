@@ -40,7 +40,6 @@ export async function destroyWithData(userId: number, access: Access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
     await Access.destroy(userId, access.id);
     await AccountController.fixupDefaultAccount(userId);
-    await View.destroyViewsWithoutAccounts(userId);
     log.info('Done!');
 }
 
@@ -153,7 +152,6 @@ export async function createAndRetrieveData(
                 if (accounts.length === 0) {
                     log.info(`Cleaning up incomplete access with id ${prevAccess.id}`);
                     await Access.destroy(userId, prevAccess.id);
-                    await View.destroyViewsWithoutAccounts(userId);
                 }
             });
 
@@ -196,7 +194,6 @@ export async function createAndRetrieveData(
         if (access !== null) {
             log.info('\tdeleting access...');
             await Access.destroy(userId, access.id);
-            await View.destroyViewsWithoutAccounts(userId);
         }
 
         // Rethrow the error

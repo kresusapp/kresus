@@ -39,7 +39,6 @@ describe('Budgets model API', () => {
 
     after(async () => {
         await Access.destroyAll(USER_ID);
-        await View.destroyViewsWithoutAccounts(USER_ID);
     });
 
     describe('Duplicates management', () => {

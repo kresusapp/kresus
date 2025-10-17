@@ -47,4 +47,12 @@ export class AccountsSubscriber implements EntitySubscriberInterface<Account> {
             }
         }
     }
+
+    /* Deletes views without accounts after account deletion */
+    async afterRemove() {
+        // When using the destroy method and not the remove method, the entity is not provided in
+        // the event, so we cannot filter by userId, but that's fine to do it for all users.
+        // See https://github.com/typeorm/typeorm/issues/6876
+        await View.destroyViewsWithoutAccounts();
+    }
 }

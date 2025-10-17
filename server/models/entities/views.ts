@@ -102,7 +102,7 @@ export default class View {
      * The method can be called after accounts deletion to ensure no empty
      * view remains.
      */
-    static async destroyViewsWithoutAccounts(userId: number): Promise<void> {
+    static async destroyViewsWithoutAccounts(): Promise<void> {
         const qb = View.repo().createQueryBuilder('view');
 
         await qb
@@ -115,12 +115,8 @@ export default class View {
                     .from(ViewAccount, 'viewAccount')
                     .addFrom(View, 'view')
                     .where('view.id = viewAccount.viewId')
-                    .andWhere('view.userId = :userId')
-                    .setParameter('userId', userId)
                     .getQuery()}`
             )
-            .andWhere('userId = :userId')
-            .setParameter('userId', userId)
             .execute();
     }
 

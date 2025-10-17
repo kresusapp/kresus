@@ -203,7 +203,8 @@ const ImportForm = (props: {
     );
 
     const disableSubmit =
-        !doc.textContent && (!doc.jsonContent || (hasEncryptedContent && password === null));
+        (!doc.textContent && !doc.jsonContent) ||
+        (!!doc.jsonContent && hasEncryptedContent && password === null);
 
     const selectedAccessId = doc.accessId === null ? accessesOptions[0].value : doc.accessId;
 
@@ -253,7 +254,9 @@ const ImportForm = (props: {
                     </DisplayIf>
 
                     <DisplayIf condition={!canEncrypt}>
-                        {$t('client.settings.cannot_decrypt_import')}
+                        <p className="alerts warning">
+                            {$t('client.settings.cannot_decrypt_import')}
+                        </p>
                     </DisplayIf>
                 </DisplayIf>
             </div>

@@ -9,7 +9,6 @@ import {
     RecurringTransaction,
     AppliedRecurringTransaction,
     Alert,
-    View,
 } from '../models';
 
 import { accountTypeIdToName } from './account-types';
@@ -1017,8 +1016,6 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (found && found.value === `${sourceAccount.id}`) {
             await Setting.update(userId, found.id, { value: `${targetAccount.id}` });
         }
-
-        await View.destroyViewsWithoutAccounts(userId);
 
         return true;
     }

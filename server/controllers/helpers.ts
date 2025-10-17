@@ -177,6 +177,22 @@ export function cleanData(world: any) {
         delete art.userId;
     }
 
+    world.views = world.views || [];
+    for (const v of world.views) {
+        v.accountIds = v.accountIds
+            .map((accId: number) => {
+                if (typeof accountMap[accId] === 'undefined') {
+                    log.warn(`unexpected default account id: ${accId}`);
+                    return null;
+                }
+                return accountMap[accId];
+            })
+            .filter((aid: number | null) => aid !== null);
+
+        delete v.id;
+        delete v.userId;
+    }
+
     return world;
 }
 
