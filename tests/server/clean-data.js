@@ -232,3 +232,82 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         }
     });
 });
+
+describe('Ensure recurring transaction ids are properly remapped after re-indexing', () => {
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+            },
+        ],
+        accounts: [
+            {
+                id: 10,
+                name: 'Account 1',
+                balance: 100,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+            {
+                id: 20,
+                name: 'Account 2',
+                balance: 200,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+        ],
+        recurringTransactions: [
+            {
+                type: 'type.loan_payment',
+                id: 123,
+                accountId: 10,
+                label: 'Recurring one',
+                amount: -123.456,
+                dayOfMonth: 15,
+                listOfMonths: 'all',
+            },
+            {
+                type: 'type.loan_payment',
+                id: 456,
+                accountId: 20,
+                label: 'Recurring two',
+                amount: -789.25,
+                dayOfMonth: 15,
+                listOfMonths: 'all',
+            },
+        ],
+        appliedRecurringTransactions: [
+            {
+                recurringTransactionId: 123,
+                accountId: 10,
+                month: 9,
+                year: 2025,
+            },
+            {
+                recurringTransactionId: 456,
+                accountId: 20,
+                month: 9,
+                year: 2025,
+            },
+        ],
+    };
+
+    it('Should be properly remapped in recurring transactions', () => {
+        const betterWorld = cleanData(world);
+        const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
+        for (const rt of betterWorld.recurringTransactions) {
+            recurringTransactionIds.should.containEql(rt.id);
+        }
+    });
+
+    it('Should be properly remapped in applied recurring transactions', () => {
+        const betterWorld = cleanData(world);
+        const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
+        for (const art of betterWorld.appliedRecurringTransactions) {
+            recurringTransactionIds.should.containEql(art.recurringTransactionId);
+        }
+    });
+});
