@@ -73,7 +73,6 @@ async function destroyWithTransactions(userId, account) {
     log.info(`\t-> Destroy account ${account.label}`);
     await models_1.Account.destroy(userId, account.id);
     await fixupDefaultAccount(userId);
-    await models_1.View.destroyViewsWithoutAccounts(userId);
     const accounts = await models_1.Account.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');

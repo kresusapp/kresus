@@ -68,7 +68,7 @@ let View = View_1 = class View {
      * The method can be called after accounts deletion to ensure no empty
      * view remains.
      */
-    static async destroyViewsWithoutAccounts(userId) {
+    static async destroyViewsWithoutAccounts() {
         const qb = View_1.repo().createQueryBuilder('view');
         await qb
             .delete()
@@ -79,11 +79,7 @@ let View = View_1 = class View {
             .from(view_accounts_1.default, 'viewAccount')
             .addFrom(View_1, 'view')
             .where('view.id = viewAccount.viewId')
-            .andWhere('view.userId = :userId')
-            .setParameter('userId', userId)
             .getQuery()}`)
-            .andWhere('userId = :userId')
-            .setParameter('userId', userId)
             .execute();
     }
     static async update(userId, viewId, fields) {

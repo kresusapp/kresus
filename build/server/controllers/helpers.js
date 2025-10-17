@@ -151,6 +151,20 @@ function cleanData(world) {
         delete art.id;
         delete art.userId;
     }
+    world.views = world.views || [];
+    for (const v of world.views) {
+        v.accountIds = v.accountIds
+            .map((accId) => {
+            if (typeof accountMap[accId] === 'undefined') {
+                log.warn(`unexpected default account id: ${accId}`);
+                return null;
+            }
+            return accountMap[accId];
+        })
+            .filter((aid) => aid !== null);
+        delete v.id;
+        delete v.userId;
+    }
     return world;
 }
 function obfuscatePasswords(string, passwords) {

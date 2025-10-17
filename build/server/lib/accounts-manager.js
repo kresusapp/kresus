@@ -678,7 +678,6 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (found && found.value === `${sourceAccount.id}`) {
             await models_1.Setting.update(userId, found.id, { value: `${targetAccount.id}` });
         }
-        await models_1.View.destroyViewsWithoutAccounts(userId);
         return true;
     }
 }
