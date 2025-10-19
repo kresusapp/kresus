@@ -105,17 +105,40 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
             {
                 id: 0,
                 name: 'View 1',
-                accountIds: [10],
+                accounts: [
+                    {
+                        id: 1,
+                        viewId: 0,
+                        accountId: 10,
+                    },
+                ],
             },
             {
                 id: 1,
                 name: 'View 2',
-                accountIds: [20],
+                accounts: [
+                    {
+                        id: 2,
+                        viewId: 0,
+                        accountId: 20,
+                    },
+                ],
             },
             {
                 id: 2,
                 name: 'View 3',
-                accountIds: [10, 20],
+                accounts: [
+                    {
+                        id: 3,
+                        viewId: 2,
+                        accountId: 10,
+                    },
+                    {
+                        id: 4,
+                        viewId: 2,
+                        accountId: 20,
+                    },
+                ],
             },
         ],
         transactions: [
@@ -226,8 +249,8 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const view of betterWorld.views) {
-            for (const accountId of view.accountIds) {
-                accountsIds.should.containEql(accountId);
+            for (const acc of view.accounts) {
+                accountsIds.should.containEql(acc.accountId);
             }
         }
     });
@@ -308,6 +331,99 @@ describe('Ensure recurring transaction ids are properly remapped after re-indexi
         const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
         for (const art of betterWorld.appliedRecurringTransactions) {
             recurringTransactionIds.should.containEql(art.recurringTransactionId);
+        }
+    });
+});
+
+describe('Ensure views ids are properly remapped after re-indexing', () => {
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+            },
+        ],
+        accounts: [
+            {
+                id: 10,
+                name: 'Account 1',
+                balance: 100,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+            {
+                id: 20,
+                name: 'Account 2',
+                balance: 200,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+        ],
+        views: [
+            {
+                id: 100,
+                name: 'View 1',
+                accounts: [
+                    {
+                        id: 1,
+                        viewId: 100,
+                        accountId: 10,
+                    },
+                ],
+            },
+            {
+                id: 101,
+                name: 'View 2',
+                accounts: [
+                    {
+                        id: 2,
+                        viewId: 101,
+                        accountId: 20,
+                    },
+                ],
+            },
+            {
+                id: 102,
+                name: 'View 3',
+                accounts: [
+                    {
+                        id: 3,
+                        viewId: 102,
+                        accountId: 10,
+                    },
+                    {
+                        id: 4,
+                        viewId: 102,
+                        accountId: 20,
+                    },
+                ],
+            },
+        ],
+        budgets: [
+            {
+                threshold: -140,
+                viewId: 100,
+                categoryId: 70,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                viewId: 102,
+                categoryId: 71,
+                year: 2025,
+                month: 9,
+            },
+        ],
+    };
+
+    it('Should be properly remapped in budgets', () => {
+        const betterWorld = cleanData(world);
+        const viewIds = betterWorld.views.map(v => v.id);
+        for (const budget of betterWorld.budgets) {
+            viewIds.should.containEql(budget.viewId);
         }
     });
 });

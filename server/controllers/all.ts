@@ -31,16 +31,12 @@ import {
 } from '../helpers';
 
 import { bankVendorByUuid } from '../lib/bank-vendors';
-import {
-    InstancePropertiesType,
-    getAll as getAllInstanceProperties,
-    ConfigGhostSettings,
-} from '../lib/instance';
+import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID, DEMO_MODE } from '../../shared/settings';
 
-import { cleanData, Remapping } from './helpers';
+import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
@@ -55,34 +51,6 @@ interface GetAllDataOptions {
     isExport?: boolean;
     cleanPassword?: boolean;
 }
-
-// FIXME also contains all the fields from Access.
-interface ClientAccess {
-    vendorId: string;
-    enabled?: boolean;
-    fields: { name: string; value: string }[];
-    password?: string | null;
-    session?: string | null;
-    customLabel: string | null;
-    label?: string | null;
-}
-
-type AllData = {
-    accounts: Account[];
-    accesses: ClientAccess[];
-    alerts: Alert[];
-    categories: Category[];
-    transactions: Transaction[];
-    settings: Setting[];
-    instance: InstancePropertiesType;
-    // For exports only.
-    budgets?: Budget[];
-    transactionRules?: TransactionRule[];
-    recurringTransactions?: RecurringTransaction[];
-    appliedRecurringTransactions?: AppliedRecurringTransaction[];
-    views: View[];
-    user?: User;
-};
 
 type StartupTask = () => Promise<void>;
 type UserId = number;

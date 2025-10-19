@@ -1,11 +1,20 @@
 import regexEscape from 'regex-escape';
 
 import { assert, makeLogger } from '../helpers';
-import { ConfigGhostSettings } from '../lib/instance';
+import { ConfigGhostSettings, InstancePropertiesType } from '../lib/instance';
 import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 import {
+    Account,
+    Alert,
+    Category,
+    Transaction,
+    Budget,
+    RecurringTransaction,
+    AppliedRecurringTransaction,
+    User,
+    View,
     Setting,
     TransactionRule,
     TransactionRuleAction,
@@ -18,8 +27,38 @@ const log = makeLogger('controllers/helpers');
 
 export type Remapping = { [key: number]: number };
 
+// FIXME also contains all the fields from Access.
+export interface ClientAccess {
+    id: number;
+    userId?: number;
+    vendorId: string;
+    enabled?: boolean;
+    fields: { name: string; value: string }[];
+    password?: string | null;
+    session?: string | null;
+    customLabel: string | null;
+    label?: string | null;
+}
+
+export type AllData = {
+    accounts: Account[];
+    accesses: ClientAccess[];
+    alerts: Alert[];
+    categories: Category[];
+    transactions: Transaction[];
+    settings: Setting[];
+    instance: InstancePropertiesType;
+    // For exports only.
+    budgets?: Budget[];
+    transactionRules?: TransactionRule[];
+    recurringTransactions?: RecurringTransaction[];
+    appliedRecurringTransactions?: AppliedRecurringTransaction[];
+    views: View[];
+    user?: User;
+};
+
 // Sync function
-export function cleanData(world: any) {
+export function cleanData(world: AllData) {
     const accessMap: Remapping = {};
     let nextAccessId = 0;
 
@@ -37,7 +76,7 @@ export function cleanData(world: any) {
         a.accessId = accessMap[a.accessId];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
-        delete a.userId;
+        delete (a as any).userId;
     }
 
     const categoryMap: Remapping = {};
@@ -46,8 +85,36 @@ export function cleanData(world: any) {
     for (const c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
-        delete c.userId;
+        delete (c as any).userId;
     }
+
+    const viewMap: Remapping = {};
+    let nextviewId = 0;
+    world.views = world.views || [];
+    for (const v of world.views) {
+        viewMap[v.id] = nextviewId;
+        v.id = nextviewId++;
+
+        v.accounts = v.accounts
+            .map(viewAcc => {
+                const accId = viewAcc.accountId;
+                if (typeof accountMap[accId] === 'undefined') {
+                    log.warn(`unexpected account id: ${accId}`);
+                    return null;
+                }
+                viewAcc.accountId = accountMap[accId];
+
+                delete (viewAcc as any).id;
+
+                return viewAcc;
+            })
+            .filter(viewAcc => viewAcc !== null);
+
+        delete (v as any).userId;
+    }
+
+    // In case of unexpected accountIds that were removed, the accounts list might become empty.
+    world.views = world.views.filter(v => v.accounts.length > 0);
 
     world.budgets = world.budgets || [];
     for (const b of world.budgets) {
@@ -56,11 +123,18 @@ export function cleanData(world: any) {
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
-        delete b.id;
-        delete b.userId;
+
+        if (typeof viewMap[b.viewId] === 'undefined') {
+            log.warn(`unexpected view id for a budget: ${b.viewId}`);
+        } else {
+            b.viewId = viewMap[b.viewId];
+        }
+
+        delete (b as any).id;
+        delete (b as any).userId;
     }
 
-    world.transactions = world.transactions || world.operations || [];
+    world.transactions = world.transactions || [];
     for (const o of world.transactions) {
         if (o.categoryId !== null) {
             const cid = o.categoryId;
@@ -74,14 +148,9 @@ export function cleanData(world: any) {
         o.accountId = accountMap[o.accountId];
 
         // Strip away id.
-        delete o.id;
-        delete o.userId;
-
-        // Remove attachments, if there are any.
-        delete o.attachments;
-        delete o.binary;
+        delete (o as any).id;
+        delete (o as any).userId;
     }
-    delete world.operations;
 
     world.settings = world.settings || [];
     const settings: Setting[] = [];
@@ -96,17 +165,17 @@ export function cleanData(world: any) {
             continue;
         }
 
-        delete s.id;
-        delete s.userId;
+        delete (s as any).id;
+        delete (s as any).userId;
 
         // Properly save the default account id if it exists.
         if (s.key === DEFAULT_ACCOUNT_ID && s.value !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
-            const accountId = s.value;
+            const accountId = s.value as unknown as number;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
                 continue;
             } else {
-                s.value = accountMap[accountId];
+                s.value = accountMap[accountId].toString();
             }
         }
 
@@ -117,8 +186,8 @@ export function cleanData(world: any) {
     world.alerts = world.alerts || [];
     for (const a of world.alerts) {
         a.accountId = accountMap[a.accountId];
-        delete a.id;
-        delete a.userId;
+        delete (a as any).id;
+        delete (a as any).userId;
     }
 
     world.transactionRules = world.transactionRules || [];
@@ -166,31 +235,17 @@ export function cleanData(world: any) {
         rt.accountId = accountMap[rt.accountId];
         recurringTransactionsMap[rt.id] = nextRecurringTransactionId;
         rt.id = nextRecurringTransactionId++;
-        delete rt.userId;
+
+        delete (rt as any).userId;
     }
 
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
     for (const art of world.appliedRecurringTransactions) {
         art.accountId = accountMap[art.accountId];
         art.recurringTransactionId = recurringTransactionsMap[art.recurringTransactionId];
-        delete art.id;
-        delete art.userId;
-    }
 
-    world.views = world.views || [];
-    for (const v of world.views) {
-        v.accountIds = v.accountIds
-            .map((accId: number) => {
-                if (typeof accountMap[accId] === 'undefined') {
-                    log.warn(`unexpected default account id: ${accId}`);
-                    return null;
-                }
-                return accountMap[accId];
-            })
-            .filter((aid: number | null) => aid !== null);
-
-        delete v.id;
-        delete v.userId;
+        delete (art as any).id;
+        delete (art as any).userId;
     }
 
     return world;
