@@ -34,6 +34,10 @@ export class AddViewIdInBudget1737381056464 implements MigrationInterface {
         const bestGuessAccount =
             allAccounts.find(acc => acc.type === 'account-type.checking') || allAccounts[0];
 
+        if (!bestGuessAccount) {
+            return -1;
+        }
+
         return bestGuessAccount.id;
     }
 
