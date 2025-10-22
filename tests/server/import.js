@@ -276,10 +276,13 @@ describe('import', () => {
         ],
 
         budgets: [
-            // Duplicates should be cleaned and no error should be thrown
-            { categoryId: 0, year: 2020, month: 12, threshold: 100 },
+            // No viewId should map to the default view.
+            { categoryId: 0, year: 2025, month: 10, threshold: 150 },
 
-            { categoryId: 0, year: 2020, month: 12, threshold: 100 },
+            // Duplicates should be cleaned and no error should be thrown
+            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 1 },
+
+            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 1 },
         ],
 
         recurringTransactions: [
@@ -369,8 +372,8 @@ describe('import', () => {
 
         // Budgets duplicates should be removed.
         const actualBudgets = await Budget.all(USER_ID);
-        actualBudgets.length.should.equal(1, 'There should be exactly 1 budget');
-        actualBudgets.should.containDeep([data.budgets[0]]);
+        actualBudgets.length.should.equal(2, 'There should be exactly 2 budgets');
+        actualBudgets.should.containDeep([data.budgets[0], data.budgets[1]]);
 
         // Test for transactions is done below.
 
@@ -385,9 +388,10 @@ describe('import', () => {
 
         // Only views created by the user should be created by the import but
         // every account will have a view associated to it automatically.
-        // So, with two accounts imported, and two user views, there should be 4 views.
+        // So, with two accounts imported, and two user views, and one auto with two accounts (even though
+        // right now every auto view has only one account), there should be 5 views.
         const views = await View.all(USER_ID);
-        views.length.should.equal(4);
+        views.length.should.equal(5);
 
         // None of the 'auto' view should be imported.
         assert(!views.some(v => v.label.includes('Automatic')));
@@ -464,7 +468,7 @@ describe('import', () => {
             });
             await importData(USER_ID, data);
             const views = await View.all(USER_ID);
-            views.length.should.equal(4);
+            views.length.should.equal(5);
             should(views.every(v => v.accounts.length > 0 && !v.accounts.includes(999))).be.true();
         });
     });
