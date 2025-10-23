@@ -120,12 +120,14 @@ export function cleanData(world: AllData) {
     for (const b of world.budgets) {
         if (typeof categoryMap[b.categoryId] === 'undefined') {
             log.warn(`unexpected category id for a budget: ${b.categoryId}`);
+            b.categoryId = -1;
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
 
         if (typeof viewMap[b.viewId] === 'undefined') {
             log.warn(`unexpected view id for a budget: ${b.viewId}`);
+            b.viewId = -1;
         } else {
             b.viewId = viewMap[b.viewId];
         }
@@ -133,6 +135,9 @@ export function cleanData(world: AllData) {
         delete (b as any).id;
         delete (b as any).userId;
     }
+
+    // Remove budgets without category or view id.
+    world.budgets = world.budgets.filter(b => b.categoryId >= 0 && b.viewId >= 0);
 
     world.transactions = world.transactions || [];
     for (const o of world.transactions) {

@@ -427,3 +427,133 @@ describe('Ensure views ids are properly remapped after re-indexing', () => {
         }
     });
 });
+
+describe('Ensure budgets without valid view/category ids are ignored', () => {
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+            },
+        ],
+        accounts: [
+            {
+                id: 10,
+                name: 'Account 1',
+                balance: 100,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+            {
+                id: 20,
+                name: 'Account 2',
+                balance: 200,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+        ],
+        views: [
+            {
+                id: 100,
+                name: 'View 1',
+                accounts: [
+                    {
+                        id: 1,
+                        viewId: 100,
+                        accountId: 10,
+                    },
+                ],
+            },
+            {
+                id: 101,
+                name: 'View 2',
+                accounts: [
+                    {
+                        id: 2,
+                        viewId: 101,
+                        accountId: 20,
+                    },
+                ],
+            },
+            {
+                id: 102,
+                name: 'View 3',
+                accounts: [
+                    {
+                        id: 3,
+                        viewId: 102,
+                        accountId: 10,
+                    },
+                    {
+                        id: 4,
+                        viewId: 102,
+                        accountId: 20,
+                    },
+                ],
+            },
+        ],
+        categories: [
+            {
+                label: 'Groceries',
+                color: '#1b9d68',
+                id: 0,
+            },
+            {
+                label: 'Whatever',
+                color: '#4b1F68',
+                id: 1,
+            },
+        ],
+        budgets: [
+            {
+                threshold: -140,
+                viewId: 100,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                viewId: 102,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -140,
+                viewId: 100,
+                categoryId: -1,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -140,
+                viewId: 100,
+                // no category
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                viewId: -1,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                // no view id
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+        ],
+    };
+
+    it('Should be properly remapped in budgets', () => {
+        const betterWorld = cleanData(world);
+        betterWorld.budgets.length.should.equal(2, 'There should be exactly 2 budgets kept');
+    });
+});
