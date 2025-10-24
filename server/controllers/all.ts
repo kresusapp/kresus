@@ -31,16 +31,12 @@ import {
 } from '../helpers';
 
 import { bankVendorByUuid } from '../lib/bank-vendors';
-import {
-    InstancePropertiesType,
-    getAll as getAllInstanceProperties,
-    ConfigGhostSettings,
-} from '../lib/instance';
+import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID, DEMO_MODE } from '../../shared/settings';
 
-import { cleanData, Remapping } from './helpers';
+import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
@@ -55,34 +51,6 @@ interface GetAllDataOptions {
     isExport?: boolean;
     cleanPassword?: boolean;
 }
-
-// FIXME also contains all the fields from Access.
-interface ClientAccess {
-    vendorId: string;
-    enabled?: boolean;
-    fields: { name: string; value: string }[];
-    password?: string | null;
-    session?: string | null;
-    customLabel: string | null;
-    label?: string | null;
-}
-
-type AllData = {
-    accounts: Account[];
-    accesses: ClientAccess[];
-    alerts: Alert[];
-    categories: Category[];
-    transactions: Transaction[];
-    settings: Setting[];
-    instance: InstancePropertiesType;
-    // For exports only.
-    budgets?: Budget[];
-    transactionRules?: TransactionRule[];
-    recurringTransactions?: RecurringTransaction[];
-    appliedRecurringTransactions?: AppliedRecurringTransaction[];
-    views: View[];
-    user?: User;
-};
 
 type StartupTask = () => Promise<void>;
 type UserId = number;
@@ -545,13 +513,48 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
 
     log.info('Import views...');
     const viewsMap: Remapping = {};
+    const existingViews = await View.all(userId);
     for (const view of world.views) {
         const viewId = view.id;
         delete view.id;
 
         if (!view.createdByUser) {
-            log.warn('Ignoring view not created by user:\n', view);
-            continue;
+            // Views created by the user are views created automatically by Kresus to group accounts.
+            // Since new automatic views were created automatically when importing accounts, we
+            // should not recreate them here.
+            // However, we still to map the view ids (for budgets at least).
+
+            // Try to retrieve the corresponding view created automatically.
+            const viewAccountsRemapped = view.accounts.map((vAcc: any) =>
+                accountIdToAccount.get(vAcc.accountId)
+            );
+
+            const correspondingView = existingViews.find(ev => {
+                if (ev.accounts.length === view.accounts.length) {
+                    const evAccounts = ev.accounts.map(a => a.accountId);
+
+                    for (const accId of viewAccountsRemapped) {
+                        if (!evAccounts.includes(accId)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (correspondingView) {
+                viewsMap[viewId] = correspondingView.id;
+
+                log.warn(
+                    'Not re-creating view not created by user as there is already one corresponding view:\n',
+                    view
+                );
+
+                continue;
+            }
         }
 
         const viewAccounts = [];
@@ -663,6 +666,11 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             // Set the default view id as the budget's viewId.
             importedBudget.viewId = defaultViewId;
         } else {
+            if (!viewsMap[importedBudget.viewId]) {
+                log.warn('No view to associate a budget with, skipping budget import…');
+                continue;
+            }
+
             importedBudget.viewId = viewsMap[importedBudget.viewId];
         }
 

@@ -321,4 +321,18 @@ describe('migrations', () => {
 
         bestGuessAccountId.should.equal(checkingAccount.id);
     });
+
+    it('should run migration 25 without throwing where there are no accounts', async () => {
+        await Access.destroyAll(USER_ID);
+
+        const connection = User.repo().manager.connection;
+        const queryRunner = connection.createQueryRunner();
+
+        const bestGuessId = await AddViewIdInBudgetMigration.guessDefaultAccount(
+            queryRunner,
+            USER_ID
+        );
+        // eslint-disable-next-line new-cap
+        bestGuessId.should.equal(-1);
+    });
 });
