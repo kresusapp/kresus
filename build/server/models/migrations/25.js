@@ -25,6 +25,9 @@ class AddViewIdInBudget1737381056464 {
         });
         // Find the first checking account if present otherwise use the first account id found.
         const bestGuessAccount = allAccounts.find(acc => acc.type === 'account-type.checking') || allAccounts[0];
+        if (!bestGuessAccount) {
+            return -1;
+        }
         return bestGuessAccount.id;
     }
     async up(q) {

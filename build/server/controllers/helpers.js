@@ -41,6 +41,28 @@ function cleanData(world) {
         c.id = nextCatId++;
         delete c.userId;
     }
+    const viewMap = {};
+    let nextviewId = 0;
+    world.views = world.views || [];
+    for (const v of world.views) {
+        viewMap[v.id] = nextviewId;
+        v.id = nextviewId++;
+        v.accounts = v.accounts
+            .map(viewAcc => {
+            const accId = viewAcc.accountId;
+            if (typeof accountMap[accId] === 'undefined') {
+                log.warn(`unexpected account id: ${accId}`);
+                return null;
+            }
+            viewAcc.accountId = accountMap[accId];
+            delete viewAcc.id;
+            return viewAcc;
+        })
+            .filter(viewAcc => viewAcc !== null);
+        delete v.userId;
+    }
+    // In case of unexpected accountIds that were removed, the accounts list might become empty.
+    world.views = world.views.filter(v => v.accounts.length > 0);
     world.budgets = world.budgets || [];
     for (const b of world.budgets) {
         if (typeof categoryMap[b.categoryId] === 'undefined') {
@@ -49,10 +71,16 @@ function cleanData(world) {
         else {
             b.categoryId = categoryMap[b.categoryId];
         }
+        if (typeof viewMap[b.viewId] === 'undefined') {
+            log.warn(`unexpected view id for a budget: ${b.viewId}`);
+        }
+        else {
+            b.viewId = viewMap[b.viewId];
+        }
         delete b.id;
         delete b.userId;
     }
-    world.transactions = world.transactions || world.operations || [];
+    world.transactions = world.transactions || [];
     for (const o of world.transactions) {
         if (o.categoryId !== null) {
             const cid = o.categoryId;
@@ -67,11 +95,7 @@ function cleanData(world) {
         // Strip away id.
         delete o.id;
         delete o.userId;
-        // Remove attachments, if there are any.
-        delete o.attachments;
-        delete o.binary;
     }
-    delete world.operations;
     world.settings = world.settings || [];
     const settings = [];
     for (const s of world.settings) {
@@ -93,7 +117,7 @@ function cleanData(world) {
                 continue;
             }
             else {
-                s.value = accountMap[accountId];
+                s.value = accountMap[accountId].toString();
             }
         }
         settings.push(s);
@@ -150,20 +174,6 @@ function cleanData(world) {
         art.recurringTransactionId = recurringTransactionsMap[art.recurringTransactionId];
         delete art.id;
         delete art.userId;
-    }
-    world.views = world.views || [];
-    for (const v of world.views) {
-        v.accountIds = v.accountIds
-            .map((accId) => {
-            if (typeof accountMap[accId] === 'undefined') {
-                log.warn(`unexpected default account id: ${accId}`);
-                return null;
-            }
-            return accountMap[accId];
-        })
-            .filter((aid) => aid !== null);
-        delete v.id;
-        delete v.userId;
     }
     return world;
 }
