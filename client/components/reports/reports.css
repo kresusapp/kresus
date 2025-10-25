@@ -165,12 +165,6 @@
     vertical-align: middle;
 }
 
-.transaction-table th,
-.transaction-table td {
-    border-left: 0;
-    border-right: 0;
-}
-
 .transaction-table tr:nth-last-child(2) td {
     border: 0;
 }

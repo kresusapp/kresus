@@ -44,6 +44,12 @@ table.no-vertical-border td {
     border-right: none;
 }
 
+table.no-horizontal-border th,
+table.no-horizontal-border td {
+    border-top: none;
+    border-bottom: none;
+}
+
 table thead th {
     border-bottom-width: 2px;
     line-height: 1.4286;
