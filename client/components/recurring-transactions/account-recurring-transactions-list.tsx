@@ -3,20 +3,24 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import * as BanksStore from '../../store/banks';
 import { useKresusState } from '../../store';
+import * as UiStore from '../../store/ui';
 
 import { RecurringTransaction } from '../../models';
 
 import { translate as $t } from '../../helpers';
 
-import DisplayIf from '../ui/display-if';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import ButtonLink from '../ui/button-link';
 
-import RecurringTransactionItem from './recurring-transaction-item';
+import RecurringTransactionItem, {
+    SwipeableRecurringTransactionItem,
+} from './recurring-transaction-item';
 
 import URL from '../../urls';
 
 const RecurringTransactionsList = () => {
     const history = useHistory();
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const { accountId: accountIdStr } = useParams<{
         accountId: string;
@@ -51,8 +55,10 @@ const RecurringTransactionsList = () => {
         return null;
     }
 
+    const Item = isSmallScreen ? SwipeableRecurringTransactionItem : RecurringTransactionItem;
+
     const recurringTransactionsItems = recurringTransactions.map((rt: RecurringTransaction) => (
-        <RecurringTransactionItem key={rt.id} recurringTransaction={rt} />
+        <Item key={rt.id} recurringTransaction={rt} />
     ));
 
     return (
@@ -68,8 +74,6 @@ const RecurringTransactionsList = () => {
                 />
             </p>
 
-            <hr />
-
             <DisplayIf condition={!recurringTransactions.length}>
                 <p className="recurring-transactions-none">
                     <span>{$t('client.recurring_transactions.none')}</span>
@@ -83,21 +87,33 @@ const RecurringTransactionsList = () => {
                 </p>
             </DisplayIf>
             <DisplayIf condition={recurringTransactions.length > 0}>
-                <table className="no-vertical-border recurring-transactions-list">
-                    <thead>
-                        <tr>
-                            <th className="label">{$t('client.addtransaction.label')}</th>
-                            <th className="type">{$t('client.addtransaction.type')}</th>
-                            <th className="amount">{$t('client.addtransaction.amount')}</th>
-                            <th className="day">{$t('client.recurring_transactions.day')}</th>
-                            <th className="months">{$t('client.recurring_transactions.months')}</th>
-                            <th className="actions" colSpan={2}>
-                                &nbsp;
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>{recurringTransactionsItems}</tbody>
-                </table>
+                <div className="swipeable-table-wrapper">
+                    <table className="swipeable-table striped no-vertical-border no-horizontal-border recurring-transactions-list">
+                        <thead>
+                            <tr>
+                                <IfMobile>
+                                    <th className="swipeable-action swipeable-action-left" />
+                                </IfMobile>
+                                <th className="label">{$t('client.addtransaction.label')}</th>
+                                <th className="type">{$t('client.addtransaction.type')}</th>
+                                <th className="amount">{$t('client.addtransaction.amount')}</th>
+                                <th className="day">{$t('client.recurring_transactions.day')}</th>
+                                <th className="months">
+                                    {$t('client.recurring_transactions.months')}
+                                </th>
+                                <IfNotMobile>
+                                    <th className="actions" colSpan={2}>
+                                        &nbsp;
+                                    </th>
+                                </IfNotMobile>
+                                <IfMobile>
+                                    <th className="swipeable-action swipeable-action-right" />
+                                </IfMobile>
+                            </tr>
+                        </thead>
+                        <tbody>{recurringTransactionsItems}</tbody>
+                    </table>
+                </div>
             </DisplayIf>
         </>
     );
