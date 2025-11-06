@@ -197,6 +197,7 @@ main nav > :nth-last-child(2) {
 #content-container {
     flex: auto;
     overflow: auto;
+    container-type: inline-size;
 }
 
 .content {
