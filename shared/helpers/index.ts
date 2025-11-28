@@ -211,6 +211,8 @@ export const currency = {
 export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
+export const NONE_CATEGORY_ID = -1;
+
 export const MIN_WOOB_VERSION = '3.5';
 export const UNKNOWN_WOOB_VERSION = null;
 

@@ -34,7 +34,12 @@ import { bankVendorByUuid } from '../lib/bank-vendors';
 import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
-import { DEFAULT_ACCOUNT_ID, DEMO_MODE } from '../../shared/settings';
+import {
+    DEFAULT_ACCOUNT_ID,
+    DEMO_MODE,
+    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
+    DUPLICATE_THRESHOLD,
+} from '../../shared/settings';
 
 import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
 import { isDemoEnabled } from './instance';
@@ -42,6 +47,7 @@ import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
 import diffAccount from '../lib/diff-accounts';
 import diffTransactions from '../lib/diff-transactions';
+import { findRedundantPairs } from '../lib/duplicates-manager';
 
 const log = makeLogger('controllers/all');
 
@@ -142,6 +148,57 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         );
     } else {
         ret.instance = await getAllInstanceProperties();
+
+        // Find duplicates.
+        // First, map transactions to accounts
+        const accountTransactionsMap = new Map<number, Transaction[]>();
+        for (const tr of ret.transactions) {
+            if (!accountTransactionsMap.has(tr.accountId)) {
+                accountTransactionsMap.set(tr.accountId, [tr]);
+            } else {
+                accountTransactionsMap.get(tr.accountId)?.push(tr);
+            }
+        }
+
+        const duplicateThresholdSetting = ret.settings.find(s => s.key === DUPLICATE_THRESHOLD);
+        const ignoreDuplicatesWithDifferentCustomFieldsSetting = ret.settings.find(
+            s => s.key === DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
+        );
+
+        const ignoreDuplicatesWithDifferentCustomFieldsSettingValue =
+            ignoreDuplicatesWithDifferentCustomFieldsSetting
+                ? ignoreDuplicatesWithDifferentCustomFieldsSetting.value
+                : unwrap(DefaultSettings.get(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS));
+
+        const threshold = Number.parseInt(
+            duplicateThresholdSetting
+                ? duplicateThresholdSetting.value
+                : unwrap(DefaultSettings.get(DUPLICATE_THRESHOLD)),
+            10
+        );
+        const ignoreDuplicatesWithDifferentCustomFields =
+            ignoreDuplicatesWithDifferentCustomFieldsSettingValue === 'true';
+
+        const newDuplicates: NonNullable<AllData['duplicates']>['new'] = [];
+
+        for (const [accountId, transactions] of accountTransactionsMap.entries()) {
+            const duplicates = findRedundantPairs(
+                transactions,
+                threshold,
+                ignoreDuplicatesWithDifferentCustomFields
+            );
+
+            if (duplicates.length > 0) {
+                newDuplicates.push({
+                    accountId,
+                    duplicates,
+                });
+            }
+        }
+
+        ret.duplicates = {
+            new: newDuplicates,
+        };
 
         const user = await User.find(userId);
         if (user) {

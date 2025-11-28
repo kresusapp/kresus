@@ -16,6 +16,7 @@ import {
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
+    NONE_CATEGORY_ID,
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -36,6 +37,7 @@ export {
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
+    NONE_CATEGORY_ID,
 };
 
 export function makeLogger(prefix: string): Logger {

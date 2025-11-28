@@ -19,6 +19,7 @@ export {
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
+    NONE_CATEGORY_ID,
 } from '../../shared/helpers';
 
 export { startOfDay, endOfDay, startOfMonth, endOfMonth } from '../../shared/helpers/dates';
@@ -95,8 +96,6 @@ export function displayLabel(obj: { customLabel: string | null; label: string })
 export function round2(x: number) {
     return Math.round(x * 100) / 100;
 }
-
-export const NONE_CATEGORY_ID = -1;
 
 export function stringToColor(str: string) {
     let hash = 0;

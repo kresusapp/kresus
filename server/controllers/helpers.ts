@@ -54,7 +54,14 @@ export type AllData = {
     recurringTransactions?: RecurringTransaction[];
     appliedRecurringTransactions?: AppliedRecurringTransaction[];
     views: View[];
+    // For non exports only.
     user?: User;
+    duplicates?: {
+        new: Array<{
+            accountId: number;
+            duplicates: Array<[Transaction['id'], Transaction['id']]>;
+        }>;
+    };
 };
 
 // Sync function
