@@ -40,6 +40,13 @@ export interface ClientAccess {
     label?: string | null;
 }
 
+export type Duplicates = {
+    new: Array<{
+        accountId: number;
+        duplicates: Array<[Transaction['id'], Transaction['id']]>;
+    }>;
+};
+
 export type AllData = {
     accounts: Account[];
     accesses: ClientAccess[];
@@ -56,12 +63,7 @@ export type AllData = {
     views: View[];
     // For non exports only.
     user?: User;
-    duplicates?: {
-        new: Array<{
-            accountId: number;
-            duplicates: Array<[Transaction['id'], Transaction['id']]>;
-        }>;
-    };
+    duplicates?: Duplicates;
 };
 
 // Sync function
