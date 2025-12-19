@@ -16,7 +16,8 @@ function help(binaryName) {
             '\tcreate:config: creates an empty configuration file up to date.\n' +
             '\tcreate:user $login [--admin]: creates a new user with given login,\n' +
             '\t\tand assigns it an ID. Pass "--admin" to create an administrator.\n' +
-            '\tdelete:user $login: deletes a user with given login'
+            '\tdelete:user $login: deletes a user with given login\n' +
+            '\tlist:users: lists all the users with their id, login and admin status.'
     );
 }
 
@@ -151,6 +152,14 @@ function deleteUser(login) {
     });
 }
 
+function listUsers() {
+    let cli = require(path.join(ROOT, 'server', 'cli'));
+    cli.listUsers().catch(error => {
+        console.error(error);
+        process.exit(-1);
+    });
+}
+
 // First two args are [node, binaryname]
 let numActualArgs = Math.max(process.argv.length - 2, 0);
 function actualArg(n) {
@@ -205,6 +214,9 @@ for (let i = 0; i < numActualArgs; i++) {
         commandArgs.push(login);
 
         i += 1;
+    } else if (arg === 'list:users') {
+        command = listUsers;
+        break;
     } else if (arg === 'create:config') {
         console.log(configurator.generate());
         process.exit(0);

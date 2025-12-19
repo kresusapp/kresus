@@ -43,3 +43,20 @@ export async function deleteUser(login: string) {
         throw new Error(`Couldn't delete user ${login}: ${err.message} ${err.stack}`);
     }
 }
+
+export async function listUsers() {
+    try {
+        log.info('Listing users: setting up database.');
+        await setupOrm();
+
+        log.info(`Database set up; listing users...`);
+        const users = await User.all();
+
+        log.info(`Found ${users.length} users.`);
+        for (const user of users) {
+            log.info(`- id=${user.id} login=${user.login} isAdmin=${user.isAdmin}`);
+        }
+    } catch (err) {
+        throw new Error(`Couldn't list users: ${err.message} ${err.stack}`);
+    }
+}
