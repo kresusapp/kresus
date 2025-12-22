@@ -45,3 +45,10 @@ export type TransactionRuleConditionType =
     | 'label_matches_regexp'
     | 'amount_equals';
 export type TransactionRuleActionType = 'categorize';
+
+export type Duplicates = {
+    new: Array<{
+        accountId: number;
+        duplicates: Array<[number, number]>;
+    }>;
+};

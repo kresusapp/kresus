@@ -23,6 +23,8 @@ import {
 
 import { conditionTypesList } from './rules';
 
+import type { Duplicates } from '../../shared/types';
+
 const log = makeLogger('controllers/helpers');
 
 export type Remapping = { [key: number]: number };
@@ -39,13 +41,6 @@ export interface ClientAccess {
     customLabel: string | null;
     label?: string | null;
 }
-
-export type Duplicates = {
-    new: Array<{
-        accountId: number;
-        duplicates: Array<[Transaction['id'], Transaction['id']]>;
-    }>;
-};
 
 export type AllData = {
     accounts: Account[];

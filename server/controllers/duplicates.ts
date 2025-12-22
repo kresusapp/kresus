@@ -6,7 +6,7 @@ import { IdentifiedRequest } from './routes';
 import { findRedundantPairs } from '../lib/duplicates-manager';
 import { DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, DUPLICATE_THRESHOLD } from '../shared/settings';
 
-import type { Duplicates } from './helpers';
+import type { Duplicates } from '../shared/types';
 
 export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Response) {
     try {

@@ -465,3 +465,8 @@ export function updateView(viewId: number, attributes: Partial<ServerView>) {
 export function deleteView(viewId: number) {
     return new Request(`api/views/${viewId}`).delete().run();
 }
+
+// /api/duplicates
+export function fetchDuplicates() {
+    return new Request('api/duplicates').run();
+}

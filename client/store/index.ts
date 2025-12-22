@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as BankStore from './banks';
 import * as BudgetStore from './budgets';
 import * as CategoryStore from './categories';
+import * as DuplicatesStore from './duplicates';
 import * as InstanceStore from './instance';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
@@ -31,6 +32,7 @@ const storesToReset = [
     RulesStore,
     InstanceStore,
     ViewStore,
+    DuplicatesStore,
 ];
 
 export const resetGlobalState = createAction<any>('global/reset');
@@ -52,6 +54,43 @@ resetStateMiddleware.startListening({
     },
 });
 
+// Duplicates are affected by transaction creation/deletion/update, as well as settings update, as
+// well as transactions sync, so we listen to these actions to update the duplicates list.
+const duplicatesMiddleware = createListenerMiddleware();
+duplicatesMiddleware.startListening({
+    matcher: isAnyOf(
+        BankStore.createTransaction.fulfilled,
+        BankStore.setTransactionCategory.fulfilled,
+        BankStore.setTransactionType.fulfilled,
+        BankStore.setTransactionCustomLabel.fulfilled,
+        BankStore.setTransactionDate.fulfilled,
+        BankStore.runAccountsSync.fulfilled,
+        BankStore.createAccess.fulfilled,
+        BankStore.deleteAccess.fulfilled,
+        BankStore.applyBulkEdit.fulfilled,
+        SettingsStore.setPair.fulfilled
+    ),
+    effect: async (action, { dispatch }) => {
+        if (action.type === SettingsStore.setPair.fulfilled.toString()) {
+            if (
+                typeof action.payload !== 'object' ||
+                !action.payload ||
+                !('key' in action.payload) ||
+                typeof action.payload.key !== 'string'
+            ) {
+                return;
+            }
+
+            const { key } = action.payload;
+            if (!key || !key.startsWith('duplicate')) {
+                return;
+            }
+        }
+
+        void dispatch(DuplicatesStore.updateDuplicatesList());
+    },
+});
+
 // Store
 export const reduxStore = configureStore({
     reducer: {
@@ -63,6 +102,7 @@ export const reduxStore = configureStore({
         settings: SettingsStore.reducer,
         views: ViewStore.reducer,
         ui: UiStore.reducer,
+        duplicates: DuplicatesStore.reducer,
     },
     devTools: true,
     middleware: getDefaultMiddleware =>
@@ -70,7 +110,7 @@ export const reduxStore = configureStore({
         // We should have serializable models/states.
         getDefaultMiddleware({
             serializableCheck: false,
-        }).concat(logger, resetStateMiddleware.middleware),
+        }).concat(logger, resetStateMiddleware.middleware, duplicatesMiddleware.middleware),
 });
 
 export type GlobalState = ReturnType<typeof reduxStore.getState>;

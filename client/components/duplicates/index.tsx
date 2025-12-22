@@ -1,20 +1,12 @@
 import React, { useCallback, useContext } from 'react';
-import { createSelector } from '@reduxjs/toolkit';
 
-import {
-    debug as dbg,
-    translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
-    NONE_CATEGORY_ID,
-} from '../../helpers';
-import {
-    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
-    DUPLICATE_THRESHOLD,
-} from '../../../shared/settings';
+import { translate as $t } from '../../helpers';
+import { DUPLICATE_THRESHOLD } from '../../../shared/settings';
 
-import { useKresusDispatch, useKresusState, reduxStore, GlobalState } from '../../store';
+import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
+import * as DuplicatesStore from '../../store/duplicates';
 
 import DefaultParameters from './default-params';
 
@@ -27,101 +19,14 @@ import { useGenericError } from '../../hooks';
 import DiscoveryMessage from '../ui/discovery-message';
 import MergeAll from './merge-all';
 
-function debug(text: string) {
-    return dbg(`Similarity Component - ${text}`);
-}
-
-// Algorithm:
-// The algorithm is split in two parts:
-// - findRedundantPairsIdsNoFields, which only looks at the transactions' dates,
-// which are considered immutable. Hence this function can be memoized.
-// - findRedundantPairs, which calls the first part, and then applies
-// additional filters on the transactions fields themselves. This will return a
-// new array each time, but it should still be very fast, since the most costly
-// part of the algorithm is memoized.
-function findRedundantPairsIdsNoFields(transactionIds: number[], duplicateThresholdStr: string) {
-    const before = Date.now();
-    debug('Running findRedundantPairsIdsNoFields algorithm...');
-    debug(`Input: ${transactionIds.length} transactions`);
-    const similar = [];
-
-    // duplicateThreshold is in hours
-    const duplicateThreshold = Number.parseInt(duplicateThresholdStr, 10);
-    const threshold = duplicateThreshold * 60 * 60 * 1000;
-    debug(`Threshold: ${threshold}`);
-
-    const state = reduxStore.getState();
-    const transactions = transactionIds.map(id => BanksStore.transactionById(state.banks, id));
-
-    // O(n log n)
-    const sorted = transactions.slice().sort((a, b) => a.amount - b.amount);
-    for (let i = 0; i < transactions.length; ++i) {
-        const tr = sorted[i];
-        let j = i + 1;
-        while (j < transactions.length) {
-            const next = sorted[j];
-            if (next.amount !== tr.amount) {
-                break;
-            }
-
-            // Two transactions are duplicates if they were not imported at the same date.
-            const datediff = Math.abs(+tr.date - +next.date);
-            if (datediff <= threshold && +tr.importDate !== +next.importDate) {
-                similar.push([tr, next]);
-            }
-
-            j += 1;
-        }
-    }
-
-    debug(`${similar.length} pairs of similar transactions found`);
-    debug(`findRedundantPairsIdsNoFields took ${Date.now() - before}ms.`);
-
-    // The duplicates are sorted from last imported to first imported
-    similar.sort(
-        (a, b) =>
-            Math.max(+b[0].importDate, +b[1].importDate) -
-            Math.max(+a[0].importDate, +a[1].importDate)
-    );
-
-    return similar.map(([trA, trB]) => [trA.id, trB.id]);
-}
-
-const findRedundantPairsIds = createSelector(
-    (state: GlobalState, currentAccountId: number) =>
-        BanksStore.transactionIdsByAccountId(state.banks, currentAccountId),
-    (state: GlobalState) => SettingsStore.get(state.settings, DUPLICATE_THRESHOLD),
-    (transactionIds: number[], threshold: string) =>
-        findRedundantPairsIdsNoFields(transactionIds, threshold)
-);
-
-export function findRedundantPairs(state: GlobalState, currentAccountId: number) {
-    let similar = findRedundantPairsIds(state, currentAccountId).map(([trId, nextId]) => [
-        BanksStore.transactionById(state.banks, trId),
-        BanksStore.transactionById(state.banks, nextId),
-    ]);
-
-    const ignoreDifferentCustomFields = SettingsStore.getBool(
-        state.settings,
-        DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
-    );
-
-    if (ignoreDifferentCustomFields) {
-        similar = similar.filter(([tr, next]) => {
-            return (
-                (!tr.customLabel || !next.customLabel || tr.customLabel === next.customLabel) &&
-                // Two transactions with the same known type/category can be considered as duplicates.
-                (tr.type === UNKNOWN_TRANSACTION_TYPE ||
-                    next.type === UNKNOWN_TRANSACTION_TYPE ||
-                    tr.type === next.type) &&
-                (tr.categoryId === NONE_CATEGORY_ID ||
-                    next.categoryId === NONE_CATEGORY_ID ||
-                    tr.categoryId === next.categoryId)
-            );
-        });
-    }
-
-    return similar;
+export function findRedundantPairs(state: GlobalState, accountId: number) {
+    const accountDuplicates = DuplicatesStore.byAccountId(state.duplicates, accountId);
+    return accountDuplicates.flatMap(item => {
+        return item.duplicates.map(dup => [
+            BanksStore.transactionById(state.banks, dup[0]),
+            BanksStore.transactionById(state.banks, dup[1]),
+        ]);
+    });
 }
 
 const THRESHOLDS_SUITE = [24, 24 * 2, 24 * 3, 24 * 4, 24 * 7, 24 * 14];
