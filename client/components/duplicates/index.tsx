@@ -185,6 +185,8 @@ const Duplicates = () => {
         return setThreshold(nextThreshold.toString());
     }, [setThreshold, nextThreshold]);
 
+    const duplicateThresholdInDays = duplicateThreshold / 24;
+
     let sim;
     if (pairsByAccount.size === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
@@ -232,8 +234,8 @@ const Duplicates = () => {
                             {$t('client.similarity.find_fewer')}
                         </button>
                         <span className="btn inner-text">
-                            {duplicateThreshold}
-                            &nbsp;{$t('client.similarity.hours')}
+                            {duplicateThresholdInDays}
+                            &nbsp;{$t('client.similarity.days')}
                         </span>
                         <button className="btn" onClick={more} disabled={!allowMore}>
                             {$t('client.similarity.find_more')}
