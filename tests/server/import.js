@@ -20,7 +20,7 @@ import {
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-import { assert } from 'console';
+import assert from 'node:assert';
 
 let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;
@@ -101,6 +101,7 @@ describe('import', () => {
             {
                 id: 0,
                 label: 'Automatic view',
+                createdByUser: false,
                 accounts: [
                     {
                         accountId: 0,
@@ -112,10 +113,6 @@ describe('import', () => {
                 label: 'Automatic view #2',
                 createdByUser: false,
                 accounts: [
-                    {
-                        accountId: 0,
-                    },
-
                     {
                         accountId: 1,
                     },
@@ -279,10 +276,11 @@ describe('import', () => {
             // No viewId should map to the default view.
             { categoryId: 0, year: 2025, month: 10, threshold: 150 },
 
-            // Duplicates should be cleaned and no error should be thrown
-            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 1 },
+            // Duplicates should be cleaned and no error should be thrown. The view id refers to a
+            // view created automatically for an account (and thus won't be imported as-is).
+            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 0 },
 
-            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 1 },
+            { categoryId: 0, year: 2020, month: 12, threshold: 100, viewId: 0 },
         ],
 
         recurringTransactions: [
@@ -391,7 +389,7 @@ describe('import', () => {
         // So, with two accounts imported, and two user views, and one auto with two accounts (even though
         // right now every auto view has only one account), there should be 5 views.
         const views = await View.all(USER_ID);
-        views.length.should.equal(5);
+        views.length.should.equal(4);
 
         // None of the 'auto' view should be imported.
         assert(!views.some(v => v.label.includes('Automatic')));
@@ -468,7 +466,7 @@ describe('import', () => {
             });
             await importData(USER_ID, data);
             const views = await View.all(USER_ID);
-            views.length.should.equal(5);
+            views.length.should.equal(4);
             should(views.every(v => v.accounts.length > 0 && !v.accounts.includes(999))).be.true();
         });
     });

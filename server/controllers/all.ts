@@ -522,7 +522,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             // Views created by the user are views created automatically by Kresus to group accounts.
             // Since new automatic views were created automatically when importing accounts, we
             // should not recreate them here.
-            // However, we still to map the view ids (for budgets at least).
+            // However, we still need to map the view ids (for budgets at least).
 
             // Try to retrieve the corresponding view created automatically.
             const viewAccountsRemapped = view.accounts.map((vAcc: any) =>
