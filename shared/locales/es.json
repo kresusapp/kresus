@@ -494,8 +494,6 @@
       "find_fewer": "Encontrar menos",
       "threshold_desc": "Dos operaciones se considerarán posibles duplicados si la duración entre ellas es inferior al umbral de tiempo definido a continuación. Puede tambien cambiar este valor en los parámetros por defecto haciendo clic en el botón « Parámetros por defecto » en la esquina superior derecha.",
       "hours": "horas",
-      "default_help": "Dos transacciones se considerarán duplicadas si se producen dentro de este periodo de tiempo (en horas).",
-      "default_threshold": "Umbral de duplicación",
       "ignore_different_custom_fields": "Ignorar diferentes campos personalizados",
       "ignore_different_custom_fields_desc": "Si ambas operaciones tienen definido un tipo, una categoría o una etiqueta personalizada, y uno de estos campos es diferente entre las dos operaciones, no las considere como duplicadas.",
       "confirm": "¿Confirma la fusión de estas dos operaciones ? Esta acción es irreversible !",
@@ -548,9 +546,6 @@
       "card_summary": "Tarjeta (diferida)",
       "deferred_card": "Débit différé",
       "internal_transfer": "Transferencia interna"
-    },
-    "units": {
-      "hours": "horas"
     },
     "addtransaction": {
       "label": "Redacción de la operación",

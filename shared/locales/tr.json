@@ -491,8 +491,6 @@
             "find_fewer": "Daha az bul",
             "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir. Bu değeri sağ üstteki \"Varsayılan ayarlar\" düğmesine tıklayarak varsayılan ayarlarda da ayarlayabilirsiniz.",
             "hours": "saat",
-            "default_help": "Iki işlem çift olarak kabul edilecektir, bu süre içinde (saat olarak) gerçekleşmişseler.",
-            "default_threshold": "Çiftleme eşiği",
             "ignore_different_custom_fields": "Farklı özel alanları yoksay",
             "ignore_different_custom_fields_desc": "İki işlemin tanımlanmış bir özel türü, kategorisi veya etiketi varsa ve bu alanlardan biri iki işlem arasında farklıysa, bunları yineleme olarak kabul etme.",
             "confirm": "Bu iki işlemi birleştirmeyi onaylıyor musunuz? Bu eylem geri alınamaz!",
@@ -545,9 +543,6 @@
             "card_summary": "Kart (ertelenmiş)",
             "deferred_card": "Ertelenmiş akış",
             "internal_transfer": "Iç havale"
-        },
-        "units": {
-            "hours": "saat"
         },
         "addtransaction": {
             "label": "Işlemin etiketi",
