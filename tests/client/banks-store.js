@@ -1,5 +1,4 @@
 import should from 'should';
-import deepcopy from 'lodash.clonedeep';
 
 import {
     accessById,
@@ -16,7 +15,7 @@ import banks from '../../shared/banks.json';
 // Store adapters.
 const makeAdapter = func => {
     return (state, ...rest) => {
-        let mut = deepcopy(state);
+        let mut = structuredClone(state);
         func(mut, ...rest);
         return mut;
     };

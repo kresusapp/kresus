@@ -1,5 +1,4 @@
 import should from 'should';
-import deepclone from 'lodash.clonedeep';
 
 import diffAccounts, { testing } from '../../server/lib/diff-accounts';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../../server/providers/manual';
@@ -12,7 +11,7 @@ let A = {
     currency: null,
 };
 
-let copyA = deepclone(A);
+let copyA = structuredClone(A);
 
 let B = {
     accessId: 0,
@@ -22,7 +21,7 @@ let B = {
     currency: 'dogecoin',
 };
 
-let copyB = deepclone(B);
+let copyB = structuredClone(B);
 
 // Same currency as B, to make sure it's not merged with B by default.
 let C = {
@@ -32,7 +31,7 @@ let C = {
     currency: 'dogecoin',
 };
 
-let copyC = deepclone(C);
+let copyC = structuredClone(C);
 
 describe("diffing account when there's only one account", () => {
     it('should return an exact match for the same account', () => {
@@ -87,7 +86,7 @@ describe("diffing account when there's only one account", () => {
 
     it('should merge a single account when an iban has been added', () => {
         let changedA = {
-            ...deepclone(A),
+            ...structuredClone(A),
             iban: '1234 5678 9012 34',
         };
 
@@ -109,7 +108,7 @@ describe("diffing account when there's only one account", () => {
 
     it('should merge a single account when the account number has been changed', () => {
         let changedA = {
-            ...deepclone(A),
+            ...structuredClone(A),
             vendorAccountId: 'lolololol',
         };
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
@@ -207,9 +206,9 @@ describe('diffing account when there are several accounts', () => {
     });
 
     it('should provide meaningful merges', () => {
-        let otherB = { ...deepclone(B), iban: null };
+        let otherB = { ...structuredClone(B), iban: null };
         let otherC = {
-            ...deepclone(C),
+            ...structuredClone(C),
             label: 'Comptes de Perrault',
             iban: '1234 5678 9012 34', // That's B's iban
         };
@@ -269,7 +268,7 @@ describe('diffing account when there are several accounts', () => {
             vendorAccountId: '1234abcd',
         };
         const same = {
-            ...deepclone(first),
+            ...structuredClone(first),
             label: 'Compte chèque',
             iban: '1234 5678 9012 34',
         };

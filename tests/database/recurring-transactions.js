@@ -7,7 +7,6 @@ import {
     AppliedRecurringTransaction,
 } from '../../server/models';
 import { importData } from '../../server/controllers/all';
-import deepcopy from 'lodash.clonedeep';
 
 const world = {
     accesses: [
@@ -67,7 +66,7 @@ describe('RecurringTransaction model API', () => {
     });
 
     describe('RecurringTransaction creation/edition/deletion', () => {
-        let smallWorld = deepcopy(world);
+        let smallWorld = structuredClone(world);
         let recurrentTrId = -1;
 
         before(async () => {
@@ -164,7 +163,7 @@ describe('RecurringTransaction model API', () => {
     });
 
     describe('AppliedRecurringTransaction creation/deletion/retrieval', () => {
-        let smallWorld = deepcopy(world);
+        let smallWorld = structuredClone(world);
 
         before(async () => {
             await Access.destroyAll(USER_ID);

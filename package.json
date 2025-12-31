@@ -65,7 +65,6 @@
     "font-awesome": "~4.7.0",
     "ignore-styles": "~5.0.1",
     "indexof": "~0.0.1",
-    "lodash.clonedeep": "~4.5.0",
     "lodash.debounce": "~4.0.8",
     "lodash.throttle": "~4.1.1",
     "mocha": "~10.1.0",
