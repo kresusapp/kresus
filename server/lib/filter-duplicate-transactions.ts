@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { amountAndLabelAndDateMatch } from './diff-transactions';
+import { getDuplicatePairScore } from './duplicates-manager';
 import { Transaction } from '../models';
 import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
@@ -33,7 +33,7 @@ export default function filterDuplicateTransactions(
 
     for (const [known, provided] of duplicates) {
         // We ignore transactions which differ from more than just the type.
-        if (!amountAndLabelAndDateMatch(known, provided)) {
+        if (getDuplicatePairScore(known, provided, 0, false) < 1) {
             toCreate.push(provided);
             continue;
         }

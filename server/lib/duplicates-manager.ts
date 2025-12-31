@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
+import { assert, UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
 
 import type { Transaction } from '../models';
 
@@ -14,20 +14,22 @@ const log = makeLogger('duplicates-manager');
  */
 export function getDuplicatePairScore(
     tr: Transaction,
-    next: Transaction,
+    next: Partial<Transaction>,
     threshold: number,
-    ignoreDuplicatesWithDifferentCustomFields: boolean
+    ignoreDuplicatesWithDifferentCustomFields: boolean,
+    ignoreIfSameImportDate = true
 ): number {
+    assert(typeof next.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    assert(typeof next.date !== 'undefined', 'a new transaction must have a date');
+    assert(typeof next.amount !== 'undefined', 'a new transaction must have a amount');
+
     const diffAmount = Math.abs(next.amount - tr.amount);
     if (diffAmount > 0.001) {
         return 0;
     }
 
-    // TODO: mutualize with diff-transactions.ts
-    // TODO: build score based on labels & levenshtein distance
-
     // Two transactions are duplicates only if they were not imported at the same date.
-    if (+tr.importDate === +next.importDate) {
+    if (ignoreIfSameImportDate && +tr.importDate === +(next.importDate || 0)) {
         return 0;
     }
 
@@ -65,7 +67,22 @@ export function getDuplicatePairScore(
         }
     }
 
-    return 1;
+    let score = 1;
+
+    // If the dates differ, decrease the score.
+    if (datediff > 0) {
+        score -= 0.1;
+    }
+
+    // If the labels do not match exactly, decrease the score.
+    // TODO: build score based on labels & levenshtein distance
+    const trRawLabel = tr.rawLabel.replace(/ /g, '').toLowerCase();
+    const nextRawLabel = next.rawLabel.replace(/ /g, '').toLowerCase();
+    if (trRawLabel !== nextRawLabel) {
+        score -= 0.1;
+    }
+
+    return score;
 }
 
 export function findRedundantPairs(

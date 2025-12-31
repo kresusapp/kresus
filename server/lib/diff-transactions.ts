@@ -2,30 +2,14 @@ import moment from 'moment';
 import { assert, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 
 import makeDiff from './diff-list';
+import { getDuplicatePairScore } from './duplicates-manager';
 import { Transaction } from '../models';
 
-export function amountAndLabelAndDateMatch(
-    known: Transaction,
-    provided: Partial<Transaction>
-): boolean {
-    assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
-    assert(typeof provided.date !== 'undefined', 'a new transaction must have a date');
-    assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
-
-    const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
-    const oldMoment = moment(known.date);
-    const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
-    const newMoment = moment(provided.date);
-
-    return (
-        Math.abs(known.amount - provided.amount) < 0.001 &&
-        oldRawLabel === newRawLabel &&
-        oldMoment.isSame(newMoment, 'day')
-    );
-}
-
 function isPerfectMatch(known: Transaction, provided: Partial<Transaction>): boolean {
-    return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
+    return (
+        getDuplicatePairScore(known, provided, 0, false, false) === 1 &&
+        known.type === provided.type
+    );
 }
 
 const HEURISTICS = {
@@ -40,6 +24,8 @@ const MAX_DATE_DIFFERENCE = 2;
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 
 function computePairScore(known: Transaction, provided: Partial<Transaction>): number {
+    // TODO: mutualize with getDuplicatePairScore in duplicates-manager
+
     assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
     assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
 
