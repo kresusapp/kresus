@@ -223,8 +223,8 @@ describe('Transaction management', () => {
 
             // Check balance.
             let account = accountById(newState, dummyAccount.id);
-            account.initialBalance.should.equal(account.initialBalance);
-            account.balance.should.equal(account.balance);
+            account.initialBalance.should.equal(dummyAccount.initialBalance);
+            account.balance.should.equal(dummyAccount.balance);
         });
     });
 });
