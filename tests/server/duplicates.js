@@ -23,7 +23,7 @@ describe('getDuplicatePairScore', () => {
             amount: 20,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, false);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, false);
         score.should.equal(0);
     });
 
@@ -33,7 +33,7 @@ describe('getDuplicatePairScore', () => {
             date: new Date('1987-02-04'),
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, false);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, false);
         score.should.equal(0);
     });
 
@@ -43,7 +43,7 @@ describe('getDuplicatePairScore', () => {
             categoryId: 2,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, true);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, true);
         score.should.equal(0);
     });
 
@@ -53,7 +53,7 @@ describe('getDuplicatePairScore', () => {
             categoryId: NONE_CATEGORY_ID,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, true);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, true);
         score.should.equal(1);
     });
 
@@ -63,7 +63,7 @@ describe('getDuplicatePairScore', () => {
             categoryId: null,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, true);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, true);
         score.should.equal(1);
     });
 
@@ -78,7 +78,7 @@ describe('getDuplicatePairScore', () => {
             type: INTERNAL_TRANSFER_TYPE,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseWithType, 24 * 60 * 60 * 1000, true);
+        const score = getDuplicatePairScore(comparison, BaseWithType, 1, true);
         score.should.equal(0);
     });
 
@@ -88,7 +88,7 @@ describe('getDuplicatePairScore', () => {
             type: UNKNOWN_TRANSACTION_TYPE,
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 24 * 60 * 60 * 1000, true);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 1, true);
         score.should.equal(1);
     });
 
@@ -103,12 +103,7 @@ describe('getDuplicatePairScore', () => {
             customLabel: 'Another custom label',
         };
 
-        const score = getDuplicatePairScore(
-            comparison,
-            BaseWithCustomLabel,
-            24 * 60 * 60 * 1000,
-            true
-        );
+        const score = getDuplicatePairScore(comparison, BaseWithCustomLabel, 1, true);
         score.should.equal(0);
     });
 
@@ -118,7 +113,7 @@ describe('getDuplicatePairScore', () => {
             date: new Date('1987-01-05'),
         };
 
-        const score = getDuplicatePairScore(comparison, BaseTrancation, 48 * 60 * 60 * 1000, false);
+        const score = getDuplicatePairScore(comparison, BaseTrancation, 2, false);
         score.should.be.above(0);
     });
 });
