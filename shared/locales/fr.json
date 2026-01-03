@@ -574,7 +574,7 @@
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
             "threshold": "Seuil temporel",
-            "threshold_desc": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel défini ci-dessous. Vous pouvez aussi changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite.",
+            "threshold_desc": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel défini ci-dessous.",
             "days": "jours",
             "ignore_different_custom_fields": "Ignorer les champs personnalisés différents",
             "ignore_different_custom_fields_desc": "Si les deux opérations ont un type, une catégorie ou un label personnalisé défini, et qu'un de ces champs est différent entre les deux opérations, ne pas les considérer comme des doublons.",

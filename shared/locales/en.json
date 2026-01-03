@@ -578,7 +578,7 @@
             "find_more": "Find more",
             "find_fewer": "Find fewer",
             "threshold": "Time threshold",
-            "threshold_desc": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold set below. You can also change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner.",
+            "threshold_desc": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold set below.",
             "days": "days",
             "ignore_different_custom_fields": "Ignore different custom fields",
             "ignore_different_custom_fields_desc": "If both transactions have a defined type, category or custom label and one of these fields differ between the two transactions, do no count it as a duplicate.",

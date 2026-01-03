@@ -489,7 +489,7 @@
             "type": "Tür:",
             "find_more": "Daha fazla bul",
             "find_fewer": "Daha az bul",
-            "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir. Bu değeri sağ üstteki \"Varsayılan ayarlar\" düğmesine tıklayarak varsayılan ayarlarda da ayarlayabilirsiniz.",
+            "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir.",
             "days": "gün",
             "ignore_different_custom_fields": "Farklı özel alanları yoksay",
             "ignore_different_custom_fields_desc": "İki işlemin tanımlanmış bir özel türü, kategorisi veya etiketi varsa ve bu alanlardan biri iki işlem arasında farklıysa, bunları yineleme olarak kabul etme.",
