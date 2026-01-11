@@ -1,13 +1,14 @@
+import assert from 'node:assert';
+
 import fs from 'fs';
 import ini from 'ini';
 import ospath from 'ospath';
 import path from 'path';
-import should from 'should';
 
 import { apply as applyConfig } from '../../server/config';
 
 function checkHasConfigKeys(env) {
-    let configKeys = [
+    const configKeys = [
         'dataDir',
         'providedUserId',
         'userLoginHttpHeader',
@@ -42,31 +43,31 @@ function checkHasConfigKeys(env) {
         'dbLog',
     ];
 
-    env.should.have.keys(...configKeys);
+    configKeys.forEach(key => assert.ok(key in env));
 
     // Note: Checking the length as well so that test will fail if someone adds
     // new config options and does not update the tests.
-    Object.keys(env).should.have.length(configKeys.length);
+    assert.strictEqual(Object.keys(env).length, configKeys.length);
 }
 
 function checkCommonDefaultConfig(env) {
-    env.port.should.equal(9876);
-    env.host.should.equal('127.0.0.1');
-    env.pythonExec.should.equal('python3');
-    should.not.exist(env.salt);
-    env.forceDemoMode.should.equal(false);
-    should.not.exist(env.woobDir);
-    should.not.exist(env.woobSourcesList);
-    should.not.exist(env.emailTransport);
-    should.not.exist(env.emailSendmailBin);
-    should.not.exist(env.emailFrom);
-    should.not.exist(env.smtpHost);
-    should.not.exist(env.smtpPort);
-    should.not.exist(env.smtpUser);
-    should.not.exist(env.smtpPassword);
-    should.not.exist(env.appriseApiBaseUrl);
-    env.smtpForceTLS.should.equal(false);
-    env.smtpRejectUnauthorizedTLS.should.equal(true);
+    assert.strictEqual(env.port, 9876);
+    assert.strictEqual(env.host, '127.0.0.1');
+    assert.strictEqual(env.pythonExec, 'python3');
+    assert.ok(!env.salt);
+    assert.strictEqual(env.forceDemoMode, false);
+    assert.ok(!env.woobDir);
+    assert.ok(!env.woobSourcesList);
+    assert.ok(!env.emailTransport);
+    assert.ok(!env.emailSendmailBin);
+    assert.ok(!env.emailFrom);
+    assert.ok(!env.smtpHost);
+    assert.ok(!env.smtpPort);
+    assert.ok(!env.smtpUser);
+    assert.ok(!env.smtpPassword);
+    assert.ok(!env.appriseApiBaseUrl);
+    assert.strictEqual(env.smtpForceTLS, false);
+    assert.strictEqual(env.smtpRejectUnauthorizedTLS, true);
 }
 
 const TEST_CONFIG = {
@@ -84,7 +85,6 @@ describe('Test the configuration file is correctly taken into account', () => {
             this.skip();
         }
     });
-
     describe('Test default configuration', () => {
         it('the minimal configuration should not throw', () => {
             process.kresus = {};
@@ -140,21 +140,21 @@ describe('Test the configuration file is correctly taken into account', () => {
             applyConfig(config);
             checkHasConfigKeys(process.kresus);
 
-            process.kresus.port.should.equal(4242);
-            process.kresus.host.should.equal('127.0.0.1');
-            process.kresus.pythonExec.should.equal('python3');
-            should.not.exist(process.kresus.woobDir);
-            should.not.exist(process.kresus.woobSourcesList);
-            should.not.exist(process.kresus.emailTransport);
-            should.not.exist(process.kresus.emailSendmailBin);
-            should.not.exist(process.kresus.emailFrom);
-            should.not.exist(process.kresus.smtpHost);
-            should.not.exist(process.kresus.smtpPort);
-            should.not.exist(process.kresus.smtpUser);
-            should.not.exist(process.kresus.smtpPassword);
-            should.not.exist(process.kresus.appriseApiBaseUrl);
-            process.kresus.smtpForceTLS.should.equal(false);
-            process.kresus.smtpRejectUnauthorizedTLS.should.equal(true);
+            assert.strictEqual(process.kresus.port, 4242);
+            assert.strictEqual(process.kresus.host, '127.0.0.1');
+            assert.strictEqual(process.kresus.pythonExec, 'python3');
+            assert.ok(!process.kresus.woobDir);
+            assert.ok(!process.kresus.woobSourcesList);
+            assert.ok(!process.kresus.emailTransport);
+            assert.ok(!process.kresus.emailSendmailBin);
+            assert.ok(!process.kresus.emailFrom);
+            assert.ok(!process.kresus.smtpHost);
+            assert.ok(!process.kresus.smtpPort);
+            assert.ok(!process.kresus.smtpUser);
+            assert.ok(!process.kresus.smtpPassword);
+            assert.ok(!process.kresus.appriseApiBaseUrl);
+            assert.strictEqual(process.kresus.smtpForceTLS, false);
+            assert.strictEqual(process.kresus.smtpRejectUnauthorizedTLS, true);
         });
     });
 
@@ -175,11 +175,12 @@ describe('Test the configuration file is correctly taken into account', () => {
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
-            process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
-            process.kresus.logFilePath.should.equal(
+            assert.strictEqual(process.kresus.dataDir, path.join(ospath.home(), '.kresus'));
+            assert.strictEqual(
+                process.kresus.logFilePath,
                 path.join(ospath.home(), '.kresus', 'kresus.log')
             );
-            process.kresus.urlPrefix.should.equal('/');
+            assert.strictEqual(process.kresus.urlPrefix, '/');
         });
     });
 
@@ -230,37 +231,37 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             checkHasConfigKeys(process.kresus);
 
-            process.kresus.port.should.equal(8080);
-            process.kresus.host.should.equal('0.0.0.0');
-            process.kresus.pythonExec.should.equal('pythonExec');
-            process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.woobDir.should.equal('woobDir');
-            process.kresus.woobSourcesList.should.equal('woobSourcesList');
-            process.kresus.emailTransport.should.equal('smtp');
-            process.kresus.emailSendmailBin.should.equal('sendmailBin');
-            process.kresus.emailFrom.should.equal('emailFrom');
-            process.kresus.smtpHost.should.equal('smtpHost');
-            process.kresus.smtpPort.should.equal(4242);
-            process.kresus.smtpUser.should.equal('smtpUser');
-            process.kresus.smtpPassword.should.equal('smtpPassword');
-            process.kresus.smtpForceTLS.should.equal(true);
-            process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
-            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+            assert.strictEqual(process.kresus.port, 8080);
+            assert.strictEqual(process.kresus.host, '0.0.0.0');
+            assert.strictEqual(process.kresus.pythonExec, 'pythonExec');
+            assert.strictEqual(process.kresus.salt, '1234567890123456');
+            assert.strictEqual(process.kresus.woobDir, 'woobDir');
+            assert.strictEqual(process.kresus.woobSourcesList, 'woobSourcesList');
+            assert.strictEqual(process.kresus.emailTransport, 'smtp');
+            assert.strictEqual(process.kresus.emailSendmailBin, 'sendmailBin');
+            assert.strictEqual(process.kresus.emailFrom, 'emailFrom');
+            assert.strictEqual(process.kresus.smtpHost, 'smtpHost');
+            assert.strictEqual(process.kresus.smtpPort, 4242);
+            assert.strictEqual(process.kresus.smtpUser, 'smtpUser');
+            assert.strictEqual(process.kresus.smtpPassword, 'smtpPassword');
+            assert.strictEqual(process.kresus.smtpForceTLS, true);
+            assert.strictEqual(process.kresus.smtpRejectUnauthorizedTLS, false);
+            assert.strictEqual(process.kresus.appriseApiBaseUrl, 'appriseApiBaseUrl');
 
-            process.kresus.dbType.should.equal('postgres');
-            process.kresus.dbPort.should.equal(1234);
-            process.kresus.dbHost.should.equal('dbhost');
-            process.kresus.dbName.should.equal('dbname');
-            process.kresus.dbUsername.should.equal('dbuser');
-            process.kresus.dbPassword.should.equal('dbpassword');
-            should.equal(process.kresus.sqlitePath, null);
-            process.kresus.dbLog.should.equal('error');
+            assert.strictEqual(process.kresus.dbType, 'postgres');
+            assert.strictEqual(process.kresus.dbPort, 1234);
+            assert.strictEqual(process.kresus.dbHost, 'dbhost');
+            assert.strictEqual(process.kresus.dbName, 'dbname');
+            assert.strictEqual(process.kresus.dbUsername, 'dbuser');
+            assert.strictEqual(process.kresus.dbPassword, 'dbpassword');
+            assert.strictEqual(process.kresus.sqlitePath, null);
+            assert.strictEqual(process.kresus.dbLog, 'error');
 
-            process.kresus.dataDir.should.equal('dataDir');
-            should.equal(process.kresus.userLoginHttpHeader, null);
-            process.kresus.urlPrefix.should.equal('/foobar');
+            assert.strictEqual(process.kresus.dataDir, 'dataDir');
+            assert.strictEqual(process.kresus.userLoginHttpHeader, null);
+            assert.strictEqual(process.kresus.urlPrefix, '/foobar');
 
-            process.kresus.logFilePath.should.equal('/tmp/kresus.log');
+            assert.strictEqual(process.kresus.logFilePath, '/tmp/kresus.log');
         });
 
         it('shall let environment variables define config keys', () => {
@@ -296,29 +297,29 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             checkHasConfigKeys(process.kresus);
 
-            process.kresus.port.should.equal(8080);
-            process.kresus.host.should.equal('0.0.0.0');
-            process.kresus.pythonExec.should.equal('pythonExec');
-            process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.woobDir.should.equal('woobDir');
-            process.kresus.woobSourcesList.should.equal('woobSourcesList');
-            process.kresus.emailTransport.should.equal('smtp');
-            process.kresus.emailSendmailBin.should.equal('sendmailBin');
-            process.kresus.emailFrom.should.equal('emailFrom');
-            process.kresus.smtpHost.should.equal('smtpHost');
-            process.kresus.smtpPort.should.equal(4242);
-            process.kresus.smtpUser.should.equal('smtpUser');
-            process.kresus.smtpPassword.should.equal('smtpPassword');
-            process.kresus.smtpForceTLS.should.equal(true);
-            process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
-            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+            assert.strictEqual(process.kresus.port, 8080);
+            assert.strictEqual(process.kresus.host, '0.0.0.0');
+            assert.strictEqual(process.kresus.pythonExec, 'pythonExec');
+            assert.strictEqual(process.kresus.salt, '1234567890123456');
+            assert.strictEqual(process.kresus.woobDir, 'woobDir');
+            assert.strictEqual(process.kresus.woobSourcesList, 'woobSourcesList');
+            assert.strictEqual(process.kresus.emailTransport, 'smtp');
+            assert.strictEqual(process.kresus.emailSendmailBin, 'sendmailBin');
+            assert.strictEqual(process.kresus.emailFrom, 'emailFrom');
+            assert.strictEqual(process.kresus.smtpHost, 'smtpHost');
+            assert.strictEqual(process.kresus.smtpPort, 4242);
+            assert.strictEqual(process.kresus.smtpUser, 'smtpUser');
+            assert.strictEqual(process.kresus.smtpPassword, 'smtpPassword');
+            assert.strictEqual(process.kresus.smtpForceTLS, true);
+            assert.strictEqual(process.kresus.smtpRejectUnauthorizedTLS, false);
+            assert.strictEqual(process.kresus.appriseApiBaseUrl, 'appriseApiBaseUrl');
 
-            process.kresus.dbType.should.equal('sqlite');
-            process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
+            assert.strictEqual(process.kresus.dbType, 'sqlite');
+            assert.strictEqual(process.kresus.sqlitePath, '/tmp/kresus-tests-env-path.sqlite');
 
-            process.kresus.dataDir.should.equal('dataDir');
-            process.kresus.userLoginHttpHeader.should.equal('SOME_HTTP_HEADER');
-            process.kresus.urlPrefix.should.equal('/foobar');
+            assert.strictEqual(process.kresus.dataDir, 'dataDir');
+            assert.strictEqual(process.kresus.userLoginHttpHeader, 'SOME_HTTP_HEADER');
+            assert.strictEqual(process.kresus.urlPrefix, '/foobar');
 
             process.env = previousEnv;
         });
@@ -386,29 +387,29 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             checkHasConfigKeys(process.kresus);
 
-            process.kresus.port.should.equal(8080);
-            process.kresus.host.should.equal('0.0.0.0');
-            process.kresus.pythonExec.should.equal('pythonExec');
-            process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.woobDir.should.equal('woobDir');
-            process.kresus.woobSourcesList.should.equal('woobSourcesList');
-            process.kresus.emailTransport.should.equal('smtp');
-            process.kresus.emailSendmailBin.should.equal('sendmailBin');
-            process.kresus.emailFrom.should.equal('emailFrom');
-            process.kresus.smtpHost.should.equal('smtpHost');
-            process.kresus.smtpPort.should.equal(4242);
-            process.kresus.smtpUser.should.equal('smtpUser');
-            process.kresus.smtpPassword.should.equal('smtpPassword');
-            process.kresus.smtpForceTLS.should.equal(true);
-            process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
-            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+            assert.strictEqual(process.kresus.port, 8080);
+            assert.strictEqual(process.kresus.host, '0.0.0.0');
+            assert.strictEqual(process.kresus.pythonExec, 'pythonExec');
+            assert.strictEqual(process.kresus.salt, '1234567890123456');
+            assert.strictEqual(process.kresus.woobDir, 'woobDir');
+            assert.strictEqual(process.kresus.woobSourcesList, 'woobSourcesList');
+            assert.strictEqual(process.kresus.emailTransport, 'smtp');
+            assert.strictEqual(process.kresus.emailSendmailBin, 'sendmailBin');
+            assert.strictEqual(process.kresus.emailFrom, 'emailFrom');
+            assert.strictEqual(process.kresus.smtpHost, 'smtpHost');
+            assert.strictEqual(process.kresus.smtpPort, 4242);
+            assert.strictEqual(process.kresus.smtpUser, 'smtpUser');
+            assert.strictEqual(process.kresus.smtpPassword, 'smtpPassword');
+            assert.strictEqual(process.kresus.smtpForceTLS, true);
+            assert.strictEqual(process.kresus.smtpRejectUnauthorizedTLS, false);
+            assert.strictEqual(process.kresus.appriseApiBaseUrl, 'appriseApiBaseUrl');
 
-            process.kresus.dbType.should.equal('sqlite');
-            process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
+            assert.strictEqual(process.kresus.dbType, 'sqlite');
+            assert.strictEqual(process.kresus.sqlitePath, '/tmp/kresus-tests-env-path.sqlite');
 
-            process.kresus.dataDir.should.equal('dataDir');
-            process.kresus.userLoginHttpHeader.should.equal('SOME_HTTP_HEADER');
-            process.kresus.urlPrefix.should.equal('/foobar');
+            assert.strictEqual(process.kresus.dataDir, 'dataDir');
+            assert.strictEqual(process.kresus.userLoginHttpHeader, 'SOME_HTTP_HEADER');
+            assert.strictEqual(process.kresus.urlPrefix, '/foobar');
 
             process.env = previousEnv;
         });
@@ -426,9 +427,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                 },
             });
 
-            process.kresus.dbType.should.equal('postgres');
-            process.kresus.dbHost.should.equal('localhost');
-            process.kresus.dbPort.should.equal(5432);
+            assert.strictEqual(process.kresus.dbType, 'postgres');
+            assert.strictEqual(process.kresus.dbHost, 'localhost');
+            assert.strictEqual(process.kresus.dbPort, 5432);
         });
 
         it("doesn't overload values with default values for postgres", () => {
@@ -442,9 +443,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                     port: '5433',
                 },
             });
-            process.kresus.dbType.should.equal('postgres');
-            process.kresus.dbHost.should.equal('localhost');
-            process.kresus.dbPort.should.equal(5433);
+            assert.strictEqual(process.kresus.dbType, 'postgres');
+            assert.strictEqual(process.kresus.dbHost, 'localhost');
+            assert.strictEqual(process.kresus.dbPort, 5433);
 
             process.kresus = {};
             applyConfig({
@@ -456,9 +457,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                     host: '172.17.0.1',
                 },
             });
-            process.kresus.dbType.should.equal('postgres');
-            process.kresus.dbHost.should.equal('172.17.0.1');
-            process.kresus.dbPort.should.equal(5432);
+            assert.strictEqual(process.kresus.dbType, 'postgres');
+            assert.strictEqual(process.kresus.dbHost, '172.17.0.1');
+            assert.strictEqual(process.kresus.dbPort, 5432);
         });
 
         it("doesn't set a default host and port for sqlite", () => {
@@ -467,106 +468,106 @@ describe('Test the configuration file is correctly taken into account', () => {
                 ...TEST_CONFIG,
             });
 
-            process.kresus.dbType.should.equal('sqlite');
-            should.not.exist(process.kresus.dbHost);
-            should.not.exist(process.kresus.dbPort);
+            assert.strictEqual(process.kresus.dbType, 'sqlite');
+            assert.ok(!process.kresus.dbHost);
+            assert.ok(!process.kresus.dbPort);
         });
     });
 
     describe('Test invalid configurations', () => {
         it('shall throw when no configuration is provided', () => {
-            (function noConfig() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig();
-            }).should.throw();
+            });
 
-            (function emptyConfig() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({});
-            }).should.throw();
+            });
         });
 
         it('shall throw when an invalid database type is provided', () => {
-            (function noDatabaseConfig() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({
                     db: null,
                 });
-            }).should.throw();
+            });
 
-            (function invalidDatabaseType() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({
                     db: {
                         type: 'WHATEVER',
                     },
                 });
-            }).should.throw();
+            });
         });
 
         it('shall throw when Kresus port is out of range', () => {
-            (function negativePort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { port: -1 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function negativePortEnv() {
+            assert.throws(() => {
                 process.kresus = {};
                 process.env.PORT = '-1';
                 applyConfig({ ...TEST_CONFIG });
-            }).should.throw();
+            });
             delete process.env.PORT;
 
-            (function zeroPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 0 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function zeroPortEnv() {
+            assert.throws(() => {
                 process.kresus = {};
                 process.env.PORT = '0';
                 applyConfig({ ...TEST_CONFIG });
-            }).should.throw();
+            });
             delete process.env.PORT;
 
-            (function overflowPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 65536 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function stringPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 'ALO UI CER LE BUG' }, ...TEST_CONFIG });
-            }).should.throw();
+            });
         });
 
         it('shall throw when SMTP port is out of range', () => {
-            (function negativePort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ email: { port: -1 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function zeroPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ email: { port: 0 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function overflowPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ email: { port: 65536 }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function stringPort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' }, ...TEST_CONFIG });
-            }).should.throw();
+            });
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
-            (function negativePort() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ email: { transport: 'foobar' }, ...TEST_CONFIG });
-            }).should.throw();
+            });
         });
 
         it("shall throw when a non-empty salt doesn't fit the criteria", () => {
@@ -576,15 +577,15 @@ describe('Test the configuration file is correctly taken into account', () => {
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
-            (function tooShort1() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { salt: 'a' }, ...TEST_CONFIG });
-            }).should.throw();
+            });
 
-            (function tooShort15() {
+            assert.throws(() => {
                 process.kresus = {};
                 applyConfig({ kresus: { salt: '123456789012345' }, ...TEST_CONFIG });
-            }).should.throw();
+            });
         });
     });
 });

@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import {
     Access,
@@ -91,7 +91,7 @@ describe('RecurringTransaction model API', () => {
 
         it('Retrieval of a recurring transaction should work', async () => {
             const recurrentTr = await RecurringTransaction.find(USER_ID, recurrentTrId);
-            should(recurrentTr).not.be.null();
+            assert.notStrictEqual(recurrentTr, null);
         });
 
         it('Edition of a recurring transaction should work', async () => {
@@ -107,23 +107,23 @@ describe('RecurringTransaction model API', () => {
             await RecurringTransaction.update(USER_ID, recurrentTrId, fieldsToUpdate);
 
             const recurrentTr = await RecurringTransaction.find(USER_ID, recurrentTrId);
-            recurrentTr.type.should.equal(fieldsToUpdate.type);
-            recurrentTr.label.should.equal(fieldsToUpdate.label);
-            recurrentTr.amount.should.equal(fieldsToUpdate.amount);
-            recurrentTr.dayOfMonth.should.equal(fieldsToUpdate.dayOfMonth);
-            recurrentTr.listOfMonths.should.equal(fieldsToUpdate.listOfMonths);
+            assert.strictEqual(recurrentTr.type, fieldsToUpdate.type);
+            assert.strictEqual(recurrentTr.label, fieldsToUpdate.label);
+            assert.strictEqual(recurrentTr.amount, fieldsToUpdate.amount);
+            assert.strictEqual(recurrentTr.dayOfMonth, fieldsToUpdate.dayOfMonth);
+            assert.strictEqual(recurrentTr.listOfMonths, fieldsToUpdate.listOfMonths);
             // Account id should not be changed
-            recurrentTr.accountId.should.equal(smallWorld.transactions[0].accountId);
+            assert.strictEqual(recurrentTr.accountId, smallWorld.transactions[0].accountId);
         });
 
         it('Deletion of a recurring transaction should work', async () => {
             await RecurringTransaction.destroy(USER_ID, recurrentTrId);
 
             const exists = await RecurringTransaction.exists(USER_ID, recurrentTrId);
-            should(exists).be.false();
+            assert.strictEqual(exists, false);
 
             const all = await RecurringTransaction.all(USER_ID);
-            should(all.length).equal(0);
+            assert.strictEqual(all.length, 0);
         });
 
         it('Deletion of a parent account should destroy recurring transactions', async () => {
@@ -143,22 +143,27 @@ describe('RecurringTransaction model API', () => {
             await Account.destroy(USER_ID, accountId);
 
             const all = await RecurringTransaction.all(USER_ID);
-            should(all.length).equal(0);
+            assert.strictEqual(all.length, 0);
         });
 
         it('Validation of a months list should return the right state', () => {
-            RecurringTransaction.isValidListOfMonths('all').should.be.true();
-            RecurringTransaction.isValidListOfMonths('1;2;3;4;5;6;7;8;9;10;11;12').should.be.true();
-            RecurringTransaction.isValidListOfMonths('1;12').should.be.true();
-            RecurringTransaction.isValidListOfMonths('10').should.be.true();
+            assert.strictEqual(RecurringTransaction.isValidListOfMonths('all'), true);
+            assert.strictEqual(
+                RecurringTransaction.isValidListOfMonths('1;2;3;4;5;6;7;8;9;10;11;12'),
+                true
+            );
+            assert.strictEqual(RecurringTransaction.isValidListOfMonths('1;12'), true);
+            assert.strictEqual(RecurringTransaction.isValidListOfMonths('10'), true);
 
-            RecurringTransaction.isValidListOfMonths('ALL').should.be.false();
-            RecurringTransaction.isValidListOfMonths(
-                '0;2;3;4;5;6;7;8;9;10;11;12'
-            ).should.be.false();
-            RecurringTransaction.isValidListOfMonths(
-                '1;2;3;4;5;6;7;8;9;10;11;13'
-            ).should.be.false();
+            assert.strictEqual(RecurringTransaction.isValidListOfMonths('ALL'), false);
+            assert.strictEqual(
+                RecurringTransaction.isValidListOfMonths('0;2;3;4;5;6;7;8;9;10;11;12'),
+                false
+            );
+            assert.strictEqual(
+                RecurringTransaction.isValidListOfMonths('1;2;3;4;5;6;7;8;9;10;11;13'),
+                false
+            );
         });
     });
 
@@ -225,9 +230,9 @@ describe('RecurringTransaction model API', () => {
                 2022
             );
 
-            missing.should.be.Array();
-            missing.length.should.equal(2);
-            missing.some(rt => rt.accountId !== accountId).should.be.false();
+            assert.ok(missing instanceof Array);
+            assert.strictEqual(missing.length, 2);
+            assert.ok(!missing.some(rt => rt.accountId !== accountId));
         });
 
         it('Deletion of a parent recurring transaction should delete applied recurrent transactions too', async () => {
@@ -235,7 +240,7 @@ describe('RecurringTransaction model API', () => {
             await RecurringTransaction.destroyAll(USER_ID);
 
             const all = await AppliedRecurringTransaction.all(USER_ID);
-            should(all.length).equal(0);
+            assert.strictEqual(all.length, 0);
         });
     });
 });

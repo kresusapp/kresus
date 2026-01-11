@@ -1,17 +1,15 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Category, TransactionRule } from '../../server/models';
 import { updateCategorizeRules } from '../../server/lib/rule-engine';
 
 describe('automatic database cleanups', () => {
     let USER_ID = null;
-    before(() => {
-        // applyConfig must have already been called.
-        USER_ID = process.kresus.defaultUser.id;
-    });
-
     let rouge, bleu, vert;
     before(async () => {
+        // applyConfig must have already been called.
+        USER_ID = process.kresus.defaultUser.id;
+
         rouge = await Category.create(USER_ID, {
             label: 'rouge',
             color: null,
@@ -83,7 +81,7 @@ describe('automatic database cleanups', () => {
         });
 
         let rules = await TransactionRule.allOrdered(USER_ID);
-        rules.length.should.equal(3);
+        assert.strictEqual(rules.length, 3);
     });
 
     it('should replace categoryId when a category is being replaced', async () => {
@@ -95,21 +93,21 @@ describe('automatic database cleanups', () => {
         // - one rule has a single action, categorize as vert.id
 
         let rules = await TransactionRule.allOrdered(USER_ID);
-        rules.length.should.equal(3);
+        assert.strictEqual(rules.length, 3);
 
-        rules[0].actions.length.should.equal(1);
-        rules[0].actions[0].type.should.equal('categorize');
-        rules[0].actions[0].categoryId.should.equal(bleu.id);
+        assert.strictEqual(rules[0].actions.length, 1);
+        assert.strictEqual(rules[0].actions[0].type, 'categorize');
+        assert.strictEqual(rules[0].actions[0].categoryId, bleu.id);
 
-        rules[1].actions.length.should.equal(2);
-        rules[1].actions[0].type.should.equal('categorize');
-        rules[1].actions[0].categoryId.should.equal(bleu.id);
-        rules[1].actions[1].type.should.equal('categorize');
-        rules[1].actions[1].categoryId.should.equal(vert.id);
+        assert.strictEqual(rules[1].actions.length, 2);
+        assert.strictEqual(rules[1].actions[0].type, 'categorize');
+        assert.strictEqual(rules[1].actions[0].categoryId, bleu.id);
+        assert.strictEqual(rules[1].actions[1].type, 'categorize');
+        assert.strictEqual(rules[1].actions[1].categoryId, vert.id);
 
-        rules[2].actions.length.should.equal(1);
-        rules[2].actions[0].type.should.equal('categorize');
-        rules[2].actions[0].categoryId.should.equal(vert.id);
+        assert.strictEqual(rules[2].actions.length, 1);
+        assert.strictEqual(rules[2].actions[0].type, 'categorize');
+        assert.strictEqual(rules[2].actions[0].categoryId, vert.id);
     });
 
     it('should remove the rule when a category is deleted and the rule had only one action which is categorize', async () => {
@@ -119,12 +117,12 @@ describe('automatic database cleanups', () => {
         // categorizes both as vert.id.
 
         let rules = await TransactionRule.allOrdered(USER_ID);
-        rules.length.should.equal(2);
+        assert.strictEqual(rules.length, 2);
         for (let rule of rules) {
-            rule.actions.length.should.equal(1);
+            assert.strictEqual(rule.actions.length, 1);
             let action = rule.actions[0];
-            action.type.should.equal('categorize');
-            action.categoryId.should.equal(vert.id);
+            assert.strictEqual(action.type, 'categorize');
+            assert.strictEqual(action.categoryId, vert.id);
         }
     });
 });

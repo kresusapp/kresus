@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { testing } from '../../server/controllers/all';
 
@@ -6,10 +6,10 @@ const { encryptData, decryptData } = testing;
 
 describe('encryption', () => {
     it('should throw if no salt is provided', () => {
-        (function noSalt() {
+        assert.throws(() => {
             process.kresus = {};
             encryptData({}, 'randomthing');
-        }).should.throw();
+        });
     });
 
     it('should decrypt an object encrypted with the same passphrase', () => {
@@ -30,6 +30,6 @@ describe('encryption', () => {
             ],
         };
         const encryptedData = encryptData(data, passphrase);
-        decryptData(encryptedData, passphrase).should.equal(JSON.stringify(data));
+        assert.strictEqual(decryptData(encryptedData, passphrase), JSON.stringify(data));
     });
 });

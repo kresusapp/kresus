@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access, Account, Budget, Category, User, Transaction } from '../../server/models';
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
@@ -13,23 +13,21 @@ async function cleanAll(userId) {
     await Category.destroyAll(userId);
 }
 
-let USER_ID = null;
-before(async () => {
-    // Reload the USER_ID from the database, since process.kresus.defaultUser.id which
-    // might have been clobbered by another test.
-    // TODO: this is bad for testing and we should fix this properly later.
-    const users = await User.all();
-    if (!users.length) {
-        throw new Error('user should have been created!');
-    }
-    USER_ID = users[0].id;
-    if (typeof USER_ID !== 'number') {
-        throw new Error('missing user id in test.');
-    }
-});
-
 describe('migrations', () => {
+    let USER_ID = null;
     before(async () => {
+        // Reload the USER_ID from the database, since process.kresus.defaultUser.id which
+        // might have been clobbered by another test.
+        // TODO: this is bad for testing and we should fix this properly later.
+        const users = await User.all();
+        if (!users.length) {
+            throw new Error('user should have been created!');
+        }
+        USER_ID = users[0].id;
+        if (typeof USER_ID !== 'number') {
+            throw new Error('missing user id in test.');
+        }
+
         await cleanAll(USER_ID);
     });
 
@@ -39,16 +37,16 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         let table = await queryRunner.getTable('budget');
-        table.uniques.length.should.equal(1);
-        should(table.uniques[0].columnNames.includes('viewId')).be.true();
+        assert.strictEqual(table.uniques.length, 1);
+        assert.ok(table.uniques[0].columnNames.includes('viewId'));
 
         // There is a unique constraint but the columnNames do not include 'viewId' anymore.
         const constraintMigration = new AddViewIdInBudgetMigration();
         await constraintMigration.down(queryRunner);
 
         table = await queryRunner.getTable('budget');
-        table.uniques.length.should.equal(1);
-        should(table.uniques[0].columnNames.includes('viewId')).be.false();
+        assert.strictEqual(table.uniques.length, 1);
+        assert.ok(!table.uniques[0].columnNames.includes('viewId'));
     });
 
     // Run before test on migration 7 (we need the unique constraint removed before faking duplicates).
@@ -57,13 +55,13 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         let table = await queryRunner.getTable('budget');
-        should(table.uniques.length).equal(1);
+        assert.strictEqual(table.uniques.length, 1);
 
         const constraintMigration = new BudgetsConstraintMigration();
         await constraintMigration.down(queryRunner);
 
         table = await queryRunner.getTable('budget');
-        should(table.uniques.length).equal(0);
+        assert.strictEqual(table.uniques.length, 0);
     });
 
     it('should run migration 7 (removing budgets duplicates) properly', async () => {
@@ -74,7 +72,7 @@ describe('migrations', () => {
             id: 0,
         });
         const allCategories = await Category.all(USER_ID);
-        allCategories.length.should.equal(1);
+        assert.strictEqual(allCategories.length, 1);
 
         // Then an account, that will create an associated view, mandatory since migration 24.
         const someAccess = await Access.create(USER_ID, {
@@ -119,7 +117,7 @@ describe('migrations', () => {
                 userId: USER_ID,
             },
         });
-        allBudgets.length.should.equal(2);
+        assert.strictEqual(allBudgets.length, 2);
 
         // Then run the migration
         const duplicatesRemoval = new BudgetsDuplicatesRemoval();
@@ -134,7 +132,7 @@ describe('migrations', () => {
                 userId: USER_ID,
             },
         });
-        allBudgets.length.should.equal(1);
+        assert.strictEqual(allBudgets.length, 1);
     });
 
     it('should run migration 13 (setting default bank accounts balance) properly', async () => {
@@ -189,13 +187,13 @@ describe('migrations', () => {
         let account = await Account.repo().findOne({
             where: { userId: USER_ID, id: manualAccount.id },
         });
-        should(account.balance).be.null();
+        assert.strictEqual(account.balance, null);
 
         // For other accounts it should be initialBalance minus the sum of transactions
         account = await Account.repo().findOne({
             where: { userId: USER_ID, id: classicAccount.id },
         });
-        account.balance.should.equal(376.5);
+        assert.strictEqual(account.balance, 376.5);
     });
 
     it('should run migration 23 and create views for existing accounts', async () => {
@@ -235,19 +233,19 @@ describe('migrations', () => {
         const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = $1', [
             USER_ID,
         ]);
-        views.length.should.be.above(0);
+        assert.ok(views.length > 0);
 
         // Check that the view-accounts link exists
         const viewAccounts = await queryRunner.query(
             'SELECT * FROM "view-accounts" WHERE "accountId" = $1',
             [account.id]
         );
-        viewAccounts.length.should.be.above(0);
+        assert.ok(viewAccounts.length > 0);
     });
 
     it('should run migration 24 (adding isAdmin field to user model & set current users as admin) properly', async () => {
         let allUsers = await User.all();
-        allUsers.length.should.equal(1);
+        assert.strictEqual(allUsers.length, 1);
 
         // Drop unique constraint first
         const connection = User.repo().manager.connection;
@@ -261,7 +259,7 @@ describe('migrations', () => {
         await newColMigration.up(queryRunner);
 
         allUsers = await User.all();
-        allUsers.length.should.equal(1);
+        assert.strictEqual(allUsers.length, 1);
     });
 
     it('should run migration 25 and guess the best account on which to migrate budgets', async () => {
@@ -301,7 +299,7 @@ describe('migrations', () => {
         );
 
         // Should return the first account.
-        bestGuessAccountId.should.equal(savingAccount.id);
+        assert.strictEqual(bestGuessAccountId, savingAccount.id);
 
         // Now create a checking account
         const checkingAccount = await Account.create(USER_ID, {
@@ -319,7 +317,7 @@ describe('migrations', () => {
             USER_ID
         );
 
-        bestGuessAccountId.should.equal(checkingAccount.id);
+        assert.strictEqual(bestGuessAccountId, checkingAccount.id);
     });
 
     it('should run migration 25 without throwing where there are no accounts', async () => {
@@ -332,7 +330,7 @@ describe('migrations', () => {
             queryRunner,
             USER_ID
         );
-        // eslint-disable-next-line new-cap
-        bestGuessId.should.equal(-1);
+
+        assert.strictEqual(bestGuessId, -1);
     });
 });

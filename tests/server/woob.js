@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { KError } from '../../server/helpers';
 import { testing } from '../../server/providers/woob';
@@ -56,11 +56,11 @@ async function callWoobBefore(command, access, session) {
 }
 
 function checkError(result, errCode) {
-    should.not.exist(result.success);
-    should.exist(result.error);
-    result.error.should.instanceof(KError);
-    should.exist(result.error.errCode);
-    result.error.errCode.should.equal(errCode);
+    assert.ok(!('success' in result));
+    assert.ok('error' in result);
+    assert.ok(result.error instanceof KError);
+    assert.ok('errCode' in result.error);
+    assert.strictEqual(result.error.errCode, errCode);
 }
 
 // Test different defect situations. `command` must be transactions or accounts.
@@ -241,11 +241,11 @@ async function makeDefectSituation(command) {
                 sessionManager
             );
 
-            should.exist(result.success);
-            should.exist(result.success.kind);
-            result.success.kind.should.equal('user_action');
-            should.exist(result.success.fields);
-            result.success.fields.should.instanceof(Array);
+            assert.ok('success' in result);
+            assert.ok('kind' in result.success);
+            assert.strictEqual(result.success.kind, 'user_action');
+            assert.ok('fields' in result.success);
+            assert.ok(result.success.fields instanceof Array);
 
             // And re-calling with the same session and fields should be
             // sufficient to launch the sync.
@@ -263,10 +263,10 @@ async function makeDefectSituation(command) {
                 Object.assign({}, VALID_FAKE_ACCESS, { login: '2fa' })
             );
 
-            should.exist(woobResponse);
-            should.exist(woobResponse.kind);
-            woobResponse.kind.should.equal('values');
-            should.exist(woobResponse.values);
+            assert.ok(woobResponse);
+            assert.ok('kind' in woobResponse);
+            assert.strictEqual(woobResponse.kind, 'values');
+            assert.ok('values' in woobResponse);
         });
     });
 }
@@ -276,7 +276,6 @@ describe('Testing kresus/woob integration', function () {
     // These tests can be long
     this.slow(4000);
     this.timeout(10000);
-
     describe('with woob not installed.', () => {
         it('call "test" should raise "WOOB_NOT_INSTALLED" error, if woob is not globally installed. WARNING: if this test fails, make sure Woob is not installed globally before opening an issue.', async () => {
             applyTestConfig();
@@ -310,17 +309,16 @@ describe('Testing kresus/woob integration', function () {
         describe('Normal uses', () => {
             it('call test should not throw and return nothing', async () => {
                 let { error, success } = await callWoobBefore(CallWoobCommand.Test);
-                should.not.exist(error);
-                should.exist(success);
+                assert.ok(!error);
+                assert.ok(success);
             });
 
             it('call version should not raise and return a non empty string', async () => {
                 let { error, success } = await callWoobBefore(CallWoobCommand.Version);
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(String);
-                success.values.length.should.be.aboveOrEqual(1);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(typeof success.values === 'string');
+                assert.ok(success.values.length >= 1);
             });
 
             it('call "transactions" should not raise and should return an array of transaction-like shaped objects', async () => {
@@ -330,13 +328,16 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
@@ -349,13 +350,16 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
@@ -368,13 +372,16 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
@@ -385,20 +392,17 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys(
-                        'vendorAccountId',
-                        'label',
-                        'currency',
-                        'balance',
-                        'iban',
-                        'type'
-                    );
+                    assert.ok('vendorAccountId' in element);
+                    assert.ok('label' in element);
+                    assert.ok('currency' in element);
+                    assert.ok('balance' in element);
+                    assert.ok('iban' in element);
+                    assert.ok('type' in element);
                 }
             });
         });
@@ -411,7 +415,7 @@ describe('Testing kresus/woob integration', function () {
             });
 
             it('call "accounts" on an account which supports session saving should add session information to the SessionMap', async () => {
-                session.map.has('accessId').should.equal(false);
+                assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Accounts,
                     Object.assign({}, VALID_FAKE_ACCESS, {
@@ -421,14 +425,15 @@ describe('Testing kresus/woob integration', function () {
                     }),
                     session
                 );
-                session.map.has('accessId').should.equal(true);
-                should.deepEqual(session.map.get('accessId'), {
+
+                assert.ok(session.map.has('accessId'));
+                assert.deepStrictEqual(session.map.get('accessId'), {
                     backends: { fakewoobbank: { browser_state: { password: 'password' } } },
                 });
             });
 
             it('call "transactions" on an account which supports session saving should add session information to the SessionMap', async () => {
-                session.map.has('accessId').should.equal(false);
+                assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Transactions,
                     Object.assign({}, VALID_FAKE_ACCESS, {
@@ -438,9 +443,12 @@ describe('Testing kresus/woob integration', function () {
                     }),
                     session
                 );
-                session.map.has('accessId').should.equal(true);
-                should.deepEqual(session.map.get('accessId'), {
-                    backends: { fakewoobbank: { browser_state: { password: 'password2' } } },
+
+                assert.ok(session.map.has('accessId'));
+                assert.deepStrictEqual(session.map.get('accessId'), {
+                    backends: {
+                        fakewoobbank: { browser_state: { password: 'password2' } },
+                    },
                 });
             });
         });

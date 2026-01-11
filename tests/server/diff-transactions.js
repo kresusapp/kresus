@@ -1,4 +1,5 @@
-import should from 'should';
+import assert from 'node:assert';
+
 import moment from 'moment';
 
 import diffTransactions from '../../server/lib/diff-transactions';
@@ -39,41 +40,41 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should return an exact match for the same transaction', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], [copyA]);
-        perfectMatches.length.should.equal(1);
+        assert.strictEqual(perfectMatches.length, 1);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(copyA);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], copyA);
 
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it("should insert a single provider's transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([], [A]);
 
-        perfectMatches.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(A);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], A);
 
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should mark a known single transaction as orphan', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], []);
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
 
-        knownOrphans.length.should.equal(1);
-        knownOrphans[0].should.equal(A);
+        assert.strictEqual(knownOrphans.length, 1);
+        assert.strictEqual(knownOrphans[0], A);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should merge a single provided and a known transaction when the dates are separated by 1 day', () => {
@@ -85,14 +86,14 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], [changedA]);
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
         let pair = duplicateCandidates[0];
-        pair[0].should.equal(A);
-        pair[1].should.equal(changedA);
+        assert.strictEqual(pair[0], A);
+        assert.strictEqual(pair[1], changedA);
     });
 
     it('should select the transaction with the closest date as duplicate, and detect the other as orphan', () => {
@@ -102,15 +103,15 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], [changedA, youngerA]);
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(youngerA);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], youngerA);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
         let pair = duplicateCandidates[0];
-        pair[0].should.equal(A);
-        pair[1].should.equal(changedA);
+        assert.strictEqual(pair[0], A);
+        assert.strictEqual(pair[1], changedA);
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
@@ -119,11 +120,11 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], [changedA]);
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
@@ -132,11 +133,11 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([changedA], [A]);
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
     });
 
     it('should merge a transaction if the known transaction has an unknown debitDate.', () => {
@@ -146,11 +147,11 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([changedA], [A]);
 
-        perfectMatches.length.should.equal(1);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 1);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should merge a transaction if the known and provided transactions have date which are the same day, but differ from a few hours.', () => {
@@ -164,11 +165,11 @@ describe("diffing transactions when there's only one transaction", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([changedA], [A]);
 
-        perfectMatches.length.should.equal(1);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 1);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 });
 
@@ -177,82 +178,82 @@ describe('diffing transaction when there are several transactions', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A, B, C], [copyB, copyC, copyA]);
 
-        perfectMatches.length.should.equal(3);
+        assert.strictEqual(perfectMatches.length, 3);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(copyA);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], copyA);
 
         match = perfectMatches[1];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
         match = perfectMatches[2];
-        match[0].should.equal(C);
-        match[1].should.equal(copyC);
+        assert.strictEqual(match[0], C);
+        assert.strictEqual(match[1], copyC);
 
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should find kresus orphans', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A, B, C], [copyB, copyC]);
 
-        perfectMatches.length.should.equal(2);
+        assert.strictEqual(perfectMatches.length, 2);
 
         let match = perfectMatches[0];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
         match = perfectMatches[1];
-        match[0].should.equal(C);
-        match[1].should.equal(copyC);
+        assert.strictEqual(match[0], C);
+        assert.strictEqual(match[1], copyC);
 
-        providerOrphans.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
 
-        knownOrphans.length.should.equal(1);
-        knownOrphans[0].should.equal(A);
+        assert.strictEqual(knownOrphans.length, 1);
+        assert.strictEqual(knownOrphans[0], A);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should find provider orphans', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A, B], [A, copyB, C]);
 
-        perfectMatches.length.should.equal(2);
+        assert.strictEqual(perfectMatches.length, 2);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(A);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], A);
 
         match = perfectMatches[1];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(C);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], C);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should not merge transactions that are too different', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A, B], [C]);
 
-        perfectMatches.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
 
-        knownOrphans.length.should.equal(2);
-        knownOrphans[0].should.equal(A);
-        knownOrphans[1].should.equal(B);
+        assert.strictEqual(knownOrphans.length, 2);
+        assert.strictEqual(knownOrphans[0], A);
+        assert.strictEqual(knownOrphans[1], B);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(C);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], C);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 });

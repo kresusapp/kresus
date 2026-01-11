@@ -1,4 +1,5 @@
-import should from 'should';
+import assert from 'node:assert';
+
 import { QueryFailedError } from 'typeorm';
 import { Access, Budget, Category, View } from '../../server/models';
 import { importData } from '../../server/controllers/all';
@@ -47,7 +48,7 @@ describe('Budgets model API', () => {
 
             // There already exists an account, and by extension, a view.
             const views = await View.all(USER_ID);
-            views.length.should.equal(1);
+            assert.strictEqual(views.length, 1);
 
             const dummyBudget = {
                 categoryId: category.id,
@@ -58,7 +59,7 @@ describe('Budgets model API', () => {
             };
 
             await Budget.create(USER_ID, dummyBudget);
-            await Budget.create(USER_ID, dummyBudget).should.be.rejectedWith(QueryFailedError);
+            await assert.rejects(Budget.create(USER_ID, dummyBudget), QueryFailedError);
         });
     });
 
@@ -80,7 +81,7 @@ describe('Budgets model API', () => {
 
             // There already exists an account, and by extension, a view.
             const views = await View.all(USER_ID);
-            views.length.should.equal(1);
+            assert.strictEqual(views.length, 1);
 
             const dummyBudget = {
                 categoryId: categoryA.id,
@@ -94,7 +95,7 @@ describe('Budgets model API', () => {
             await Budget.replaceForCategory(USER_ID, categoryA.id, categoryB.id);
 
             const replaced = await Budget.find(USER_ID, created.id);
-            replaced.categoryId.should.equal(categoryB.id);
+            assert.strictEqual(replaced.categoryId, categoryB.id);
         });
 
         it('should do nothing when there already exists a budget with threshold for the replacement category', async () => {
@@ -109,7 +110,7 @@ describe('Budgets model API', () => {
 
             // There already exists an account, and by extension, a view.
             const views = await View.all(USER_ID);
-            views.length.should.equal(1);
+            assert.strictEqual(views.length, 1);
 
             const dummyBudgetCatA = {
                 categoryId: categoryA.id,
@@ -130,12 +131,12 @@ describe('Budgets model API', () => {
             await Budget.replaceForCategory(USER_ID, categoryA.id, categoryB.id);
 
             const unchangedA = await Budget.find(USER_ID, createdA.id);
-            unchangedA.categoryId.should.equal(categoryA.id);
-            unchangedA.threshold.should.equal(dummyBudgetCatA.threshold);
+            assert.strictEqual(unchangedA.categoryId, categoryA.id);
+            assert.strictEqual(unchangedA.threshold, dummyBudgetCatA.threshold);
 
             const unchangedB = await Budget.find(USER_ID, createdB.id);
-            unchangedB.categoryId.should.equal(categoryB.id);
-            unchangedB.threshold.should.equal(dummyBudgetCatB.threshold);
+            assert.strictEqual(unchangedB.categoryId, categoryB.id);
+            assert.strictEqual(unchangedB.threshold, dummyBudgetCatB.threshold);
         });
 
         it('should work properly when there already exists a budget for the replacement category and the replacement has no threshold', async () => {
@@ -150,7 +151,7 @@ describe('Budgets model API', () => {
 
             // There already exists an account, and by extension, a view.
             const views = await View.all(USER_ID);
-            views.length.should.equal(1);
+            assert.strictEqual(views.length, 1);
 
             const dummyBudgetCatA = {
                 categoryId: categoryA.id,
@@ -171,8 +172,8 @@ describe('Budgets model API', () => {
             await Budget.replaceForCategory(USER_ID, categoryA.id, categoryB.id);
 
             const existingB = await Budget.find(USER_ID, createdB.id);
-            existingB.categoryId.should.equal(categoryB.id);
-            existingB.threshold.should.equal(dummyBudgetCatA.threshold);
+            assert.strictEqual(existingB.categoryId, categoryB.id);
+            assert.strictEqual(existingB.threshold, dummyBudgetCatA.threshold);
         });
     });
 });

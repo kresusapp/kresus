@@ -1,7 +1,9 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access, Account, Transaction } from '../../server/models';
 import { importData } from '../../server/controllers/all';
+
+import { checkObjectIsSubsetOf } from '../helpers';
 
 describe('Transaction model API', () => {
     let world = {
@@ -117,8 +119,14 @@ describe('Transaction model API', () => {
                 world.transactions[0].date,
                 world.transactions[1].date
             );
-            twoFirstTransactions.length.should.equal(2);
-            twoFirstTransactions.should.containDeep(world.transactions.slice(0, 2));
+            assert.strictEqual(twoFirstTransactions.length, 2);
+
+            assert.ok(
+                world.transactions.some(tr => checkObjectIsSubsetOf(tr, twoFirstTransactions[0]))
+            );
+            assert.ok(
+                world.transactions.some(tr => checkObjectIsSubsetOf(tr, twoFirstTransactions[1]))
+            );
         });
     });
 });

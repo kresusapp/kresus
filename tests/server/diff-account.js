@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import diffAccounts, { testing } from '../../server/lib/diff-accounts';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../../server/providers/manual';
@@ -41,15 +41,15 @@ describe("diffing account when there's only one account", () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(1);
+        assert.strictEqual(perfectMatches.length, 1);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(copyA);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], copyA);
 
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it("should insert a single provider's account", () => {
@@ -59,13 +59,13 @@ describe("diffing account when there's only one account", () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(A);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], A);
 
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should mark a known single account as orphan', () => {
@@ -75,13 +75,13 @@ describe("diffing account when there's only one account", () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
 
-        knownOrphans.length.should.equal(1);
-        knownOrphans[0].should.equal(A);
+        assert.strictEqual(knownOrphans.length, 1);
+        assert.strictEqual(knownOrphans[0], A);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should merge a single account when an iban has been added', () => {
@@ -96,14 +96,14 @@ describe("diffing account when there's only one account", () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
         let pair = duplicateCandidates[0];
-        pair[0].should.equal(A);
-        pair[1].should.equal(changedA);
+        assert.strictEqual(pair[0], A);
+        assert.strictEqual(pair[1], changedA);
     });
 
     it('should merge a single account when the account number has been changed', () => {
@@ -117,14 +117,14 @@ describe("diffing account when there's only one account", () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(1);
+        assert.strictEqual(duplicateCandidates.length, 1);
         let pair = duplicateCandidates[0];
-        pair[0].should.equal(A);
-        pair[1].should.equal(changedA);
+        assert.strictEqual(pair[0], A);
+        assert.strictEqual(pair[1], changedA);
     });
 });
 
@@ -136,23 +136,23 @@ describe('diffing account when there are several accounts', () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(3);
+        assert.strictEqual(perfectMatches.length, 3);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(copyA);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], copyA);
 
         match = perfectMatches[1];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
         match = perfectMatches[2];
-        match[0].should.equal(C);
-        match[1].should.equal(copyC);
+        assert.strictEqual(match[0], C);
+        assert.strictEqual(match[1], copyC);
 
-        providerOrphans.length.should.equal(0);
-        knownOrphans.length.should.equal(0);
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
+        assert.strictEqual(knownOrphans.length, 0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should find kresus orphans', () => {
@@ -162,22 +162,22 @@ describe('diffing account when there are several accounts', () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(2);
+        assert.strictEqual(perfectMatches.length, 2);
 
         let match = perfectMatches[0];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
         match = perfectMatches[1];
-        match[0].should.equal(C);
-        match[1].should.equal(copyC);
+        assert.strictEqual(match[0], C);
+        assert.strictEqual(match[1], copyC);
 
-        providerOrphans.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
 
-        knownOrphans.length.should.equal(1);
-        knownOrphans[0].should.equal(A);
+        assert.strictEqual(knownOrphans.length, 1);
+        assert.strictEqual(knownOrphans[0], A);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should find provider orphans', () => {
@@ -187,22 +187,22 @@ describe('diffing account when there are several accounts', () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(2);
+        assert.strictEqual(perfectMatches.length, 2);
 
         let match = perfectMatches[0];
-        match[0].should.equal(A);
-        match[1].should.equal(A);
+        assert.strictEqual(match[0], A);
+        assert.strictEqual(match[1], A);
 
         match = perfectMatches[1];
-        match[0].should.equal(B);
-        match[1].should.equal(copyB);
+        assert.strictEqual(match[0], B);
+        assert.strictEqual(match[1], copyB);
 
-        knownOrphans.length.should.equal(0);
+        assert.strictEqual(knownOrphans.length, 0);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(C);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], C);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should provide meaningful merges', () => {
@@ -219,22 +219,22 @@ describe('diffing account when there are several accounts', () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
 
-        knownOrphans.length.should.equal(1);
-        knownOrphans[0].should.equal(A);
+        assert.strictEqual(knownOrphans.length, 1);
+        assert.strictEqual(knownOrphans[0], A);
 
-        providerOrphans.length.should.equal(0);
+        assert.strictEqual(providerOrphans.length, 0);
 
-        duplicateCandidates.length.should.equal(2);
+        assert.strictEqual(duplicateCandidates.length, 2);
 
         let pair = duplicateCandidates[0];
-        pair[0].should.equal(B);
-        pair[1].should.equal(otherB);
+        assert.strictEqual(pair[0], B);
+        assert.strictEqual(pair[1], otherB);
 
         pair = duplicateCandidates[1];
-        pair[0].should.equal(C);
-        pair[1].should.equal(otherC);
+        assert.strictEqual(pair[0], C);
+        assert.strictEqual(pair[1], otherC);
     });
 
     it('should not merge accounts that are too different', () => {
@@ -244,16 +244,16 @@ describe('diffing account when there are several accounts', () => {
             'whatever'
         );
 
-        perfectMatches.length.should.equal(0);
+        assert.strictEqual(perfectMatches.length, 0);
 
-        knownOrphans.length.should.equal(2);
-        knownOrphans[0].should.equal(A);
-        knownOrphans[1].should.equal(B);
+        assert.strictEqual(knownOrphans.length, 2);
+        assert.strictEqual(knownOrphans[0], A);
+        assert.strictEqual(knownOrphans[1], B);
 
-        providerOrphans.length.should.equal(1);
-        providerOrphans[0].should.equal(C);
+        assert.strictEqual(providerOrphans.length, 1);
+        assert.strictEqual(providerOrphans[0], C);
 
-        duplicateCandidates.length.should.equal(0);
+        assert.strictEqual(duplicateCandidates.length, 0);
     });
 
     it('should return a higher compute paire score for manual accounts with different labels as long as vendorAccountId is identical', () => {
@@ -276,9 +276,9 @@ describe('diffing account when there are several accounts', () => {
         const { computePairScore } = testing;
 
         // Without a manual bank.
-        computePairScore(first, same, 'whatever').should.equal(7);
+        assert.strictEqual(computePairScore(first, same, 'whatever'), 7);
 
         // Without a manual bank.
-        computePairScore(first, same, MANUAL_BANK_NAME).should.equal(12);
+        assert.strictEqual(computePairScore(first, same, MANUAL_BANK_NAME), 12);
     });
 });

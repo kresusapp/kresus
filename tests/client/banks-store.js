@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import {
     accessById,
@@ -91,13 +91,13 @@ const dummyTransaction2 = {
 };
 
 function checkTransaction(transactionFromStore, referenceTransaction) {
-    should(transactionFromStore).not.be.null();
-    transactionFromStore.should.not.equal(referenceTransaction);
-    transactionFromStore.amount.should.equal(referenceTransaction.amount);
-    transactionFromStore.type.should.equal(referenceTransaction.type);
-    transactionFromStore.label.should.equal(referenceTransaction.label);
-    transactionFromStore.id.should.equal(referenceTransaction.id);
-    transactionFromStore.date.toString().should.equal(referenceTransaction.date.toString());
+    assert.notStrictEqual(transactionFromStore, null);
+    assert.notEqual(transactionFromStore, referenceTransaction);
+    assert.strictEqual(transactionFromStore.amount, referenceTransaction.amount);
+    assert.strictEqual(transactionFromStore.type, referenceTransaction.type);
+    assert.strictEqual(transactionFromStore.label, referenceTransaction.label);
+    assert.strictEqual(transactionFromStore.id, referenceTransaction.id);
+    assert.strictEqual(transactionFromStore.date.toString(), referenceTransaction.date.toString());
 }
 
 describe('Transaction management', () => {
@@ -133,9 +133,9 @@ describe('Transaction management', () => {
         let account = accountById(newState, dummyAccount.id);
 
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
-            opIds.should.containEql(dummyTransaction.id);
-            account.initialBalance.should.equal(dummyAccount.initialBalance);
-            account.balance.should.equal(dummyAccount.balance);
+            assert.ok(opIds.includes(dummyTransaction.id));
+            assert.strictEqual(account.initialBalance, dummyAccount.initialBalance);
+            assert.strictEqual(account.balance, dummyAccount.balance);
         });
     });
 
@@ -161,10 +161,10 @@ describe('Transaction management', () => {
         let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
         let account = accountById(newState, dummyAccount.id);
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
-            opIds.should.containEql(dummyTransaction.id);
-            opIds.should.containEql(anotherTransaction.id);
-            account.balance.should.equal(dummyAccount.balance);
-            account.initialBalance.should.equal(dummyAccount.initialBalance);
+            assert.ok(opIds.includes(dummyTransaction.id));
+            assert.ok(opIds.includes(anotherTransaction.id));
+            assert.strictEqual(account.balance, dummyAccount.balance);
+            assert.strictEqual(account.initialBalance, dummyAccount.initialBalance);
         });
     });
 
@@ -199,12 +199,13 @@ describe('Transaction management', () => {
         let opIds2 = transactionIdsByAccountId(newState, dummyAccount2.id);
         let account2 = accountById(newState, dummyAccount2.id);
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
-            opIds.should.containEql(dummyTransaction.id);
-            account.balance.should.equal(dummyAccount.balance);
-            account.initialBalance.should.equal(dummyAccount.initialBalance);
-            opIds2.should.containEql(dummyTransaction2.id);
-            account2.balance.should.equal(dummyAccount2.balance);
-            account2.initialBalance.should.equal(dummyAccount2.initialBalance);
+            assert.ok(opIds.includes(dummyTransaction.id));
+            assert.strictEqual(account.balance, dummyAccount.balance);
+            assert.strictEqual(account.initialBalance, dummyAccount.initialBalance);
+
+            assert.ok(opIds2.includes(dummyTransaction2.id));
+            assert.strictEqual(account2.balance, dummyAccount2.balance);
+            assert.strictEqual(account2.initialBalance, dummyAccount2.initialBalance);
         });
     });
 
@@ -213,18 +214,18 @@ describe('Transaction management', () => {
         let transaction = transactionById(newState, dummyTransaction.id);
         it('The transaction should be deleted and be removed of the list of transactions of the according account and the balance should not be updated', () => {
             // First ensure the transaction exists and is in the transaction list.
-            should(transaction).not.be.null();
+            assert.notStrictEqual(transaction, null);
 
             newState = removeTransaction(newState, dummyTransaction.id);
             // Check transactions map.
-            should.throws(() => {
+            assert.throws(() => {
                 transactionById(newState, dummyTransaction.id);
             });
 
             // Check balance.
             let account = accountById(newState, dummyAccount.id);
-            account.initialBalance.should.equal(dummyAccount.initialBalance);
-            account.balance.should.equal(dummyAccount.balance);
+            assert.strictEqual(account.balance, dummyAccount.balance);
+            assert.strictEqual(account.initialBalance, dummyAccount.initialBalance);
         });
     });
 });
@@ -255,16 +256,15 @@ describe('Account management', () => {
             let newState = addAccounts(state, [dummyAccount], [dummyTransaction]);
             let account = accountById(newState, dummyAccount.id);
             it('The account should be in the store', () => {
-                account.id.should.equal(dummyAccount.id);
-                account.initialBalance.should.equal(dummyAccount.initialBalance);
-                account.balance.should.equal(dummyAccount.balance);
-                // No attached transaction
-                account.accessId.should.equal(dummyAccount.accessId);
+                assert.strictEqual(account.id, dummyAccount.id);
+                assert.strictEqual(account.initialBalance, dummyAccount.initialBalance);
+                assert.strictEqual(account.balance, dummyAccount.balance);
+                assert.strictEqual(account.accessId, dummyAccount.accessId);
             });
 
             it("The account should be added to its access's account's list", () => {
                 let access = accessById(newState, dummyAccount.accessId);
-                access.accountIds.should.containEql(dummyAccount.id);
+                assert.ok(access.accountIds.includes(dummyAccount.id));
             });
 
             it("The transaction should be added to the account's transactions list", () => {
@@ -284,23 +284,24 @@ describe('Account management', () => {
             let account = accountById(newState, dummyAccount.id);
             let account2 = accountById(newState, dummyAccount2.id);
             it('Both accounts should be in the store', () => {
-                should(account).not.be.null();
-                account.label.should.equal(dummyAccount.label);
-                should(account2).not.be.null();
-                account2.label.should.equal(dummyAccount2.label);
+                assert.notStrictEqual(account, null);
+                assert.strictEqual(account.label, dummyAccount.label);
+
+                assert.notStrictEqual(account2, null);
+                assert.strictEqual(account2.label, dummyAccount2.label);
             });
 
             it("Both accounts should be in their access's list", () => {
                 let access = accessById(newState, dummyAccount.accessId);
-                access.accountIds.should.containEql(dummyAccount.id);
-                access.accountIds.should.containEql(dummyAccount2.id);
+                assert.ok(access.accountIds.includes(dummyAccount.id));
+                assert.ok(access.accountIds.includes(dummyAccount2.id));
             });
 
             it('The transaction ids should be in the transactionId list of the appropriate account', () => {
                 let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
-                opIds.should.containEql(dummyTransaction.id);
+                assert.ok(opIds.includes(dummyTransaction.id));
                 let opIds2 = transactionIdsByAccountId(newState, dummyAccount2.id);
-                opIds2.should.containEql(dummyTransaction2.id);
+                assert.ok(opIds2.includes(dummyTransaction2.id));
             });
 
             it("The transactions should be added to the appropriate account's transactions list", () => {
@@ -321,16 +322,16 @@ describe('Account management', () => {
 
             it('The account should be deleted from the store', () => {
                 // First ensure the account is correctly added in the store
-                account.id.should.equal(dummyAccount.id);
-                access.accountIds.should.containEql(dummyAccount.id);
+                assert.strictEqual(account.id, dummyAccount.id);
+                assert.ok(access.accountIds.includes(dummyAccount.id));
                 newState = removeAccount(newState, dummyAccount.id);
-                should.throws(() => {
+                assert.throws(() => {
                     accountById(newState, dummyAccount.id);
                 });
             });
 
             it('The access to which the account was attached is removed from the store, as there is no more account attached to it', () => {
-                should.throws(() => {
+                assert.throws(() => {
                     accessById(newState, dummyAccount.accessId);
                 });
             });
@@ -343,19 +344,20 @@ describe('Account management', () => {
             let account = accountById(newState, dummyAccount.id);
             let account2 = accountById(newState, dummyAccount2.id);
             it('The account should be removed from the store, and its access should still be in the store, ', () => {
-                should(account).not.be.null();
-                account.label.should.equal(dummyAccount.label);
-                should(account2).not.be.null();
-                account2.label.should.equal(dummyAccount2.label);
+                assert.notStrictEqual(account, null);
+                assert.strictEqual(account.label, dummyAccount.label);
+
+                assert.notStrictEqual(account2, null);
+                assert.strictEqual(account2.label, dummyAccount2.label);
                 newState = removeAccount(newState, dummyAccount.id);
-                should.throws(() => {
+                assert.throws(() => {
                     accountById(newState, dummyAccount.id);
                 });
 
                 let access = accessById(newState, dummyAccount.accessId);
-                should(access).not.be.null();
-                access.accountIds.should.not.containEql(dummyAccount.id);
-                access.accountIds.should.containEql(dummyAccount2.id);
+                assert.notStrictEqual(access, null);
+                assert.ok(!access.accountIds.includes(dummyAccount.id));
+                assert.ok(access.accountIds.includes(dummyAccount2.id));
             });
         });
 
@@ -365,13 +367,13 @@ describe('Account management', () => {
 
             // First ensure the transaction is in the store.
             let transaction = transactionById(newState, dummyTransaction.id);
-            should(transaction).not.be.null();
+            assert.notStrictEqual(transaction, null);
 
             // Remove the account (and thus the transactions).
             newState = removeAccount(newState, dummyAccount.id);
 
             // Now check the transaction is deleted.
-            should.throws(() => {
+            assert.throws(() => {
                 transactionById(newState, dummyTransaction.id);
             });
         });
@@ -381,13 +383,13 @@ describe('Account management', () => {
 
             // Check the accounts are in the store.
             let readDummyAccount = accountById(newState, dummyAccount.id);
-            should(readDummyAccount).not.be.null();
-            readDummyAccount.transactionIds.length.should.equal(1);
-            readDummyAccount.transactionIds.should.containDeep([dummyTransaction.id]);
+            assert.notStrictEqual(readDummyAccount, null);
+            assert.strictEqual(readDummyAccount.transactionIds.length, 1);
+            assert.ok(readDummyAccount.transactionIds.includes(dummyTransaction.id));
 
             let readDummyAccount2 = accountById(newState, dummyAccount2.id);
-            should(readDummyAccount2).not.be.null();
-            readDummyAccount2.transactionIds.length.should.equal(0);
+            assert.notStrictEqual(readDummyAccount2, null);
+            assert.strictEqual(readDummyAccount2.transactionIds.length, 0);
 
             // Update the store with an updated account.
             let newDummyAccount = {
@@ -402,19 +404,19 @@ describe('Account management', () => {
             // Ensure the "added again" account is updated, and the other is not changed.
             let updatedAccount = accountById(newState, dummyAccount.id);
 
-            updatedAccount.should.not.deepEqual(readDummyAccount);
-            updatedAccount.customLabel.should.equal(newDummyAccount.customLabel);
-            updatedAccount.transactionIds.length.should.equal(2);
-            updatedAccount.transactionIds.should.containDeep([
-                newDummyTransaction.id,
-                dummyTransaction.id,
-            ]);
-            updatedAccount.initialBalance.should.equal(newDummyAccount.initialBalance);
+            assert.notDeepEqual(updatedAccount, readDummyAccount);
+            assert.strictEqual(updatedAccount.customLabel, newDummyAccount.customLabel);
+            assert.strictEqual(updatedAccount.transactionIds.length, 2);
+
+            assert.ok(updatedAccount.transactionIds.includes(dummyTransaction.id));
+            assert.ok(updatedAccount.transactionIds.includes(newDummyTransaction.id));
+
+            assert.strictEqual(updatedAccount.initialBalance, newDummyAccount.initialBalance);
 
             // The balance should not change.
-            updatedAccount.balance.should.equal(newDummyAccount.balance);
+            assert.strictEqual(updatedAccount.balance, newDummyAccount.balance);
 
-            accountById(newState, dummyAccount2.id).should.deepEqual(readDummyAccount2);
+            assert.deepEqual(accountById(newState, dummyAccount2.id), readDummyAccount2);
         });
     });
 });
@@ -423,14 +425,15 @@ describe('Access management', () => {
     describe('Access creation', () => {
         it('the access should be added to the store', () => {
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
-            getAccessIds(newState).should.containEql(dummyAccess.id);
+            assert.ok(getAccessIds(newState).includes(dummyAccess.id));
+
             let access = accessById(newState, dummyAccess.id);
-            should.deepEqual(access.customFields, []);
-            should.deepEqual(access.accountIds, []);
-            should.equal(access.id, dummyAccess.id);
-            should.equal(access.vendorId, dummyAccess.vendorId);
-            should.equal(access.enabled, dummyAccess.enabled);
-            should.equal(access.login, dummyAccess.login);
+            assert.deepStrictEqual(access.customFields, []);
+            assert.deepStrictEqual(access.accountIds, []);
+            assert.strictEqual(access.id, dummyAccess.id);
+            assert.strictEqual(access.vendorId, dummyAccess.vendorId);
+            assert.strictEqual(access.enabled, dummyAccess.enabled);
+            assert.strictEqual(access.login, dummyAccess.login);
         });
     });
 
@@ -439,23 +442,23 @@ describe('Access management', () => {
             // First we create an access.
             let newState = addAccesses(dummyState, [dummyAccess], [dummyAccount], []);
             let access = accessById(newState, dummyAccess.id);
-            getAccessIds(newState).should.containEql(dummyAccess.id);
-            should.equal(access.id, dummyAccess.id);
+            assert.ok(getAccessIds(newState).includes(dummyAccess.id));
+            assert.strictEqual(access.id, dummyAccess.id);
 
             newState = removeAccess(newState, dummyAccess.id);
             // Ensure the access is deleted.
-            should.throws(() => accessById(newState, dummyAccess.id));
-            getAccessIds(newState).should.not.containEql(dummyAccess.id);
+            assert.throws(() => accessById(newState, dummyAccess.id));
+            assert.ok(!getAccessIds(newState).includes(dummyAccess.id));
         });
 
         it('All attached accounts should be deleted from the store', () => {
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
             newState = addAccounts(newState, [dummyAccount], []);
-            should(accountById(newState, dummyAccount.id)).not.be.null();
+            assert.notStrictEqual(accountById(newState, dummyAccount.id), null);
 
             newState = removeAccess(newState, dummyAccess.id);
-            should.throws(() => accountById(newState, dummyAccount.id));
-            getAccessIds(newState).should.not.containEql(dummyAccess.id);
+            assert.throws(() => accountById(newState, dummyAccount.id));
+            assert(!getAccessIds(newState).includes(dummyAccess.id));
         });
     });
     describe('Access update', () => {
@@ -463,8 +466,8 @@ describe('Access management', () => {
             // First we create an access.
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
             let access = accessById(newState, dummyAccess.id);
-            getAccessIds(newState).should.containEql(dummyAccess.id);
-            should.equal(access.id, dummyAccess.id);
+            assert.ok(getAccessIds(newState).includes(dummyAccess.id));
+            assert.strictEqual(access.id, dummyAccess.id);
         });
     });
 });

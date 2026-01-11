@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { accessByAccountId } from '../../client/store/banks';
 
@@ -21,22 +21,22 @@ describe('client getters', () => {
     describe("'accessByAccountId'", () => {
         describe('should throw', () => {
             it('if the accountId is unknown', () => {
-                should.throws(() =>
+                assert.throws(() =>
                     accessByAccountId(makeStateInitialAccountId(null, [], []), 'id')
                 );
-                should.throws(() =>
+                assert.throws(() =>
                     accessByAccountId(makeStateInitialAccountId(null, [], [{ id: 'id' }]), 'id1')
                 );
             });
 
             it('if the accountId is known but not the accessId', () => {
-                should.throws(() =>
+                assert.throws(() =>
                     accessByAccountId(
                         makeStateInitialAccountId(null, [], [{ id: 'id', accessId: 'id2' }]),
                         'id'
                     )
                 );
-                should.throws(() =>
+                assert.throws(() =>
                     accessByAccountId(
                         makeStateInitialAccountId(
                             null,
@@ -56,18 +56,18 @@ describe('client getters', () => {
                 { id: 'id2', accessId: 'idAccess1' },
             ];
             // Trying different cases, to ensure there is no edge case
-            accessByAccountId(
-                makeStateInitialAccountId(null, accesses, accounts),
-                'id'
-            ).id.should.equal('idAccess');
-            accessByAccountId(
-                makeStateInitialAccountId(null, accesses, accounts),
-                'id1'
-            ).id.should.equal('idAccess');
-            accessByAccountId(
-                makeStateInitialAccountId(null, accesses, accounts),
-                'id2'
-            ).id.should.equal('idAccess1');
+            assert.strictEqual(
+                accessByAccountId(makeStateInitialAccountId(null, accesses, accounts), 'id').id,
+                'idAccess'
+            );
+            assert.strictEqual(
+                accessByAccountId(makeStateInitialAccountId(null, accesses, accounts), 'id1').id,
+                'idAccess'
+            );
+            assert.strictEqual(
+                accessByAccountId(makeStateInitialAccountId(null, accesses, accounts), 'id2').id,
+                'idAccess1'
+            );
         });
     });
 });

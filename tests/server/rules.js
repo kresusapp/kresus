@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import {
     TransactionRule,
@@ -75,9 +75,9 @@ describe('rule based engine for transactions', () => {
 
         applyRules([textRule], [tr]);
 
-        tr.label.should.be.equal('HELLO WORLD');
-        tr.rawLabel.should.be.equal('WORLD');
-        tr.categoryId.should.be.equal(42);
+        assert.strictEqual(tr.label, 'HELLO WORLD');
+        assert.strictEqual(tr.rawLabel, 'WORLD');
+        assert.strictEqual(tr.categoryId, 42);
     });
 
     it('should match text on the rawLabel', () => {
@@ -89,9 +89,9 @@ describe('rule based engine for transactions', () => {
 
         applyRules([textRule], [tr]);
 
-        tr.label.should.be.equal('WORLD');
-        tr.rawLabel.should.be.equal('HELLO WORLD');
-        tr.categoryId.should.be.equal(42);
+        assert.strictEqual(tr.label, 'WORLD');
+        assert.strictEqual(tr.rawLabel, 'HELLO WORLD');
+        assert.strictEqual(tr.categoryId, 42);
     });
 
     it("shouldn't match text if not found", () => {
@@ -103,9 +103,9 @@ describe('rule based engine for transactions', () => {
 
         applyRules([textRule], [tr]);
 
-        tr.label.should.be.equal('HEY WORLD');
-        tr.rawLabel.should.be.equal('YO WORLD');
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.label, 'HEY WORLD');
+        assert.strictEqual(tr.rawLabel, 'YO WORLD');
+        assert.strictEqual(tr.categoryId, null);
     });
 
     it('should not match by regexp if regexp is not matching', () => {
@@ -116,7 +116,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([regexpRule], [tr]);
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.categoryId, null);
 
         tr = Transaction.cast({
             categoryId: null,
@@ -125,7 +125,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([regexpRule], [tr]);
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.categoryId, null);
 
         tr = Transaction.cast({
             categoryId: null,
@@ -134,7 +134,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([regexpRule], [tr]);
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.categoryId, null);
     });
 
     it('should match by regexp if regexp matches the label', () => {
@@ -145,7 +145,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([regexpRule], [tr]);
-        should.equal(tr.categoryId, 43);
+        assert.strictEqual(tr.categoryId, 43);
 
         tr = Transaction.cast({
             categoryId: null,
@@ -154,7 +154,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([regexpRule], [tr]);
-        should.equal(tr.categoryId, 43);
+        assert.strictEqual(tr.categoryId, 43);
     });
 
     it('should match by amount', () => {
@@ -166,7 +166,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([amountRule], [tr]);
-        should.equal(tr.categoryId, 42);
+        assert.strictEqual(tr.categoryId, 42);
     });
 
     it('should not match by amount if different', () => {
@@ -178,7 +178,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([amountRule], [tr]);
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.categoryId, null);
     });
 
     it('should match if all conditions match', () => {
@@ -190,7 +190,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([combinedRule], [tr]);
-        should.equal(tr.categoryId, 42);
+        assert.strictEqual(tr.categoryId, 42);
     });
 
     it('should not match if any of the conditions does not match', () => {
@@ -202,7 +202,7 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([combinedRule], [tr]);
-        should.equal(tr.categoryId, null);
+        assert.strictEqual(tr.categoryId, null);
     });
 
     it('should respect the order of the rules array when no rule aborts execution', () => {
@@ -214,10 +214,10 @@ describe('rule based engine for transactions', () => {
 
         // Test rule applies first, which sets category 42.
         applyRules([textRule, regexpRule], [tr]);
-        should.equal(tr.categoryId, 42);
+        assert.strictEqual(tr.categoryId, 42);
 
         // Regexp rule applies first, which sets category 43.
         applyRules([regexpRule, textRule], [tr]);
-        should.equal(tr.categoryId, 43);
+        assert.strictEqual(tr.categoryId, 43);
     });
 });

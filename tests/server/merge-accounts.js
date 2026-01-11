@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import {
     Access,
@@ -250,43 +250,42 @@ describe('Merging two accounts together', () => {
             accounts[1],
             accounts[0]
         );
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         accounts = await Account.all(USER_ID);
-        accounts.length.should.equal(1);
+        assert.strictEqual(accounts.length, 1);
     });
 
     it('should replace the accountId in every transaction, recurring transaction, applied recurring transaction and alert', async () => {
         await importData(USER_ID, newWorld(genesis));
 
         const accounts = await Account.all(USER_ID);
-        accounts.length.should.equal(genesis.accounts.length);
+        assert.strictEqual(accounts.length, genesis.accounts.length);
+
         const success = await accountsManager.mergeExistingAccounts(
             USER_ID,
             accounts[1],
             accounts[0]
         );
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         const expectedAccountId = accounts[0].id;
         const allTransactions = await Transaction.all(USER_ID);
-        allTransactions.length.should.equal(genesis.transactions.length);
-        should(allTransactions.every(tr => tr.accountId === expectedAccountId)).be.true();
+        assert.strictEqual(allTransactions.length, genesis.transactions.length);
+        assert.ok(allTransactions.every(tr => tr.accountId === expectedAccountId));
 
         const allRecurringTransactions = await RecurringTransaction.all(USER_ID);
-        allRecurringTransactions.length.should.equal(genesis.recurringTransactions.length);
-        should(
-            allRecurringTransactions.every(entry => entry.accountId === expectedAccountId)
-        ).be.true();
+        assert.strictEqual(allRecurringTransactions.length, genesis.recurringTransactions.length);
+        assert.ok(allRecurringTransactions.every(entry => entry.accountId === expectedAccountId));
 
         const allAppliedRecurringTransactions = await AppliedRecurringTransaction.all(USER_ID);
-        should(
+        assert.ok(
             allAppliedRecurringTransactions.every(entry => entry.accountId === expectedAccountId)
-        ).be.true();
+        );
 
         const allAlerts = await Alert.all(USER_ID);
-        allAlerts.length.should.equal(genesis.alerts.length);
-        should(allAlerts.every(entry => entry.accountId === expectedAccountId)).be.true();
+        assert.strictEqual(allAlerts.length, genesis.alerts.length);
+        assert.ok(allAlerts.every(entry => entry.accountId === expectedAccountId));
     });
 
     it('should have a null balance for manual access', async () => {
@@ -300,10 +299,10 @@ describe('Merging two accounts together', () => {
             accounts[1],
             accounts[0]
         );
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         accounts = await Account.all(USER_ID, false);
-        should(accounts[0].balance).be.null();
+        assert.strictEqual(accounts[0].balance, null);
     });
 
     it('should use the balance of the account with the latest transaction', async () => {
@@ -314,11 +313,11 @@ describe('Merging two accounts together', () => {
             accounts[1],
             accounts[0]
         );
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         // Check
         accounts = await Account.all(USER_ID, false);
-        accounts[0].balance.should.equal(genesis.accounts[1].balance);
+        assert.strictEqual(accounts[0].balance, genesis.accounts[1].balance);
 
         // Edit data so that the first account has the latest transaction
         await cleanAll(USER_ID);
@@ -328,7 +327,7 @@ describe('Merging two accounts together', () => {
         accounts = await Account.all(USER_ID);
         await accountsManager.mergeExistingAccounts(USER_ID, accounts[0], accounts[1]);
         accounts = await Account.all(USER_ID, false);
-        accounts[0].balance.should.equal(genesis.accounts[0].balance);
+        assert.strictEqual(accounts[0].balance, genesis.accounts[0].balance);
     });
 
     it('should use the initialBalance of the account with the furthest transaction', async () => {
@@ -339,11 +338,11 @@ describe('Merging two accounts together', () => {
             accounts[1],
             accounts[0]
         );
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         // Check
         accounts = await Account.all(USER_ID, false);
-        accounts[0].initialBalance.should.equal(genesis.accounts[0].initialBalance);
+        assert.strictEqual(accounts[0].initialBalance, genesis.accounts[0].initialBalance);
 
         // Edit data so that the first account has the latest transaction
         await cleanAll(USER_ID);
@@ -352,9 +351,9 @@ describe('Merging two accounts together', () => {
         await importData(USER_ID, reverseWorld);
         accounts = await Account.all(USER_ID);
         success = await accountsManager.mergeExistingAccounts(USER_ID, accounts[0], accounts[1]);
-        success.should.be.true();
+        assert.strictEqual(success, true);
         accounts = await Account.all(USER_ID, false);
-        accounts[0].initialBalance.should.equal(genesis.accounts[1].initialBalance);
+        assert.strictEqual(accounts[0].initialBalance, genesis.accounts[1].initialBalance);
     });
 
     it('should correctly update the default account id, if needs be', async () => {
@@ -369,13 +368,13 @@ describe('Merging two accounts together', () => {
         await Setting.updateByKey(USER_ID, DEFAULT_ACCOUNT_ID, source.id.toString());
 
         const success = await accountsManager.mergeExistingAccounts(USER_ID, source, target);
-        success.should.be.true();
+        assert.strictEqual(success, true);
 
         accounts = await Account.all(USER_ID);
-        accounts.length.should.equal(1);
+        assert.strictEqual(accounts.length, 1);
 
         // The default account has been updated.
         let setting = await Setting.byKey(USER_ID, DEFAULT_ACCOUNT_ID);
-        setting.value.should.equal(target.id.toString());
+        assert.strictEqual(setting.value, target.id.toString());
     });
 });

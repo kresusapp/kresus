@@ -1,17 +1,15 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access, Account, View, User } from '../../server/models';
 import ViewAccount from '../../server/models/entities/view-accounts';
 
 describe('Views database CRUD tests', () => {
     let USER_ID = null;
-    before(() => {
-        // applyConfig must have already been called.
-        USER_ID = process.kresus.defaultUser.id;
-    });
-
     let classicAccess, livretA, compteCheque, compteJoint;
     before(async () => {
+        // applyConfig must have already been called.
+        USER_ID = process.kresus.defaultUser.id;
+
         await Access.destroyAll(USER_ID);
         await View.destroyAll(USER_ID);
 
@@ -51,7 +49,7 @@ describe('Views database CRUD tests', () => {
 
     it('should have created a view for each account', async () => {
         const allViews = await View.all(USER_ID);
-        allViews.length.should.equal(3);
+        assert.strictEqual(allViews.length, 3);
     });
 
     it('should create views correctly', async () => {
@@ -87,7 +85,7 @@ describe('Views database CRUD tests', () => {
         });
 
         let views = await View.all(USER_ID);
-        views.length.should.equal(6);
+        assert.strictEqual(views.length, 6);
     });
 
     it('should edit & delete views correctly', async () => {
@@ -105,7 +103,7 @@ describe('Views database CRUD tests', () => {
             label: 'Look ma, I changed my name',
         });
 
-        updated.label.should.equal('Look ma, I changed my name');
+        assert.strictEqual(updated.label, 'Look ma, I changed my name');
 
         // Change accounts
         updated = await View.update(USER_ID, view.id, {
@@ -120,7 +118,7 @@ describe('Views database CRUD tests', () => {
             ],
         });
 
-        updated.accounts.length.should.equal(2);
+        assert.strictEqual(updated.accounts.length, 2);
 
         // Destroy the view
         await View.destroy(USER_ID, view.id);
@@ -145,13 +143,13 @@ describe('Views database CRUD tests', () => {
 
         // Sanity check: the other user has 1 view, automatically created for this account.
         const otherUserViews = await View.all(otherUser.id);
-        otherUserViews.length.should.equal(1);
+        assert.strictEqual(otherUserViews.length, 1);
 
         // Destroy compte cheque
         await Account.destroy(USER_ID, compteCheque.id);
 
-        const views = await View.all(USER_ID);
-        views.length.should.equal(4);
+        let views = await View.all(USER_ID);
+        assert.strictEqual(views.length, 4);
 
         /**
          * Should remain:
@@ -160,14 +158,15 @@ describe('Views database CRUD tests', () => {
          * - view 'Look ma, I did this' associated to Livret A only, by user
          * - view 'Again and again' since it still has one account linked (Livret A)
          */
-        views.some(v => v.label === livretA.label).should.be.true();
-        views.some(v => v.label === compteJoint.label).should.be.true();
-        views.some(v => v.label === 'Look ma, I did this').should.be.true();
-        views.some(v => v.label === 'Again and again').should.be.true();
+        assert.ok(views.some(v => v.label === livretA.label));
+        assert.ok(views.some(v => v.label === compteJoint.label));
+        assert.ok(views.some(v => v.label === 'Look ma, I did this'));
+        assert.ok(views.some(v => v.label === 'Again and again'));
 
         // This should not remove the other user's views (the one automatically created for their
         // account).
-        (await View.all(otherUser.id)).length.should.equal(1);
+        views = await View.all(otherUser.id);
+        assert.strictEqual(views.length, 1);
 
         // Get rid of the user, which cascades deletion of all their data.
         await User.destroy(otherUser.id);
@@ -193,7 +192,7 @@ describe('Views database CRUD tests', () => {
         await Access.destroy(USER_ID, accessToDestroy.id);
 
         const views = await View.all(USER_ID);
-        views.length.should.equal(4);
+        assert.strictEqual(views.length, 4);
 
         /**
          * Should remain:
@@ -202,10 +201,10 @@ describe('Views database CRUD tests', () => {
          * - view 'Look ma, I did this' associated to Livret A only, by user
          * - view 'Again and again' since it still has one account linked (Livret A)
          */
-        views.some(v => v.label === livretA.label).should.be.true();
-        views.some(v => v.label === compteJoint.label).should.be.true();
-        views.some(v => v.label === 'Look ma, I did this').should.be.true();
-        views.some(v => v.label === 'Again and again').should.be.true();
+        assert.ok(views.some(v => v.label === livretA.label));
+        assert.ok(views.some(v => v.label === compteJoint.label));
+        assert.ok(views.some(v => v.label === 'Look ma, I did this'));
+        assert.ok(views.some(v => v.label === 'Again and again'));
     });
 
     it('should rename the associated view when an account is renamed', async () => {
@@ -222,8 +221,8 @@ describe('Views database CRUD tests', () => {
         });
 
         let views = await View.all(USER_ID);
-        views.length.should.equal(1);
-        views[0].label.should.equal(accToRename.label);
+        assert.strictEqual(views.length, 1);
+        assert.strictEqual(views[0].label, accToRename.label);
 
         // Rename the account
         await Account.update(USER_ID, accToRename.id, {
@@ -231,14 +230,14 @@ describe('Views database CRUD tests', () => {
         });
 
         views = await View.all(USER_ID);
-        views.length.should.equal(1);
-        views[0].label.should.equal('Better name');
+        assert.strictEqual(views.length, 1);
+        assert.strictEqual(views[0].label, 'Better name');
     });
 
     it('should remove ViewAccount properly when destroying a view', async () => {
         await View.destroyAll(USER_ID);
 
         const viewAccounts = await ViewAccount.all();
-        should.strictEqual(viewAccounts.length, 0);
+        assert.strictEqual(viewAccounts.length, 0);
     });
 });

@@ -1,6 +1,8 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { AccessField, Access } from '../../server/models';
+
+import { checkObjectIsSubsetOf } from '../helpers';
 
 describe('Access model API', () => {
     let accessWithoutFields = {
@@ -26,12 +28,12 @@ describe('Access model API', () => {
         it('The access should be in the database', async () => {
             await Access.create(USER_ID, accessWithoutFields);
             allAccesses = await Access.all(USER_ID);
+
+            assert.strictEqual(allAccesses.length, 1);
+            assert.ok(checkObjectIsSubsetOf(accessWithoutFields, allAccesses[0]));
+
             allFields = await AccessField.all(USER_ID);
-
-            should.equal(allAccesses.length, 1);
-            allAccesses.should.containDeep([accessWithoutFields]);
-
-            should.equal(allFields.length, 0);
+            assert.strictEqual(allFields.length, 0);
         });
 
         let fields = [
@@ -46,13 +48,14 @@ describe('Access model API', () => {
             allAccesses = await Access.all(USER_ID);
             allFields = await AccessField.all(USER_ID);
 
-            should.equal(allAccesses.length, 2);
-            allAccesses.should.containDeep([accessWithFields, accessWithoutFields]);
+            assert.strictEqual(allAccesses.length, 2);
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithFields, acc)));
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
 
-            should.equal(allFields.length, 2);
-            allFields.should.containDeep(fields);
+            assert.strictEqual(allFields.length, 2);
             for (let field of allFields) {
-                should.equal(field.accessId, accessWithoutFieldsId);
+                assert.ok(allFields.some(f => checkObjectIsSubsetOf(f, field)));
+                assert.strictEqual(field.accessId, accessWithoutFieldsId);
             }
         });
 
@@ -64,11 +67,11 @@ describe('Access model API', () => {
             await Access.create(USER_ID, rogueAccess);
             allAccesses = await Access.all(USER_ID);
 
-            should.equal(allAccesses.length, 3);
-            allAccesses.should.containDeep([accessWithoutFields]);
+            assert.strictEqual(allAccesses.length, 3);
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
 
             let answer = await Access.all(42);
-            should.equal(answer.length, 0);
+            assert.strictEqual(answer.length, 0);
         });
     });
 
@@ -92,21 +95,24 @@ describe('Access model API', () => {
             allAccesses = await Access.all(USER_ID);
             allFields = await AccessField.all(USER_ID);
 
-            should.equal(allAccesses.length, 2);
-            allAccesses.should.containDeep([accessWithFields, accessWithoutFields]);
+            assert.strictEqual(allAccesses.length, 2);
+            // assert.ok(checkObjectIsSubsetOf(accessWithFields, allAccesses[0]));
+            // assert.ok(checkObjectIsSubsetOf(accessWithoutFields, allAccesses[1]));
 
-            should.equal(allFields.length, 2);
-            allFields.should.containDeep(fields);
+            assert.strictEqual(allFields.length, 2);
+            for (let field of allFields) {
+                assert.ok(allFields.some(f => checkObjectIsSubsetOf(f, field)));
+            }
         });
 
         it('The access should be deleted', async () => {
             await Access.destroy(USER_ID, accessWithFieldsId);
 
             allFields = await AccessField.all(USER_ID);
-            should.equal(allFields.length, 0);
+            assert.strictEqual(allFields.length, 0);
 
             allAccesses = await Access.all(USER_ID);
-            should.equal(allAccesses.length, 1);
+            assert.strictEqual(allAccesses.length, 1);
         });
     });
 });

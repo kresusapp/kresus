@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { cleanData } from '../../server/controllers/helpers';
 import DefaultSettings from '../../shared/default-settings';
@@ -27,15 +27,15 @@ describe('Ensure settings without default values are removed when exporting data
     };
     let all = cleanData(world);
     it('The unknown setting should be removed from the list', () => {
-        DefaultSettings.has(UNKNOWN_SETTING).should.equal(false);
-        all.settings.some(s => s.key === UNKNOWN_SETTING).should.equal(false);
+        assert.ok(!DefaultSettings.has(UNKNOWN_SETTING));
+        assert.ok(!all.settings.some(s => s.key === UNKNOWN_SETTING));
     });
     it('The known setting should be kept in the list', () => {
-        DefaultSettings.has(KNOWN_SETTING).should.equal(true);
-        all.settings.some(s => s.key === KNOWN_SETTING).should.equal(true);
+        assert.ok(DefaultSettings.has(KNOWN_SETTING));
+        assert.ok(all.settings.some(s => s.key === KNOWN_SETTING));
     });
     it('The ghost setting should be removed from the list', () => {
-        all.settings.some(s => s.key === GHOST_SETTING).should.equal(false);
+        assert.ok(!all.settings.some(s => s.key === GHOST_SETTING));
     });
 });
 
@@ -64,14 +64,14 @@ describe('Ensure transaction rules conditions are properly exported', () => {
 
     it('Should not throw if all conditions types are known', () => {
         const func = () => cleanData(world);
-        should.doesNotThrow(func);
+        assert.doesNotThrow(func);
     });
 
     it('Should throw if a condition type is unknown', () => {
         const newWorld = JSON.parse(JSON.stringify(world));
         newWorld.transactionRules[0].conditions[0].type = 'UNKNOWN';
         const func = () => cleanData(newWorld);
-        should.throws(func);
+        assert.throws(func);
     });
 });
 
@@ -217,7 +217,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const transaction of betterWorld.transactions) {
-            accountsIds.should.containEql(transaction.accountId);
+            assert.ok(accountsIds.includes(transaction.accountId));
         }
     });
 
@@ -225,7 +225,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const rt of betterWorld.recurringTransactions) {
-            accountsIds.should.containEql(rt.accountId);
+            assert.ok(accountsIds.includes(rt.accountId));
         }
     });
 
@@ -233,7 +233,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const art of betterWorld.appliedRecurringTransactions) {
-            accountsIds.should.containEql(art.accountId);
+            assert.ok(accountsIds.includes(art.accountId));
         }
     });
 
@@ -241,7 +241,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const al of betterWorld.alerts) {
-            accountsIds.should.containEql(al.accountId);
+            assert.ok(accountsIds.includes(al.accountId));
         }
     });
 
@@ -250,7 +250,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const view of betterWorld.views) {
             for (const acc of view.accounts) {
-                accountsIds.should.containEql(acc.accountId);
+                assert.ok(accountsIds.includes(acc.accountId));
             }
         }
     });
@@ -322,7 +322,7 @@ describe('Ensure recurring transaction ids are properly remapped after re-indexi
         const betterWorld = cleanData(world);
         const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
         for (const rt of betterWorld.recurringTransactions) {
-            recurringTransactionIds.should.containEql(rt.id);
+            assert.ok(recurringTransactionIds.includes(rt.id));
         }
     });
 
@@ -330,7 +330,7 @@ describe('Ensure recurring transaction ids are properly remapped after re-indexi
         const betterWorld = cleanData(world);
         const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
         for (const art of betterWorld.appliedRecurringTransactions) {
-            recurringTransactionIds.should.containEql(art.recurringTransactionId);
+            assert.ok(recurringTransactionIds.includes(art.recurringTransactionId));
         }
     });
 });
@@ -423,7 +423,7 @@ describe('Ensure views ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const viewIds = betterWorld.views.map(v => v.id);
         for (const budget of betterWorld.budgets) {
-            viewIds.should.containEql(budget.viewId);
+            assert.ok(viewIds.includes(budget.viewId));
         }
     });
 });
@@ -554,6 +554,6 @@ describe('Ensure budgets without valid view/category ids are ignored', () => {
 
     it('Should be properly remapped in budgets', () => {
         const betterWorld = cleanData(world);
-        betterWorld.budgets.length.should.equal(2, 'There should be exactly 2 budgets kept');
+        assert.strictEqual(betterWorld.budgets.length, 2, 'There should be exactly 2 budgets kept');
     });
 });

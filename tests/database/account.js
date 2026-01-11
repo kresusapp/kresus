@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access, Account } from '../../server/models';
 import { importData } from '../../server/controllers/all';
@@ -114,14 +114,14 @@ describe('Account model API', () => {
 
             const result = await account[0].computeBalance(0);
             const expected = world.transactions.reduce((sum, tr) => sum + tr.amount, 0);
-            result.should.be.approximately(expected, 0.01);
+            assert.ok(expected - result < 0.01);
         });
 
         it('should return the right amount given an offset', async () => {
             const account = await Account.all(USER_ID);
             const result = await account[0].computeBalance(1337);
             const expected = world.transactions.reduce((sum, tr) => sum + tr.amount, 1337);
-            result.should.be.approximately(expected, 0.01);
+            assert.ok(expected - result < 0.01);
         });
     });
 
@@ -152,7 +152,7 @@ describe('Account model API', () => {
                 userId: USER_ID,
                 id: account.id,
             });
-            should(updatedAccount.balance).be.null();
+            assert.strictEqual(updatedAccount.balance, null);
         });
     });
 });

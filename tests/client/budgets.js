@@ -1,16 +1,17 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { testing } from '../../client/components/budget/item';
 
 const { getBars } = testing;
 
 function checkHasBar(bars, name, expectedWidth, expectedClass) {
-    bars.has(name).should.equal(true);
+    assert.ok(bars.has(name));
+
     const bar = bars.get(name);
-    bar.width.should.equal(expectedWidth);
+    assert.strictEqual(bar.width, expectedWidth);
 
     if (expectedClass) {
-        bar.classes.should.equal(expectedClass);
+        assert.strictEqual(bar.classes, expectedClass);
     }
 }
 
@@ -20,20 +21,20 @@ describe('budgets', () => {
     describe('when the threshold is null', () => {
         it('should return no bars', () => {
             const bars = getBars(null, 10, WARNING_THRESHOLD_PERCENT);
-            should(bars).be.null();
+            assert.strictEqual(bars, null);
         });
     });
 
     describe('when the threshold is 0', () => {
         it('and amount equals the threshold', () => {
             const bars = getBars(0, 0, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
         });
 
         it('and amount does not equal the threshold', () => {
             const bars = getBars(0, 10, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'dangerRange', 100, 'stacked-progress-part-danger');
         });
     });
@@ -41,25 +42,25 @@ describe('budgets', () => {
     describe('when the threshold is above 0', () => {
         it('and amount is below the threshold and below the warning', () => {
             const bars = getBars(100, 50, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 50, 'stacked-progress-part-danger');
         });
 
         it('amount is below the threshold and over the warning', () => {
             const bars = getBars(100, 80, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 80, 'stacked-progress-part-warning');
         });
 
         it('and amount equals the threshold', () => {
             const bars = getBars(100, 100, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
         });
 
         it('and amount is over the threshold', () => {
             const bars = getBars(100, 120, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
         });
     });
@@ -67,13 +68,13 @@ describe('budgets', () => {
     describe('when the threshold is below 0', () => {
         it('and amount is below the threshold and below the warning', () => {
             const bars = getBars(-100, -50, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(1);
+            assert.strictEqual(bars.size, 1);
             checkHasBar(bars, 'successRange', 50, 'stacked-progress-part-success');
         });
 
         it('and amount is below the threshold and over the warning', () => {
             const bars = getBars(-100, -80, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(2);
+            assert.strictEqual(bars.size, 2);
             checkHasBar(
                 bars,
                 'successRange',
@@ -90,7 +91,7 @@ describe('budgets', () => {
 
         it('and amount equals the threshold', () => {
             const bars = getBars(-100, -100, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(2);
+            assert.strictEqual(bars.size, 2);
             checkHasBar(
                 bars,
                 'successRange',
@@ -107,7 +108,7 @@ describe('budgets', () => {
 
         it('and amount is over the threshold', () => {
             const bars = getBars(-100, -120, WARNING_THRESHOLD_PERCENT);
-            bars.size.should.equal(3);
+            assert.strictEqual(bars.size, 3);
             checkHasBar(
                 bars,
                 'successRange',

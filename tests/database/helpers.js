@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access } from '../../server/models';
 import { bulkDelete } from '../../server/models/helpers';
@@ -34,11 +34,11 @@ describe('Models helpers', () => {
             accessesIds.push(access.id);
 
             let allAccesses = await Access.all(USER_ID);
-            allAccesses.length.should.equal(accessesIds.length);
+            assert.strictEqual(allAccesses.length, accessesIds.length);
 
             await bulkDelete(Access.repo(), accessesIds);
             allAccesses = await Access.all(USER_ID);
-            allAccesses.length.should.equal(0);
+            assert.strictEqual(allAccesses.length, 0);
         });
     });
 });
