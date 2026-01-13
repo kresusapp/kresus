@@ -54,8 +54,8 @@ describe('Access model API', () => {
 
             assert.strictEqual(allFields.length, 2);
             for (let field of allFields) {
-                assert.ok(allFields.some(f => checkObjectIsSubsetOf(f, field)));
                 assert.strictEqual(field.accessId, accessWithoutFieldsId);
+                assert.ok(fields.some(f => checkObjectIsSubsetOf(field, f)));
             }
         });
 
@@ -96,12 +96,12 @@ describe('Access model API', () => {
             allFields = await AccessField.all(USER_ID);
 
             assert.strictEqual(allAccesses.length, 2);
-            // assert.ok(checkObjectIsSubsetOf(accessWithFields, allAccesses[0]));
-            // assert.ok(checkObjectIsSubsetOf(accessWithoutFields, allAccesses[1]));
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithFields, acc)));
+            assert.ok(allAccesses.some(acc => checkObjectIsSubsetOf(accessWithoutFields, acc)));
 
             assert.strictEqual(allFields.length, 2);
             for (let field of allFields) {
-                assert.ok(allFields.some(f => checkObjectIsSubsetOf(f, field)));
+                assert.ok(fields.some(f => checkObjectIsSubsetOf(field, f)));
             }
         });
 
