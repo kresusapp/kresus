@@ -2,6 +2,7 @@
 """
 Fake Woob module with capability CapBank.
 """
+
 from __future__ import unicode_literals
 
 import datetime
