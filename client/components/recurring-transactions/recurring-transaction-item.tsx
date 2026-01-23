@@ -7,7 +7,7 @@ import { useKresusDispatch } from '../../store';
 
 import { RecurringTransaction } from '../../models';
 
-import { translate as $t, notify } from '../../helpers';
+import { translate as $t, currency, notify } from '../../helpers';
 
 import Popconfirm from '../ui/popform';
 import { ButtonLink } from '../ui';
@@ -16,7 +16,10 @@ import { useTableRowSwipeDetection } from '../ui/use-swipe';
 
 import URL from '../../urls';
 
-type RecurringTransactionItemProps = { recurringTransaction: RecurringTransaction };
+type RecurringTransactionItemProps = {
+    recurringTransaction: RecurringTransaction;
+    currency: string;
+};
 
 interface RecurringTransactionRef extends HTMLTableRowElement {
     openEditionView: () => void;
@@ -33,6 +36,8 @@ const RecurringTransactionItem = React.forwardRef<
     const editionUrl = URL.editRecurringTransaction.url(rt.id);
 
     const dispatch = useKresusDispatch();
+
+    const currencyFormatter = currency.makeFormat(props.currency);
 
     const handleDelete = useCallback(async () => {
         try {
@@ -103,7 +108,7 @@ const RecurringTransactionItem = React.forwardRef<
 
             <td className="label">{rt.label}</td>
             <td className="type">{$t(`client.${rt.type}`)}</td>
-            <td className="amount">{rt.amount}</td>
+            <td className="amount">{currencyFormatter(rt.amount)}</td>
             <td className="day">{rt.dayOfMonth}</td>
             <td className="months">{months}</td>
             <IfNotMobile>

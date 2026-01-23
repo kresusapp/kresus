@@ -58,7 +58,7 @@ const RecurringTransactionsList = () => {
     const Item = isSmallScreen ? SwipeableRecurringTransactionItem : RecurringTransactionItem;
 
     const recurringTransactionsItems = recurringTransactions.map((rt: RecurringTransaction) => (
-        <Item key={rt.id} recurringTransaction={rt} />
+        <Item key={rt.id} recurringTransaction={rt} currency={account.currency} />
     ));
 
     return (
