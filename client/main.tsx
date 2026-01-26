@@ -27,7 +27,7 @@ import * as InstanceStore from './store/instance';
 import * as ViewStore from './store/views';
 import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import URL from './urls';
-import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
+import { DEV_ENV, FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
 
 // Components
 import About from './components/about';
@@ -393,11 +393,18 @@ const DisplayOrRedirectToInitialScreen = (props: {
     const isWoobInstalled = useKresusState(state =>
         InstanceStore.getBool(state.instance, WOOB_INSTALLED)
     );
+    const isDevEnv = useKresusState(state => InstanceStore.getBool(state.instance, DEV_ENV));
 
     const displayWoobReadme = useRouteMatch({ path: URL.woobReadme.pattern });
     const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
 
-    if (!isWoobInstalled) {
+    if (isDevEnv && !isWoobInstalled) {
+        window.alert(
+            'Warning: woob is not installed. Being in a DEV environment, you will not be redirected to the readme'
+        );
+    }
+
+    if (!isWoobInstalled && !isDevEnv) {
         if (!displayWoobReadme) {
             return <Redirect to={URL.woobReadme.url()} push={false} />;
         }
