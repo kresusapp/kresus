@@ -42,7 +42,10 @@ const RecurringTransactionsList = () => {
     });
 
     const recurringTransactions = useKresusState(state => {
-        return BanksStore.getRecurringTransactionsByAccountId(state.banks, accountId);
+        const rt = BanksStore.getRecurringTransactionsByAccountId(state.banks, accountId);
+        return rt.slice().sort((a, b) => {
+            return a.dayOfMonth - b.dayOfMonth || a.label.localeCompare(b.label);
+        });
     });
 
     useEffect(() => {
