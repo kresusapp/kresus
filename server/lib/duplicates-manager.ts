@@ -21,7 +21,7 @@ export function getDuplicatePairScore(
 ): number {
     assert(typeof next.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
     assert(typeof next.date !== 'undefined', 'a new transaction must have a date');
-    assert(typeof next.amount !== 'undefined', 'a new transaction must have a amount');
+    assert(typeof next.amount !== 'undefined', 'a new transaction must have an amount');
 
     const diffAmount = Math.abs(next.amount - tr.amount);
     if (diffAmount > 0.001) {

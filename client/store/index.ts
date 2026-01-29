@@ -71,6 +71,7 @@ duplicatesMiddleware.startListening({
         SettingsStore.setPair.fulfilled
     ),
     effect: async (action, { dispatch }) => {
+        // Check if the setting that was modified is related to duplicates.
         if (action.type === SettingsStore.setPair.fulfilled.toString()) {
             if (
                 typeof action.payload !== 'object' ||
