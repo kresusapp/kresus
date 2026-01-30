@@ -74,7 +74,7 @@ export class Driver {
             return currency.makeFormat(accounts[0].currency);
         }
 
-        return Number.toString;
+        return String;
     }
 
     getTransactions(state: GlobalState): Transaction[] {
