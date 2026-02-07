@@ -4,6 +4,7 @@ import {
     Access,
     Account,
     Setting,
+    MinimalTransaction,
     Transaction,
     TransactionRule,
     RecurringTransaction,
@@ -315,7 +316,7 @@ function normalizeTransaction(
     startOfPoll: Date,
     vendorToOwnAccountIdMap: Map<string, number>,
     providerTr: ProviderTransaction
-): Partial<Transaction> | null {
+): MinimalTransaction | null {
     if (!vendorToOwnAccountIdMap.has(providerTr.account)) {
         log.error(
             `Transaction attached to an unknown account (vendor id: ${providerTr.account}), skipping`
@@ -328,12 +329,13 @@ function normalizeTransaction(
         return null;
     }
 
-    const tr: Partial<Transaction> = {
+    const tr: MinimalTransaction = {
         accountId: vendorToOwnAccountIdMap.get(providerTr.account),
         amount: Number.parseFloat(providerTr.amount),
         rawLabel: providerTr.rawLabel || providerTr.label,
         date: new Date(providerTr.date),
         label: providerTr.label || providerTr.rawLabel,
+        importDate: startOfPoll,
     };
 
     if (typeof tr.amount === 'undefined' || Number.isNaN(tr.amount)) {
@@ -368,8 +370,6 @@ function normalizeTransaction(
         tr.debitDate = debitDate;
     }
 
-    tr.importDate = startOfPoll;
-
     const transactionType = transactionTypeIdToName(providerTr.type);
     if (transactionType !== null) {
         tr.type = transactionType;
@@ -391,7 +391,7 @@ async function pollTransactions(
     vendorToOwnAccountIdMap: Map<string, number>,
     access: Access,
     config: PollTransactionsConfig
-): Promise<UserActionOrValue<Partial<Transaction>[]>> {
+): Promise<UserActionOrValue<MinimalTransaction[]>> {
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
     const autoRetryFetch = await Setting.findOrCreateDefaultBooleanValue(
@@ -434,7 +434,7 @@ async function pollTransactions(
     }
 
     log.info('Normalizing source information...');
-    const transactions: Partial<Transaction>[] = providerTransactions
+    const transactions: MinimalTransaction[] = providerTransactions
         .map(tr => normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, tr))
         .filter(tr => tr !== null) as any;
 
@@ -640,7 +640,7 @@ merging as per request`);
         );
 
         log.info('Comparing with database to ignore already known transactions…');
-        let toCreate: Partial<Transaction>[] = [];
+        let toCreate: MinimalTransaction[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
         const now = new Date();
@@ -706,8 +706,8 @@ merging as per request`);
             // Split the provider transactions into two parts: those related to
             // this account go in `providerTransactions`, the rest goes to
             // `otherTransactions`.
-            const providerTransactions: Partial<Transaction>[] = [];
-            const otherTransactions: Partial<Transaction>[] = [];
+            const providerTransactions: MinimalTransaction[] = [];
+            const otherTransactions: MinimalTransaction[] = [];
             for (const op of filteredTransactions) {
                 if (op.accountId === account.id) {
                     providerTransactions.push(op);

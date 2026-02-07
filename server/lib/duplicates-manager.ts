@@ -1,10 +1,15 @@
 import moment from 'moment';
 
-import { assert, UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
+import { UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
 
-import type { Transaction } from '../models';
+import type { MinimalTransaction, Transaction } from '../models';
 
 const log = makeLogger('duplicates-manager');
+
+const isMinimalTransaction = (tr: any): tr is MinimalTransaction =>
+    typeof tr.rawLabel !== 'undefined' &&
+    typeof tr.date !== 'undefined' &&
+    typeof tr.amount !== 'undefined';
 
 /**
  * Returns a score between 0 and 1 indicating if two transactions are duplicates.
@@ -14,22 +19,18 @@ const log = makeLogger('duplicates-manager');
  */
 export function getDuplicatePairScore(
     tr: Transaction,
-    next: Partial<Transaction>,
+    next: MinimalTransaction,
     threshold: number,
     ignoreDuplicatesWithDifferentCustomFields: boolean,
     ignoreIfSameImportDate = true
 ): number {
-    assert(typeof next.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
-    assert(typeof next.date !== 'undefined', 'a new transaction must have a date');
-    assert(typeof next.amount !== 'undefined', 'a new transaction must have an amount');
-
     const diffAmount = Math.abs(next.amount - tr.amount);
     if (diffAmount > 0.001) {
         return 0;
     }
 
     // Two transactions are duplicates only if they were not imported at the same date.
-    if (ignoreIfSameImportDate && +tr.importDate === +(next.importDate || 0)) {
+    if (ignoreIfSameImportDate && +tr.importDate === +next.importDate) {
         return 0;
     }
 
@@ -100,7 +101,10 @@ export function findRedundantPairs(
     log.debug(`Threshold: ${threshold}`);
 
     // O(n log n)
-    const sorted = transactions.slice().sort((a, b) => a.amount - b.amount);
+    // Tests showed that assert'ing the rawLabel/date/amount fields inside the getDuplicatePairScore
+    // was slow (650ms for 4592 transactions, vs 280 with this filter).
+    const sorted = transactions.filter(isMinimalTransaction).sort((a, b) => a.amount - b.amount);
+
     for (let i = 0; i < transactions.length; ++i) {
         const tr = sorted[i];
         let j = i + 1;

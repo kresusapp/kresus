@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { getDuplicatePairScore } from './duplicates-manager';
-import { Transaction } from '../models';
+import { Transaction, MinimalTransaction } from '../models';
 import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
@@ -18,15 +18,15 @@ import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } f
       is by definition a transaction which debit date is in the future).
 */
 export default function filterDuplicateTransactions(
-    duplicates: [Transaction, Partial<Transaction>][]
+    duplicates: [Transaction, MinimalTransaction][]
 ): {
-    toCreate: Partial<Transaction>[];
+    toCreate: MinimalTransaction[];
     toUpdate: {
         known: Transaction;
         update: Partial<Transaction>;
     }[];
 } {
-    const toCreate: Partial<Transaction>[] = [];
+    const toCreate: MinimalTransaction[] = [];
     const toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
     const today = new Date();

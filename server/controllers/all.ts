@@ -9,6 +9,7 @@ import {
     Category,
     RecurringTransaction,
     Setting,
+    MinimalTransaction,
     Transaction,
     TransactionRule,
     AppliedRecurringTransaction,
@@ -768,7 +769,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     }
 
     log.info('Import transactions...');
-    const newByAccountId: Map<number, any[]> = new Map();
+    const newByAccountId: Map<number, MinimalTransaction[]> = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
         const tr = world.transactions[i];
 
@@ -862,7 +863,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     for (const [accountId, provided] of newByAccountId) {
         const known = await Transaction.byAccount(userId, accountId);
 
-        const diffResult = diffTransactions(known, provided as Partial<Transaction>[]);
+        const diffResult = diffTransactions(known, provided);
 
         // Ignore perfect matches and knownOrphans. Only import the "provider" (import) orphans
         // and the duplicate candidates, since we're not too sure about those.

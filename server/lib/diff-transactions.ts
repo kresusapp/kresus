@@ -3,9 +3,9 @@ import { assert, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 
 import makeDiff from './diff-list';
 import { getDuplicatePairScore } from './duplicates-manager';
-import { Transaction } from '../models';
+import { MinimalTransaction, Transaction } from '../models';
 
-function isPerfectMatch(known: Transaction, provided: Partial<Transaction>): boolean {
+function isPerfectMatch(known: Transaction, provided: MinimalTransaction): boolean {
     return (
         getDuplicatePairScore(known, provided, 0, false, false) === 1 &&
         known.type === provided.type
@@ -23,7 +23,7 @@ const MAX_DATE_DIFFERENCE = 2;
 
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 
-function computePairScore(known: Transaction, provided: Partial<Transaction>): number {
+function computePairScore(known: Transaction, provided: MinimalTransaction): number {
     // TODO: mutualize with getDuplicatePairScore in duplicates-manager
 
     assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
@@ -55,5 +55,9 @@ function computePairScore(known: Transaction, provided: Partial<Transaction>): n
     return amountScore + dateScore + typeScore + labelScore;
 }
 
-const diffTransactions = makeDiff<Transaction>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
+const diffTransactions = makeDiff<Transaction, MinimalTransaction>(
+    isPerfectMatch,
+    computePairScore,
+    MIN_SIMILARITY
+);
 export default diffTransactions;

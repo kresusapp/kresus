@@ -26,6 +26,9 @@ import RecurringTransaction from './entities/recurring-transactions';
 import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
 import View from './entities/views';
 
+type MinimalTransaction = Partial<Transaction> &
+    Pick<Transaction, 'date' | 'importDate' | 'amount' | 'rawLabel'>;
+
 export {
     Access,
     AccessField,
@@ -35,6 +38,7 @@ export {
     Category,
     Setting,
     Transaction,
+    MinimalTransaction,
     TransactionRule,
     TransactionRuleAction,
     TransactionRuleCondition,
