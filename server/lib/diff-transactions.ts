@@ -5,7 +5,9 @@ import type { MinimalTransaction, Transaction } from '../models';
 function isPerfectMatch(known: Transaction, provided: MinimalTransaction): boolean {
     return (
         getDuplicatePairScore(known, provided, 0, false, false) === 1 &&
-        known.type === provided.type
+        known.type === provided.type &&
+        !!known.isRecurrentTransaction === !!provided.isRecurrentTransaction &&
+        !!known.createdByUser === !!provided.createdByUser
     );
 }
 

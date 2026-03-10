@@ -54,17 +54,10 @@ export default function filterDuplicateTransactions(
 
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === UNKNOWN_TRANSACTION_TYPE && provided.type !== UNKNOWN_TRANSACTION_TYPE) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: provided.type,
-                },
-            });
-            continue;
+            updateBase.type = provided.type;
         }
 
-        // The transaction type which was "deferred_card", is now "card", and the debitDate is now
+        // If the transaction type which was "deferred_card" is now "card", and the debitDate is now
         // in the past (ie. the change of type is legitimate), update the transaction.
         if (
             known.debitDate &&
@@ -72,14 +65,7 @@ export default function filterDuplicateTransactions(
             provided.type === TRANSACTION_CARD_TYPE.name &&
             moment(known.debitDate).isSameOrBefore(today, 'day')
         ) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: TRANSACTION_CARD_TYPE.name,
-                },
-            });
-            continue;
+            updateBase.type = TRANSACTION_CARD_TYPE.name;
         }
 
         if (Object.keys(updateBase).length > 0) {
