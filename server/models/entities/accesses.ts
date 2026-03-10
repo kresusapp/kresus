@@ -155,10 +155,10 @@ export default class Access {
         accessId: number,
         newAttributes: Partial<Access>
     ): Promise<Access> {
-        if (typeof newAttributes.fields !== 'undefined') {
-            throw new Error('API error: use AccessField model instead!');
+        if (Object.keys(newAttributes).length > 0) {
+            await Access.repo().update({ userId, id: accessId }, newAttributes);
         }
-        await Access.repo().update({ userId, id: accessId }, newAttributes);
+
         return unwrap(await Access.find(userId, accessId));
     }
 
