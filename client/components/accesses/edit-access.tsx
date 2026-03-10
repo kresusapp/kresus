@@ -98,7 +98,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                     password,
                     customFields: customFieldsArray,
                 })
-            );
+            ).unwrap();
         },
         [login, password, accessId, dispatch]
     );
