@@ -16,7 +16,7 @@ For up to date installation instructions, please refer to the
 [kresus.org](https://kresus.org/en/install.html) website.
 
 Note that this website is opensource as well and you can
-[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/en/05-install.md)
+[contribute](https://codeberg.org/kresus/kresus.org/src/branch/main/content/pages/en/01-install.md)
 to improve installation instructions.
 
 ## Contributing
