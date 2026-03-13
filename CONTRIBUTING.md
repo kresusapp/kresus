@@ -146,3 +146,11 @@ version to use. Please make sure all version numbers are **exact** in
   isn't a reason to merge any time sooner.
 - Failing to respect these rules may result in losing the right to merge, after
   a first warning strike and a discussion between contributors.
+
+# Bumping the node.js version
+
+When bumping the node.js version, make sure to update it in all the following places:
+
+- in `package.json`, in the `engines` field,
+- in the `Dockerfile`s, in the `FROM` lines,
+- in the CI configuration, in the `.gitlab-ci.yml` file, in the `default` `image` field.
