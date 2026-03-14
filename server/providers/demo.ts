@@ -306,8 +306,27 @@ export const fetchTransactions = ({
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
 
+export const getBankVendors = () => [
+    {
+        customFields: [
+            {
+                name: 'login',
+                type: 'text',
+            },
+            {
+                name: 'password',
+                type: 'password',
+            },
+        ],
+        deprecated: false,
+        name: 'Demo bank',
+        uuid: 'demo',
+    },
+];
+
 export const _: Provider = {
     SOURCE_NAME,
+    getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

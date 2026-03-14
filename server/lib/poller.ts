@@ -1,12 +1,12 @@
 import moment from 'moment';
 
 import { Access, Setting, User } from '../models';
+import { bankVendorByUuid } from '../providers';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
 import AlertManager from './alert-manager';
-import { bankVendorByUuid } from './bank-vendors';
 
 import {
     assert,

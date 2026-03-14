@@ -3,8 +3,10 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import banks from '../../shared/banks.json';
+import { getBankVendors } from '../../server/providers';
 import { makeLogger } from '../../server/helpers';
+
+const banks = getBankVendors();
 
 const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..');
 

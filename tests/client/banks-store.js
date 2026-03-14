@@ -10,7 +10,9 @@ import {
 } from '../../client/store/banks';
 import { setupTranslator } from '../../client/helpers';
 
-import banks from '../../shared/banks.json';
+import { getBankVendors } from '../../server/providers';
+
+const banks = getBankVendors();
 
 import { checkObjectIsSubsetOf } from '../helpers';
 

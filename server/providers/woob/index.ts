@@ -31,6 +31,8 @@ import {
     ProviderTransactionResponse,
 } from '../';
 
+import BankVendors from './banks.json';
+
 const log = makeLogger('providers/woob');
 
 // Subcommand error code indicating malformed argparse parameters.
@@ -498,11 +500,14 @@ export async function fetchTransactions(
 
 export const SOURCE_NAME = 'woob';
 
+export const getBankVendors = () => BankVendors;
+
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
 // expected, and use it.
 export const _: Provider = {
-    SOURCE_NAME: 'woob',
+    SOURCE_NAME,
+    getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

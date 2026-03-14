@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-A simple script to generate the banks.json file for Kresus.
+A simple script to generate the providers/woob/banks.json file for Kresus.
 """
 
 import argparse
@@ -97,35 +97,6 @@ IGNORE_MODULE_LIST = [
     "bnporc",
 ] + [m.name for m in DEPRECATED_MODULES]
 
-MANUAL_MODULES = [
-    MockModule(
-        "manual",
-        "Manual Bank",
-        BackendConfig(
-            Value("login"),
-            ValueBackendPassword("password"),
-            Value(
-                "currency",
-                label="Currency",
-                choices={"EUR": "Euro", "USD": "Dollar"},
-                default="EUR",
-                required=True,
-            ),
-        ),
-        backend="manual",
-        no_credentials=True,
-    )
-]
-
-MOCK_MODULES = [
-    MockModule(
-        "demo",
-        "Demo bank",
-        BackendConfig(Value("login"), ValueBackendPassword("password")),
-        backend="demo",
-    ),
-]
-
 NEEDS_PLACEHOLDER = ["login", "secret", "birthday"]
 
 # List of transient fields in case the module does not use `ValueTransient`
@@ -173,12 +144,11 @@ def ignore_parent_config(parent):
     return parent == "creditdunord"
 
 
-def format_kresus(backend, module, is_deprecated=False, module_loader=None):
+def format_kresus(module, is_deprecated=False):
     """
     Export the bank module to kresus format
     name : module.description
     uuid: module.name
-    backend: backend
     customFields: [
         name:
         type:
@@ -188,10 +158,10 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
     kresus_module = {
         "name": module.description,
         "uuid": module.name,
-        "backend": backend,
         "deprecated": is_deprecated,
     }
 
+    # Does that really exist?
     if getattr(module, "no_credentials", False):
         kresus_module["noCredentials"] = True
 
@@ -327,11 +297,13 @@ class ModuleManager(WoobBase):
         return module
 
     def format_list_modules(self):
-        return [format_kresus("woob", module) for module in self.list_bank_modules()]
+        return [format_kresus(module) for module in self.list_bank_modules()]
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generates the banks.json for Kresus")
+    parser = argparse.ArgumentParser(
+        description="Generates the providers/woob/banks.json for Kresus"
+    )
     parser.add_argument(
         "-o",
         "--output",
@@ -375,16 +347,9 @@ if __name__ == "__main__":
         fake_modules_manager = ModuleManager(fake_modules_path)
         content += fake_modules_manager.format_list_modules()
 
-        # Then the mock modules.
-        content += [format_kresus(module.backend, module) for module in MOCK_MODULES]
-
-    # Add the manual modules.
-    content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
-
     # Add metadata for the deprecated modules
     content += [
-        format_kresus("woob", module, is_deprecated=True)
-        for module in DEPRECATED_MODULES
+        format_kresus(module, is_deprecated=True) for module in DEPRECATED_MODULES
     ]
 
     data = json.dumps(

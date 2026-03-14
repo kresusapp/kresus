@@ -28,7 +28,7 @@ import * as BudgetStore from './budgets';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
 import { regenerateAllViews, ServerView } from './views';
-import { Duplicates } from '../../shared/types';
+import type { BankVendor, Duplicates } from '../../shared/types';
 
 type ImportType = 'ofx' | 'json';
 
@@ -75,6 +75,7 @@ export async function init(): Promise<any> {
         views: ServerView[];
         user: User;
         duplicates: Duplicates;
+        bankVendors: BankVendor[];
     } = await backend.init();
 
     assertHas(world, 'settings');
@@ -127,6 +128,7 @@ export async function init(): Promise<any> {
             transactions: world.transactions,
             alerts: world.alerts,
             recurringTransactions: world.recurringTransactions,
+            bankVendors: world.bankVendors,
         },
 
         rules: RulesStore.initialState,

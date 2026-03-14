@@ -1,12 +1,13 @@
 import fs from 'fs';
 
 import { Access } from '../models';
-import { assert, KError } from '../helpers';
+import { assert, KError, unwrap } from '../helpers';
 
-import ALL_BANKS from '../shared/banks.json';
 import { UserActionResponse } from '../shared/types';
+import { BankVendor } from '../../shared/types';
 
-const BANK_HANDLERS = new Map();
+const BANK_HANDLERS = new Map<string, Provider>();
+const ALL_BANKS: BankVendor[] = [];
 
 export interface ProviderTransaction {
     account: string;
@@ -62,6 +63,7 @@ export interface SessionManager {
 
 export interface Provider {
     SOURCE_NAME: string;
+    getBankVendors: () => Omit<BankVendor, 'backend'>[];
     fetchAccounts: (
         opts: FetchAccountsOptions,
         session: SessionManager
@@ -83,6 +85,18 @@ function init() {
         ) {
             throw new KError("Backend doesn't implement basic functionality.");
         }
+
+        // Connect static bank information to their backends.
+        const vendors = handler.getBankVendors();
+        for (const bank of vendors) {
+            assert(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
+            BANK_HANDLERS.set(bank.uuid, handler);
+            ALL_BANKS.push({
+                ...bank,
+                backend: handler.SOURCE_NAME,
+            });
+        }
+
         SOURCE_HANDLERS[handler.SOURCE_NAME] = handler;
     }
 
@@ -99,19 +113,18 @@ function init() {
 
         addBackend(handler);
     }
-
-    // Connect static bank information to their backends.
-    for (const bank of ALL_BANKS) {
-        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
-            throw new KError('Bank handler not described or not imported.');
-        }
-        assert(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
-        BANK_HANDLERS.set(bank.uuid, SOURCE_HANDLERS[bank.backend]);
-    }
 }
 
-export function getProvider(access: Access): Provider {
+export function getProvider(access: Access) {
     return BANK_HANDLERS.get(access.vendorId);
+}
+
+export function getBankVendors() {
+    return ALL_BANKS;
+}
+
+export function bankVendorByUuid(uuid: string) {
+    return unwrap(ALL_BANKS.find(vendor => vendor.uuid === uuid));
 }
 
 init();

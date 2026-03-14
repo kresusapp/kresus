@@ -1,6 +1,6 @@
 [
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -16,7 +16,7 @@
         "uuid": "abeilleassurances"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -32,7 +32,7 @@
         "uuid": "afer"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -48,7 +48,7 @@
         "uuid": "allianzbanque"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "username",
@@ -72,7 +72,7 @@
         "uuid": "amazonstorecard"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -88,7 +88,7 @@
         "uuid": "americanexpress"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -127,7 +127,7 @@
         "uuid": "amundi"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -143,7 +143,7 @@
         "uuid": "apivie"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -159,7 +159,7 @@
         "uuid": "axabanque"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -175,7 +175,7 @@
         "uuid": "banqueaccord"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -245,7 +245,7 @@
         "uuid": "banquepopulaire"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -261,7 +261,7 @@
         "uuid": "becm"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -281,7 +281,7 @@
         "uuid": "bforbank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -297,7 +297,7 @@
         "uuid": "binck"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -358,7 +358,7 @@
         "uuid": "bnp"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -390,7 +390,7 @@
         "uuid": "bnpcards"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -421,7 +421,7 @@
         "uuid": "bnppere"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -437,7 +437,7 @@
         "uuid": "boursedirect"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -458,7 +458,7 @@
         "uuid": "boursorama"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -489,7 +489,7 @@
         "uuid": "bp"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -520,7 +520,7 @@
         "uuid": "bred"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -563,7 +563,7 @@
         "uuid": "btpbanque"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -579,7 +579,7 @@
         "uuid": "caels"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -622,7 +622,7 @@
         "uuid": "caissedepargne"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -638,7 +638,7 @@
         "uuid": "capeasi"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -654,7 +654,7 @@
         "uuid": "carrefourbanque"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -689,7 +689,7 @@
         "uuid": "ccf"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -705,7 +705,7 @@
         "uuid": "cic"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -721,7 +721,7 @@
         "uuid": "cices"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "username",
@@ -737,7 +737,7 @@
         "uuid": "citibank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -768,7 +768,7 @@
         "uuid": "cmb"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -784,7 +784,7 @@
         "uuid": "cmes"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -815,7 +815,7 @@
         "uuid": "cmso"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -831,7 +831,7 @@
         "uuid": "courtois"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1009,7 +1009,7 @@
         "uuid": "cragr"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1052,7 +1052,7 @@
         "uuid": "creditcooperatif"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1107,7 +1107,7 @@
         "uuid": "creditdunord"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1123,7 +1123,7 @@
         "uuid": "creditdunordpee"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1139,7 +1139,7 @@
         "uuid": "creditmutuel"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1155,7 +1155,7 @@
         "uuid": "degiro"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1171,7 +1171,7 @@
         "uuid": "delubac"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1187,7 +1187,7 @@
         "uuid": "erehsbc"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1203,7 +1203,7 @@
         "uuid": "esalia"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1244,7 +1244,7 @@
         "uuid": "fakewoobbank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1260,7 +1260,7 @@
         "uuid": "federalfinancees"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1276,7 +1276,7 @@
         "uuid": "fortuneo"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1292,7 +1292,7 @@
         "uuid": "ganassurances"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1308,7 +1308,7 @@
         "uuid": "ganpatrimoine"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1324,7 +1324,7 @@
         "uuid": "ganprevoyance"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1340,7 +1340,7 @@
         "uuid": "gmf"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1356,7 +1356,7 @@
         "uuid": "groupamaes"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1372,7 +1372,7 @@
         "uuid": "helios"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1418,7 +1418,7 @@
         "uuid": "hellobank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1439,7 +1439,7 @@
         "uuid": "hsbchk"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1455,7 +1455,7 @@
         "uuid": "humanis"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1476,7 +1476,7 @@
         "uuid": "ing"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1492,7 +1492,7 @@
         "uuid": "kiwibank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1508,7 +1508,7 @@
         "uuid": "kolb"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1563,7 +1563,7 @@
         "uuid": "laydernier"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1602,7 +1602,7 @@
         "uuid": "lcl"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "username",
@@ -1618,7 +1618,7 @@
         "uuid": "lita"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1634,7 +1634,7 @@
         "uuid": "mafrenchbank"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1650,7 +1650,7 @@
         "uuid": "milleis"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1666,7 +1666,7 @@
         "uuid": "myedenred"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1682,7 +1682,7 @@
         "uuid": "n26"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1698,7 +1698,7 @@
         "uuid": "nalo"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1714,7 +1714,7 @@
         "uuid": "nef"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1730,7 +1730,7 @@
         "uuid": "nuger"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1746,7 +1746,7 @@
         "uuid": "oney"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1762,7 +1762,7 @@
         "uuid": "pradoepargne"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "username",
@@ -1778,7 +1778,7 @@
         "uuid": "primonialreim"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1833,7 +1833,7 @@
         "uuid": "rhonealpe"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1849,7 +1849,7 @@
         "uuid": "roblox"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1904,7 +1904,7 @@
         "uuid": "smc"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1939,7 +1939,7 @@
         "uuid": "societegenerale"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1970,7 +1970,7 @@
         "uuid": "sogecartenet"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -1986,7 +1986,7 @@
         "uuid": "spirica"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2024,7 +2024,7 @@
         "uuid": "suravenir"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2040,7 +2040,7 @@
         "uuid": "swile"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2061,7 +2061,7 @@
         "uuid": "swisslife"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2116,7 +2116,7 @@
         "uuid": "tarneaud"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2132,7 +2132,7 @@
         "uuid": "themisbanque"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2148,7 +2148,7 @@
         "uuid": "tiime"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2164,7 +2164,7 @@
         "uuid": "transatplan"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "username",
@@ -2180,7 +2180,7 @@
         "uuid": "vicseccard"
     },
     {
-        "backend": "woob",
+
         "customFields": [
             {
                 "name": "login",
@@ -2196,103 +2196,55 @@
         "uuid": "yomoni"
     },
     {
-        "backend": "demo",
-        "customFields": [
-            {
-                "name": "login",
-                "type": "text"
-            },
-            {
-                "name": "password",
-                "type": "password"
-            }
-        ],
-        "deprecated": false,
-        "name": "Demo bank",
-        "uuid": "demo"
-    },
-    {
-        "backend": "manual",
-        "customFields": [
-            {
-                "name": "login",
-                "type": "text"
-            },
-            {
-                "name": "password",
-                "type": "password"
-            },
-            {
-                "default": "EUR",
-                "name": "currency",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Euro",
-                        "value": "EUR"
-                    },
-                    {
-                        "label": "Dollar",
-                        "value": "USD"
-                    }
-                ]
-            }
-        ],
-        "deprecated": false,
-        "name": "Manual Bank",
-        "noCredentials": true,
-        "uuid": "manual"
-    },
-    {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Wells Fargo",
         "uuid": "wellsfargo"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "City Bank",
         "uuid": "citelis"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Allo Resto",
         "uuid": "alloresto"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Paypal",
         "uuid": "paypal"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Netfinca",
         "uuid": "netfinca"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Tickets CESU Edenred",
         "uuid": "ticketscesu"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Barclays",
         "uuid": "barclays"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Aviva",
         "uuid": "aviva"
     },
     {
-        "backend": "woob",
+
         "deprecated": true,
         "name": "Bolden",
         "uuid": "bolden"

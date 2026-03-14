@@ -31,7 +31,7 @@ import {
     unwrap,
 } from '../helpers';
 
-import { bankVendorByUuid } from '../lib/bank-vendors';
+import { bankVendorByUuid, getBankVendors } from '../providers';
 import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
@@ -95,6 +95,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         instance: {},
         recurringTransactions: [],
         views: [],
+        bankVendors: [],
     };
 
     const accesses = await Access.all(userId);
@@ -148,6 +149,8 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
             now.getFullYear()
         );
     } else {
+        ret.bankVendors = getBankVendors();
+
         ret.instance = await getAllInstanceProperties();
 
         // Find duplicates.

@@ -4,7 +4,7 @@ import { Access, AccessField, Account, Transaction, View } from '../models';
 
 import accountManager, { GLOBAL_CONTEXT, UserActionOrValue } from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
-import { bankVendorByUuid } from '../lib/bank-vendors';
+import { bankVendorByUuid } from '../providers';
 
 import { registerStartupTask } from './all';
 import * as AccountController from './accounts';

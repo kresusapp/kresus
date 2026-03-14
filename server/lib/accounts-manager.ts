@@ -210,7 +210,7 @@ async function pollAccounts(
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await getProvider(access).fetchAccounts(
+            return await getProvider(access)?.fetchAccounts(
                 {
                     access,
                     debug,
@@ -221,6 +221,10 @@ async function pollAccounts(
                 userSession
             );
         });
+
+        if (!providerResponse) {
+            throw new KError('Could not retrieve provider');
+        }
 
         if (providerResponse.kind === 'user_action') {
             // User action response.
@@ -408,7 +412,7 @@ async function pollTransactions(
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await getProvider(access).fetchTransactions(
+            return await getProvider(access)?.fetchTransactions(
                 {
                     access,
                     debug,
@@ -419,6 +423,10 @@ async function pollTransactions(
                 sessionManager
             );
         });
+
+        if (!providerResponse) {
+            throw new KError('Could not retrieve provider');
+        }
 
         if (providerResponse.kind === 'user_action') {
             return providerResponse;

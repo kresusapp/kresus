@@ -39,7 +39,7 @@ import {
 
 import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
-import { UserActionResponse } from '../../shared/types';
+import type { BankVendor, UserActionResponse } from '../../shared/types';
 import TransactionTypes from '../../shared/transaction-types.json';
 
 import * as UiStore from './ui';
@@ -49,7 +49,6 @@ import * as SettingsStore from './settings';
 
 import { mergeInArray, removeInArrayById, mergeInObject, removeInArray } from './helpers';
 
-import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
@@ -918,6 +917,7 @@ function makeInitialState(
         defaultAccountId: string;
         isOngoingLimitedToCurrentMonth: boolean;
     },
+    bankVendors: BankVendor[],
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
     allTransactions: Partial<Transaction>[],
@@ -936,7 +936,7 @@ function makeInitialState(
         defaultAccountId = parseInt(defaultAccountIdStr, 10);
     }
 
-    const banks = StaticBanks.map(b => createValidBank(b));
+    const banks = bankVendors.map(b => createValidBank(b));
     sortBanks(banks);
 
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
@@ -1037,16 +1037,26 @@ const banksSlice = createSlice({
         [],
         [],
         [],
+        [],
         []
     ),
     reducers: {
         reset(_state, action) {
             // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
             // Returning a value here will overwrite the state.
-            const { external, accesses, accounts, transactions, alerts, recurringTransactions } =
-                action.payload;
+            const {
+                external,
+                bankVendors,
+                accesses,
+                accounts,
+                transactions,
+                alerts,
+                recurringTransactions,
+            } = action.payload;
+
             return makeInitialState(
                 external,
+                bankVendors,
                 accesses,
                 accounts,
                 transactions,

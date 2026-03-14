@@ -14,7 +14,7 @@ import User from './users';
 import AccessField from './access-fields';
 
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
-import { bankVendorByUuid } from '../../lib/bank-vendors';
+import { bankVendorByUuid } from '../../providers';
 
 @Entity('access')
 export default class Access {
