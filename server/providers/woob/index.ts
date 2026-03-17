@@ -112,9 +112,11 @@ interface WoobUserActionResponse extends PythonResponse {
 
 // Successful execution of woob, with a range of values, to be interpreted in
 // the context of the caller's query.
+// While the execution worked, there still might be partial errors.
 interface WoobSuccessResponse extends PythonResponse {
     kind: 'success';
     values: [Record<string, unknown>];
+    errors: string[];
 }
 
 type WoobResponse = WoobErrorResponse | WoobSuccessResponse | WoobUserActionResponse;
@@ -419,6 +421,7 @@ async function callWoob(
     return {
         kind: 'values',
         values: response.values,
+        errors: response.errors,
     };
 }
 

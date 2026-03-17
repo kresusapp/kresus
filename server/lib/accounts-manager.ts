@@ -71,6 +71,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
 interface Value<T> {
     kind: 'value';
     value: T;
+    errors?: string[];
 }
 
 export type UserActionOrValue<T> = UserActionResponse | Value<T>;
@@ -212,6 +213,7 @@ async function pollAccounts(
     const userSession = ctx.getUserSession(userId);
 
     let sourceAccounts: ProviderAccount[];
+    let sourceErrors: string[] | undefined;
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
@@ -238,6 +240,10 @@ async function pollAccounts(
 
         // Real values.
         sourceAccounts = providerResponse.values;
+
+        if (providerResponse.errors && providerResponse.errors.length) {
+            sourceErrors = providerResponse.errors;
+        }
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -252,7 +258,7 @@ async function pollAccounts(
     );
     log.info(`-> ${accounts.length} bank account(s) found`);
 
-    return { kind: 'value', value: accounts };
+    return { kind: 'value', value: accounts, errors: sourceErrors };
 }
 
 interface AccountInfo {
@@ -414,6 +420,7 @@ async function pollTransactions(
     const sessionManager = GLOBAL_CONTEXT.getUserSession(userId);
 
     let providerTransactions: ProviderTransaction[];
+    let providerErrors: string[] | undefined;
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
@@ -439,6 +446,10 @@ async function pollTransactions(
 
         // Real values.
         providerTransactions = providerResponse.values;
+
+        if (providerResponse.errors && providerResponse.errors.length) {
+            providerErrors = providerResponse.errors;
+        }
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -457,6 +468,7 @@ async function pollTransactions(
     return {
         kind: 'value',
         value: transactions,
+        errors: providerErrors,
     };
 }
 
@@ -635,6 +647,7 @@ merging as per request`);
         if (result.kind === 'user_action') {
             return result;
         }
+        const providerErrors = result.errors;
         let transactions = result.value;
 
         const currentMoment = Date.now();
@@ -880,7 +893,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
-        return { kind: 'value', value: { accounts, createdTransactions } };
+        return { kind: 'value', value: { accounts, createdTransactions }, errors: providerErrors };
     }
 
     async resyncAccountBalance(

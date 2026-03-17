@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { handleSyncError } from '../../errors';
-import { translate as $t } from '../../helpers';
+import { translate as $t, notify } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
@@ -22,11 +22,20 @@ const SyncButton = (props: SyncButtonProps) => {
     const dispatch = useKresusDispatch();
     const handleSync = useCallback(async () => {
         try {
-            await dispatch(
+            const result = await dispatch(
                 BanksStore.runTransactionsSync({
                     accessId: props.account.accessId,
                 })
             ).unwrap();
+
+            // There might be errors along with the values
+            if (result && result.errors instanceof Array && result.errors.length) {
+                notify.error(
+                    $t('client.sync.partial_errors', {
+                        errors: result.errors.map((err: string) => `”${err}”`).join(', '),
+                    })
+                );
+            }
         } catch (err) {
             handleSyncError(err);
         }

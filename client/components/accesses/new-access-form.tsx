@@ -5,7 +5,7 @@ import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import * as InstanceStore from '../../store/instance';
 import { useKresusDispatch, useKresusState } from '../../store';
-import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
+import { assert, translate as $t, noValueFoundMessage, notify } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
@@ -258,7 +258,14 @@ const NewAccessForm = (props: {
             }
 
             // Create access.
-            await createAccess(arrayCustomFields);
+            const res = await createAccess(arrayCustomFields);
+            if (res && res.errors instanceof Array && res.errors.length) {
+                notify.error(
+                    $t('client.sync.partial_errors', {
+                        errors: res.errors.map((err: string) => `”${err}”`).join(', '),
+                    })
+                );
+            }
 
             // Create default categories if requested.
             if (mustCreateDefaultCategories) {

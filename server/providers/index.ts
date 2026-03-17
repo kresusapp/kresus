@@ -23,6 +23,7 @@ export interface ProviderTransaction {
 export interface ProviderTransactionResponse {
     kind: 'values';
     values: ProviderTransaction[];
+    errors?: string[];
 }
 
 export interface ProviderAccount {
@@ -37,6 +38,7 @@ export interface ProviderAccount {
 export interface ProviderAccountResponse {
     kind: 'values';
     values: ProviderAccount[];
+    errors?: string[];
 }
 
 export interface FetchAccountsOptions {

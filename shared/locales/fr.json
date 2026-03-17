@@ -613,7 +613,8 @@
             "action_needed": "Le site web de votre banque nécessite une action manuelle de votre part. Veuillez vous connecter sur le site de votre banque, suivez les instructions et réessayez.",
             "auth_method_nyi": "La méthode d'authentification configurée pour votre compte n'est pas supportée par le module. Veuillez modifier ce paramètre sur le site de votre banque pour utiliser Kresus.",
             "browser_question": "Cette banque nécessite de saisir une information supplémentaire (par exemple un mot de passe temporaire), Kresus ne sait pas encore gérer cette fonctionnalité. Désactivez l'authentification à deux facteurs et rééssayez.",
-            "woob_not_installed": "Woob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée."
+            "woob_not_installed": "Woob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée.",
+            "partial_errors": "La synchronisation a fonctionné partiellement, des erreurs ont été rencontrées : %{errors}"
         },
         "type": {
             "none": "Aucun",

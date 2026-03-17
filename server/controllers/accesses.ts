@@ -81,6 +81,7 @@ export interface CreateAndRetrieveDataResult {
     views: View[];
     newTransactions: Transaction[];
     label: string;
+    errors?: string[];
 }
 
 export function extractUserActionFields(body: Record<string, string>) {
@@ -125,6 +126,8 @@ export async function createAndRetrieveData(
             access = await Access.create(userId, params);
         }
 
+        let providerErrors: string[] = [];
+
         const accountResponse = await accountManager.syncAccounts(userId, access, {
             addNewAccounts: true,
             updateProvider: false, // TODO infer from setting?
@@ -159,6 +162,11 @@ export async function createAndRetrieveData(
         }
 
         const accountInfoMap = accountResponse.value;
+
+        if (accountResponse.errors) {
+            providerErrors = providerErrors.concat(accountResponse.errors);
+        }
+
         const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
@@ -172,6 +180,11 @@ export async function createAndRetrieveData(
             transactionResponse.kind !== 'user_action',
             'user action should have been requested when fetching accounts'
         );
+
+        if (transactionResponse.errors) {
+            providerErrors = providerErrors.concat(transactionResponse.errors);
+        }
+
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
         // New views have automatically been created along with accounts.
@@ -185,6 +198,7 @@ export async function createAndRetrieveData(
                 views,
                 newTransactions,
                 label: bankVendorByUuid(access.vendorId).name,
+                errors: providerErrors,
             },
         };
     } catch (err) {
@@ -245,6 +259,7 @@ const _fetchAccountsAndTransactions = async (
 
         const userActionFields = extractUserActionFields(req.body);
 
+        let providerErrors: string[] = [];
         let accountResponse: Awaited<ReturnType<typeof accountManager.syncAccounts>> | null = null;
 
         // To deal with banks that often throw errors when dealing with recurrent requests,
@@ -273,6 +288,10 @@ const _fetchAccountsAndTransactions = async (
 
         const accountInfoMap = accountResponse ? accountResponse.value : null;
 
+        if (accountResponse && accountResponse.errors) {
+            providerErrors = providerErrors.concat(accountResponse.errors);
+        }
+
         const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
@@ -286,6 +305,11 @@ const _fetchAccountsAndTransactions = async (
             transactionResponse.kind !== 'user_action',
             'user action should have been requested when fetching accounts'
         );
+
+        if (transactionResponse.errors) {
+            providerErrors = providerErrors.concat(transactionResponse.errors);
+        }
+
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
         // New views have automatically been created along with accounts.
@@ -295,6 +319,7 @@ const _fetchAccountsAndTransactions = async (
             accounts,
             views,
             newTransactions,
+            errors: providerErrors,
         });
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
