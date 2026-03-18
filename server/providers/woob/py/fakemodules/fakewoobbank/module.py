@@ -256,7 +256,7 @@ class FakeBankModule(Module, CapBank):
         fourth_account.type = Account.TYPE_CARD
         accounts.append(fourth_account)
 
-        return accounts
+        return iter(accounts)
 
     def fill_account(self, account, fields):
         """
@@ -425,7 +425,7 @@ class FakeBankModule(Module, CapBank):
         for _ in range(random.randrange(15)):
             transactions.append(self.generate_single_transaction())
 
-        return transactions
+        return iter(transactions)
 
     def iter_coming(self, account):
         """
@@ -445,4 +445,4 @@ class FakeBankModule(Module, CapBank):
 
                 comings.append(transaction)
 
-        return comings
+        return iter(comings)
