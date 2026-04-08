@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useImperativeHandle } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import moment from 'moment';
 
 import * as BankStore from '../../store/banks';
@@ -30,7 +30,7 @@ const RecurringTransactionItem = React.forwardRef<
     RecurringTransactionRef,
     RecurringTransactionItemProps
 >((props, ref) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const innerDomRef = useRef<any>();
     const { recurringTransaction: rt } = props;
     const editionUrl = URL.editRecurringTransaction.url(rt.id);
@@ -59,7 +59,7 @@ const RecurringTransactionItem = React.forwardRef<
                         return;
                     }
 
-                    history.push(URL.editRecurringTransaction.url(rt.id));
+                    navigate(URL.editRecurringTransaction.url(rt.id));
                 },
 
                 async delete() {
@@ -74,7 +74,7 @@ const RecurringTransactionItem = React.forwardRef<
                 },
             });
         },
-        [rt, history, handleDelete]
+        [rt, navigate, handleDelete]
     );
 
     let months;

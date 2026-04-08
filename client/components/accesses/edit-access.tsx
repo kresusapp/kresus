@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
@@ -18,7 +18,7 @@ import {
     CustomFieldMap,
 } from './new-access-form';
 import URL from './urls';
-import { useNotifyError, useSyncError } from '../../hooks';
+import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
 import {
     Access,
     AccessCustomField,
@@ -236,7 +236,7 @@ const CustomLabelForm = (props: { access: Access }) => {
 
 const DangerZone = (props: { access: Access }) => {
     const dispatch = useKresusDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const accessId = props.access.id;
     const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
@@ -255,11 +255,11 @@ const DangerZone = (props: { access: Access }) => {
             try {
                 await dispatch(BanksStore.deleteAccess(props.access.id)).unwrap();
                 notify.success($t('client.accesses.deletion_success'));
-                history.push(URL.accessList);
+                navigate(URL.accessList);
             } catch (error) {
                 notify.error($t('client.accesses.deletion_error', { error: error.message }));
             }
-        }, [history, dispatch, props.access.id])
+        }, [navigate, dispatch, props.access.id])
     );
 
     return (
@@ -321,7 +321,7 @@ const Labels = (props: { access: Access }) => {
 };
 
 export default () => {
-    const { accessId: accessIdStr } = useParams<{ accessId: string }>();
+    const { accessId: accessIdStr } = useRequiredParams<{ accessId: string }>();
     const accessId = Number.parseInt(accessIdStr, 10);
 
     const access = useKresusState(state => {

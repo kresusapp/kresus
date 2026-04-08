@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { notify, translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 
 import URL from '../../urls';
 
@@ -20,7 +21,7 @@ export default () => {
         amount: rawPredefinedAmount,
         day: rawPredefinedDay,
         type: predefinedType,
-    } = useParams<{
+    } = useRequiredParams<{
         accountId: string;
         label?: string;
         amount?: string;
@@ -52,7 +53,7 @@ export default () => {
     const accountId = Number.parseInt(accountIdStr, 10);
     const listUrl = URL.accountRecurringTransactions.url(accountId);
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const dispatch = useKresusDispatch();
 
@@ -71,9 +72,9 @@ export default () => {
             }
 
             notify.success($t('client.recurring_transactions.creation_success'));
-            history.push(listUrl);
+            navigate(listUrl);
         },
-        [dispatch, accountId, history, listUrl]
+        [dispatch, accountId, navigate, listUrl]
     );
 
     const indexLink = <BackLink to={listUrl}>{$t('client.recurring_transactions.list')}</BackLink>;

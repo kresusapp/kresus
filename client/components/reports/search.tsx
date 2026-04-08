@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { matchPath, useLocation } from 'react-router';
 import debounce from 'lodash.debounce';
 
 import {
@@ -22,7 +23,6 @@ import MultipleSelect from '../ui/multiple-select';
 import MinMaxInput, { MinMaxInputRef } from '../ui/min-max-input';
 
 import './search.css';
-import { matchPath, useHistory } from 'react-router-dom';
 
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
@@ -179,7 +179,11 @@ const MaxDatePicker = (props: { id: string }) => {
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
-    const history = useHistory();
+    const location = useLocation();
+
+    const locationRef = useRef(location);
+    locationRef.current = location;
+
     const displaySearchDetails = useKresusState(state => UiStore.getDisplaySearchDetails(state.ui));
     const searchFields = useKresusState(state => UiStore.getSearchFields(state.ui));
 
@@ -282,12 +286,12 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             // transaction's detail page. We already know what the next path
             // will be, because this effect is triggered asynchronously, after
             // we've requested to leave the current route/component.
-            const nextPath = history.location.pathname;
-            if (matchPath(nextPath, URL.transactions.pattern) === null) {
+            const nextPath = locationRef.current.pathname;
+            if (matchPath({ path: URL.transactions.pattern, end: false }, nextPath) === null) {
                 resetAll(false);
             }
         };
-    }, [resetAll, history]);
+    }, [resetAll]);
 
     return (
         <form className="search" hidden={!displaySearchDetails}>

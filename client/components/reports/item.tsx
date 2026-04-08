@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { displayLabel, formatDate, NONE_CATEGORY_ID, notify, translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -54,7 +54,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
     (props, ref) => {
         const innerDomRef = useRef<any>();
         const driver = useContext(DriverContext);
-        const history = useHistory();
+        const navigate = useNavigate();
         const dispatch = useKresusDispatch();
 
         const transaction = useKresusState(state => {
@@ -76,7 +76,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                             return;
                         }
 
-                        history.push(TransactionUrls.details.url(driver, transaction.id));
+                        navigate(TransactionUrls.details.url(driver, transaction.id));
                     },
 
                     async delete() {
@@ -103,7 +103,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                     },
                 });
             },
-            [dispatch, transaction, history, driver, formatCurrency]
+            [dispatch, transaction, navigate, driver, formatCurrency]
         );
 
         const categoryColor = useKresusState(state => {

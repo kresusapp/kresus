@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink, useLocation, matchPath } from 'react-router';
 
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
@@ -42,7 +42,7 @@ const Entry = (props: EntryProps) => {
 
     return (
         <li className={className} onClick={handleHideMenu}>
-            <NavLink to={props.path} activeClassName="active">
+            <NavLink to={props.path}>
                 <i className={`fa fa-${props.icon}`} />
                 {props.children}
             </NavLink>
@@ -99,11 +99,13 @@ AccountSubMenu.displayName = 'AccountSubMenu';
 const Menu = () => {
     const isHidden = useKresusState(state => UiStore.isMenuHidden(state.ui));
 
-    const { driver: driverType = DriverType.None, value } = useParams<{
-        driver: string;
-        value: string;
-        subsection: string;
-    }>();
+    const { pathname } = useLocation();
+
+    // This component is rendered outside the route tree defining
+    // :driver and :value params as it is persistent, so we cannot use useParams here.
+    const viewMatch = matchPath('/view/:driver/:value/*', pathname);
+    const driverType = viewMatch?.params.driver ?? DriverType.None;
+    const value = viewMatch?.params.value ?? null;
 
     const driver = getDriver(driverType, value);
 

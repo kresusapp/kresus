@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import URL from '../../urls';
 import { DriverType } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';
@@ -29,7 +30,7 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
     const totalEntries = Object.entries(props.totals);
 
     const { pathname } = useLocation();
-    const { driver = null, value: driverValue } = useParams<{
+    const { driver = null, value: driverValue } = useRequiredParams<{
         driver?: string;
         value: string;
     }>();

@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { assert, translate as $t } from '../../../helpers';
 import { useKresusDispatch } from '../../../store';
@@ -6,13 +7,12 @@ import * as BanksStore from '../../../store/banks';
 
 import AccountSelector from '../../ui/account-select';
 import AmountInput from '../../ui/amount-input';
-import { useHistory, useParams } from 'react-router-dom';
 import { BackLink, Form } from '../../ui';
 import URL from './urls';
-import { useGenericError } from '../../../hooks';
+import { useGenericError, useRequiredParams } from '../../../hooks';
 
 const AlertForm = () => {
-    const { type } = useParams<{ type: 'balance' | 'transaction' }>();
+    const { type } = useRequiredParams<{ type: 'balance' | 'transaction' }>();
     assert(type === 'balance' || type === 'transaction', 'subset of valid types');
 
     const dispatch = useKresusDispatch();
@@ -22,7 +22,7 @@ const AlertForm = () => {
     const refSelectOrder = useRef<HTMLSelectElement | null>(null);
     const refSelectAccount = useRef<{ value: number } | null>(null);
 
-    const history = useHistory();
+    const navigate = useNavigate();
     const onSubmit = useGenericError(
         useCallback(async () => {
             assert(type !== null, 'type must be set');
@@ -43,8 +43,8 @@ const AlertForm = () => {
                 })
             ).unwrap();
 
-            history.push(URL.all);
-        }, [dispatch, history, type, limit, refSelectOrder, refSelectAccount])
+            navigate(URL.all);
+        }, [dispatch, navigate, type, limit, refSelectOrder, refSelectAccount])
     );
 
     const isBalanceAlert = type === 'balance';

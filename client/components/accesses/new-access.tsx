@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { notify, translate as $t } from '../../helpers';
 import URL from './urls';
@@ -7,12 +7,12 @@ import URL from './urls';
 import NewAccessForm from './new-access-form';
 
 export default () => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const onSubmit = useCallback(() => {
         notify.success($t('client.accesses.creation_success'));
-        history.push(URL.accessList);
-    }, [history]);
+        navigate(URL.accessList);
+    }, [navigate]);
 
     return (
         <NewAccessForm

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation, useParams } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as ViewsStore from '../../store/views';
@@ -7,13 +7,14 @@ import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 import { DriverType } from '../drivers';
 import { translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 
 const UserViewList = () => {
     const views = useKresusState(state => ViewsStore.allUserViews(state.views));
     const { pathname } = useLocation();
-    const { driver = null, value } = useParams<{ driver?: string; value: string }>();
+    const { driver = null, value } = useRequiredParams<{ driver?: string; value: string }>();
 
     const viewsItems = useKresusState(state => {
         return views.map(view => {
@@ -30,7 +31,7 @@ const UserViewList = () => {
 
             return (
                 <li key={`view-list-item-${view.id}`}>
-                    <NavLink to={newPathname} activeClassName="active">
+                    <NavLink to={newPathname}>
                         <span>{view.label}</span>
                         &nbsp;
                         <ColoredAmount

@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import URL from './urls';
 import {
@@ -23,7 +23,7 @@ import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import { Access, Account, isManualAccess } from '../../models';
-import { useNotifyError, useSyncError } from '../../hooks';
+import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
 import AnyAccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
 
@@ -180,9 +180,9 @@ const SetBalanceForm = (props: {
 
 export default () => {
     const dispatch = useKresusDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
-    const { accountId: accountIdStr } = useParams<{ accountId: string }>();
+    const { accountId: accountIdStr } = useRequiredParams<{ accountId: string }>();
     const accountId = Number.parseInt(accountIdStr, 10);
 
     const account = useKresusState(state => {
@@ -208,11 +208,11 @@ export default () => {
         try {
             await dispatch(BanksStore.deleteAccount({ accountId: account.id })).unwrap();
             notify.success($t('client.accesses.account_deletion_success'));
-            history.push(URL.accessList);
+            navigate(URL.accessList);
         } catch (error) {
             notify.error($t('client.accesses.account_deletion_error', { error: error.message }));
         }
-    }, [history, dispatch, account]);
+    }, [navigate, dispatch, account]);
 
     const updateAccount = useCallback(
         async (update: any, previousAttributes: any) => {

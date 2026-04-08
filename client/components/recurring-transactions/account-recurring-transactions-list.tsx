@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import * as BanksStore from '../../store/banks';
 import { useKresusState } from '../../store';
@@ -8,6 +8,7 @@ import * as UiStore from '../../store/ui';
 import { RecurringTransaction } from '../../models';
 
 import { translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import ButtonLink from '../ui/button-link';
@@ -19,10 +20,10 @@ import RecurringTransactionItem, {
 import URL from '../../urls';
 
 const RecurringTransactionsList = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
-    const { accountId: accountIdStr } = useParams<{
+    const { accountId: accountIdStr } = useRequiredParams<{
         accountId: string;
     }>();
 
@@ -50,9 +51,9 @@ const RecurringTransactionsList = () => {
 
     useEffect(() => {
         if (!account) {
-            history.push(URL.recurringTransactions.pattern);
+            navigate(URL.recurringTransactions.pattern);
         }
-    }, [account, recurringTransactions, history]);
+    }, [account, recurringTransactions, navigate]);
 
     if (!account) {
         return null;

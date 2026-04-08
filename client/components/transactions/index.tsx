@@ -1,20 +1,14 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
-
-import URL from './urls';
+import { Routes, Route } from 'react-router';
 
 import CreateTransaction from './create';
 import Details from './details';
 
 export default () => {
     return (
-        <Switch>
-            <Route path={URL.new.pattern}>
-                <CreateTransaction />
-            </Route>
-            <Route path={URL.details.pattern}>
-                <Details />
-            </Route>
-        </Switch>
+        <Routes>
+            <Route path="new" element={<CreateTransaction />} />
+            <Route path=":transactionId" element={<Details />} />
+        </Routes>
     );
 };

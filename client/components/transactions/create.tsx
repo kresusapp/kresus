@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
@@ -25,7 +25,7 @@ import DiscoveryMessage from '../ui/discovery-message';
 import { DriverContext } from '../drivers';
 
 const CreateTransaction = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const driver = useContext(DriverContext);
 
     const accounts = useKresusState(state => driver.getAccounts(state));
@@ -64,11 +64,11 @@ const CreateTransaction = () => {
                     accountId,
                 })
             ).unwrap();
-            history.push(URL.reports.url(driver));
+            navigate(URL.reports.url(driver));
         } catch (err) {
             notify.error(err.message);
         }
-    }, [driver, dispatch, history, date, label, amount, categoryId, type, accountId]);
+    }, [driver, dispatch, navigate, date, label, amount, categoryId, type, accountId]);
 
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
     const reportUrl = URL.reports.url(driver);

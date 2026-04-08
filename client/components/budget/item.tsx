@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import URL from '../../urls';
 
 import { useKresusDispatch, useKresusState } from '../../store';

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useParams } from 'react-router';
 
 import { handleSyncError, handleFirstSyncError, genericErrorHandler } from './errors';
 import { notify, translate } from './helpers';
@@ -81,3 +82,6 @@ export const useCompareWithPrev = (itemName: string, item: any) => {
         }
     }, [item, itemName]);
 };
+
+// See https://github.com/remix-run/react-router/issues/8498
+export const useRequiredParams = <T extends Record<string, unknown>>() => useParams() as T;

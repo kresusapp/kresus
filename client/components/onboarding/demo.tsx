@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { useKresusDispatch } from '../../store';
 import * as GlobalStore from '../../store/global';

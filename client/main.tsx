@@ -1,14 +1,15 @@
 import React, { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-    BrowserRouter,
+    HashRouter,
     Route,
-    Switch,
+    Routes,
     Link,
-    Redirect,
-    useRouteMatch,
-    useParams,
-} from 'react-router-dom';
+    Navigate,
+    useMatch,
+    type NavigateOptions,
+    type To,
+} from 'react-router';
 import { Provider } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +27,7 @@ import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
 import * as ViewStore from './store/views';
 import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
+import { useRequiredParams } from './hooks';
 import URL from './urls';
 import { DEV_ENV, FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
 
@@ -40,6 +42,7 @@ import Categories from './components/categories';
 import Transactions from './components/transactions';
 import RecurringTransactions from './components/recurring-transactions/index';
 import Onboarding from './components/onboarding';
+import WoobInstallIndex from './components/onboarding/woob-readme';
 import Dashboard from './components/dashboard';
 import TransactionRules from './components/rules';
 import Menu from './components/menu';
@@ -59,6 +62,14 @@ import 'font-awesome/css/font-awesome.css';
 import 'react-toastify/dist/ReactToastify.min.css';
 import './css/base.css';
 
+// See https://reactrouter.com/api/hooks/useNavigate#return-type-augmentation
+declare module 'react-router' {
+    interface NavigateFunction {
+        (to: To, options?: NavigateOptions): void;
+        (delta: number): void;
+    }
+}
+
 const RESIZE_THROTTLING = 100;
 
 // Lazy-loaded components
@@ -73,7 +84,7 @@ const Charts = () => {
 };
 
 const SectionTitle = () => {
-    const titleKey = URL.sections.title(useParams());
+    const titleKey = URL.sections.title(useRequiredParams<Record<string, string | undefined>>());
     if (titleKey === null) {
         return null;
     }
@@ -96,7 +107,7 @@ const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.Rea
     });
 
     if (driver === NoDriver) {
-        return <Redirect to={URL.reports.url(new DriverAccount(initialViewId))} push={false} />;
+        return <Navigate to={URL.reports.url(new DriverAccount(initialViewId))} replace={true} />;
     }
     return <>{props.children}</>;
 };
@@ -105,7 +116,7 @@ const RedirectIfCurrencyView = (props: { children: React.ReactNode | React.React
     const driver = useContext(DriverContext);
 
     if (driver.type === DriverType.Currency) {
-        return <Redirect to={URL.reports.url(driver)} push={false} />;
+        return <Navigate to={URL.reports.url(driver)} replace={true} />;
     }
     return <>{props.children}</>;
 };
@@ -117,13 +128,13 @@ export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.
     });
 
     if (viewHasSeveralAccounts) {
-        return <Redirect to={URL.reports.url(driver)} push={false} />;
+        return <Navigate to={URL.reports.url(driver)} replace={true} />;
     }
     return <>{props.children}</>;
 };
 
 const View = () => {
-    const params = useParams<{
+    const params = useRequiredParams<{
         driver: string;
         value: string;
     }>();
@@ -134,36 +145,43 @@ const View = () => {
 
     return (
         <DriverContext.Provider value={currentDriver}>
-            <Switch>
-                <Route path={URL.reports.pattern}>
-                    <RedirectIfUnknownAccount>
-                        <Reports />
-                    </RedirectIfUnknownAccount>
-                </Route>
-                <Route path={URL.budgets.pattern}>
-                    <RedirectIfCurrencyView>
+            <Routes>
+                <Route
+                    path="reports"
+                    element={
                         <RedirectIfUnknownAccount>
-                            <Budget />
+                            <Reports />
                         </RedirectIfUnknownAccount>
-                    </RedirectIfCurrencyView>
-                </Route>
-                <Route path={URL.charts.pattern}>
-                    <RedirectIfUnknownAccount>
-                        <Charts />
-                    </RedirectIfUnknownAccount>
-                </Route>
-                <Route path={URL.duplicates.pattern}>
-                    <RedirectIfUnknownAccount>
-                        <DuplicatesList />
-                    </RedirectIfUnknownAccount>
-                </Route>
-                <Route path={URL.transactions.pattern}>
-                    <Transactions />
-                </Route>
-                <Route path={URL.recurringTransactions.pattern}>
-                    <RecurringTransactions />
-                </Route>
-            </Switch>
+                    }
+                />
+                <Route
+                    path="budget"
+                    element={
+                        <RedirectIfCurrencyView>
+                            <RedirectIfUnknownAccount>
+                                <Budget />
+                            </RedirectIfUnknownAccount>
+                        </RedirectIfCurrencyView>
+                    }
+                />
+                <Route
+                    path="charts/:subsection?/"
+                    element={
+                        <RedirectIfUnknownAccount>
+                            <Charts />
+                        </RedirectIfUnknownAccount>
+                    }
+                />
+                <Route
+                    path="duplicates"
+                    element={
+                        <RedirectIfUnknownAccount>
+                            <DuplicatesList />
+                        </RedirectIfUnknownAccount>
+                    }
+                />
+                <Route path="transactions/*" element={<Transactions />} />
+            </Routes>
         </DriverContext.Provider>
     );
 };
@@ -258,85 +276,113 @@ const Kresus = () => {
 
     return (
         <ErrorReporter>
-            <BrowserRouter basename={`${urlPrefix}/#`}>
-                <Switch>
-                    <Route path={[URL.woobReadme.pattern, URL.onboarding.pattern]}>
-                        <DisplayOrRedirectToInitialScreen>
-                            <Onboarding />
-                        </DisplayOrRedirectToInitialScreen>
-                    </Route>
-                    <Route path="/" exact={false}>
-                        <DisplayOrRedirectToInitialScreen>
-                            <header>
-                                <button className="menu-toggle" onClick={handleToggleMenu}>
-                                    <span className="fa fa-navicon" />
-                                </button>
-                                <h1>
-                                    <Link to={URL.dashboard.url()}>{$t('client.KRESUS')}</Link>
-                                </h1>
-                                <Route path={URL.sections.pattern}>
-                                    <SectionTitle />
-                                </Route>
+            <HashRouter basename={urlPrefix}>
+                <Routes>
+                    <Route
+                        path={URL.woobReadme.pattern}
+                        element={
+                            <DisplayOrRedirectToInitialScreen>
+                                <WoobInstallIndex />
+                            </DisplayOrRedirectToInitialScreen>
+                        }
+                    />
+                    <Route
+                        path="/onboarding/*"
+                        element={
+                            <DisplayOrRedirectToInitialScreen>
+                                <Onboarding />
+                            </DisplayOrRedirectToInitialScreen>
+                        }
+                    />
+                    <Route
+                        path="/*"
+                        element={
+                            <DisplayOrRedirectToInitialScreen>
+                                <header>
+                                    <button className="menu-toggle" onClick={handleToggleMenu}>
+                                        <span className="fa fa-navicon" />
+                                    </button>
+                                    <h1>
+                                        <Link to={URL.dashboard.url()}>{$t('client.KRESUS')}</Link>
+                                    </h1>
+                                    <Routes>
+                                        <Route
+                                            path="/:part1/:part2?/:part3?/:part4?/*"
+                                            element={<SectionTitle />}
+                                        />
+                                    </Routes>
 
-                                <DisplayIf condition={forcedDemoMode}>
-                                    <p className="disable-demo-mode">{$t('client.demo.forced')}</p>
-                                </DisplayIf>
-                                <DisplayIf condition={!forcedDemoMode}>
-                                    <DemoButton />
-                                </DisplayIf>
+                                    <DisplayIf condition={forcedDemoMode}>
+                                        <p className="disable-demo-mode">
+                                            {$t('client.demo.forced')}
+                                        </p>
+                                    </DisplayIf>
+                                    <DisplayIf condition={!forcedDemoMode}>
+                                        <DemoButton />
+                                    </DisplayIf>
 
-                                <DropdownMenu />
-                            </header>
+                                    <DropdownMenu />
+                                </header>
 
-                            <main onClick={handleAutoCloseMenu}>
-                                <Route path={URL.sections.genericPattern}>
-                                    <Menu />
-                                </Route>
-                                <div id="content-container">
-                                    <div className="content">
-                                        <Switch>
-                                            <Route path={URL.view.pattern}>
-                                                <View />
-                                            </Route>
-                                            <Route path={URL.settings.pattern}>
-                                                <Settings />
-                                            </Route>
-                                            <Route path={URL.categories.pattern}>
-                                                <Categories />
-                                            </Route>
-                                            <Route path={URL.about.pattern}>
-                                                <About />
-                                            </Route>
-                                            <Route path={URL.accesses.pattern}>
-                                                <Accesses />
-                                            </Route>
-                                            <Route path={URL.dashboard.pattern}>
-                                                <Dashboard />
-                                            </Route>
-                                            <Route path={URL.rules.pattern}>
-                                                <TransactionRules />
-                                            </Route>
-                                            <Route path={URL.recurringTransactions.pattern}>
-                                                <RecurringTransactions />
-                                            </Route>
-                                            <Redirect
-                                                to={URL.reports.url(
-                                                    new DriverAccount(initialViewId)
-                                                )}
-                                                push={false}
-                                            />
-                                        </Switch>
+                                <main onClick={handleAutoCloseMenu}>
+                                    <Routes>
+                                        <Route path="/*" element={<Menu />} />
+                                    </Routes>
+                                    <div id="content-container">
+                                        <div className="content">
+                                            <Routes>
+                                                <Route
+                                                    path={`${URL.view.pattern}/*`}
+                                                    element={<View />}
+                                                />
+                                                <Route path="/settings/*" element={<Settings />} />
+                                                <Route
+                                                    path={`${URL.categories.pattern}/*`}
+                                                    element={<Categories />}
+                                                />
+                                                <Route
+                                                    path={URL.about.pattern}
+                                                    element={<About />}
+                                                />
+                                                <Route
+                                                    path={`${URL.accesses.pattern}/*`}
+                                                    element={<Accesses />}
+                                                />
+                                                <Route
+                                                    path={URL.dashboard.pattern}
+                                                    element={<Dashboard />}
+                                                />
+                                                <Route
+                                                    path={`${URL.rules.pattern}/*`}
+                                                    element={<TransactionRules />}
+                                                />
+                                                <Route
+                                                    path={`${URL.recurringTransactions.pattern}/*`}
+                                                    element={<RecurringTransactions />}
+                                                />
+                                                <Route
+                                                    path="*"
+                                                    element={
+                                                        <Navigate
+                                                            to={URL.reports.url(
+                                                                new DriverAccount(initialViewId)
+                                                            )}
+                                                            replace={true}
+                                                        />
+                                                    }
+                                                />
+                                            </Routes>
+                                        </div>
                                     </div>
-                                </div>
-                            </main>
-                        </DisplayOrRedirectToInitialScreen>
-                    </Route>
-                    <Redirect from="" to="/" push={false} />
-                </Switch>
+                                </main>
+                            </DisplayOrRedirectToInitialScreen>
+                        }
+                    />
+                </Routes>
 
                 <ToastContainer />
                 <Overlay />
-            </BrowserRouter>
+            </HashRouter>
         </ErrorReporter>
     );
 };
@@ -360,10 +406,10 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
     return (
         <Form className="content">
             <p>
-                <a className="backlink" href="/#home" onClick={handleFunLinkClick}>
+                <Link className="backlink" to="/home" onClick={handleFunLinkClick}>
                     <span className="fa fa-chevron-left" />
                     <span className="link">{$t('client.fun.back')}</span>
-                </a>
+                </Link>
             </p>
 
             <div>
@@ -406,19 +452,19 @@ const DisplayOrRedirectToInitialScreen = (props: {
     );
     const isDevEnv = useKresusState(state => InstanceStore.getBool(state.instance, DEV_ENV));
 
-    const displayWoobReadme = useRouteMatch({ path: URL.woobReadme.pattern });
-    const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
+    const displayWoobReadme = useMatch(URL.woobReadme.pattern);
+    const displayOnboarding = useMatch(URL.onboarding.pattern);
 
     if (!isWoobInstalled && !isDevEnv) {
         if (!displayWoobReadme) {
-            return <Redirect to={URL.woobReadme.url()} push={false} />;
+            return <Navigate to={URL.woobReadme.url()} replace={true} />;
         }
     } else if (!hasAccess) {
         if (!displayOnboarding) {
-            return <Redirect to={URL.onboarding.url()} push={false} />;
+            return <Navigate to={URL.onboarding.url()} replace={true} />;
         }
     } else if (displayWoobReadme || displayOnboarding) {
-        return <Redirect to="/" push={false} />;
+        return <Navigate to="/" replace={true} />;
     }
 
     const areWeFunYetYearKey = `arewefunyet-${new Date().getFullYear()}`;

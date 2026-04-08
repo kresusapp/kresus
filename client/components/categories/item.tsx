@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
@@ -66,17 +66,17 @@ export const CategoryListItem = React.forwardRef<HTMLTableRowElement, CategoryIt
 );
 
 export const SwipeableCategoryListItem = (props: CategoryItemProps) => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { category } = props;
     const categoryId = category.id;
 
     const openEditionView = useCallback(() => {
-        history.push(URL.edit(categoryId));
-    }, [history, categoryId]);
+        navigate(URL.edit(categoryId));
+    }, [navigate, categoryId]);
     const openDeletionView = useCallback(() => {
-        history.push(URL.delete(categoryId));
-    }, [history, categoryId]);
+        navigate(URL.delete(categoryId));
+    }, [navigate, categoryId]);
 
     const ref = useTableRowSwipeDetection<HTMLTableRowElement>(openDeletionView, openEditionView);
 

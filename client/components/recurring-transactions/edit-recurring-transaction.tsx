@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { notify, translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 
 import URL from '../../urls';
 
@@ -14,11 +15,11 @@ import { RecurringTransaction } from '../../models';
 import SharedForm from './form';
 
 export default () => {
-    const { id: rtIdStr } = useParams<{ id: string }>();
+    const { id: rtIdStr } = useRequiredParams<{ id: string }>();
 
     const rtId = Number.parseInt(rtIdStr, 10);
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const dispatch = useKresusDispatch();
 
@@ -50,9 +51,9 @@ export default () => {
             }
 
             notify.success($t('client.recurring_transactions.edition_success'));
-            history.push(listUrl);
+            navigate(listUrl);
         },
-        [dispatch, recurringTransaction, history, listUrl]
+        [dispatch, recurringTransaction, navigate, listUrl]
     );
 
     if (!recurringTransaction) {
