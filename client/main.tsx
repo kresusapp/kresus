@@ -171,6 +171,17 @@ const View = () => {
 const Kresus = () => {
     const dispatch = useKresusDispatch();
 
+    const isWoobInstalled = useKresusState(state =>
+        InstanceStore.getBool(state.instance, WOOB_INSTALLED)
+    );
+    const isDevEnv = useKresusState(state => InstanceStore.getBool(state.instance, DEV_ENV));
+
+    if (isDevEnv && !isWoobInstalled) {
+        window.alert(
+            'Warning: woob is not installed. Being in a DEV environment, you will not be redirected to the readme'
+        );
+    }
+
     // Retrieve the URL prefix and remove a potential trailing '/'.
     const urlPrefix = useKresusState(state => {
         const prefix = InstanceStore.get(state.instance, URL_PREFIX);
@@ -397,12 +408,6 @@ const DisplayOrRedirectToInitialScreen = (props: {
 
     const displayWoobReadme = useRouteMatch({ path: URL.woobReadme.pattern });
     const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
-
-    if (isDevEnv && !isWoobInstalled) {
-        window.alert(
-            'Warning: woob is not installed. Being in a DEV environment, you will not be redirected to the readme'
-        );
-    }
 
     if (!isWoobInstalled && !isDevEnv) {
         if (!displayWoobReadme) {
