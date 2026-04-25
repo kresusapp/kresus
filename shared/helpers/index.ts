@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
-import memoize from 'micro-memoize';
+import { memoize } from 'micro-memoize';
 
 import { SharedTransaction } from '../types';
 
