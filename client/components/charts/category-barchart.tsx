@@ -40,7 +40,7 @@ interface BarchartProps extends TransactionsChartProps {
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
-    const container = useRef<Chart>();
+    const container = useRef<Chart | null>(null);
 
     const redraw = useCallback(() => {
         // Category name -> {date key string -> [amounts]}.

@@ -189,7 +189,7 @@ function createChartBalance(
 }
 
 const BalanceChart = (props: { balance: number; transactions: Transaction[] }) => {
-    const container = useRef<Chart>();
+    const container = useRef<Chart | null>(null);
 
     const redraw = useCallback(() => {
         container.current = createChartBalance('barchart', props.balance, props.transactions);

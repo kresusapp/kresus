@@ -2,13 +2,19 @@ import React from 'react';
 
 import TextInput, { TextInputProps, TextInputRef } from './text-input';
 
-const ValidatedTextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) => {
-    return <TextInput {...props} ref={ref} required={true} pattern="\S+.*" />;
-});
-
-ValidatedTextInput.defaultProps = {
-    initialValue: '',
-};
+const ValidatedTextInput = React.forwardRef<TextInputRef, TextInputProps>(
+    ({ initialValue = '', ...rest }, ref) => {
+        return (
+            <TextInput
+                {...rest}
+                initialValue={initialValue}
+                ref={ref}
+                required={true}
+                pattern="\S+.*"
+            />
+        );
+    }
+);
 
 export type ValidatedTextInputRef = TextInputRef;
 

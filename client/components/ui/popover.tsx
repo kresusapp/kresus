@@ -37,12 +37,14 @@ const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
 
     const close = useCallback(() => setOpen(false), [setOpen]);
 
-    const trigger = React.cloneElement(props.trigger, {
-        ...props.trigger.props,
-        onClick: () => {
-            setOpen(!isOpen);
-        },
-    });
+    const trigger = React.cloneElement(
+        props.trigger as React.ReactElement<Record<string, unknown>>,
+        {
+            onClick: () => {
+                setOpen(!isOpen);
+            },
+        }
+    );
 
     const onKeyDown = useCallback(
         (event: KeyboardEvent) => {

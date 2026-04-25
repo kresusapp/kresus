@@ -26,7 +26,7 @@ interface EntryProps {
     // The class name to apply to the li.
     className?: string;
 
-    children: React.ReactNode[] | React.ReactNode;
+    children: React.ReactNode;
 }
 
 const Entry = (props: EntryProps) => {

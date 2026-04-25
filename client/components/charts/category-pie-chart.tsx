@@ -6,7 +6,7 @@ import { Hideable } from './hidable-chart';
 import type { TransactionsChartProps } from './category-barchart';
 
 const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
-    const container = useRef<Chart<'pie'>>();
+    const container = useRef<Chart<'pie'> | null>(null);
 
     const redraw = useCallback(() => {
         const catMap = new Map<number, number>();

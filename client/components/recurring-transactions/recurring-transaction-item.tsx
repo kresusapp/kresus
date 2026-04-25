@@ -31,7 +31,7 @@ const RecurringTransactionItem = React.forwardRef<
     RecurringTransactionItemProps
 >((props, ref) => {
     const navigate = useNavigate();
-    const innerDomRef = useRef<any>();
+    const innerDomRef = useRef<any>(null);
     const { recurringTransaction: rt } = props;
     const editionUrl = URL.editRecurringTransaction.url(rt.id);
 
@@ -139,7 +139,7 @@ const RecurringTransactionItem = React.forwardRef<
 });
 
 export const SwipeableRecurringTransactionItem = (props: RecurringTransactionItemProps) => {
-    let ref: React.RefObject<RecurringTransactionRef> | null = null;
+    let ref: React.RefObject<RecurringTransactionRef | null> | null = null;
 
     const openEditionView = useCallback(async () => {
         if (!ref || !ref.current) {

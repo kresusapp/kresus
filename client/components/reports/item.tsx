@@ -52,7 +52,7 @@ interface TransactionRef extends HTMLTableRowElement {
 
 export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemProps>(
     (props, ref) => {
-        const innerDomRef = useRef<any>();
+        const innerDomRef = useRef<any>(null);
         const driver = useContext(DriverContext);
         const navigate = useNavigate();
         const dispatch = useKresusDispatch();
@@ -208,7 +208,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
 );
 
 export const SwipeableTransactionItem = (props: TransactionItemProps) => {
-    let ref: React.RefObject<TransactionRef> | null = null;
+    let ref: React.RefObject<TransactionRef | null> | null = null;
 
     const openTransactionDetails = useCallback(async () => {
         if (!ref || !ref.current) {

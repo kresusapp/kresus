@@ -73,7 +73,7 @@ export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
 // Quite useful in debugging situations when trying to identify why something
 // has triggered a re-rendering.
 export const useCompareWithPrev = (itemName: string, item: any) => {
-    const prev = useRef<any>();
+    const prev = useRef<any>(null);
     useEffect(() => {
         if (prev.current !== item) {
             /* eslint-disable-next-line no-console */
