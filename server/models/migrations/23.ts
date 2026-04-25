@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
-import { foreignKey, foreignKeyUserId, idColumn } from '../helpers';
+import { foreignKey, foreignKeyUserId, idColumn, isSqlite } from '../helpers';
 import Account from '../entities/accounts';
 
 export class AddViews1734262035140 implements MigrationInterface {
@@ -56,6 +56,8 @@ export class AddViews1734262035140 implements MigrationInterface {
             })
         );
 
+        const isSqliteDriver = isSqlite(q.connection);
+
         // For each existing account, create a view with this account.
         const allAccounts = await q.manager.find(Account);
         for (const acc of allAccounts) {
@@ -63,20 +65,31 @@ export class AddViews1734262035140 implements MigrationInterface {
             // schema, which is only updated after the migration finishes, so the view table is not
             // yet known to the ORM, View.create will fail with "relation does not exist".
 
-            // Insert into view table
-            const result = await q.query(
-                `INSERT INTO view ("userId", "label", "createdByUser") VALUES ($1, $2, $3) RETURNING id`,
-                [acc.userId, acc.customLabel || acc.label, false]
-            );
+            if (isSqliteDriver) {
+                // better-sqlite3 uses ? placeholders and returns lastInsertRowid as a BigInt.
+                const result = await q.query(
+                    `INSERT INTO view ("userId", "label", "createdByUser") VALUES (?, ?, ?)`,
+                    [acc.userId, acc.customLabel || acc.label, 0]
+                );
+                const viewId = Number(result);
 
-            // Postgresql returns an array whereas SQLite return the inserted id.
-            const viewId = result instanceof Array ? result[0].id : result;
+                await q.query(`INSERT INTO "view-accounts" ("viewId", "accountId") VALUES (?, ?)`, [
+                    viewId,
+                    acc.id,
+                ]);
+            } else {
+                // postgres uses $n placeholders and returns a structured object.
+                const result = await q.query(
+                    `INSERT INTO view ("userId", "label", "createdByUser") VALUES ($1, $2, $3) RETURNING id`,
+                    [acc.userId, acc.customLabel || acc.label, false]
+                );
+                const viewId = result[0].id;
 
-            // Insert into view-accounts table
-            await q.query(`INSERT INTO "view-accounts" ("viewId", "accountId") VALUES ($1, $2)`, [
-                viewId,
-                acc.id,
-            ]);
+                await q.query(
+                    `INSERT INTO "view-accounts" ("viewId", "accountId") VALUES ($1, $2)`,
+                    [viewId, acc.id]
+                );
+            }
         }
     }
 
