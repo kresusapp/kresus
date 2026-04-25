@@ -67,7 +67,7 @@
     "indexof": "~0.0.1",
     "lodash.debounce": "~4.0.8",
     "lodash.throttle": "~4.1.1",
-    "mocha": "~10.1.0",
+    "mocha": "^11.7.5",
     "normalize.css": "~8.0.1",
     "onchange": "~7.1.0",
     "prettier": "~2.8.8",
