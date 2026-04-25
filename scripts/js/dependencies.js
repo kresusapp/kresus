@@ -7,15 +7,15 @@ const targetFile = path.resolve(kresusRoot, 'client', 'components', 'about', 'de
 const staticDependencies = {
     // Static dependencies go here
     woob: {
-        website: "http://woob.tech",
-        license: "LGPL-3.0-or-later"
+        website: 'http://woob.tech',
+        license: 'LGPL-3.0-or-later',
     },
 
-    "money (manual bank icon)": {
-        website: "https://thenounproject.com/search/?q=money&i=798457",
-        license: "CCBY",
-        author: "Gregory Cresnar"
-    }
+    'money (manual bank icon)': {
+        website: 'https://thenounproject.com/search/?q=money&i=798457',
+        license: 'CCBY',
+        author: 'Gregory Cresnar',
+    },
 };
 
 function pushDepLicense(dep, dependencies) {
@@ -25,13 +25,13 @@ function pushDepLicense(dep, dependencies) {
     try {
         packageData = JSON.parse(fs.readFileSync(depPath, 'utf8'));
     } catch (e) {
-        console.error("unable to read or parse package.json file for dependency", dep);
+        console.error('unable to read or parse package.json file for dependency', dep);
         return;
     }
 
     dependencies[dep] = {
         license: packageData.license || null,
-        website: packageData.homepage || null,
+        website: packageData.homepage || null,
     };
 }
 

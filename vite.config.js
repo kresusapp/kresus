@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 import plainText from 'vite-plugin-plain-text';
 import sprites from 'rollup-plugin-sprite';
-import reactRefresh from 'vite-plugin-react-refresh'
+import reactRefresh from 'vite-plugin-react-refresh';
 
 // NOTE: Known workarounds:
 // - install the `indexof` package, to work around a similar issue to what's
@@ -24,7 +24,7 @@ export default defineConfig({
         alias: {
             // Alias so the base.css file can refer to the sprite directly.
             './sprite.css': './client/static/sprite/sprite.css',
-        }
+        },
     },
 
     plugins: [
@@ -40,21 +40,21 @@ export default defineConfig({
                 // Where the original files are located.
                 cwd: './client/static/images/banks',
                 // Which files should be matched there.
-                glob: '*.png'
+                glob: '*.png',
             },
             target: {
                 // Where to build the resulting png.
                 image: './client/bank-sprite.png',
                 // Where to build the css file.
-                css: './client/static/sprite/sprite.css'
+                css: './client/static/sprite/sprite.css',
             },
             // Computed path to the image, in the CSS file.
-            cssImageRef: "./bank-sprite.png",
+            cssImageRef: './bank-sprite.png',
             output: {
                 // A copy of the png, for the build directory (this plugin's
                 // output isn't duplicated, somehow).
-                image: './build/client/assets/bank-sprite.png'
-            }
+                image: './build/client/assets/bank-sprite.png',
+            },
         }),
     ],
 
@@ -71,5 +71,5 @@ export default defineConfig({
 
         // Just pretend you're webpack.
         port: 8080,
-    }
+    },
 });

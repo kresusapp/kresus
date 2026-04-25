@@ -542,7 +542,6 @@
                 "clear_logs_error": "An error occurred while clearing the logs: %{error}.",
                 "fetch_logs_error": "An error occurred while fetching the logs: %{error}.",
                 "clear_logs_success": "The logs were successfully cleared."
-
             },
             "notifications": {
                 "save_url_success": "Successfully saved Apprise configuration!",

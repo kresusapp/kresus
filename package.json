@@ -70,7 +70,7 @@
         "mocha": "~10",
         "normalize.css": "~8.0.1",
         "onchange": "~7.1.0",
-        "prettier": "~3.5.3",
+        "prettier": "~3.8.3",
         "primer-tooltips": "~2.0.0",
         "rc-color-picker": "~1.2.6",
         "rc-slider": "~11.1.9",

@@ -89,7 +89,9 @@ for (let locale of fs.readdirSync(localesPath)) {
     let missingKeys = [];
     for (let key of fieldTranslationKeys.keys()) {
         // Deep inspection of localeFile.
-        let value = key.split('.').reduce((trans, k) => (typeof trans === 'undefined' ? trans : trans[k]), localeFile);
+        let value = key
+            .split('.')
+            .reduce((trans, k) => (typeof trans === 'undefined' ? trans : trans[k]), localeFile);
         if (typeof value === 'undefined') {
             missingKeys.push(key);
         }

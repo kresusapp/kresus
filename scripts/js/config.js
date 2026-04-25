@@ -32,12 +32,12 @@ function main() {
     } else if (arg === 'generate') {
         generate();
     } else {
-        throw new Error("unknown argument `" + arg + "` passed to config.js");
+        throw new Error('unknown argument `' + arg + '` passed to config.js');
     }
 }
 
 try {
-    main()
+    main();
 } catch (ex) {
     console.error(ex.message);
     console.log(ex.stack);

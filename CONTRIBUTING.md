@@ -16,9 +16,11 @@ or our [Matrix chat](https://matrix.to/#/#kresus:delire.party).
 # Development environment
 
 - First, install the app's dependencies:
+
 ```bash
 yarn install
 ```
+
 - Copy `config.example.ini` to `config.ini` and set values for your local
   development environment. See "setting up a database for development" below.
 - Start development mode: `yarn dev`. This will:

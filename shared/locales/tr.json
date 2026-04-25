@@ -41,7 +41,7 @@
                 "demo_action": "Dene"
             }
         },
-        "accountwizard" :{
+        "accountwizard": {
             "bank": "Bankanız",
             "default_categories": "Varsayılan kategoriler",
             "default_categories_desc": "Bu, başlamanıza yardımcı olmak için temel ve sık kullanılan kategorilerin bir listesini ekleyecektir.",
@@ -119,10 +119,10 @@
             "success": "Banka erişiminiz başarıyla güncellendi",
             "error": "Banka erişiminiz güncellenemedi.",
             "disable_access": "Erişimi devre dışı bırak",
-            "this_access":"Bu erişim şu anda",
-            "enabled":"aktif",
-            "disabled":"devre dışı",
-            "fill_the_fields":"Yeniden etkinleştirmek için aşağıdaki alanları doldurun.",
+            "this_access": "Bu erişim şu anda",
+            "enabled": "aktif",
+            "disabled": "devre dışı",
+            "fill_the_fields": "Yeniden etkinleştirmek için aşağıdaki alanları doldurun.",
             "danger_zone_title": "Tehlikeli alan",
             "sync_title": "Senkronizasyon",
             "delete_session": "Oturum çerezlerini sil",
@@ -270,11 +270,10 @@
             "broaden_search": "Aramanızı genişletmeyi deneyin.",
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
-            "deletion_error":"Işlem silinirken hata: %{error}.",
+            "deletion_error": "Işlem silinirken hata: %{error}.",
             "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir.",
             "warning_merge_all": "Gerçekten tüm kopyaları birleştirmek istiyor musunuz?",
             "warning_irrevocable": "Bu işlem geri alınamaz"
-
         },
         "budget": {
             "amount": "Gerçek miktar",

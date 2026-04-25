@@ -1,5 +1,4 @@
-Kresus
-======
+# Kresus
 
 Kresus is an open-source [libre](LICENSE) self-hosted personal finance manager.
 It allows you to safely track your banking history, check your overall balance
