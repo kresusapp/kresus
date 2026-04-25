@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { Chart } from 'chart.js';
-import type { LegendItem } from 'chart.js/dist/types/index';
+import { Chart, type LegendItem } from 'chart.js';
 
 import { assert, round2, localeComparator } from '../../helpers';
 import { Category, Transaction } from '../../models';
