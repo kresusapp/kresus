@@ -59,7 +59,7 @@ import { getDriver, DriverContext, NoDriver, DriverType } from './components/dri
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
-import 'react-toastify/dist/ReactToastify.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import './css/base.css';
 
 // See https://reactrouter.com/api/hooks/useNavigate#return-type-augmentation
