@@ -48,7 +48,7 @@ RUN cd /home/user && \
     yarn && \
     yarn build:prod && \
     rm -rf node_modules && \
-    yarn add sqlite3 && \
+    yarn add better-sqlite3 && \
     yarn --production;
 
 WORKDIR /home/user/app

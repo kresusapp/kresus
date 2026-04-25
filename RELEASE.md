@@ -19,7 +19,7 @@
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
   - run Kresus from there:
-    - If you use sqlite3 for testing, install it there too: `npm -g install --production --prefix sqlite3`
+    - If you use sqlite for testing, install it there too: `npm -g install --production --prefix better-sqlite3`
     - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
@@ -30,9 +30,9 @@ stable image will use the latest version of Kresus pushed to npm.*
 - Run `yarn docker:release` (ensure it doesn't use cached images).
 - Test the docker build:
     - `docker run -ti -p 9876:9876 -v /path/to/config.ini:/opt/config.ini bnjbvr/kresus`
-    - if you've set up the testing config to use sqlite3, you'll need extra steps:
+    - if you've set up the testing config to use better-sqlite3, you'll need extra steps:
         - In a new shell, `docker exec -ti $container bash`
-        - `yarn global add sqlite3`
+        - `yarn global add better-sqlite3`
         - Ctrl+D to exit the bash shell
         - restart the container
     - it's available for testing on port 9876

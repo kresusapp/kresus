@@ -1,4 +1,4 @@
-import { DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
+import { DataSource, DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
 import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
 import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
@@ -118,6 +118,11 @@ const LOW_NUM_ENTITIES_IN_BATCH = 50;
 // The same issue happens with postgres which can't bind more than 64K features at once.
 const NUM_ENTITIES_IN_BATCH = 1000;
 
+export function isSqlite(connection: DataSource): boolean {
+    const dbType = connection.driver.options.type;
+    return dbType === 'sqlite' || dbType === 'better-sqlite3';
+}
+
 // Note: doesn't return the inserted entities.
 export async function bulkInsert<T extends ObjectLiteral>(
     repository: Repository<T>,
@@ -133,7 +138,7 @@ export async function bulkInsert<T extends ObjectLiteral>(
 
     let remaining = entities;
     let batchSize = NUM_ENTITIES_IN_BATCH;
-    if (repository.manager.connection.driver.options.type === 'sqlite') {
+    if (isSqlite(repository.manager.connection)) {
         batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
 
@@ -155,7 +160,7 @@ export async function bulkDelete<T extends ObjectLiteral>(
 
     let remaining = ids;
     let batchSize = NUM_ENTITIES_IN_BATCH;
-    if (repository.manager.connection.driver.options.type === 'sqlite') {
+    if (isSqlite(repository.manager.connection)) {
         batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
 

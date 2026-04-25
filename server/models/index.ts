@@ -55,15 +55,13 @@ function makeOrmConfig(): DataSourceOptions {
         case 'sqlite':
             assert(process.kresus.sqlitePath !== null, 'missing db path in server/models');
             ormConfig = {
-                type: 'sqlite',
+                type: 'better-sqlite3',
                 database: process.kresus.sqlitePath,
                 logging: process.kresus.dbLog,
             };
             break;
 
         case 'postgres':
-        case 'mysql':
-        case 'mariadb':
             assert(typeof process.kresus.dbHost === 'string', 'missing db host in server/models');
             assert(typeof process.kresus.dbPort === 'number', 'missing db port in server/models');
             assert(
@@ -85,6 +83,7 @@ function makeOrmConfig(): DataSourceOptions {
                 logging: process.kresus.dbLog,
             };
             break;
+
         default:
             panic('unexpected db type in server/models');
     }
