@@ -105,7 +105,10 @@ export const setTransactionType = createAsyncThunk(
 );
 
 // Set a transaction's custom label.
-type setTransactionCustomLabelError = { error: unknown; formerCustomLabel: string };
+type setTransactionCustomLabelError = {
+    error: unknown;
+    formerCustomLabel: string;
+};
 export const setTransactionCustomLabel = createAsyncThunk(
     'banks/setTransactionCustomLabel',
     async (params: { transaction: Transaction; customLabel: string }, { rejectWithValue }) => {
@@ -139,7 +142,11 @@ type setTransactionDateError = setTransactionBudgetDateError & {
 export const setTransactionDate = createAsyncThunk(
     'banks/setTransactionDate',
     async (
-        params: { transaction: Transaction; date: Date | null; budgetDate: Date | null },
+        params: {
+            transaction: Transaction;
+            date: Date | null;
+            budgetDate: Date | null;
+        },
         { rejectWithValue }
     ) => {
         const { transaction, date, budgetDate } = params;
@@ -337,7 +344,11 @@ export const deleteAccess = createAsyncThunk('banks/deleteAccess', async (access
 
 // Resyncs the balance of the given account according to the real balance read
 // from a provider.
-type ResyncBalanceParams = { accountId: number; initialBalance?: number; balance?: number };
+type ResyncBalanceParams = {
+    accountId: number;
+    initialBalance?: number;
+    balance?: number;
+};
 type ResyncBalanceError = { accountId: number; error: unknown };
 export const resyncBalance = createAsyncThunk(
     'banks/resyncBalance',
@@ -491,7 +502,11 @@ export const updateAccess = createAsyncThunk(
 );
 
 export function disableAccess(accessId: number) {
-    return updateAccess({ accessId, newFields: { enabled: false }, prevFields: { enabled: true } });
+    return updateAccess({
+        accessId,
+        newFields: { enabled: false },
+        prevFields: { enabled: true },
+    });
 }
 
 const createDefaultAlerts = createAsyncThunk(
@@ -1223,7 +1238,9 @@ const banksSlice = createSlice({
             })
             .addCase(setTransactionType.rejected, (state, action) => {
                 const { formerType, transactionId } = action.meta.arg;
-                mergeInObject(state.transactionMap, transactionId, { type: formerType });
+                mergeInObject(state.transactionMap, transactionId, {
+                    type: formerType,
+                });
             })
             .addCase(setTransactionCustomLabel.pending, (state, action) => {
                 // Optimistic update.

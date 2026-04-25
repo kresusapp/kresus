@@ -368,7 +368,9 @@ export const createValidTransaction = (arg: Record<string, any>): Transaction =>
 };
 
 // A twist on Partial<Transaction>: also allow null.
-export type PartialTransaction = { [P in keyof Transaction]?: Transaction[P] | null | undefined };
+export type PartialTransaction = {
+    [P in keyof Transaction]?: Transaction[P] | null | undefined;
+};
 
 export type Type = {
     // The unique identifier of the type.

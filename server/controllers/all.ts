@@ -303,7 +303,10 @@ export async function export_(req: IdentifiedRequest<any>, res: express.Response
             }
         }
 
-        const data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
+        const data = await getAllData(userId, {
+            isExport: true,
+            cleanPassword: !passphrase,
+        });
 
         let ret = {};
         if (passphrase) {
@@ -580,7 +583,9 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         accountCopy.accessId = accessRemap?.id;
 
         if (accessRemap?.wasKnown) {
-            const knownAccounts = await Account.byAccess(userId, { id: accessRemap.id });
+            const knownAccounts = await Account.byAccess(userId, {
+                id: accessRemap.id,
+            });
             if (typeof knownAccounts !== 'undefined') {
                 const vendorId = accessRemap.vendorId ?? undefined;
 

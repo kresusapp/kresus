@@ -21,7 +21,11 @@ export default class AccessField {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -67,7 +71,9 @@ export default class AccessField {
     }
 
     static async exists(userId: number, fieldId: number): Promise<boolean> {
-        const found = await AccessField.repo().findOne({ where: { userId, id: fieldId } });
+        const found = await AccessField.repo().findOne({
+            where: { userId, id: fieldId },
+        });
         return !!found;
     }
 

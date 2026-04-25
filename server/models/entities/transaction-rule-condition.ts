@@ -22,14 +22,22 @@ export default class TransactionRuleCondition {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
     @Column('integer')
     userId!: number;
 
-    @ManyToOne(() => TransactionRule, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => TransactionRule, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     rule!: TransactionRule;
 
@@ -77,7 +85,10 @@ export default class TransactionRuleCondition {
         userId: number,
         attributes: Partial<TransactionRuleCondition>
     ): Promise<TransactionRuleCondition> {
-        const condition = TransactionRuleCondition.repo().create({ ...attributes, userId });
+        const condition = TransactionRuleCondition.repo().create({
+            ...attributes,
+            userId,
+        });
         return await TransactionRuleCondition.repo().save(condition);
     }
 

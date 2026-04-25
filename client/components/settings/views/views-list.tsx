@@ -35,7 +35,11 @@ const ViewItem = (props: { view: View }) => {
                             <span className={'fa fa-trash'} />
                         </button>
                     }>
-                    <p>{$t('client.settings.views.delete_confirmation', { label: view.label })}</p>
+                    <p>
+                        {$t('client.settings.views.delete_confirmation', {
+                            label: view.label,
+                        })}
+                    </p>
                 </Popconfirm>
             </td>
         </tr>

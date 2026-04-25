@@ -13,7 +13,9 @@ const finishExport = (content: Record<string, unknown> | string) => {
     let blob;
     let extension;
     if (typeof content === 'object') {
-        blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
+        blob = new Blob([JSON.stringify(content, null, 2)], {
+            type: 'application/json',
+        });
         extension = 'json';
     } else {
         blob = new Blob([content], { type: 'txt' });

@@ -21,7 +21,8 @@ export default () => {
                 <LocaleSelector />
             </header>
             <div>
-                {$t('client.woobinstallreadme.content', { minVersion, installedText })}&nbsp;
+                {$t('client.woobinstallreadme.content', { minVersion, installedText })}
+                &nbsp;
                 <ExternalLink href={'https://kresus.org/install.html'}>
                     {$t('client.woobinstallreadme.link')} <i className="fa fa-external-link" />
                 </ExternalLink>

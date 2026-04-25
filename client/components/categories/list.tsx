@@ -30,7 +30,10 @@ export default () => {
     const deleteUnusedCategories = useCallback(async () => {
         return dispatch(
             CategoriesStore.batchDestroy(
-                unusedCategories.map(cat => ({ id: cat.id, replaceById: NONE_CATEGORY_ID }))
+                unusedCategories.map(cat => ({
+                    id: cat.id,
+                    replaceById: NONE_CATEGORY_ID,
+                }))
             )
         );
     }, [dispatch, unusedCategories]);

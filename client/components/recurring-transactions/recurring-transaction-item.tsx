@@ -50,32 +50,28 @@ const RecurringTransactionItem = React.forwardRef<
     }, [rt, dispatch]);
 
     // Expose some methods related to the recurring transactions.
-    useImperativeHandle(
-        ref,
-        () => {
-            return Object.assign(innerDomRef.current, {
-                openEditionView() {
-                    if (!rt) {
-                        return;
-                    }
+    useImperativeHandle(ref, () => {
+        return Object.assign(innerDomRef.current, {
+            openEditionView() {
+                if (!rt) {
+                    return;
+                }
 
-                    navigate(URL.editRecurringTransaction.url(rt.id));
-                },
+                navigate(URL.editRecurringTransaction.url(rt.id));
+            },
 
-                async delete() {
-                    if (!rt) {
-                        return;
-                    }
+            async delete() {
+                if (!rt) {
+                    return;
+                }
 
-                    const confirmMessage = $t('client.recurring_transactions.delete_confirm');
-                    if (window.confirm(confirmMessage)) {
-                        await handleDelete();
-                    }
-                },
-            });
-        },
-        [rt, navigate, handleDelete]
-    );
+                const confirmMessage = $t('client.recurring_transactions.delete_confirm');
+                if (window.confirm(confirmMessage)) {
+                    await handleDelete();
+                }
+            },
+        });
+    }, [rt, navigate, handleDelete]);
 
     let months;
     if (rt.listOfMonths === 'all') {

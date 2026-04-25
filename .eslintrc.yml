@@ -54,12 +54,6 @@
     rules:
         prettier/prettier:
             - 2
-            -
-                printWidth: 100
-                tabWidth: 4
-                singleQuote: true
-                bracketSameLine: true
-                arrowParens: "avoid"
         # Possible errors
         #######################################################################
         no-cond-assign:

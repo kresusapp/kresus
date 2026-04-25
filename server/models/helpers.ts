@@ -215,8 +215,8 @@ export type PartialOnePlus<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
         ? Array<Partial<U>>
         : T[P] extends ReadonlyArray<infer U>
-        ? ReadonlyArray<Partial<U>>
-        : Partial<T[P]> | T[P];
+          ? ReadonlyArray<Partial<U>>
+          : Partial<T[P]> | T[P];
 };
 
 export const areFieldsComplete = (vendorId: string, fields: AccessField[]) => {

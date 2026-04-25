@@ -21,21 +21,33 @@ export default class AppliedRecurringTransaction {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
     @Column('integer')
     userId!: number;
 
-    @ManyToOne(() => RecurringTransactions, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => RecurringTransactions, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     recurringTransaction!: RecurringTransactions;
 
     @Column('integer')
     recurringTransactionId!: number;
 
-    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     account!: Account;
 

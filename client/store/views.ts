@@ -88,7 +88,9 @@ export const update = createAsyncThunk(
         }
 
         if (params.view.accounts && params.view.accounts.length) {
-            serverViewFields.accounts = params.view.accounts.map(accountId => ({ accountId }));
+            serverViewFields.accounts = params.view.accounts.map(accountId => ({
+                accountId,
+            }));
         }
 
         const updated = (await backend.updateView(

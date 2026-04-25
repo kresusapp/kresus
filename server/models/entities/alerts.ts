@@ -20,7 +20,11 @@ export default class Alert {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -28,7 +32,11 @@ export default class Alert {
     userId!: number;
 
     // Account related to the alert.
-    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     account!: Account;
 
@@ -44,7 +52,11 @@ export default class Alert {
     frequency: string | null = null;
 
     // Threshold value, for balance/transaction alerts.
-    @Column('numeric', { nullable: true, default: null, transformer: new ForceNumericColumn() })
+    @Column('numeric', {
+        nullable: true,
+        default: null,
+        transformer: new ForceNumericColumn(),
+    })
     limit: number | null = null;
 
     // Ordering, for balance/transaction alerts: gt, lt.
@@ -146,7 +158,9 @@ export default class Alert {
     }
 
     static async reportsByFrequency(userId: number, frequency: string): Promise<Alert[]> {
-        return await Alert.repo().find({ where: { userId, type: 'report', frequency } });
+        return await Alert.repo().find({
+            where: { userId, type: 'report', frequency },
+        });
     }
 
     static async destroyByAccount(userId: number, accountId: number): Promise<void> {

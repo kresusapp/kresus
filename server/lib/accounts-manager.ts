@@ -888,7 +888,9 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForTransactions(userId, access, createdTransactions);
         }
 
-        await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
+        await Access.update(userId, access.id, {
+            fetchStatus: FETCH_STATUS_SUCCESS,
+        });
         log.info('Post process: done.');
 
         return { kind: 'value', value: { accounts, createdTransactions }, errors: providerErrors };

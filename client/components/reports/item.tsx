@@ -67,44 +67,38 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
         const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
         // Expose some methods related to the transactions.
-        useImperativeHandle(
-            ref,
-            () => {
-                return Object.assign(innerDomRef.current, {
-                    openDetailsView() {
-                        if (!transaction) {
-                            return;
+        useImperativeHandle(ref, () => {
+            return Object.assign(innerDomRef.current, {
+                openDetailsView() {
+                    if (!transaction) {
+                        return;
+                    }
+
+                    navigate(TransactionUrls.details.url(driver, transaction.id));
+                },
+
+                async delete() {
+                    if (!transaction) {
+                        return;
+                    }
+
+                    const confirmMessage = $t('client.transactions.are_you_sure', {
+                        label: displayLabel(transaction),
+                        amount: formatCurrency(transaction.amount),
+                        date: formatDate.toDayString(transaction.date),
+                    });
+
+                    if (window.confirm(confirmMessage)) {
+                        try {
+                            await dispatch(BanksStore.deleteTransaction(transaction.id)).unwrap();
+                            notify.success($t('client.transactions.deletion_success'));
+                        } catch (error) {
+                            notify.error($t('client.transactions.deletion_error'));
                         }
-
-                        navigate(TransactionUrls.details.url(driver, transaction.id));
-                    },
-
-                    async delete() {
-                        if (!transaction) {
-                            return;
-                        }
-
-                        const confirmMessage = $t('client.transactions.are_you_sure', {
-                            label: displayLabel(transaction),
-                            amount: formatCurrency(transaction.amount),
-                            date: formatDate.toDayString(transaction.date),
-                        });
-
-                        if (window.confirm(confirmMessage)) {
-                            try {
-                                await dispatch(
-                                    BanksStore.deleteTransaction(transaction.id)
-                                ).unwrap();
-                                notify.success($t('client.transactions.deletion_success'));
-                            } catch (error) {
-                                notify.error($t('client.transactions.deletion_error'));
-                            }
-                        }
-                    },
-                });
-            },
-            [dispatch, transaction, navigate, driver, formatCurrency]
-        );
+                    }
+                },
+            });
+        }, [dispatch, transaction, navigate, driver, formatCurrency]);
 
         const categoryColor = useKresusState(state => {
             if (!transaction || transaction.categoryId === NONE_CATEGORY_ID) {

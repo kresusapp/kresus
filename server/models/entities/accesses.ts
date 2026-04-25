@@ -31,7 +31,11 @@ export default class Access {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -50,7 +54,9 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(() => AccessField, accessField => accessField.access, { cascade: ['insert'] })
+    @OneToMany(() => AccessField, accessField => accessField.access, {
+        cascade: ['insert'],
+    })
     fields!: AccessField[];
 
     // A JSON-serialized session's content.
@@ -118,7 +124,11 @@ export default class Access {
             ...field,
             userId,
         }));
-        const entity = Access.repo().create({ ...other, userId, fields: fieldsWithUserId });
+        const entity = Access.repo().create({
+            ...other,
+            userId,
+            fields: fieldsWithUserId,
+        });
         const access = await Access.repo().save(entity);
         return access;
     }
@@ -131,11 +141,16 @@ export default class Access {
     }
 
     static async all(userId: number): Promise<Access[]> {
-        return await Access.repo().find({ where: { userId }, relations: ['fields'] });
+        return await Access.repo().find({
+            where: { userId },
+            relations: ['fields'],
+        });
     }
 
     static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await Access.repo().findOne({ where: { userId, id: accessId } });
+        const found = await Access.repo().findOne({
+            where: { userId, id: accessId },
+        });
         return !!found;
     }
 
@@ -163,7 +178,10 @@ export default class Access {
         userId: number,
         { uuid: vendorId }: { uuid: string }
     ): Promise<Access[]> {
-        return await Access.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
+        return await Access.repo().find({
+            where: { userId, vendorId },
+            relations: ['fields'],
+        });
     }
 
     static async byCredentials(

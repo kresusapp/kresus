@@ -614,7 +614,12 @@ function extractValue(
         defaultVal,
         configPath,
         processPath,
-    }: { envName: string; defaultVal: any; configPath: string; processPath: string }
+    }: {
+        envName: string;
+        defaultVal: any;
+        configPath: string;
+        processPath: string;
+    }
 ): string | null {
     let value = process.env[envName];
 
