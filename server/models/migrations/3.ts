@@ -15,7 +15,7 @@ export class AddIsUserDefinedTypeToTransaction1586769077310 implements Migration
         // Mark existing transactions as having a user defined type; we can't
         // know for sure, but assuming it's not user-defined could lead to
         // creation of new duplicates.
-        await q.manager.update('transaction', {}, { isUserDefinedType: true });
+        await q.query('UPDATE "transaction" SET "isUserDefinedType" = true');
     }
 
     public async down(q: QueryRunner): Promise<void> {

@@ -27,7 +27,7 @@
     "pg": "~8.4.2",
     "regex-escape": "~3.4.11",
     "semver": "~7.7.2",
-    "typeorm": "0.3.12"
+    "typeorm": "0.3.28"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "~2.3.0",

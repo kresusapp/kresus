@@ -120,7 +120,7 @@ export class AddRecurringTransactions1671005821717 implements MigrationInterface
             })
         );
 
-        await q.manager.update('transaction', {}, { isRecurrentTransaction: false });
+        await q.query('UPDATE "transaction" SET "isRecurrentTransaction" = false');
     }
 
     public async down(q: QueryRunner): Promise<void> {
