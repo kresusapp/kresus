@@ -17,7 +17,7 @@ import { transactionTypeIdToName } from './transaction-types';
 import applyRules from './rule-engine';
 import errors from '../shared/errors.json';
 
-import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
+import { bankVendorByUuid, getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 
 import {
@@ -187,9 +187,14 @@ async function pollAccounts(
     config: PollAccountsConfig
 ): Promise<UserActionOrValue<Partial<Account>[]>> {
     if (!access.hasPassword()) {
-        log.warn("Skipping accounts fetching -- password isn't present");
-        const errcode = getErrorCode('NO_PASSWORD');
-        throw new KError("Access' password is not set", 500, errcode);
+        // If the access has no password, check if it's an access that doesn't require
+        // credentials.
+        const bankVendor = bankVendorByUuid(access.vendorId);
+        if (!bankVendor.noCredentials) {
+            log.warn("Skipping accounts fetching — password isn't present");
+            const errcode = getErrorCode('NO_PASSWORD');
+            throw new KError("Access' password is not set", 500, errcode);
+        }
     }
 
     log.info(
@@ -597,9 +602,15 @@ merging as per request`);
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
         if (!access.hasPassword()) {
-            log.warn("Skipping transactions fetching -- password isn't present");
-            const errcode = getErrorCode('NO_PASSWORD');
-            throw new KError("Access' password is not set", 500, errcode);
+            // If the access has no password, check if it's an access that doesn't require
+            // credentials.
+            const bankVendor = bankVendorByUuid(access.vendorId);
+            if (!bankVendor.noCredentials) {
+                // The access requires credentials: fail with an error.
+                log.warn("Skipping transactions fetching — password isn't present");
+                const errcode = getErrorCode('NO_PASSWORD');
+                throw new KError("Access' password is not set", 500, errcode);
+            }
         }
 
         const startOfPoll = new Date();
