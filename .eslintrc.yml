@@ -40,6 +40,12 @@
                 - 2
               '@typescript-eslint/explicit-module-boundary-types':
                 - 0
+              # v8 recommended changed no-explicit-any from warn to error; keep as warn
+              '@typescript-eslint/no-explicit-any':
+                - 1
+              # v8 recommended added no-require-imports; turn off as the codebase uses require()
+              '@typescript-eslint/no-require-imports':
+                - 0
         - files: 'server/**/*.js'
           rules:
               prefer-const:

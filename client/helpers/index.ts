@@ -76,7 +76,6 @@ export function assertNotNull<T>(x: T): asserts x is Exclude<T, null> {
     assert(x !== null, 'unexpected null');
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function assertHas(obj: object, prop: string, errorMsg?: string) {
     return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
 }

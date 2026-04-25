@@ -27,7 +27,6 @@ import ACCOUNT_TYPES from '../account-types.json';
 import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
 import { endOfMonth } from './dates';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function maybeHas(obj: object, prop: string): boolean {
     return obj && obj.hasOwnProperty(prop);
 }
