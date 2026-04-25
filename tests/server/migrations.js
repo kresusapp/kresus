@@ -374,7 +374,7 @@ describe('migrations', () => {
             // Create an account
             await queryRunner.query(
                 `INSERT INTO account (userId, accessId, vendorAccountId, type, importDate, initialBalance, lastCheckDate, label, excludeFromBalance, isOrphan, gracePeriod) VALUES
-                (${USER_ID}, ${createdAccessId}, 'fakeAccountVendorId', 'account-type.unknown', '2015-11-20 07:42:39', 0, 0, "Some label", 0, false, 0)`
+                (${USER_ID}, ${createdAccessId}, 'fakeAccountVendorId', 'account-type.unknown', '2015-11-20 07:42:39', 0, 0, 'Some label', 0, false, 0)`
             );
 
             await migration.up(queryRunner);

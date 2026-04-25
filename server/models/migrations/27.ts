@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { isSqlite } from '../helpers';
 
 export class MoveLoginPasswordToFields1756391927839 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
@@ -18,15 +19,14 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
         // fields in CASCADE. Disable the foreign keys checks beforehand and re-enable them afterwards.
         // However, doing the "PRAGMA foreign_keys" thing in a transaction is a no-op
         // (see https://www.sqlite.org/pragma.html), so we commit the transaction first.
-        const dbType = queryRunner.connection.driver.options.type;
-        const isSqlite = dbType === 'sqlite' || dbType === 'better-sqlite3';
-        let isInATransaction = false;
+        const isSqliteDriver = isSqlite(queryRunner.connection);
+        let wasInTransaction = false;
 
-        if (isSqlite) {
+        if (isSqliteDriver) {
             try {
                 await queryRunner.commitTransaction();
 
-                isInATransaction = true;
+                wasInTransaction = true;
 
                 // eslint-disable-next-line no-empty
             } catch (ignore) {}
@@ -36,10 +36,10 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
 
         await queryRunner.dropColumns('access', ['login', 'password']);
 
-        if (isSqlite) {
+        if (isSqliteDriver) {
             await queryRunner.query('PRAGMA foreign_keys = ON');
 
-            if (isInATransaction) {
+            if (wasInTransaction) {
                 try {
                     await queryRunner.startTransaction();
                     // eslint-disable-next-line no-empty
