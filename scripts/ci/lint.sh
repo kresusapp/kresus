@@ -28,5 +28,5 @@ then
 fi
 
 concurrently \
-    "yarn run -- eslint --cache $QUIET --ext .js,.ts,.tsx $FIX $TARGET"\
+    "yarn run -- eslint --cache $QUIET $FIX $TARGET"\
     "yarn run ci:lint-css $QUIET $FIX"
