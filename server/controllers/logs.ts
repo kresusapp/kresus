@@ -42,13 +42,10 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
 
         const accesses = await Access.all(userId);
         accesses.forEach(acc => {
-            const sensitiveFields = acc.fields.filter(
-                f => f.name === 'login' || f.name === 'password'
-            );
-            sensitiveFields.forEach(field => {
+            acc.fields.forEach(field => {
                 if (field.name === 'password') {
                     passwords.add(field.value);
-                } else {
+                } else if (field.name === 'login') {
                     sensitiveKeywords.add(field.value);
                 }
             });
