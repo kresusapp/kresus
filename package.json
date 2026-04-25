@@ -80,7 +80,7 @@
         "react-redux": "~9.2.0",
         "react-router": "^7.13.2",
         "react-select": "^5.10.2",
-        "react-toastify": "~11.0.5",
+        "react-toastify": "~11.1.0",
         "redux-logger": "~3.0.6",
         "rollup-plugin-sprite": "~0.1.2",
         "stylelint": "~14.14.1",
