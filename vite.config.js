@@ -20,6 +20,14 @@ export default defineConfig({
         outDir: '../build/client',
     },
 
+    css: {
+        // Primer tooltips' CSS contains a `@media (min-width: 0\0)` IE hack rejected by lightningcss.
+        // Since we don't need IE support, stip it with errorRecovery.
+        lightningcss: {
+            errorRecovery: true,
+        },
+    },
+
     resolve: {
         alias: {
             // Alias so the base.css file can refer to the sprite directly.
