@@ -93,7 +93,10 @@ export interface CreateAndRetrieveDataResult {
     enabled: boolean;
 }
 
-export function extractUserActionFields(body: Record<string, string>) {
+export function extractUserActionFields(body: Record<string, string> | undefined) {
+    if (!body) {
+        return null;
+    }
     const fields = (body.userActionFields || null) as Record<string, string> | null;
     delete body.userActionFields;
     return fields;
