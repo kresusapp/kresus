@@ -15,7 +15,7 @@ export class AddIsAdminInUser1741675783114 implements MigrationInterface {
         );
 
         // Enable current users as administrators.
-        await q.manager.update('user', {}, { isAdmin: true });
+        await q.query('UPDATE "user" SET "isAdmin" = true');
     }
 
     async down(q: QueryRunner): Promise<void> {
