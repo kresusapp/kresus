@@ -23,7 +23,7 @@ table.duplicates td[rowspan] {
     width: 100%;
     padding: 0;
     margin-bottom: 1em;
-    border: 1px solid #DDDDDD;
+    border: 1px solid #DDD;
 }
 
 .duplicate > div {
@@ -93,7 +93,7 @@ table.duplicates td[rowspan] {
 }
 
 .duplicate > div:first-child {
-    border-bottom: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDD;
 }
 
 @container (max-width: 768px) {

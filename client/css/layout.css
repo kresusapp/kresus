@@ -141,7 +141,7 @@ main nav {
  * content but below the header. Keep in sync with the media query doing the same thing on small
  * widths.
  */
-@media (min-width: calc(320px + 100ch)) {
+@media (width >= calc(320px + 100ch)) {
     body:not(.fluid) main {
         position: relative;
     }
@@ -222,7 +222,7 @@ body.fluid .content {
     margin-top: 0;
 }
 
-@media (max-width: 620px) {
+@media (width <= 620px) {
     /*
      * Put the nav menu on top of content, but below the header, be it in fluid layout or not.
      * Keep this in sync with the rule doing the same on body:not(.fluid).

@@ -13,7 +13,7 @@
     border-radius: 4px;
     box-shadow: inset 0 1px 0 hsl(0deg 0% 100% / 15%), 0 1px 1px rgb(0 0 0 / 7.5%);
     color: #717171;
-    background-color: #FFFFFF;
+    background-color: #FFF;
     outline: none !important;
 
     /* Prevent zoom on double tap */
@@ -25,7 +25,7 @@
 
 .btn:hover {
     text-decoration: none;
-    color: #333333;
+    color: #333;
 }
 
 .btn:active,
@@ -56,7 +56,7 @@
 
 /* Warning button */
 .btn.warning {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #F0AD4E;
     border-color: #E38D13;
 }
@@ -69,7 +69,7 @@
     border-color: #D58512;
 
     /* Some links set as buttons will override the default color on hover so we need to set it back here */
-    color: #FFFFFF;
+    color: #fff;
 }
 
 .btn.warning:focus {
@@ -81,13 +81,13 @@
 .btn.warning[disabled]:focus,
 .btn.warning[disabled]:active,
 .btn.warning[disabled].active {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #EB9316;
 }
 
 /* Danger button */
 .btn.danger {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #D9534F;
     border-color: #D43F3A;
 }
@@ -100,7 +100,7 @@
     border-color: #AC2925;
 
     /* Some links set as buttons will override the default color on hover so we need to set it back here */
-    color: #FFFFFF;
+    color: #fff;
 }
 
 .btn.danger:focus {
@@ -112,13 +112,13 @@
 .btn.danger[disabled]:focus,
 .btn.danger[disabled]:active,
 .btn.danger[disabled].active {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #C12E2A;
 }
 
 /* Primary button */
 .btn.primary {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #337AB7;
     border-color: #2E6DA4;
 }
@@ -140,13 +140,13 @@
 .btn.primary[disabled]:focus,
 .btn.primary[disabled]:active,
 .btn.primary[disabled].active {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #265A88;
 }
 
 /* Success button */
 .btn.success {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #5CB85C;
     border-color: #3E8F3E;
 }
@@ -168,13 +168,13 @@
 .btn.success[disabled]:focus,
 .btn.success[disabled]:active,
 .btn.success[disabled].active {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #419641;
 }
 
 /* Info button */
 .btn.info {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #5BC0DE;
     border-color: #28A4C9;
 }
@@ -192,7 +192,7 @@
 .btn.info[disabled]:focus,
 .btn.info[disabled]:active,
 .btn.info[disabled].active {
-    color: #FFFFFF;
+    color: #FFF;
     background-color: #2AABD2;
 }
 

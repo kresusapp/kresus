@@ -16,8 +16,8 @@
 body.dark .onboarding {
     background-color: #2D2C2C;
     color: white;
-    border-left-color: #555555;
-    border-right-color: #555555;
+    border-left-color: #555;
+    border-right-color: #555;
 }
 
 .onboarding header {
@@ -73,7 +73,7 @@ body.dark .onboarding {
     text-align: center;
     border-color: #C5C5C5;
     border-radius: 2px;
-    color: #444444;
+    color: #444;
 }
 
 .onboarding-panes > a {
@@ -81,8 +81,8 @@ body.dark .onboarding {
 }
 
 body.dark .onboarding-panes > * {
-    border-color: #555555;
-    color: #FFFFFF;
+    border-color: #555;
+    color: #FFF;
 }
 
 .onboarding-panes > * p .fa {
@@ -148,7 +148,7 @@ body.dark .onboarding-panes > * {
     margin-bottom: 2em;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .onboarding header {
         height: auto;
     }
@@ -188,7 +188,6 @@ body.dark .onboarding-panes > * {
     }
 
     .onboarding-panes > * > * {
-        padding: auto;
         margin-bottom: auto;
     }
 
@@ -207,7 +206,7 @@ body.dark .onboarding header a {
 
 .onboarding-panes > *:hover,
 .onboarding-panes > *:focus {
-    box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
+    box-shadow: 5px 10px 5px #CCC, -5px 10px 5px #CCC;
 }
 
 body.dark .onboarding-panes > *:hover,

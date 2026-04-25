@@ -9,7 +9,7 @@
     gap: 0.5em;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .categories .actions {
         justify-content: center;
     }

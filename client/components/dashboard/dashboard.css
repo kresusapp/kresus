@@ -17,12 +17,12 @@
     padding: 0.5em;
     display: flex;
     flex-wrap: wrap;
-    background-color: #DDDDDD;
+    background-color: #DDD;
     border-bottom: 1px solid transparent;
 }
 
 body.dark #dashboard .accesses-list > li > .dashboard-access-summary {
-    background-color: #444444;
+    background-color: #444;
     border-bottom-color: currentColor;
 }
 
@@ -40,7 +40,7 @@ body.dark #dashboard .accesses-list > li > .dashboard-access-summary {
     flex-grow: 1;
     font-size: 1.25em;
     flex-wrap: wrap;
-    color: #444444;
+    color: #444;
 }
 
 body.dark #dashboard .accesses-list > li .bank-summary {
@@ -117,7 +117,7 @@ body.dark #dashboard .accesses-list > li .accounts li a:focus::before {
     text-align: center;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     #dashboard .bank-total-accesses {
         font-size: 1.25em;
     }
@@ -152,7 +152,7 @@ body.dark #dashboard .accesses-list > li .accounts li a:focus::before {
 }
 
 .dashboard-access {
-    border: 1px solid #DDDDDD;
+    border: 1px solid #DDD;
 }
 
 #dashboard .accesses-list > li .accounts li a::before {
@@ -170,7 +170,7 @@ body.dark #dashboard .accesses-list > li .accounts li a:focus::before {
 #dashboard .accesses-list > li .accounts li a:hover::before,
 #dashboard .accesses-list > li .accounts li a:active::before,
 #dashboard .accesses-list > li .accounts li a:focus::before {
-    color: #444444;
+    color: #444;
 }
 
 #dashboard .amount.positive {

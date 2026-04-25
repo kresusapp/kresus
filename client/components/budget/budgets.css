@@ -24,7 +24,7 @@
     padding: 5px 9px;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .budgets table tr > .category-threshold,
     .budgets table tr > .category-diff,
     .budgets table tr > .category-button {
@@ -59,7 +59,7 @@
     margin-bottom: 1em;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .budgets .toolbar * {
         flex: 1 1 100%;
     }
@@ -109,7 +109,7 @@ table.budget td:last-child {
     left: 0;
     width: 100%;
     text-align: center;
-    color: #FFFFFF;
+    color: #FFF;
     background-color: transparent;
 }
 
@@ -136,7 +136,7 @@ table.budget td:last-child {
     display: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .stacked-progress-bar .threshold {
         display: inline;
     }

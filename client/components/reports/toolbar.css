@@ -31,7 +31,7 @@
     padding: 1em 0;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .transaction-toolbar li:first-child button .fa {
         margin-right: 0;
     }

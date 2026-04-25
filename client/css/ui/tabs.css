@@ -11,7 +11,7 @@
     display: block;
     padding: 12px 15px;
     color: #717171;
-    border-bottom: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDD;
     text-decoration: none;
 }
 
@@ -21,16 +21,16 @@
 }
 
 .tabs-container-selector li a:not(.active):hover {
-    background-color: #EEEEEE;
+    background-color: #EEE;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .tabs-container-selector select {
         display: none;
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .tabs-container-selector ul {
         display: none;
     }

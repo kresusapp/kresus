@@ -2,7 +2,7 @@
     overflow: auto;
     padding: 1em;
     background-color: white;
-    color: #444444;
+    color: #444;
 }
 
 .error-reporter pre {
@@ -11,6 +11,6 @@
     overflow: inherit;
     border-radius: 1px;
     border-color: #2F2F2F;
-    background-color: #444444;
+    background-color: #444;
     color: white;
 }

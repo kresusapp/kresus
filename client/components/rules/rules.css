@@ -21,7 +21,7 @@ ul.rules {
     margin-left: 5px;
 }
 
-@media screen and (max-width: 620px) {
+@media screen and (width <= 620px) {
     .rules li {
         flex-wrap: wrap;
     }

@@ -63,7 +63,7 @@
     left: -4px;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .popover-content {
         max-width: 95%;
     }

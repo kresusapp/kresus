@@ -18,23 +18,23 @@ header {
 
 header h1 {
     font-weight: bold;
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 header h1 a,
 header h1 a:hover,
 header h1 a:focus {
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 .content {
-    background: #FFFFFF;
+    background: #FFF;
 }
 
 main nav {
     background-color: #F5F6F7;
     border-right: 1px solid #D6D8DA;
-    color: #444444;
+    color: #444;
 }
 
 table caption {
@@ -43,9 +43,9 @@ table caption {
 
 body.dark {
     --main-font-color: white;
-    --popover-background-color: #444444;
-    --popover-border-color: #222222;
-    --popover-shadow-color: #000000;
+    --popover-background-color: #444;
+    --popover-border-color: #222;
+    --popover-shadow-color: #000;
 
     color: #F9FCFE;
     background: #3D424C;
@@ -64,13 +64,13 @@ body.dark main a.fa {
 }
 
 body.dark input[type='checkbox'] {
-    border-color: #FFFFFF;
+    border-color: #FFF;
     background-color: transparent;
 }
 
 body.dark input[type='checkbox']:checked {
-    color: #666666;
-    background-color: #FFFFFF;
+    color: #666;
+    background-color: #FFF;
 }
 
 body.dark input[type='checkbox'].switch:checked {
@@ -82,7 +82,7 @@ body.dark input[type='checkbox'].switch:not(:checked) {
 }
 
 body.dark input[type='checkbox'].switch:not(:checked)::after {
-    background-color: #555555;
+    background-color: #555;
 }
 
 body.dark .content {
@@ -93,7 +93,7 @@ body.dark .content {
 body.dark header,
 body.dark main nav {
     background-color: #2D2C2C;
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 body.dark main nav {
@@ -102,7 +102,7 @@ body.dark main nav {
 
 body.dark table caption {
     color: inherit;
-    background-color: #444444;
+    background-color: #444;
 }
 
 body.dark table:not(.no-hover) > tbody > tr:hover {
@@ -118,13 +118,13 @@ body.dark .tabs-container-selector li a {
 }
 
 body.dark .tabs-container-selector li a.active {
-    color: #444444;
+    color: #444;
     background-color: white;
     border-color: white;
 }
 
 body.dark .tabs-container-selector li a:not(.active):hover {
-    background-color: #444444;
+    background-color: #444;
 }
 
 body.dark .btn.transparent {

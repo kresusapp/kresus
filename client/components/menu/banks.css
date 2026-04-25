@@ -3,7 +3,7 @@ main nav > .sidebar-section-list a {
     padding-left: 20px;
 }
 
-@media (max-width: 620px) {
+@media (width <= 620px) {
     main nav > .views-details,
     main nav > .sidebar-section-list a {
         padding-left: 1em;
@@ -139,7 +139,7 @@ main nav .views-details > * .bank-name button:focus {
 
 main nav .views-details > *.active .bank-name button:hover,
 main nav .views-details > *.active .bank-name button:focus {
-    color: #444444;
+    color: #444;
 }
 
 main nav .views-details .views-list > li a:hover,
@@ -174,7 +174,7 @@ main nav .views-details.bank-total-accesses > a.active .total-balance-item {
 }
 
 body.dark main nav .views-details .bank-name {
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 body.dark main nav .views-details .bank-name .bank-sum {
@@ -195,7 +195,7 @@ body.dark main nav .views-details .views-list > li a:hover,
 body.dark main nav .views-details .views-list > li a:focus {
     background-color: rgb(255 255 255 / 25%);
     border-left-color: #242491;
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 body.dark main nav .views-details .views-list > li a.active {
@@ -215,7 +215,7 @@ body.dark main nav .views-details.bank-total-accesses > a .total-balance-item {
 body.dark main nav .views-details.bank-total-accesses > a:hover .total-balance-item,
 body.dark main nav .views-details.bank-total-accesses > a:focus .total-balance-item {
     background-color: rgb(255 255 255 / 25%);
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 body.dark main nav .views-details.bank-total-accesses > a.active:hover .total-balance-item,

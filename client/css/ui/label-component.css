@@ -9,7 +9,8 @@
     position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: fill-available;
+    width: -webkit-fill-available;
+    width: stretch;
     white-space: nowrap;
     text-transform: uppercase;
 }
@@ -41,7 +42,7 @@ body.dark .label-component-container.force-edit-mode input {
     text-transform: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .label-component-container:not(.force-edit-mode) span {
         display: inline;
     }
