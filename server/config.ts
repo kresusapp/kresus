@@ -88,7 +88,7 @@ const OPTIONS: {
         defaultVal: path.join(ospath.home(), '.kresus'),
         processPath: 'dataDir',
         doc: `This is where Kresus stores additional data, as the latest bank
-        scrapping modules. It should be writeable by the user which launches
+        scrapping modules. It should be writable by the user which launches
         the Kresus executable.`,
         defaultDoc: 'HOME_DIR/.kresus',
         docExample: '/home/ben/.kresus',
