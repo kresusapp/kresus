@@ -239,14 +239,12 @@ describe('migrations', () => {
         await migration.up(queryRunner);
 
         // Check that at least one view exists
-        const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = $1', [
-            USER_ID,
-        ]);
+        const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = ?', [USER_ID]);
         assert.ok(views.length > 0);
 
         // Check that the view-accounts link exists
         const viewAccounts = await queryRunner.query(
-            'SELECT * FROM "view-accounts" WHERE "accountId" = $1',
+            'SELECT * FROM "view-accounts" WHERE "accountId" = ?',
             [account.id]
         );
         assert.ok(viewAccounts.length > 0);
