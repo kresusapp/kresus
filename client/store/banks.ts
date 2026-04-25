@@ -1072,13 +1072,29 @@ const banksSlice = createSlice({
                 const { accessId, label, accounts, newTransactions, excludeFromPoll } =
                     action.payload;
 
+                // An access is enabled if it has a login and a password.
+                const enabled =
+                    fields.some(
+                        f =>
+                            (f.name === 'login' || f.name === 'username') &&
+                            f.value &&
+                            f.value.length > 0
+                    ) && fields.some(f => f.name === 'password' && f.value && f.value.length > 0);
+
+                // Locally remove the password from the list of fields, before saving it in the
+                // UI's model.
+                const passwordIndex = fields.findIndex(f => f.name === 'password');
+                if (passwordIndex !== -1) {
+                    fields.splice(passwordIndex, 1);
+                }
+
                 const access = {
                     id: accessId,
                     vendorId: uuid,
                     fields,
                     label,
                     customLabel,
-                    enabled: true,
+                    enabled,
                     excludeFromPoll,
                 };
 
@@ -1278,6 +1294,15 @@ const banksSlice = createSlice({
                     newFields.customFields = newFields.customFields.filter(
                         field => field.value !== null
                     );
+
+                    // Locally remove the password from the list of fields, before saving it in the
+                    // UI's model.
+                    const passwordIndex = newFields.customFields.findIndex(
+                        f => f.name === 'password'
+                    );
+                    if (passwordIndex !== -1) {
+                        newFields.customFields.splice(passwordIndex, 1);
+                    }
                 }
 
                 mergeInObject(state.accessMap, results.accessId, newFields);

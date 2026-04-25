@@ -133,6 +133,7 @@ const NewAccessForm = (props: {
     const createAccess = useCallback(
         async (arrayCustomFields: AccessCustomField[]) => {
             assert(bankDesc !== null, 'bank descriptor must be set');
+
             if (!bankDesc.noCredentials) {
                 assert(
                     arrayCustomFields.some(f => f.name === 'login' && !!f.value),
@@ -143,6 +144,7 @@ const NewAccessForm = (props: {
                     'password must be set'
                 );
             }
+
             return await dispatch(
                 BanksStore.createAccess({
                     uuid: bankDesc.uuid,
