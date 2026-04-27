@@ -73,14 +73,12 @@ function makeOrmConfig() {
         case 'sqlite':
             (0, helpers_1.assert)(process.kresus.sqlitePath !== null, 'missing db path in server/models');
             ormConfig = {
-                type: 'sqlite',
+                type: 'better-sqlite3',
                 database: process.kresus.sqlitePath,
                 logging: process.kresus.dbLog,
             };
             break;
         case 'postgres':
-        case 'mysql':
-        case 'mariadb':
             (0, helpers_1.assert)(typeof process.kresus.dbHost === 'string', 'missing db host in server/models');
             (0, helpers_1.assert)(typeof process.kresus.dbPort === 'number', 'missing db port in server/models');
             (0, helpers_1.assert)(typeof process.kresus.dbUsername === 'string', 'missing db username in server/models');

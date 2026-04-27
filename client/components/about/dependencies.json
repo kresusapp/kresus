@@ -156,6 +156,10 @@
         "license": "BSD-2-Clause",
         "website": null
     },
+    "better-sqlite3": {
+        "license": "MIT",
+        "website": "http://github.com/WiseLibs/better-sqlite3"
+    },
     "chart.js": {
         "license": "MIT",
         "website": "https://www.chartjs.org"
@@ -291,10 +295,6 @@
     "should": {
         "license": "MIT",
         "website": "https://github.com/shouldjs/should.js"
-    },
-    "sqlite3": {
-        "license": "BSD-3-Clause",
-        "website": "https://github.com/TryGhost/node-sqlite3"
     },
     "stylelint": {
         "license": "MIT",

@@ -1,6 +1,6 @@
 {
     "name": "kresus",
-    "version": "0.23.5",
+    "version": "0.23.6",
     "engines": {
         "node": ">=16"
     },
@@ -27,7 +27,7 @@
         "pg": "~8.4.2",
         "regex-escape": "~3.4.11",
         "semver": "~7.7.2",
-        "typeorm": "0.3.12"
+        "typeorm": "0.3.28"
     },
     "devDependencies": {
         "@reduxjs/toolkit": "~2.3.0",
@@ -51,6 +51,7 @@
         "@types/semver": "~7.3.13",
         "@typescript-eslint/eslint-plugin": "~5.42.1",
         "@typescript-eslint/parser": "~5.42.1",
+        "better-sqlite3": "~12.9.0",
         "chart.js": "~4.4.9",
         "chartjs-adapter-moment": "~1.0.1",
         "chartjs-plugin-zoom": "~2.0.1",
@@ -85,7 +86,6 @@
         "redux-logger": "~3.0.6",
         "rollup-plugin-sprite": "~0.1.2",
         "should": "~13.2.3",
-        "sqlite3": "~5.1.7",
         "stylelint": "~14.14.1",
         "stylelint-config-standard": "~29.0.0",
         "ts-node": "~10.9.2",

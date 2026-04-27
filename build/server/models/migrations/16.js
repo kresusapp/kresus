@@ -81,7 +81,7 @@ class AddRecurringTransactions1671005821717 {
             isNullable: false,
             default: false,
         }));
-        await q.manager.update('transaction', {}, { isRecurrentTransaction: false });
+        await q.query('UPDATE "transaction" SET "isRecurrentTransaction" = false');
     }
     async down(q) {
         await q.dropTable('recurring-transaction');

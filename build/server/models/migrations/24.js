@@ -12,7 +12,7 @@ class AddIsAdminInUser1741675783114 {
             default: false,
         }));
         // Enable current users as administrators.
-        await q.manager.update('user', {}, { isAdmin: true });
+        await q.query('UPDATE "user" SET "isAdmin" = true');
     }
     async down(q) {
         await q.dropColumn('user', 'isAdmin');

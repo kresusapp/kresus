@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DatetimeType = exports.ForceNumericColumn = void 0;
 exports.mergeWith = mergeWith;
 exports.datetimeType = datetimeType;
+exports.isSqlite = isSqlite;
 exports.bulkInsert = bulkInsert;
 exports.bulkDelete = bulkDelete;
 exports.idColumn = idColumn;
@@ -106,6 +107,10 @@ function datetimeType(queryRunner) {
 const LOW_NUM_ENTITIES_IN_BATCH = 50;
 // The same issue happens with postgres which can't bind more than 64K features at once.
 const NUM_ENTITIES_IN_BATCH = 1000;
+function isSqlite(connection) {
+    const dbType = connection.driver.options.type;
+    return dbType === 'sqlite' || dbType === 'better-sqlite3';
+}
 // Note: doesn't return the inserted entities.
 async function bulkInsert(repository, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,7 +123,7 @@ entities) {
     }
     let remaining = entities;
     let batchSize = NUM_ENTITIES_IN_BATCH;
-    if (repository.manager.connection.driver.options.type === 'sqlite') {
+    if (isSqlite(repository.manager.connection)) {
         batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
     log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
@@ -134,7 +139,7 @@ async function bulkDelete(repository, ids) {
     }
     let remaining = ids;
     let batchSize = NUM_ENTITIES_IN_BATCH;
-    if (repository.manager.connection.driver.options.type === 'sqlite') {
+    if (isSqlite(repository.manager.connection)) {
         batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
     log.info(`bulk delete: splitting up batches with a size of ${batchSize}`);

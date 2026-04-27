@@ -52,15 +52,12 @@ class AddViews1734262035140 {
             // Don't use View.create: TypeORM's entity manager (q.manager) uses the current database
             // schema, which is only updated after the migration finishes, so the view table is not
             // yet known to the ORM, View.create will fail with "relation does not exist".
-            // Insert into view table
-            const result = await q.query(`INSERT INTO view ("userId", "label", "createdByUser") VALUES ($1, $2, $3) RETURNING id`, [acc.userId, acc.customLabel || acc.label, false]);
-            // Postgresql returns an array whereas SQLite return the inserted id.
-            const viewId = result instanceof Array ? result[0].id : result;
-            // Insert into view-accounts table
-            await q.query(`INSERT INTO "view-accounts" ("viewId", "accountId") VALUES ($1, $2)`, [
-                viewId,
-                acc.id,
-            ]);
+            const result = await q.sql `INSERT INTO view ("userId", "label", "createdByUser") VALUES (${acc.userId}, ${acc.customLabel || acc.label}, ${0}) RETURNING id`;
+            // postgres returns a structured object, but sqlite returns a bigint.
+            const viewId = typeof result === 'bigint' || typeof result === 'number'
+                ? Number(result)
+                : result[0].id;
+            await q.sql `INSERT INTO "view-accounts" ("viewId", "accountId") VALUES (${viewId}, ${acc.id})`;
         }
     }
     async down(q) {
