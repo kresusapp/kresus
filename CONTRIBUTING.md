@@ -63,6 +63,11 @@ And then you can use the following settings in the configuration file:
 
 A series of tests are shipped with the code to avoid regressions. They are
 located in the `./tests` folder.
+
+These tests can be run with `yarn ci:test`.
+
+## Woob-specific tests
+
 Some tests require a valid install of Woob to work properly, some others do not.
 For that, the woob related tests are disabled if the environment variable
 `KRESUS_WOOB_DIR` is not set. Some other tests are disabled if this
@@ -73,6 +78,32 @@ To ensure all the tests pass, you need to run the test command twice, once with
 ```bash
 yarn ci:test
 KRESUS_WOOB_DIR=/path/to/woob yarn ci:test
+```
+
+## Extra SQL logs
+
+It's possible to show extra logs (including the SQL queries) when running tests, by defining
+the `FORCE_DB_LOGS` environment variable to any value:
+
+```bash
+FORCE_DB_LOGS=y yarn ci:test
+```
+
+## Running database tests against Postgres
+
+It's possible to run the database tests against PostgreSQL, by defining the `USE_POSTGRES`
+environment variable to any value:
+
+```bash
+USE_POSTGRES=y yarn ci:test
+```
+
+In this case, a preconfigured postgres instance must be running on `localhost:5432`, with a
+`postgres` user with full permissions on a `postgres` database, using password `test`. The
+following `docker` command allows creating a temporary docker instance with these exact settings:
+
+```bash
+docker run --rm -ti -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=test postgres
 ```
 
 # About `package.json` file

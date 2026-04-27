@@ -40,25 +40,46 @@ const rmdir = dir => {
     fs.rmdirSync(dir);
 };
 
-export function applyTestConfig() {
+const SQLITE_DB_CONFIG = {
+    type: 'sqlite',
+    sqlite_path: TEST_DB_PATH,
+};
+
+// Assume a default database `postgres` for user `postgres` with password `test` running locally.
+const POSTGRES_DB_CONFIG = {
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    name: 'postgres',
+    username: 'postgres',
+    password: 'test',
+};
+
+export function applyTestConfig(usePostgres) {
     let dbLogs = typeof process.env.FORCE_DB_LOGS !== 'undefined' ? 'all' : 'error';
+
+    let dbConfig = usePostgres ? POSTGRES_DB_CONFIG : SQLITE_DB_CONFIG;
+
     applyConfig({
         db: {
-            type: 'sqlite',
-            sqlite_path: TEST_DB_PATH,
-            log: dbLogs,
+            logs: dbLogs,
+            ...dbConfig,
         },
     });
 }
 
 before(async () => {
-    // Remove previous test data.
-    if (fs.existsSync(TEST_DIR)) {
-        rmdir(TEST_DIR);
-    }
-    fs.mkdirSync(TEST_DIR);
+    const usePostgres = typeof process.env.USE_POSTGRES !== 'undefined';
 
-    applyTestConfig();
+    if (!usePostgres) {
+        // Remove previous test data.
+        if (fs.existsSync(TEST_DIR)) {
+            rmdir(TEST_DIR);
+        }
+        fs.mkdirSync(TEST_DIR);
+    }
+
+    applyTestConfig(usePostgres);
 
     // Initialize models.
     await initModels();
