@@ -19,7 +19,7 @@
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
   - run Kresus from there:
-    - If you use sqlite for testing, install it there too: `npm -g install --production --prefix better-sqlite3`
+    - If you use sqlite for testing, install it there too: `npm -g install --production --prefix /tmp better-sqlite3`
     - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
