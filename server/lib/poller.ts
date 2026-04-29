@@ -49,6 +49,28 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
     });
 }
 
+async function managePartialPollingErrors(
+    userId: number,
+    access: Access,
+    errors: string[]
+): Promise<void> {
+    const i18n = await getTranslator(userId);
+    const subject = $t(i18n, 'server.email.fetch_error.subject');
+
+    for (const error of errors) {
+        const content = $t(i18n, 'server.email.fetch_error.text', {
+            bank: access.getLabel(),
+            error,
+        });
+
+        log.info('Warning the user that a partial error was detected');
+        await AlertManager.send(userId, i18n, {
+            subject,
+            text: content,
+        });
+    }
+}
+
 // Can throw.
 export async function fullPoll(userId: number) {
     log.info('Checking accounts and transactions for all accesses...');
@@ -89,6 +111,10 @@ export async function fullPoll(userId: number) {
 
                 const accountInfoMap = accountResponse.value;
 
+                if (accountResponse.errors && accountResponse.errors.length) {
+                    await managePartialPollingErrors(userId, access, accountResponse.errors);
+                }
+
                 // Update the repos only once.
                 needUpdate = false;
 
@@ -104,6 +130,10 @@ export async function fullPoll(userId: number) {
                     transactionResponse.kind !== 'user_action',
                     'Unexpected action requirement after accounts have been successfully polled'
                 );
+
+                if (transactionResponse.errors && transactionResponse.errors.length) {
+                    await managePartialPollingErrors(userId, access, transactionResponse.errors);
+                }
             } else if (!access.isEnabled() || access.excludeFromPoll) {
                 log.info(
                     `Won't poll, access from bank ”${access.getLabel()}” with vendorId ${vendorId} is disabled or shouldn't be polled.`
