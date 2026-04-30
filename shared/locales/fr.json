@@ -604,6 +604,7 @@
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",
             "no_password": "Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer.",
+            "missing_mandatory_field": "Un ou plusieurs champs obligatoires sont absent pour ce compte, veuillez le(s) définir dans les préférences et réessayer.",
             "wrong_password": "Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.",
             "first_time_wrong_password": "Le mot de passe semble incorrect, veuillez réessayer.",
             "invalid_parameters": "Le format de votre identifiant ou mot de passe semble être incorrect : %{content}",
@@ -683,6 +684,7 @@
                 "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_ACCOUNTS": "Le connecteur n'a trouvé aucun compte.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
+                "MISSING_MANDATORY_FIELD": "Un ou plusieurs champs obligatoires sont absents.",
                 "INVALID_PASSWORD": "Le mot de passe est invalide.",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré.",
                 "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides.",

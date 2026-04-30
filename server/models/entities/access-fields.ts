@@ -75,6 +75,10 @@ export default class AccessField {
         await AccessField.repo().delete({ userId, id: fieldId });
     }
 
+    static async destroyAllFromAccessId(userId: number, accessId: number): Promise<void> {
+        await AccessField.repo().delete({ userId, accessId });
+    }
+
     static async destroyAll(userId: number): Promise<void> {
         await AccessField.repo().delete({ userId });
     }

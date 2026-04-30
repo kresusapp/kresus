@@ -99,6 +99,7 @@ export class KError extends Error {
             switch (errCode) {
                 case errors.INVALID_PARAMETERS:
                 case errors.NO_PASSWORD:
+                case errors.MISSING_MANDATORY_FIELD:
                 case errors.INVALID_ENCRYPTED_EXPORT:
                 case errors.INVALID_PASSWORD_JSON_EXPORT:
                     this.statusCode = 400;
@@ -168,6 +169,7 @@ export function errorRequiresUserAction(err: KError): boolean {
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
         err.errCode === getErrorCode('INVALID_PARAMETERS') ||
         err.errCode === getErrorCode('NO_PASSWORD') ||
+        err.errCode === getErrorCode('MISSING_MANDATORY_FIELD') ||
         err.errCode === getErrorCode('ACTION_NEEDED') ||
         err.errCode === getErrorCode('REQUIRES_INTERACTIVE')
     );

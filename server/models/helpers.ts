@@ -3,7 +3,9 @@ import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOp
 import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
 import { UNKNOWN_TRANSACTION_TYPE, makeLogger } from '../helpers';
-import { Transaction } from './';
+import { Transaction, AccessField } from './';
+import { bankVendorByUuid } from '../providers';
+import { BankVendor } from '../../shared/types';
 
 const log = makeLogger('models/helpers');
 
@@ -215,4 +217,28 @@ export type PartialOnePlus<T> = {
         : T[P] extends ReadonlyArray<infer U>
         ? ReadonlyArray<Partial<U>>
         : Partial<T[P]> | T[P];
+};
+
+export const areFieldsComplete = (vendorId: string, fields: AccessField[]) => {
+    let vendorDescriptor: BankVendor;
+    try {
+        vendorDescriptor = bankVendorByUuid(vendorId);
+    } catch {
+        return false;
+    }
+
+    // Check that for every non-optional field, we do have a corresponding value.
+    if (!vendorDescriptor.customFields) {
+        return vendorDescriptor.noCredentials === true;
+    }
+
+    const mandatoryFields = vendorDescriptor.customFields
+        .filter(f => !('optional' in f) || f.optional === false)
+        .map(f => f.name);
+
+    if (fields.length < mandatoryFields.length) {
+        return false;
+    }
+
+    return mandatoryFields.every(fieldName => fields.find(f => f.name === fieldName && !!f.value));
 };

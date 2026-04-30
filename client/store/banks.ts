@@ -1069,17 +1069,8 @@ const banksSlice = createSlice({
         builder
             .addCase(createAccess.fulfilled, (state, action) => {
                 const { uuid, fields, customLabel } = action.meta.arg;
-                const { accessId, label, accounts, newTransactions, excludeFromPoll } =
+                const { accessId, label, accounts, newTransactions, excludeFromPoll, enabled } =
                     action.payload;
-
-                // An access is enabled if it has a login and a password.
-                const enabled =
-                    fields.some(
-                        f =>
-                            (f.name === 'login' || f.name === 'username') &&
-                            f.value &&
-                            f.value.length > 0
-                    ) && fields.some(f => f.name === 'password' && f.value && f.value.length > 0);
 
                 // Locally remove the password from the list of fields, before saving it in the
                 // UI's model.

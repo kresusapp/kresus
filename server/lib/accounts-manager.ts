@@ -187,14 +187,14 @@ async function pollAccounts(
     access: Access,
     config: PollAccountsConfig
 ): Promise<UserActionOrValue<Partial<Account>[]>> {
-    if (!access.hasPassword()) {
+    if (!access.isEnabled()) {
         // If the access has no password, check if it's an access that doesn't require
         // credentials.
         const bankVendor = bankVendorByUuid(access.vendorId);
         if (!bankVendor.noCredentials) {
-            log.warn("Skipping accounts fetching — password isn't present");
-            const errcode = getErrorCode('NO_PASSWORD');
-            throw new KError("Access' password is not set", 500, errcode);
+            log.warn('Skipping transactions fetching -- access is disabled');
+            const errcode = getErrorCode('MISSING_MANDATORY_FIELD');
+            throw new KError('Access is lacking mandatory fields', 500, errcode);
         }
     }
 
@@ -613,15 +613,14 @@ merging as per request`);
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
-        if (!access.hasPassword()) {
+        if (!access.isEnabled()) {
             // If the access has no password, check if it's an access that doesn't require
             // credentials.
             const bankVendor = bankVendorByUuid(access.vendorId);
             if (!bankVendor.noCredentials) {
-                // The access requires credentials: fail with an error.
-                log.warn("Skipping transactions fetching — password isn't present");
-                const errcode = getErrorCode('NO_PASSWORD');
-                throw new KError("Access' password is not set", 500, errcode);
+                log.warn('Skipping transactions fetching -- access is disabled');
+                const errcode = getErrorCode('MISSING_MANDATORY_FIELD');
+                throw new KError('Access is lacking mandatory fields', 500, errcode);
             }
         }
 

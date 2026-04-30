@@ -82,6 +82,7 @@ export interface CreateAndRetrieveDataResult {
     newTransactions: Transaction[];
     label: string;
     errors?: string[];
+    enabled: boolean;
 }
 
 export function extractUserActionFields(body: Record<string, string>) {
@@ -199,6 +200,7 @@ export async function createAndRetrieveData(
                 newTransactions,
                 label: bankVendorByUuid(access.vendorId).name,
                 errors: providerErrors,
+                enabled: access.isEnabled(),
             },
         };
     } catch (err) {
@@ -373,11 +375,7 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
         }
 
         if (attrs.enabled === false) {
-            // Clear the password AccessField to disable the access.
-            const passwordField = access.fields.find(f => f.name === 'password');
-            if (passwordField) {
-                await AccessField.destroy(userId, passwordField.id);
-            }
+            await AccessField.destroyAllFromAccessId(userId, access.id);
             delete attrs.enabled;
         }
 

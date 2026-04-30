@@ -15,6 +15,7 @@ import AccessField from './access-fields';
 
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../providers';
+import { areFieldsComplete } from '../helpers';
 
 @Entity('access')
 export default class Access {
@@ -69,14 +70,9 @@ export default class Access {
         return field?.value ?? null;
     }
 
-    hasPassword(): boolean {
-        const password = this.getFieldValue('password');
-        return typeof password === 'string' && password.length > 0;
-    }
-
     // Is the access enabled?
     isEnabled(): boolean {
-        return this.getFieldValue('password') !== null;
+        return areFieldsComplete(this.vendorId, this.fields);
     }
 
     // Returns a cleaned up label for this access.
@@ -96,6 +92,7 @@ export default class Access {
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
             this.fetchStatus !== 'INVALID_PARAMETERS' &&
             this.fetchStatus !== 'NO_PASSWORD' &&
+            this.fetchStatus !== 'MISSING_MANDATORY_FIELD' &&
             this.fetchStatus !== 'ACTION_NEEDED' &&
             this.fetchStatus !== 'AUTH_METHOD_NYI' &&
             this.fetchStatus !== 'REQUIRES_INTERACTIVE'
