@@ -87,6 +87,29 @@ describe('Access model API', () => {
         });
     });
 
+    describe('Access creation without credentials', () => {
+        before(async () => {
+            await Access.destroyAll(USER_ID);
+            await AccessField.destroyAll(USER_ID);
+        });
+
+        it('should create an access with no fields rows when fields is not provided', async () => {
+            const access = await Access.create(USER_ID, { vendorId: 'gnagnagna' });
+            const allFields = await AccessField.all(USER_ID);
+            assert.strictEqual(allFields.length, 0);
+            assert.strictEqual(access.fields.length, 0);
+        });
+
+        it('Access.find should return the access with an empty fields array', async () => {
+            const all = await Access.all(USER_ID);
+            assert.strictEqual(all.length, 1);
+            const found = await Access.find(USER_ID, all[0].id);
+            assert.ok(found !== null);
+            assert.ok(found.fields instanceof Array);
+            assert.strictEqual(found.fields.length, 0);
+        });
+    });
+
     describe('Access deletion', () => {
         before(async () => {
             await Access.destroyAll(USER_ID);

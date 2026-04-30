@@ -297,19 +297,28 @@ type AccessParams = {
     fields: AccessCustomField[];
     customLabel: string | null;
     shouldCreateDefaultAlerts: boolean;
+    storeCredentials: boolean;
 };
 export const createAccess = createAsyncThunk(
     'banks/createAccess',
     async (params: AccessParams, { dispatch, getState }) => {
-        const { uuid, fields, customLabel } = params;
-        let results = await backend.createAccess(uuid, fields, customLabel);
+        const { uuid, fields, customLabel, storeCredentials } = params;
+        let results = await backend.createAccess(uuid, fields, customLabel, storeCredentials);
 
         const defaultCurrency = (getState() as any).banks.defaultCurrency;
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
+            const accessId = results.accessId;
             const userActionFields = await userAction;
-            results = await backend.createAccess(uuid, fields, customLabel, userActionFields);
+            results = await backend.createAccess(
+                uuid,
+                fields,
+                customLabel,
+                storeCredentials,
+                userActionFields,
+                accessId
+            );
         }
 
         if (params.shouldCreateDefaultAlerts) {
@@ -432,19 +441,23 @@ export const updateAndFetchAccess = createAsyncThunk(
         params: {
             accessId: number;
             customFields: AccessCustomField[];
+            storeCredentials?: boolean;
         },
         { dispatch }
     ) => {
-        const { accessId, customFields } = params;
+        const { accessId, customFields, storeCredentials } = params;
 
-        let results = await backend.updateAndFetchAccess(accessId, { customFields });
+        let results = await backend.updateAndFetchAccess(accessId, {
+            customFields,
+            storeCredentials,
+        });
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
             const userActionFields = await userAction;
             results = await backend.updateAndFetchAccess(
                 accessId,
-                { customFields },
+                { customFields, storeCredentials },
                 userActionFields
             );
         }
@@ -455,8 +468,8 @@ export const updateAndFetchAccess = createAsyncThunk(
                 accessId,
             },
             newFields: {
-                customFields,
-                enabled: true,
+                customFields: results.enabled === false ? [] : customFields,
+                enabled: results.enabled,
             },
         };
     }
@@ -1072,11 +1085,15 @@ const banksSlice = createSlice({
                 const { accessId, label, accounts, newTransactions, excludeFromPoll, enabled } =
                     action.payload;
 
-                // Locally remove the password from the list of fields, before saving it in the
-                // UI's model.
-                const passwordIndex = fields.findIndex(f => f.name === 'password');
-                if (passwordIndex !== -1) {
-                    fields.splice(passwordIndex, 1);
+                if (enabled) {
+                    // Locally remove the password from the list of fields, before saving it in the
+                    // UI's model.
+                    const passwordIndex = fields.findIndex(f => f.name === 'password');
+                    if (passwordIndex !== -1) {
+                        fields.splice(passwordIndex, 1);
+                    }
+                } else {
+                    fields.length = 0;
                 }
 
                 const access = {

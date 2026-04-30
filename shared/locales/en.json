@@ -52,6 +52,8 @@
             "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
             "default_alerts": "Default email alerts",
             "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
+            "store_credentials": "Store credentials",
+            "store_credentials_desc": "If enabled, the credentials will be stored in the database.",
             "add_bank_button": "Create the bank access"
         },
         "demo": {
@@ -136,7 +138,7 @@
             "enabled": "enabled",
             "disabled": "disabled",
             "deprecated_access": "Kresus' bank connectors don't support this bank anymore. All associated data is kept in read-only mode.",
-            "fill_the_fields": "Fill the fields and click save to re-enable it.",
+            "fill_the_fields": "Fill the fields and click save to re-synchronize it. To re-enable it, enable “store credentials” below.",
             "danger_zone_title": "Danger zone",
             "sync_title": "Synchronization",
             "delete_session": "Delete session cookies",

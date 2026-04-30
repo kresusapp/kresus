@@ -119,6 +119,7 @@ const NewAccessForm = (props: {
 
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
+    const [storeCredentials, setStoreCredentials] = useState(true);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
     const [customFields, setCustomFields] = useState<CustomFieldMap | null>(
         forcedBank ? bankCustomFieldsMapBuilder(forcedBank) : null
@@ -151,10 +152,11 @@ const NewAccessForm = (props: {
                     fields: arrayCustomFields,
                     customLabel,
                     shouldCreateDefaultAlerts: mustCreateDefaultAlerts,
+                    storeCredentials,
                 })
             ).unwrap();
         },
-        [dispatch, bankDesc, customLabel, mustCreateDefaultAlerts]
+        [dispatch, bankDesc, customLabel, mustCreateDefaultAlerts, storeCredentials]
     );
 
     const saveEmail = useCallback(
@@ -379,6 +381,18 @@ const NewAccessForm = (props: {
                     </Form.Input>
                 </DisplayIf>
             </DisplayIf>
+
+            <Form.Input
+                inline={true}
+                id="store-credentials"
+                label={$t('client.accountwizard.store_credentials')}
+                help={$t('client.accountwizard.store_credentials_desc')}>
+                <Switch
+                    ariaLabel={$t('client.accountwizard.store_credentials')}
+                    checked={storeCredentials}
+                    onChange={setStoreCredentials}
+                />
+            </Form.Input>
 
             <input
                 type="submit"

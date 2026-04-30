@@ -33,6 +33,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
     const dispatch = useKresusDispatch();
 
+    const [storeCredentials, setStoreCredentials] = useState(access.enabled);
+
     const [customFields, setCustomFields] = useState<CustomFieldMap>(() => {
         const fields: CustomFieldMap = {};
         for (const fieldDesc of bankDesc.customFields) {
@@ -94,10 +96,11 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                 BanksStore.updateAndFetchAccess({
                     accessId,
                     customFields: customFieldsArray,
+                    storeCredentials,
                 })
             ).unwrap();
         },
-        [accessId, noCredentials, dispatch]
+        [accessId, noCredentials, storeCredentials, dispatch]
     );
 
     const onSubmit = useSyncError(
@@ -193,6 +196,20 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                             value={customFields[field.name]}
                         />
                     ))}
+                </DisplayIf>
+
+                <DisplayIf condition={!noCredentials}>
+                    <Form.Input
+                        inline={true}
+                        id="store-credentials"
+                        label={$t('client.accountwizard.store_credentials')}
+                        help={$t('client.accountwizard.store_credentials_desc')}>
+                        <Switch
+                            ariaLabel={$t('client.accountwizard.store_credentials')}
+                            checked={storeCredentials}
+                            onChange={setStoreCredentials}
+                        />
+                    </Form.Input>
                 </DisplayIf>
 
                 <button type="submit" className="btn primary" disabled={!isFormValid}>

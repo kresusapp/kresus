@@ -170,6 +170,7 @@ export function createAccess(
     vendorId: string,
     customFields: AccessCustomField[],
     customLabel: string | null,
+    storeCredentials: boolean,
     userActionFields: FinishUserActionFields | null = null,
     accessId?: number // Needed only when the server sent it back for 2FA.
 ) {
@@ -177,6 +178,7 @@ export function createAccess(
         vendorId,
         customLabel,
         fields: customFields,
+        storeCredentials,
         // TODO would be nice to separate the access' fields from the user action fields.
         userActionFields,
     };
@@ -198,10 +200,16 @@ export function updateAndFetchAccess(
     accessId: number,
     access: {
         customFields: AccessCustomField[];
+        storeCredentials?: boolean;
     },
     userActionFields: FinishUserActionFields | null = null
 ) {
-    const error = hasForbiddenField(access, ['login', 'password', 'customFields']);
+    const error = hasForbiddenField(access, [
+        'login',
+        'password',
+        'customFields',
+        'storeCredentials',
+    ]);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }
