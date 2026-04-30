@@ -103,6 +103,7 @@ export async function createAndRetrieveData(
             'customLabel',
             'userActionFields',
             'excludeFromPoll',
+            'accessId',
         ]);
     if (error) {
         throw new KError(`when creating a new access: ${error}`, 400);
@@ -115,13 +116,11 @@ export async function createAndRetrieveData(
     let access: Access | null = null;
     try {
         if (userActionFields !== null) {
-            // The access must exist, as this is a second step of a 2FA; we don't have access (heh)
-            // to the access id, so use the uuid and login as unique identifiers.
-            access = unwrap(
-                await Access.byCredentials(userId, {
-                    uuid: params.vendorId as string,
-                    login: accessLogin,
-                })
+            // The access must exist, as this is a second step of a 2FA. Use the access id
+            // provided in the first step's response to find it.
+            assert(
+                typeof params.accessId === 'number',
+                'accessId is required for 2FA continuation'
             );
         } else {
             access = await Access.create(userId, params);
@@ -159,7 +158,7 @@ export async function createAndRetrieveData(
                 }
             });
 
-            return accountResponse;
+            return { ...accountResponse, accessId: access.id };
         }
 
         const accountInfoMap = accountResponse.value;

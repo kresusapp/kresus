@@ -170,15 +170,19 @@ export function createAccess(
     vendorId: string,
     customFields: AccessCustomField[],
     customLabel: string | null,
-    userActionFields: FinishUserActionFields | null = null
+    userActionFields: FinishUserActionFields | null = null,
+    accessId?: number // Needed only when the server sent it back for 2FA.
 ) {
-    const data = {
+    const data: Record<string, unknown> = {
         vendorId,
         customLabel,
         fields: customFields,
         // TODO would be nice to separate the access' fields from the user action fields.
         userActionFields,
     };
+    if (accessId !== undefined) {
+        data.accessId = accessId;
+    }
     return new Request('api/accesses').post().json(data).run();
 }
 

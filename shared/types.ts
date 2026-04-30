@@ -36,6 +36,7 @@ export interface UserActionResponse {
     actionKind: UserActionKind;
     message?: string;
     fields?: UserActionField[];
+    accessId?: number;
 }
 
 // Transaction rules.
