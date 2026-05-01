@@ -16,4 +16,9 @@ export default {
         return `${BASE}/edit-account/${id}`;
     },
     EDIT_ACCOUNT_PATTERN: `${BASE}/edit-account/:accountId`,
+
+    manualSync(id: number) {
+        return `${BASE}/manual-sync/${id}`;
+    },
+    MANUAL_SYNC_PATTERN: `${BASE}/manual-sync/:accessId`,
 };

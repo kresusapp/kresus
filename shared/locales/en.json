@@ -296,7 +296,7 @@
             "create_recurring_transaction": "Create a recurring transaction",
             "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize",
-            "sync_disabled": "This bank access is disabled, go to the bank accesses settings to enable it again",
+            "sync_disabled": "This bank access is disabled, please fill the credentials to manually synchronize the access",
             "type": "Type",
             "date": "Real date",
             "custom_label": "Custom label",

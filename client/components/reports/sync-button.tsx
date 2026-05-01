@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 import { handleSyncError } from '../../errors';
 import { translate as $t, notify } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
+import AccessesURL from '../accesses/urls';
 
 interface SyncButtonProps {
     // Account to be resynced.
@@ -15,12 +17,19 @@ const SyncButton = (props: SyncButtonProps) => {
     const access = useKresusState(state =>
         BanksStore.accessById(state.banks, props.account.accessId)
     );
-    const canBeSynced = useKresusState(state => {
-        return !BanksStore.bankByUuid(state.banks, access.vendorId).deprecated && access.enabled;
-    });
+    const isDeprecated = useKresusState(
+        state => BanksStore.bankByUuid(state.banks, access.vendorId).deprecated
+    );
 
     const dispatch = useKresusDispatch();
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+
     const handleSync = useCallback(async () => {
+        if (!access.enabled) {
+            void navigate(AccessesURL.manualSync(access.id), { state: { backLink: pathname } });
+            return;
+        }
         try {
             const result = await dispatch(
                 BanksStore.runTransactionsSync({
@@ -39,18 +48,16 @@ const SyncButton = (props: SyncButtonProps) => {
         } catch (err) {
             handleSyncError(err);
         }
-    }, [dispatch, props]);
+    }, [access.enabled, access.id, dispatch, navigate, pathname, props.account.accessId]);
 
-    const label = canBeSynced
-        ? $t('client.transactions.sync_now')
-        : $t('client.transactions.sync_disabled');
+    if (isDeprecated) {
+        return null;
+    }
+
+    const label = $t('client.transactions.sync_now');
     return (
         <span className="tooltipped tooltipped-n" aria-label={label}>
-            <button
-                type="button"
-                disabled={!canBeSynced}
-                onClick={canBeSynced ? handleSync : undefined}
-                className="btn">
+            <button type="button" onClick={handleSync} className="btn">
                 <span className="fa fa-refresh" />
                 <span>{$t('client.transactions.sync_now')}</span>
             </button>

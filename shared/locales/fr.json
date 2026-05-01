@@ -292,7 +292,7 @@
             "create_recurring_transaction": "Créer une opération récurrente",
             "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser",
-            "sync_disabled": "Cet accès bancaire est désactivé, allez dans les paramètres des comptes bancaires pour le réactiver",
+            "sync_disabled": "Cet accès bancaire est désactivé, veuillez remplir les identifiants pour synchroniser le compte.",
             "type": "Type",
             "date": "Date réelle",
             "custom_label": "Libellé personnalisé",
