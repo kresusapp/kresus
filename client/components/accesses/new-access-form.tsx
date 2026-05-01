@@ -56,7 +56,7 @@ export const customFieldsContainCredentials = (customFieldValues: CustomFieldMap
     return !!customFieldValues.login && !!customFieldValues.password;
 };
 
-function bankCustomFieldsMapBuilder(bankDesc: Bank): CustomFieldMap | null {
+export function bankCustomFieldsMapBuilder(bankDesc: Bank): CustomFieldMap | null {
     let newFields: CustomFieldMap | null = null;
     if (bankDesc.customFields.length) {
         // Set initial custom fields values.

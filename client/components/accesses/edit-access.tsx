@@ -1,31 +1,20 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
-import { assert, translate as $t, notify, displayLabel, assertDefined } from '../../helpers';
+import { assert, translate as $t, notify, displayLabel } from '../../helpers';
 
 import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
 
 import DisplayIf from '../ui/display-if';
+import CredentialsForm from './sync-form';
 
-import CustomBankField from './custom-bank-field';
-import {
-    areCustomFieldsValid,
-    customFieldsContainCredentials,
-    CustomFieldMap,
-} from './new-access-form';
 import URL from './urls';
 import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
-import {
-    Access,
-    AccessCustomField,
-    Bank,
-    CustomFieldDescriptor,
-    isManualAccess,
-} from '../../models';
+import { Access, AccessCustomField, Bank, isManualAccess } from '../../models';
 
 const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
@@ -33,94 +22,26 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
     const dispatch = useKresusDispatch();
 
-    const [storeCredentials, setStoreCredentials] = useState(access.enabled);
-
-    const [customFields, setCustomFields] = useState<CustomFieldMap>(() => {
-        const fields: CustomFieldMap = {};
-        for (const fieldDesc of bankDesc.customFields) {
-            const maybeField = access.customFields.find(field => field.name === fieldDesc.name);
-            let value;
-            if (!maybeField || typeof maybeField.value === 'undefined') {
-                // We could in theory assert here, but if a new custom
-                // field is added by Woob and the user hasn't updated it,
-                // they'll see an error that doesn't prevent anything from
-                // working correctly and might be hard to understand, so
-                // don't do it.
-                value = null;
-            } else {
-                value = maybeField.value;
-            }
-            fields[fieldDesc.name] = value;
-        }
-        return fields;
-    });
-
-    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
-
-    const isFormValid =
-        areCustomFieldsValid(bankDesc, customFields) &&
-        (noCredentials || customFieldsContainCredentials(customFields));
-
     const onSyncAccounts = useSyncError(
         useCallback(async () => {
             await dispatch(BanksStore.runAccountsSync({ accessId: props.access.id })).unwrap();
         }, [dispatch, props.access.id])
     );
 
-    const onChangeCustomField = useCallback(
-        (name: string, value: string | null) => {
-            assert(
-                typeof customFields[name] !== 'undefined',
-                'all custom fields must have an initial value'
-            );
-            // Make sure to create a copy to trigger a re-render.
-            const changedCustomFields = { ...customFields, [name]: value };
-            setCustomFields(changedCustomFields);
-        },
-        [customFields, setCustomFields]
-    );
-
-    const updateAndFetchAccessCb = useCallback(
-        (customFieldsArray: AccessCustomField[]) => {
-            if (!noCredentials) {
-                assert(
-                    customFieldsArray.some(f => f.name === 'login' && !!f.value),
-                    'login must be set'
-                );
-                assert(
-                    customFieldsArray.some(f => f.name === 'password' && !!f.value),
-                    'password must be set'
-                );
-            }
-            return dispatch(
-                BanksStore.updateAndFetchAccess({
-                    accessId,
-                    customFields: customFieldsArray,
-                    storeCredentials,
-                })
-            ).unwrap();
-        },
-        [accessId, noCredentials, storeCredentials, dispatch]
-    );
-
     const onSubmit = useSyncError(
-        useCallback(async () => {
-            assert(isFormValid, 'form should be valid');
-
-            const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
-                (field: CustomFieldDescriptor) => {
-                    assertDefined(customFields[field.name], 'custom fields should all be set');
-                    return {
-                        name: field.name,
-                        type: field.type,
-                        value: customFields[field.name],
-                    };
-                }
-            );
-
-            await updateAndFetchAccessCb(customFieldsArray);
-            notify.success($t('client.editaccess.success'));
-        }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb])
+        useCallback(
+            async (customFieldsArray: AccessCustomField[], storeCredentials: boolean) => {
+                await dispatch(
+                    BanksStore.updateAndFetchAccess({
+                        accessId,
+                        customFields: customFieldsArray,
+                        storeCredentials,
+                    })
+                ).unwrap();
+                notify.success($t('client.editaccess.success'));
+            },
+            [accessId, dispatch]
+        )
     );
 
     const onToggleExcludeFromPoll = useNotifyError(
@@ -139,7 +60,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     );
 
     return (
-        <Form center={true} onSubmit={onSubmit}>
+        <div className="form-center">
             <h3>{$t('client.editaccess.sync_title')}</h3>
 
             <DisplayIf condition={bankDesc.deprecated}>
@@ -183,40 +104,19 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                             checked={!access.excludeFromPoll}
                         />
                     </Form.Input>
-
-                    <h4>{$t('client.settings.connection_parameters')}</h4>
                 </DisplayIf>
 
-                <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
-                    {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
-                        <CustomBankField
-                            key={index}
-                            onChange={onChangeCustomField}
-                            field={field}
-                            value={customFields[field.name]}
-                        />
-                    ))}
-                </DisplayIf>
+                <h4>{$t('client.settings.connection_parameters')}</h4>
 
-                <DisplayIf condition={!noCredentials}>
-                    <Form.Input
-                        inline={true}
-                        id="store-credentials"
-                        label={$t('client.accountwizard.store_credentials')}
-                        help={$t('client.accountwizard.store_credentials_desc')}>
-                        <Switch
-                            ariaLabel={$t('client.accountwizard.store_credentials')}
-                            checked={storeCredentials}
-                            onChange={setStoreCredentials}
-                        />
-                    </Form.Input>
-                </DisplayIf>
-
-                <button type="submit" className="btn primary" disabled={!isFormValid}>
-                    {$t('client.general.save')}
-                </button>
+                <CredentialsForm
+                    key={String(access.enabled)}
+                    bankDesc={bankDesc}
+                    accessCustomFields={access.customFields}
+                    initialStoreCredentials={access.enabled}
+                    onSubmit={onSubmit}
+                />
             </DisplayIf>
-        </Form>
+        </div>
     );
 };
 
@@ -326,17 +226,6 @@ const DangerZone = (props: { access: Access }) => {
     );
 };
 
-const Labels = (props: { access: Access }) => {
-    return (
-        <Form center={true}>
-            <CustomLabelForm access={props.access} />
-            <Form.Input id="original-label" label={$t('client.general.original_label')}>
-                <div>{props.access.label}</div>
-            </Form.Input>
-        </Form>
-    );
-};
-
 export default () => {
     const { accessId: accessIdStr } = useRequiredParams<{ accessId: string }>();
     const accessId = Number.parseInt(accessIdStr, 10);
@@ -357,35 +246,6 @@ export default () => {
     }
     assert(bankDesc !== null, 'bank descriptor must be set at this point');
 
-    let forms: JSX.Element;
-    if (access.enabled) {
-        // Display the custom label field, then the sync fields, then the
-        // danger zone.
-        forms = (
-            <>
-                <Labels access={access} />
-                <DisplayIf condition={!isManualAccess(access)}>
-                    <hr />
-                    <SyncForm access={access} bankDesc={bankDesc} />
-                </DisplayIf>
-                <hr />
-                <DangerZone access={access} />
-            </>
-        );
-    } else {
-        // Display the sync fields, then the custom label field, then the
-        // danger zone.
-        forms = (
-            <>
-                <SyncForm access={access} bankDesc={bankDesc} />
-                <hr />
-                <Labels access={access} />
-                <hr />
-                <DangerZone access={access} />
-            </>
-        );
-    }
-
     return (
         <>
             <Form center={true}>
@@ -395,7 +255,21 @@ export default () => {
                 </h2>
             </Form>
 
-            {forms}
+            <Form center={true}>
+                <CustomLabelForm access={access} />
+                <Form.Input id="original-label" label={$t('client.general.original_label')}>
+                    <div>{access.label}</div>
+                </Form.Input>
+            </Form>
+
+            <DisplayIf condition={!isManualAccess(access)}>
+                <hr />
+                <SyncForm access={access} bankDesc={bankDesc} />
+            </DisplayIf>
+
+            <hr />
+
+            <DangerZone access={access} />
         </>
     );
 };

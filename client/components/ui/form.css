@@ -67,6 +67,7 @@
     margin-left: calc(25% + 1rem);
 }
 
+.form-center > .sub-form,
 .form-center > .form-input {
     margin-left: 0;
 }

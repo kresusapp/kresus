@@ -1116,7 +1116,9 @@ const banksSlice = createSlice({
             .addCase(updateAccess.pending, (state, action) => {
                 // Optimistic update
                 const { accessId, newFields } = action.meta.arg;
-                updateAccessFieldsAndSort(state, accessId, newFields);
+                const mergedFields: Partial<Access> =
+                    newFields.enabled === false ? { ...newFields, customFields: [] } : newFields;
+                updateAccessFieldsAndSort(state, accessId, mergedFields);
             })
             .addCase(updateAccess.rejected, (state, action) => {
                 // Revert to previous fields
