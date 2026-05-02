@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { matchPath, useLocation } from 'react-router';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { matchPath } from 'react-router';
 import debounce from 'lodash.debounce';
 
 import {
@@ -179,11 +179,6 @@ const MaxDatePicker = (props: { id: string }) => {
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
-    const location = useLocation();
-
-    const locationRef = useRef(location);
-    locationRef.current = location;
-
     const displaySearchDetails = useKresusState(state => UiStore.getDisplaySearchDetails(state.ui));
     const searchFields = useKresusState(state => UiStore.getSearchFields(state.ui));
 
@@ -283,10 +278,12 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     useEffect(() => {
         return () => {
             // On unmount, reset the search, unless we're going to a
-            // transaction's detail page. We already know what the next path
-            // will be, because this effect is triggered asynchronously, after
-            // we've requested to leave the current route/component.
-            const nextPath = locationRef.current.pathname;
+            // transaction's detail page.
+            // To know which page will then be rendered, we use window.location.hash
+            // as it is updated synchronously by HashRouter before React's cleanup phase.
+            // useLocation would return the stale URL.
+            // Since we use the URL hash, no need to strip the URL prefix.
+            const nextPath = window.location.hash.slice(1); // strip leading '#'
             if (matchPath({ path: URL.transactions.pattern, end: false }, nextPath) === null) {
                 resetAll(false);
             }
