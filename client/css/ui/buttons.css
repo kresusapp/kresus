@@ -67,6 +67,9 @@
 .btn.warning:focus {
     background-color: #EC971F;
     border-color: #D58512;
+
+    /* Some links set as buttons will override the default color on hover so we need to set it back here */
+    color: #FFFFFF;
 }
 
 .btn.warning:focus {
@@ -95,6 +98,9 @@
 .btn.danger:focus {
     background-color: #C9302C;
     border-color: #AC2925;
+
+    /* Some links set as buttons will override the default color on hover so we need to set it back here */
+    color: #FFFFFF;
 }
 
 .btn.danger:focus {
