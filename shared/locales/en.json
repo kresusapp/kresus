@@ -117,6 +117,7 @@
             "new_bank_form_title": "Configure a new access",
             "edit_bank_form_title": "Edit current access",
             "edit_account_form_title": "Edit current account",
+            "back_to_account_edition": "Go back to the account",
             "default_account": "Default account",
             "default_account_helper": "The chosen bank account will be displayed at startup.",
             "creation_success": "The bank access was successfully created.",
@@ -479,7 +480,8 @@
                 "manage_duplicates": "merged the duplicates",
                 "add_transaction": "manually added the missing transaction(s)",
                 "delete_transaction": "deleted the extra transaction(s)",
-                "are_you_sure": "Are you sure you want to proceed?"
+                "are_you_sure": "Are you sure you want to proceed?",
+                "success": "The account's balance was successfully resynchronized!"
             },
             "enable_access": "Enable the access",
             "disable_access": "Disable the access",

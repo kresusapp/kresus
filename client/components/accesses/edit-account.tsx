@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import URL from './urls';
 import {
@@ -22,7 +22,7 @@ import {
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
 import { useKresusDispatch, useKresusState } from '../../store';
-import { Access, Account, isManualAccess } from '../../models';
+import { Access, Account, isManualAccess, type AccessCustomField } from '../../models';
 import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
 import AnyAccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
@@ -116,12 +116,15 @@ const CustomLabelForm = (props: { account: Account }) => {
     );
 };
 
-const SyncAccount = (props: { accountId: number }) => {
+export const SyncAccount = (props: { accountId: number; fields?: AccessCustomField[] }) => {
     const dispatch = useKresusDispatch();
     const handleConfirm = useSyncError(
         useCallback(async () => {
-            await dispatch(BanksStore.resyncBalance({ accountId: props.accountId })).unwrap();
-        }, [dispatch, props.accountId])
+            await dispatch(
+                BanksStore.resyncBalance({ accountId: props.accountId, fields: props.fields })
+            ).unwrap();
+            notify.success($t('client.settings.resync_account.success'));
+        }, [dispatch, props.accountId, props.fields])
     );
     return (
         <Popconfirm
@@ -376,12 +379,17 @@ export default () => {
 
                 <Form.Toolbar align="left">
                     <DisplayIf
-                        condition={
-                            !isManualAccess(access) &&
-                            access.enabled &&
-                            !access.isBankVendorDeprecated
-                        }>
-                        <SyncAccount accountId={account.id} />
+                        condition={!isManualAccess(access) && !access.isBankVendorDeprecated}>
+                        {access.enabled ? (
+                            <SyncAccount accountId={account.id} />
+                        ) : (
+                            <Link
+                                to={URL.manualResyncAccount(account.id)}
+                                state={{ backLink: URL.editAccount(account.id) }}
+                                className="btn warning">
+                                {$t('client.settings.resync_account_button')}
+                            </Link>
+                        )}
                     </DisplayIf>
 
                     <DisplayIf condition={!isDemoEnabled}>

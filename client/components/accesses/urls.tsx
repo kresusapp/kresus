@@ -21,4 +21,9 @@ export default {
         return `${BASE}/manual-sync/${id}`;
     },
     MANUAL_SYNC_PATTERN: `${BASE}/manual-sync/:accessId`,
+
+    manualResyncAccount(id: number) {
+        return `${BASE}/manual-resync-account/${id}`;
+    },
+    MANUAL_RESYNC_ACCOUNT_PATTERN: `${BASE}/manual-resync-account/:accountId`,
 };

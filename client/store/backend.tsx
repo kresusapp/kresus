@@ -269,11 +269,19 @@ export function deleteAccount(accountId: number) {
 }
 export async function resyncBalance(
     accountId: number,
-    userActionFields: FinishUserActionFields | null = null
+    userActionFields: FinishUserActionFields | null = null,
+    fields: AccessCustomField[] | null = null
 ) {
-    let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
+    const body: Record<string, unknown> = {};
     if (userActionFields !== null) {
-        request = request.json({ userActionFields });
+        body.userActionFields = userActionFields;
+    }
+    if (fields !== null) {
+        body.fields = fields;
+    }
+    let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
+    if (Object.keys(body).length > 0) {
+        request = request.json(body);
     }
     return request.run();
 }

@@ -17,11 +17,18 @@ export interface CredentialsFormProps {
     bankDesc: Bank;
     accessCustomFields: AccessCustomField[];
     initialStoreCredentials: boolean;
+    showStoreCredentials?: boolean;
     onSubmit: (customFieldsArray: AccessCustomField[], storeCredentials: boolean) => void;
 }
 
 const CredentialsForm = (props: CredentialsFormProps) => {
-    const { bankDesc, accessCustomFields, initialStoreCredentials, onSubmit } = props;
+    const {
+        bankDesc,
+        accessCustomFields,
+        initialStoreCredentials,
+        showStoreCredentials = true,
+        onSubmit,
+    } = props;
 
     const [storeCredentials, setStoreCredentials] = useState(initialStoreCredentials);
 
@@ -88,7 +95,7 @@ const CredentialsForm = (props: CredentialsFormProps) => {
                 ))}
             </DisplayIf>
 
-            <DisplayIf condition={!noCredentials}>
+            <DisplayIf condition={!noCredentials && showStoreCredentials}>
                 <Form.Input
                     inline={true}
                     id="store-credentials"

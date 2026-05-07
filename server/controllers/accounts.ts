@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { Access, Account, Setting } from '../models';
-import { makeLogger, KError, asyncErr } from '../helpers';
+import { Access, Account, Setting, type AccessField } from '../models';
+import { makeLogger, KError, asyncErr, unwrap } from '../helpers';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { hasForbiddenField } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
@@ -138,9 +138,26 @@ export async function resyncBalance(req: PreloadedRequest<Account>, res: express
         const account = req.preloaded.account;
 
         const userActionFields = extractUserActionFields(req.body);
+
+        const access = unwrap(await Access.find(userId, account.accessId));
+
+        const providedFields: AccessField[] | undefined = req.body.fields;
+        const isAccessEnabled = access.isEnabled();
+
+        if (!isAccessEnabled && typeof providedFields === 'undefined') {
+            throw new KError(
+                'when resyncing balance: access disabled and no fields provided by user',
+                403
+            );
+        }
+        if (typeof providedFields !== 'undefined') {
+            access.fields = providedFields;
+        }
+
         const response = await accountManager.resyncAccountBalance(
             userId,
             account,
+            access,
             /* interactive */ true,
             userActionFields
         );

@@ -345,17 +345,18 @@ export const resyncBalance = createAsyncThunk(
         params: {
             accountId: number;
             userActionFields?: FinishUserActionFields;
+            fields?: AccessCustomField[];
         },
         { dispatch, rejectWithValue }
     ) => {
-        const { accountId } = params;
+        const { accountId, fields = null } = params;
         try {
-            let results = await backend.resyncBalance(accountId);
+            let results = await backend.resyncBalance(accountId, null, fields);
 
             const userAction = maybeGetUserAction(dispatch, results);
             if (userAction) {
                 const userActionFields = await userAction;
-                results = await backend.resyncBalance(accountId, userActionFields);
+                results = await backend.resyncBalance(accountId, userActionFields, fields);
             }
 
             return results as ResyncBalanceParams;

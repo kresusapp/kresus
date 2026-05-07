@@ -113,6 +113,7 @@
             "new_bank_form_title": "Configurer un nouvel accès",
             "edit_bank_form_title": "Éditer l'accès",
             "edit_account_form_title": "Éditer le compte",
+            "back_to_account_edition": "Retourner au compte",
             "default_account": "Compte par défaut",
             "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus.",
             "creation_success": "L'accès bancaire a été créé avec succès.",
@@ -476,7 +477,8 @@
                 "manage_duplicates": "supprimé les doublons",
                 "add_transaction": "ajouté la ou les opérations manquantes",
                 "delete_transaction": "supprimé la ou les opérations en trop",
-                "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?"
+                "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?",
+                "success": "Le solde du compte a bien été resynchronisé !"
             },
             "enable_access": "Activer l'accès",
             "disable_access": "Désactiver l'accès",

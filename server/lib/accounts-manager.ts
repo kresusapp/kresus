@@ -26,7 +26,6 @@ import {
     makeLogger,
     currency,
     assert,
-    unwrap,
     UNKNOWN_TRANSACTION_TYPE,
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
@@ -898,11 +897,10 @@ to be resynced, by an offset of ${balanceOffset}.`);
     async resyncAccountBalance(
         userId: number,
         account: Account,
+        access: Access,
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<Account>> {
-        const access = unwrap(await Access.find(userId, account.accessId));
-
         // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
 
