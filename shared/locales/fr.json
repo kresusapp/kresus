@@ -793,7 +793,9 @@
                 "no_new_transactions": "Aucune nouvelle opération n'a été importée au cours de cette période."
             },
             "fetch_error": {
-                "subject": "Erreur de récupération des opérations bancaires",
+                "subject": "Une erreur %{type} est survenue lors de la récupération des opérations bancaires |||| %{smart_count} erreurs %{type} sont survenues lors de la récupération des opérations bancaires",
+                "blocking": "bloquante |||| bloquantes",
+                "non_blocking": "non-bloquante |||| non-bloquantes",
                 "UNKNOWN_WOOB_MODULE": "Le module woob est inconnu.",
                 "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_PASSWORD": "Le mot de passe est absent.",

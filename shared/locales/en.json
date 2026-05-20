@@ -797,7 +797,9 @@
                 "no_new_transactions": "No new transactions have been imported during that period."
             },
             "fetch_error": {
-                "subject": "Error when polling transactions",
+                "subject": "A %{type} error occurred when polling transactions |||| %{smart_count} %{type} errors occurred when polling transactions",
+                "blocking": "blocking |||| non-blocking",
+                "non_blocking": "non-blocking |||| non-blocking",
                 "UNKNOWN_WOOB_MODULE": "The module is unknown.",
                 "WOOB_NOT_INSTALLED": "Kresus can't correctly load Woob.",
                 "NO_PASSWORD": "The password is not set.",
@@ -810,7 +812,7 @@
                 "BROWSER_QUESTION": "Accessing this bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. You can disable the two factor authentication and try again.",
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "REQUIRES_INTERACTIVE": "The server needs your presence to do an interactive synchronization, probably because of a two-factor authentication. You need to connect to your Kresus instance, manually hit synchronize and validate the connection through your bank application to make it work again.",
-                "text": "Kresus detected the following error when fetching transactions from the bank %{bank}: \n%{error}\n",
+                "text": "Kresus detected the following error(s) when fetching transactions from the bank %{bank}: \n%{error}\n",
                 "pause_poll": "Please note no automatic polling will be retried until the problem is manually fixed."
             },
             "test_email": {

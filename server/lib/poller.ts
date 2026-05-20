@@ -23,30 +23,65 @@ import { getTranslator } from './translator';
 
 const log = makeLogger('poller');
 
-async function managePollingErrors(userId: number, access: Access, err: KError): Promise<void> {
-    assert(!!err.errCode, 'should have an error code to call managePollingErrors');
-
+async function managePollingErrors(
+    userId: number,
+    accessLabel: string,
+    type: 'blocking' | 'non_blocking',
+    errorMessages: string[],
+    requiresUserAction = false
+): Promise<void> {
     const i18n = await getTranslator(userId);
 
-    // Retrieve the human readable error code.
-    const error = $t(i18n, `server.email.fetch_error.${err.errCode}`);
-    const subject = $t(i18n, 'server.email.fetch_error.subject');
+    const blockingStatusLocale = $t(i18n, `server.email.fetch_error.${type}`, {
+        // eslint-disable-next-line camelcase
+        smart_count: errorMessages.length,
+    });
+    const subject = $t(i18n, 'server.email.fetch_error.subject', {
+        // eslint-disable-next-line camelcase
+        smart_count: errorMessages.length,
 
-    let content = $t(i18n, 'server.email.fetch_error.text', {
-        bank: access.getLabel(),
-        error,
+        type: blockingStatusLocale,
     });
 
-    if (errorRequiresUserAction(err)) {
+    let content = $t(i18n, 'server.email.fetch_error.text', {
+        bank: accessLabel,
+        error:
+            errorMessages.length > 1
+                ? errorMessages.map(e => `– ${e}`).join('\n')
+                : errorMessages[0],
+    });
+
+    if (requiresUserAction) {
         content += '\n';
         content += $t(i18n, 'server.email.fetch_error.pause_poll');
     }
 
-    log.info('Warning the user that an error was detected');
+    log.info('Warning the user that errors were detected');
     await AlertManager.send(userId, i18n, {
         subject,
         text: content,
     });
+}
+
+async function manageBlockingPollingErrors(
+    userId: number,
+    access: Access,
+    err: KError
+): Promise<void> {
+    assert(!!err.errCode, 'should have an error code to call manageBlockingPollingErrors');
+
+    const i18n = await getTranslator(userId);
+
+    await managePollingErrors(
+        userId,
+        access.getLabel(),
+        'blocking',
+        [
+            // Retrieve the human readable error code.
+            $t(i18n, `server.email.fetch_error.${err.errCode}`),
+        ],
+        errorRequiresUserAction(err)
+    );
 }
 
 async function managePartialPollingErrors(
@@ -54,21 +89,7 @@ async function managePartialPollingErrors(
     access: Access,
     errors: string[]
 ): Promise<void> {
-    const i18n = await getTranslator(userId);
-    const subject = $t(i18n, 'server.email.fetch_error.subject');
-
-    for (const error of errors) {
-        const content = $t(i18n, 'server.email.fetch_error.text', {
-            bank: access.getLabel(),
-            error,
-        });
-
-        log.info('Warning the user that a partial error was detected');
-        await AlertManager.send(userId, i18n, {
-            subject,
-            text: content,
-        });
-    }
+    await managePollingErrors(userId, access.getLabel(), 'non_blocking', errors);
 }
 
 // Can throw.
@@ -147,7 +168,7 @@ export async function fullPoll(userId: number) {
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode) {
-                await managePollingErrors(userId, access, err);
+                await manageBlockingPollingErrors(userId, access, err);
             }
         }
     }

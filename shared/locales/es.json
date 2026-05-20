@@ -635,7 +635,6 @@
                 "no_new_transactions": "Durante este periodo no se importaron nuevas transacciones."
             },
             "fetch_error": {
-                "subject": "Error de recuperación de transacciones bancarias",
                 "UNKNOWN_WOOB_MODULE": "El módulo Woob es desconocido.",
                 "NO_PASSWORD": "La contraseña no está.",
                 "INVALID_PASSWORD": "La contraseña no está presente",
