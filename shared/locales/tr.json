@@ -649,7 +649,6 @@
             }
         },
         "notification": {
-            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
             "test_notification": {
                 "subject": "[Kresus] Test bildirimi",
                 "content": "Merhaba, sevgili Kresus kullanıcısı,\n\nBu mesajı okuyorsanız, bildirim yapılandırmanız doğrudur!\n\nIyi günler.\nKresus"

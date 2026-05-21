@@ -655,7 +655,6 @@
             }
         },
         "notification": {
-            "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
             "test_notification": {
                 "subject": "[Kresus] Notificación de la prueba",
                 "content": "Hola querido usuario de Kresus,\n\nSi está leyendo este mensaje, su configuración de notificaciones es correcta !\n\nQue tenga un buen día.\nKresus"
