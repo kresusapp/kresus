@@ -32,7 +32,7 @@ const AccessItem = (props: AccessItemProps) => {
     // If it does, display the accounts list, else hide it.
     const containsCurrentAccountView = useKresusState(state => {
         if (props.currentViewId === null || !access) {
-            return null;
+            return false;
         }
 
         return access.accountIds.some(id => {
