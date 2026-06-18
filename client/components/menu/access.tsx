@@ -43,11 +43,19 @@ const AccessItem = (props: AccessItemProps) => {
         });
     });
 
-    const [showAccounts, setShowAccounts] = useState(containsCurrentAccountView);
+    // React-router (since v6) redirects through the Navigate component are done in an
+    // async way within a useEffect. Which means that this component renders before the
+    // redirection. If we were to store the value of containsCurrentAccountView in state
+    // through useState, it would not be updated after the redirection (from root to the view),
+    // and the menu would remain closed.
+    // Instead we always rely on containsCurrentAccountView but also use a state to store
+    // any explicit action from the user.
+    const [stateSetByUser, setStateSetByUser] = useState<boolean | null>(null);
+    const showAccounts = stateSetByUser ?? containsCurrentAccountView;
 
     const handleClick = useCallback(() => {
-        setShowAccounts(!showAccounts);
-    }, [setShowAccounts, showAccounts]);
+        setStateSetByUser(!showAccounts);
+    }, [showAccounts]);
 
     if (!access) {
         return null;

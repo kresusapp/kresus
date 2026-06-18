@@ -326,8 +326,7 @@ const Kresus = () => {
 
                                 <main onClick={handleAutoCloseMenu}>
                                     <Routes>
-                                        <Route index={true} element={null} />
-                                        <Route path="*" element={<Menu />} />
+                                        <Route path="/*" element={<Menu />} />
                                     </Routes>
                                     <div id="content-container">
                                         <div className="content">
