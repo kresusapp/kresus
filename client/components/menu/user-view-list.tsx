@@ -12,12 +12,11 @@ import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 
 const UserViewList = () => {
-    const views = useKresusState(state => ViewsStore.allUserViews(state.views));
     const { pathname } = useLocation();
     const { driver = null, value } = useRequiredParams<{ driver?: string; value: string }>();
 
     const viewsItems = useKresusState(state => {
-        return views.map(view => {
+        return ViewsStore.allUserViews(state.views).map(view => {
             const accountDriver = new DriverAccount(view.id);
             const currencyFormatter = accountDriver.getCurrencyFormatter(state);
             const outstandingSum = accountDriver.getOutstandingSum(state);
