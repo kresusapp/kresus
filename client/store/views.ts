@@ -4,7 +4,7 @@ import { assertDefined, assert } from '../helpers';
 
 import { Account, View } from '../models';
 
-import { createAccess, runAccountsSync } from './banks';
+import { createAccess, deleteAccess, deleteAccount, runAccountsSync } from './banks';
 
 import { mergeInArray, removeInArrayById } from './helpers';
 import * as backend from './backend';
@@ -18,6 +18,19 @@ export type ServerView = Omit<View, 'accounts'> & {
         accountId: number;
     }[];
 };
+
+function removeAccountsIdsFromViews(state: ViewState, accountIds: number[]): void {
+    if (accountIds.length === 0) {
+        return;
+    }
+
+    state.items = state.items
+        .map(view => ({
+            ...view,
+            accounts: view.accounts.filter(id => !accountIds.includes(id)),
+        }))
+        .filter(view => view.accounts.length > 0);
+}
 
 export function regenerateAllViews(
     serverViews: ServerView[],
@@ -133,6 +146,12 @@ const viewsSlice = createSlice({
             })
             .addCase(destroy.fulfilled, (state, action) => {
                 removeInArrayById(state.items, action.payload);
+            })
+            .addCase(deleteAccess.fulfilled, (state, action) => {
+                removeAccountsIdsFromViews(state, action.payload.accountIds);
+            })
+            .addCase(deleteAccount.fulfilled, (state, action) => {
+                removeAccountsIdsFromViews(state, [action.payload]);
             })
             .addMatcher(
                 // Note: make sure that these actions return the expected fields on success.

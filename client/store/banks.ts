@@ -337,10 +337,14 @@ export const createAccess = createAsyncThunk(
 );
 
 // Deletes the given access.
-export const deleteAccess = createAsyncThunk('banks/deleteAccess', async (accessId: number) => {
-    await backend.deleteAccess(accessId);
-    return accessId;
-});
+export const deleteAccess = createAsyncThunk(
+    'banks/deleteAccess',
+    async (accessId: number, { getState }) => {
+        const access: Access = (getState() as any).banks.accessMap[accessId];
+        await backend.deleteAccess(accessId);
+        return access;
+    }
+);
 
 // Resyncs the balance of the given account according to the real balance read
 // from a provider.
@@ -1142,8 +1146,7 @@ const banksSlice = createSlice({
                 updateAccessFieldsAndSort(state, accessId, prevFields);
             })
             .addCase(deleteAccess.fulfilled, (state, action) => {
-                const accessId = action.payload;
-                removeAccess(state, accessId);
+                removeAccess(state, action.payload.id);
             })
             .addCase(resyncBalance.fulfilled, (state, action) => {
                 if (!action.payload) {
