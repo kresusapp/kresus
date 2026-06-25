@@ -48,7 +48,10 @@ let TransactionRuleCondition = TransactionRuleCondition_1 = class TransactionRul
         return await TransactionRuleCondition_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
-        const condition = TransactionRuleCondition_1.repo().create({ ...attributes, userId });
+        const condition = TransactionRuleCondition_1.repo().create({
+            ...attributes,
+            userId,
+        });
         return await TransactionRuleCondition_1.repo().save(condition);
     }
     static async destroy(userId, conditionId) {
@@ -65,7 +68,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRuleCondition.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], TransactionRuleCondition.prototype, "user", void 0);
@@ -74,7 +81,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRuleCondition.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => transaction_rule_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => transaction_rule_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", transaction_rule_1.default)
 ], TransactionRuleCondition.prototype, "rule", void 0);

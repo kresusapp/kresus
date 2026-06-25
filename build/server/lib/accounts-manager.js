@@ -121,33 +121,46 @@ async function retryCallProvider(paramNumRetries, func) {
 // Returns a list of all the accounts returned by the backend, associated to
 // the given access.
 async function pollAccounts(ctx, userId, access, config) {
-    if (!access.hasPassword()) {
-        log.warn("Skipping accounts fetching -- password isn't present");
-        const errcode = (0, helpers_1.getErrorCode)('NO_PASSWORD');
-        throw new helpers_1.KError("Access' password is not set", 500, errcode);
+    if (!access.isEnabled()) {
+        // If the access has no password, check if it's an access that doesn't require
+        // credentials.
+        const bankVendor = (0, providers_1.bankVendorByUuid)(access.vendorId);
+        if (!bankVendor.noCredentials) {
+            log.warn('Skipping transactions fetching -- access is disabled');
+            const errcode = (0, helpers_1.getErrorCode)('MISSING_MANDATORY_FIELD');
+            throw new helpers_1.KError('Access is lacking mandatory fields', 500, errcode);
+        }
     }
-    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
+    log.info(`Retrieve all accounts from access ”${access.getLabel()}” with vendorId ${access.vendorId}`);
     const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
     const autoRetryFetch = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.PROVIDER_AUTO_RETRY);
     const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
     const userSession = ctx.getUserSession(userId);
     let sourceAccounts;
+    let sourceErrors;
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await (0, providers_1.getProvider)(access).fetchAccounts({
+            var _a;
+            return await ((_a = (0, providers_1.getProvider)(access)) === null || _a === void 0 ? void 0 : _a.fetchAccounts({
                 access,
                 debug,
                 update: config.updateProvider,
                 isInteractive: config.isInteractive,
                 userActionFields: config.userActionFields,
-            }, userSession);
+            }, userSession));
         });
+        if (!providerResponse) {
+            throw new helpers_1.KError('Could not retrieve provider');
+        }
         if (providerResponse.kind === 'user_action') {
             // User action response.
             return providerResponse;
         }
         // Real values.
         sourceAccounts = providerResponse.values;
+        if (providerResponse.errors && providerResponse.errors.length) {
+            sourceErrors = providerResponse.errors;
+        }
     }
     catch (err) {
         const { errCode } = err;
@@ -159,7 +172,7 @@ async function pollAccounts(ctx, userId, access, config) {
     }
     const accounts = sourceAccounts.map(account => normalizeAccount(access, account));
     log.info(`-> ${accounts.length} bank account(s) found`);
-    return { kind: 'value', value: accounts };
+    return { kind: 'value', value: accounts, errors: sourceErrors };
 }
 async function preparePollTransactions(userId, accounts, ignoreLastFetchDate, accountInfoMap) {
     let oldestLastFetchDate = null;
@@ -209,6 +222,7 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
         rawLabel: providerTr.rawLabel || providerTr.label,
         date: new Date(providerTr.date),
         label: providerTr.label || providerTr.rawLabel,
+        importDate: startOfPoll,
     };
     if (typeof tr.amount === 'undefined' || Number.isNaN(tr.amount)) {
         log.error('Transaction with invalid amount, skipping');
@@ -237,7 +251,6 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
         (0, helpers_1.assert)(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
         tr.debitDate = debitDate;
     }
-    tr.importDate = startOfPoll;
     const transactionType = (0, transaction_types_1.transactionTypeIdToName)(providerTr.type);
     if (transactionType !== null) {
         tr.type = transactionType;
@@ -254,21 +267,29 @@ async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, ac
     const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
     const sessionManager = exports.GLOBAL_CONTEXT.getUserSession(userId);
     let providerTransactions;
+    let providerErrors;
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await (0, providers_1.getProvider)(access).fetchTransactions({
+            var _a;
+            return await ((_a = (0, providers_1.getProvider)(access)) === null || _a === void 0 ? void 0 : _a.fetchTransactions({
                 access,
                 debug,
                 fromDate: config.fromDate,
                 isInteractive: config.isInteractive,
                 userActionFields: config.userActionFields,
-            }, sessionManager);
+            }, sessionManager));
         });
+        if (!providerResponse) {
+            throw new helpers_1.KError('Could not retrieve provider');
+        }
         if (providerResponse.kind === 'user_action') {
             return providerResponse;
         }
         // Real values.
         providerTransactions = providerResponse.values;
+        if (providerResponse.errors && providerResponse.errors.length) {
+            providerErrors = providerResponse.errors;
+        }
     }
     catch (err) {
         const { errCode } = err;
@@ -286,6 +307,7 @@ async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, ac
     return {
         kind: 'value',
         value: transactions,
+        errors: providerErrors,
     };
 }
 class AccountManager {
@@ -383,10 +405,15 @@ merging as per request`);
     }
     async syncTransactions(userId, access, pAccountInfoMap, ignoreLastFetchDate, isInteractive, userActionFields) {
         var _a, _b, _c;
-        if (!access.hasPassword()) {
-            log.warn("Skipping transactions fetching -- password isn't present");
-            const errcode = (0, helpers_1.getErrorCode)('NO_PASSWORD');
-            throw new helpers_1.KError("Access' password is not set", 500, errcode);
+        if (!access.isEnabled()) {
+            // If the access has no password, check if it's an access that doesn't require
+            // credentials.
+            const bankVendor = (0, providers_1.bankVendorByUuid)(access.vendorId);
+            if (!bankVendor.noCredentials) {
+                log.warn('Skipping transactions fetching -- access is disabled');
+                const errcode = (0, helpers_1.getErrorCode)('MISSING_MANDATORY_FIELD');
+                throw new helpers_1.KError('Access is lacking mandatory fields', 500, errcode);
+            }
         }
         const startOfPoll = new Date();
         const allAccounts = await models_1.Account.byAccess(userId, access);
@@ -396,6 +423,7 @@ merging as per request`);
         if (result.kind === 'user_action') {
             return result;
         }
+        const providerErrors = result.errors;
         let transactions = result.value;
         const currentMoment = Date.now();
         const filteredTransactions = [];
@@ -564,15 +592,16 @@ to be resynced, by an offset of ${balanceOffset}.`);
             log.info('Checking alerts based on transactions amounts...');
             await alert_manager_1.default.checkAlertsForTransactions(userId, access, createdTransactions);
         }
-        await models_1.Access.update(userId, access.id, { fetchStatus: helpers_1.FETCH_STATUS_SUCCESS });
+        await models_1.Access.update(userId, access.id, {
+            fetchStatus: helpers_1.FETCH_STATUS_SUCCESS,
+        });
         log.info('Post process: done.');
-        return { kind: 'value', value: { accounts, createdTransactions } };
+        return { kind: 'value', value: { accounts, createdTransactions }, errors: providerErrors };
     }
-    async resyncAccountBalance(userId, account, isInteractive, userActionFields) {
-        var _a, _b;
-        const access = (0, helpers_1.unwrap)(await models_1.Access.find(userId, account.accessId));
+    async resyncAccountBalance(userId, account, access, isInteractive, userActionFields) {
         // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
+        var _a, _b;
         const result = await pollAccounts(exports.GLOBAL_CONTEXT, userId, access, {
             updateProvider: false,
             isInteractive,

@@ -90,7 +90,9 @@ let Alert = Alert_1 = class Alert {
         return await Alert_1.repo().findBy({ userId, accountId, type });
     }
     static async reportsByFrequency(userId, frequency) {
-        return await Alert_1.repo().find({ where: { userId, type: 'report', frequency } });
+        return await Alert_1.repo().find({
+            where: { userId, type: 'report', frequency },
+        });
     }
     static async destroyByAccount(userId, accountId) {
         await Alert_1.repo().delete({ userId, accountId });
@@ -134,7 +136,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Alert.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => __1.User, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => __1.User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", __1.User)
 ], Alert.prototype, "user", void 0);
@@ -143,7 +149,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Alert.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => __1.Account, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => __1.Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", __1.Account)
 ], Alert.prototype, "account", void 0);
@@ -160,7 +170,11 @@ __decorate([
     __metadata("design:type", Object)
 ], Alert.prototype, "frequency", void 0);
 __decorate([
-    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_3.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', {
+        nullable: true,
+        default: null,
+        transformer: new helpers_3.ForceNumericColumn(),
+    }),
     __metadata("design:type", Object)
 ], Alert.prototype, "limit", void 0);
 __decorate([

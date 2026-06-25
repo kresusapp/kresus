@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -133,34 +143,33 @@ function getManager() {
     return dataSource.manager;
 }
 async function initModels() {
+    const { userLoginHttpHeader } = process.kresus;
     dataSource = await setupOrm();
-    let userId;
+    // Create default user.
+    let defaultUser;
     if (process.kresus.providedUserId !== null) {
-        userId = process.kresus.providedUserId;
+        const userId = process.kresus.providedUserId;
         // Check that the user actually exists already.
-        const user = await users_1.default.find(userId);
-        if (!user) {
+        defaultUser = await users_1.default.find(userId);
+        if (!defaultUser) {
             throw new Error(`The user with provided ID ${userId} doesn't exist. Did you run "kresus create:user" first?`);
         }
     }
     else {
-        // Create default user.
-        let user;
         const users = await users_1.default.all();
         if (!users.length) {
-            const { login } = process.kresus.user;
+            const { login } = process.kresus.defaultUser;
             (0, helpers_1.assert)(!!login, 'There should be a default login set!');
             log.info('Creating default user as administrator...');
-            user = await users_1.default.create({ login, isAdmin: true });
+            defaultUser = await users_1.default.create({ login, isAdmin: true });
         }
-        else if (users.length > 1) {
-            throw new Error('Several users in database but no user ID provided. Please provide a user ID');
+        else if (users.length > 1 && !userLoginHttpHeader) {
+            throw new Error('Several users in database but "userLoginHttpHeader" was not configured. Please configure the userLoginHttpHeader variable in config.ini and setup a reverse proxy accordingly.');
         }
         else {
-            user = users[0];
+            defaultUser = users[0];
         }
-        userId = user.id;
     }
-    process.kresus.user.id = userId;
-    log.info(`User has id ${userId}`);
+    process.kresus.defaultUser = defaultUser;
+    log.info(`Default user “${defaultUser.login}“ is set with id ${defaultUser.id} (admin: ${defaultUser.isAdmin})`);
 }

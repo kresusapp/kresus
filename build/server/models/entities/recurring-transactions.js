@@ -57,10 +57,14 @@ let RecurringTransaction = RecurringTransaction_1 = class RecurringTransaction {
         return await RecurringTransaction_1.repo().find({ where: { userId } });
     }
     static async byAccountId(userId, accountId) {
-        return await RecurringTransaction_1.repo().find({ where: { userId, accountId } });
+        return await RecurringTransaction_1.repo().find({
+            where: { userId, accountId },
+        });
     }
     static async find(userId, recurringTrId) {
-        return await RecurringTransaction_1.repo().findOne({ where: { id: recurringTrId, userId } });
+        return await RecurringTransaction_1.repo().findOne({
+            where: { id: recurringTrId, userId },
+        });
     }
     static async exists(userId, recurringTrId) {
         const found = await RecurringTransaction_1.find(userId, recurringTrId);
@@ -76,7 +80,10 @@ let RecurringTransaction = RecurringTransaction_1 = class RecurringTransaction {
             attributes.dayOfMonth <= 31, 'recurring transaction must have a day of month');
         (0, helpers_1.assert)(typeof attributes.listOfMonths === 'string' &&
             RecurringTransaction_1.isValidListOfMonths(attributes.listOfMonths), 'recurring transaction must have a valid list of months');
-        const recurringTransaction = RecurringTransaction_1.repo().create({ ...attributes, userId });
+        const recurringTransaction = RecurringTransaction_1.repo().create({
+            ...attributes,
+            userId,
+        });
         return await RecurringTransaction_1.repo().save(recurringTransaction);
     }
     static async destroy(userId, recurringTrId) {
@@ -129,7 +136,11 @@ __decorate([
     __metadata("design:type", Number)
 ], RecurringTransaction.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], RecurringTransaction.prototype, "user", void 0);
@@ -138,7 +149,11 @@ __decorate([
     __metadata("design:type", Number)
 ], RecurringTransaction.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => accounts_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => accounts_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accounts_1.default)
 ], RecurringTransaction.prototype, "account", void 0);

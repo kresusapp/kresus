@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._ = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
+exports._ = exports.getBankVendors = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const account_types_1 = require("../lib/account-types");
@@ -17,7 +17,8 @@ const randomArray = (arr) => arr[randInt(0, arr.length)];
 const randomType = () => randInt(0, 10);
 // Generates a map of the accounts belonging to the given access.
 const hashAccount = (access) => {
-    const login = access.login;
+    var _a;
+    const login = ((_a = access.fields.find(f => f.name === 'login')) === null || _a === void 0 ? void 0 : _a.value) || '';
     const uuid = access.vendorId;
     const hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
     const map = {
@@ -33,6 +34,7 @@ const hashAccount = (access) => {
 exports.SOURCE_NAME = 'demo';
 let CHECKING_ACCOUNT_BALANCE = 0;
 const fetchAccounts = async ({ access, }) => {
+    var _a;
     const { main, second, third, fourth } = hashAccount(access);
     const values = [
         {
@@ -54,7 +56,8 @@ const fetchAccounts = async ({ access, }) => {
             type: (0, account_types_1.accountTypeNameToId)('account-type.savings'),
         },
     ];
-    if (access.login === 'test-balance') {
+    const accessLogin = ((_a = access.fields.find(f => f.name === 'login')) === null || _a === void 0 ? void 0 : _a.value) || '';
+    if (accessLogin === 'test-balance') {
         CHECKING_ACCOUNT_BALANCE += 10;
         values[0].balance = String(CHECKING_ACCOUNT_BALANCE);
     }
@@ -165,8 +168,10 @@ const selectRandomAccount = (access) => {
     return accounts.third;
 };
 const generate = (access) => {
+    var _a;
     const transactions = [];
-    if (access.login === 'test-balance') {
+    const accessLogin = ((_a = access.fields.find(f => f.name === 'login')) === null || _a === void 0 ? void 0 : _a.value) || '';
+    if (accessLogin === 'test-balance') {
         // Don't perturb the balance when testing it.
         return transactions;
     }
@@ -230,8 +235,27 @@ const fetchTransactions = ({ access, }) => {
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
 exports.fetchTransactions = fetchTransactions;
+const getBankVendors = () => [
+    {
+        customFields: [
+            {
+                name: 'login',
+                type: 'text',
+            },
+            {
+                name: 'password',
+                type: 'password',
+            },
+        ],
+        deprecated: false,
+        name: 'Demo bank',
+        uuid: 'demo',
+    },
+];
+exports.getBankVendors = getBankVendors;
 exports._ = {
     SOURCE_NAME: exports.SOURCE_NAME,
+    getBankVendors: exports.getBankVendors,
     fetchAccounts: exports.fetchAccounts,
     fetchTransactions: exports.fetchTransactions,
 };

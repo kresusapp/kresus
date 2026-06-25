@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createUser = createUser;
 exports.deleteUser = deleteUser;
+exports.listUsers = listUsers;
 const helpers_1 = require("./helpers");
 const models_1 = require("./models");
 const log = (0, helpers_1.makeLogger)('cli');
@@ -40,5 +41,20 @@ async function deleteUser(login) {
     }
     catch (err) {
         throw new Error(`Couldn't delete user ${login}: ${err.message} ${err.stack}`);
+    }
+}
+async function listUsers() {
+    try {
+        log.info('Listing users: setting up database.');
+        await (0, models_1.setupOrm)();
+        log.info(`Database set up; listing users...`);
+        const users = await models_1.User.all();
+        log.info(`Found ${users.length} users.`);
+        for (const user of users) {
+            log.info(`- id=${user.id} login=${user.login} isAdmin=${user.isAdmin}`);
+        }
+    }
+    catch (err) {
+        throw new Error(`Couldn't list users: ${err.message} ${err.stack}`);
     }
 }

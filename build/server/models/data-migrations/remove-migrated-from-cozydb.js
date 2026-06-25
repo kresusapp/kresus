@@ -10,6 +10,9 @@ async function run(userId, manager) {
     if (userId !== null) {
         userCondition.userId = userId;
     }
-    await manager.delete(__1.Setting, { key: 'migrated-from-cozydb', ...userCondition });
+    await manager.delete(__1.Setting, {
+        key: 'migrated-from-cozydb',
+        ...userCondition,
+    });
     log.info('Finished data migration: remove unused migrated-from-cozydb');
 }

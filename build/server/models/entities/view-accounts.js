@@ -49,7 +49,11 @@ __decorate([
     __metadata("design:type", Number)
 ], ViewAccount.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => views_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => views_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", views_1.default)
 ], ViewAccount.prototype, "view", void 0);
@@ -58,7 +62,11 @@ __decorate([
     __metadata("design:type", Number)
 ], ViewAccount.prototype, "viewId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => accounts_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => accounts_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accounts_1.default)
 ], ViewAccount.prototype, "account", void 0);

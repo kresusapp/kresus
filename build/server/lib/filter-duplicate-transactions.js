@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = filterDuplicateTransactions;
 const moment_1 = __importDefault(require("moment"));
-const diff_transactions_1 = require("./diff-transactions");
+const duplicates_manager_1 = require("./duplicates-manager");
 const helpers_1 = require("../helpers");
 /*
     This function tries to be smarter in detecting which of the provided
@@ -26,7 +26,7 @@ function filterDuplicateTransactions(duplicates) {
     const today = new Date();
     for (const [known, provided] of duplicates) {
         // We ignore transactions which differ from more than just the type.
-        if (!(0, diff_transactions_1.amountAndLabelAndDateMatch)(known, provided)) {
+        if ((0, duplicates_manager_1.getDuplicatePairScore)(known, provided, 0, false) < 1) {
             toCreate.push(provided);
             continue;
         }
@@ -42,29 +42,15 @@ function filterDuplicateTransactions(duplicates) {
         }
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === helpers_1.UNKNOWN_TRANSACTION_TYPE && provided.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: provided.type,
-                },
-            });
-            continue;
+            updateBase.type = provided.type;
         }
-        // The transaction type which was "deferred_card", is now "card", and the debitDate is now
+        // If the transaction type which was "deferred_card" is now "card", and the debitDate is now
         // in the past (ie. the change of type is legitimate), update the transaction.
         if (known.debitDate &&
             known.type === helpers_1.DEFERRED_CARD_TYPE.name &&
             provided.type === helpers_1.TRANSACTION_CARD_TYPE.name &&
             (0, moment_1.default)(known.debitDate).isSameOrBefore(today, 'day')) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: helpers_1.TRANSACTION_CARD_TYPE.name,
-                },
-            });
-            continue;
+            updateBase.type = helpers_1.TRANSACTION_CARD_TYPE.name;
         }
         if (Object.keys(updateBase).length > 0) {
             toUpdate.push({ known, update: updateBase });

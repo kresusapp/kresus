@@ -28,8 +28,10 @@ async function setupDemoMode(userId) {
     }
     const response = await (0, accesses_1.createAndRetrieveData)(userId, {
         vendorId: 'demo',
-        login: 'mylogin',
-        password: 'couldnotcareless',
+        fields: [
+            { name: 'login', value: 'mylogin' },
+            { name: 'password', value: 'couldnotcareless' },
+        ],
         customLabel: 'Demo bank',
     });
     (0, helpers_1.assert)(response.kind === 'value', "demo account shouldn't require a user action");

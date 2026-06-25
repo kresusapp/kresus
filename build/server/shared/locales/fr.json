@@ -43,6 +43,8 @@
             "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
             "default_alerts": "Alertes par défaut",
             "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
+            "store_credentials": "Stocker les identifiants",
+            "store_credentials_desc": "Si activé, les identifiants seront stockés dans la base de données.",
             "add_bank_button": "Ajouter l'accès"
         },
         "demo": {
@@ -106,6 +108,7 @@
             "new_bank_form_title": "Configurer un nouvel accès",
             "edit_bank_form_title": "Éditer l'accès",
             "edit_account_form_title": "Éditer le compte",
+            "back_to_account_edition": "Retourner au compte",
             "default_account": "Compte par défaut",
             "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus.",
             "creation_success": "L'accès bancaire a été créé avec succès.",
@@ -127,7 +130,7 @@
             "enabled": "activé",
             "disabled": "désactivé",
             "deprecated_access": "Les connecteurs bancaires de Kresus ne supportent plus l'accès à cette banque. Les données sont conservées en lecture seule.",
-            "fill_the_fields": "Remplissez les champs ci-dessous pour le réactiver.",
+            "fill_the_fields": "Remplissez les champs ci-dessous pour le re-synchroniser. Pour le réactiver, cochez « Stocker les identifiants » ci-dessous.",
             "danger_zone_title": "Zone dangereuse",
             "sync_title": "Synchronisation",
             "delete_session": "Supprimer les cookies de session",
@@ -285,7 +288,7 @@
             "create_recurring_transaction": "Créer une opération récurrente",
             "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser",
-            "sync_disabled": "Cet accès bancaire est désactivé, allez dans les paramètres des comptes bancaires pour le réactiver",
+            "sync_disabled": "Cet accès bancaire est désactivé, veuillez remplir les identifiants pour synchroniser le compte.",
             "type": "Type",
             "date": "Date réelle",
             "custom_label": "Libellé personnalisé",
@@ -361,6 +364,7 @@
             "website": "Site internet",
             "domain": "Domaine",
             "auth_type": "Type d'authentification",
+            "login_placeholder": "123456789",
             "birthday": "Date d'anniversaire",
             "birthdate": "Date d'anniversaire",
             "merchant_id": "Identifiant de marchand",
@@ -378,7 +382,9 @@
             "custom_label": "Libellé personnalisé",
             "connection_parameters": "Paramètres de connexion",
             "login": "Identifiant",
+            "username": "Nom d'utilisateur",
             "password": "Mot de passe",
+            "identity": "Identité",
             "phone": "Numéro de téléphone",
             "code_file": "Code de vérification",
             "broker": "Courtier",
@@ -465,7 +471,8 @@
                 "manage_duplicates": "supprimé les doublons",
                 "add_transaction": "ajouté la ou les opérations manquantes",
                 "delete_transaction": "supprimé la ou les opérations en trop",
-                "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?"
+                "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?",
+                "success": "Le solde du compte a bien été resynchronisé !"
             },
             "enable_access": "Activer l'accès",
             "disable_access": "Désactiver l'accès",
@@ -568,10 +575,8 @@
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
             "threshold": "Seuil temporel",
-            "threshold_desc": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel défini ci-dessous. Vous pouvez aussi changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite.",
-            "hours": "heures",
-            "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
-            "default_threshold": "Seuil de doublon",
+            "threshold_desc": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel défini ci-dessous.",
+            "days": "jours",
             "ignore_different_custom_fields": "Ignorer les champs personnalisés différents",
             "ignore_different_custom_fields_desc": "Si les deux opérations ont un type, une catégorie ou un label personnalisé défini, et qu'un de ces champs est différent entre les deux opérations, ne pas les considérer comme des doublons.",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
@@ -597,6 +602,7 @@
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",
             "no_password": "Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer.",
+            "missing_mandatory_field": "Un ou plusieurs champs obligatoires sont absent pour ce compte, veuillez le(s) définir dans les préférences et réessayer.",
             "wrong_password": "Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.",
             "first_time_wrong_password": "Le mot de passe semble incorrect, veuillez réessayer.",
             "invalid_parameters": "Le format de votre identifiant ou mot de passe semble être incorrect : %{content}",
@@ -606,7 +612,8 @@
             "action_needed": "Le site web de votre banque nécessite une action manuelle de votre part. Veuillez vous connecter sur le site de votre banque, suivez les instructions et réessayez.",
             "auth_method_nyi": "La méthode d'authentification configurée pour votre compte n'est pas supportée par le module. Veuillez modifier ce paramètre sur le site de votre banque pour utiliser Kresus.",
             "browser_question": "Cette banque nécessite de saisir une information supplémentaire (par exemple un mot de passe temporaire), Kresus ne sait pas encore gérer cette fonctionnalité. Désactivez l'authentification à deux facteurs et rééssayez.",
-            "woob_not_installed": "Woob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée."
+            "woob_not_installed": "Woob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée.",
+            "partial_errors": "La synchronisation a fonctionné partiellement, des erreurs ont été rencontrées : %{errors}"
         },
         "type": {
             "none": "Aucun",
@@ -624,9 +631,6 @@
             "card_summary": "Carte (différé)",
             "deferred_card": "Débit différé",
             "internal_transfer": "Virement interne"
-        },
-        "units": {
-            "hours": "heures"
         },
         "addtransaction": {
             "account": "Compte",
@@ -678,6 +682,7 @@
                 "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_ACCOUNTS": "Le connecteur n'a trouvé aucun compte.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
+                "MISSING_MANDATORY_FIELD": "Un ou plusieurs champs obligatoires sont absents.",
                 "INVALID_PASSWORD": "Le mot de passe est invalide.",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré.",
                 "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides.",
@@ -780,7 +785,9 @@
                 "no_new_transactions": "Aucune nouvelle opération n'a été importée au cours de cette période."
             },
             "fetch_error": {
-                "subject": "Erreur de récupération des opérations bancaires",
+                "subject": "Une erreur %{type} est survenue lors de la récupération des opérations bancaires |||| %{smart_count} erreurs %{type} sont survenues lors de la récupération des opérations bancaires",
+                "blocking": "bloquante |||| bloquantes",
+                "non_blocking": "non-bloquante |||| non-bloquantes",
                 "UNKNOWN_WOOB_MODULE": "Le module woob est inconnu.",
                 "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
@@ -802,7 +809,6 @@
             }
         },
         "notification": {
-            "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées.",
             "test_notification": {
                 "subject": "[Kresus] Notification de test",
                 "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration de notification est correcte !\n\nPassez une bonne journée.\nKresus"

@@ -129,7 +129,10 @@ async function update(req, res) {
             const dbCondition = currentConditions.find(current => current.type === condition.type);
             if (!dbCondition) {
                 // Create it
-                await models_1.TransactionRuleCondition.create(userId, { ...condition, ruleId: rule.id });
+                await models_1.TransactionRuleCondition.create(userId, {
+                    ...condition,
+                    ruleId: rule.id,
+                });
             }
             else {
                 if (dbCondition.ruleId !== rule.id) {

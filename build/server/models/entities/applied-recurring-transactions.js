@@ -85,7 +85,11 @@ __decorate([
     __metadata("design:type", Number)
 ], AppliedRecurringTransaction.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], AppliedRecurringTransaction.prototype, "user", void 0);
@@ -94,7 +98,11 @@ __decorate([
     __metadata("design:type", Number)
 ], AppliedRecurringTransaction.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => recurring_transactions_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => recurring_transactions_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", recurring_transactions_1.default)
 ], AppliedRecurringTransaction.prototype, "recurringTransaction", void 0);
@@ -103,7 +111,11 @@ __decorate([
     __metadata("design:type", Number)
 ], AppliedRecurringTransaction.prototype, "recurringTransactionId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => accounts_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => accounts_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accounts_1.default)
 ], AppliedRecurringTransaction.prototype, "account", void 0);

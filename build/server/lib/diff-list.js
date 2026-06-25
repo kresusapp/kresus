@@ -28,10 +28,7 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, p
         if (indexes === null) {
             break;
         }
-        const pair = [
-            knowns.splice(indexes.i, 1)[0],
-            provideds.splice(indexes.j, 1)[0],
-        ];
+        const pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
         // Remove line indexes.i and column indexes.j from the score matrix.
         for (let i = 0; i < scoreMatrix.length; i++) {
             scoreMatrix[i].splice(indexes.j, 1);

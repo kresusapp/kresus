@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._ = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
+exports._ = exports.getBankVendors = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
 const account_types_1 = require("../lib/account-types");
 const helpers_1 = require("../helpers");
 const accounts_1 = __importDefault(require("../models/entities/accounts"));
@@ -61,8 +61,35 @@ const fetchTransactions = () => {
     return Promise.resolve({ kind: 'values', values: [] });
 };
 exports.fetchTransactions = fetchTransactions;
+const getBankVendors = () => [
+    {
+        customFields: [
+            {
+                default: 'EUR',
+                name: 'currency',
+                type: 'select',
+                values: [
+                    {
+                        label: 'Euro',
+                        value: 'EUR',
+                    },
+                    {
+                        label: 'Dollar',
+                        value: 'USD',
+                    },
+                ],
+            },
+        ],
+        deprecated: false,
+        name: 'Manual Bank',
+        noCredentials: true,
+        uuid: 'manual',
+    },
+];
+exports.getBankVendors = getBankVendors;
 exports._ = {
     SOURCE_NAME: exports.SOURCE_NAME,
+    getBankVendors: exports.getBankVendors,
     fetchAccounts: exports.fetchAccounts,
     fetchTransactions: exports.fetchTransactions,
 };

@@ -15,15 +15,28 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testing = exports._ = exports.SOURCE_NAME = void 0;
+exports.testing = exports._ = exports.getBankVendors = exports.SOURCE_NAME = void 0;
 exports.fetchAccounts = fetchAccounts;
 exports.fetchTransactions = fetchTransactions;
 exports.getVersion = getVersion;
@@ -32,6 +45,7 @@ const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 const helpers_1 = require("../../helpers");
 const errors_json_1 = require("../../shared/errors.json");
+const banks_json_1 = __importDefault(require("./banks.json"));
 const log = (0, helpers_1.makeLogger)('providers/woob');
 // Subcommand error code indicating malformed argparse parameters.
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
@@ -204,22 +218,36 @@ async function callWoob(command, options, sessionManager, access = null) {
     const env = {};
     if (command === CallWoobCommand.Accounts || command === CallWoobCommand.Transactions) {
         (0, helpers_1.assert)(access !== null, 'Access must not be null for accounts/transactions.');
-        cliArgs.push('--module', access.vendorId, '--login', access.login);
-        // Pass the password via an environment variable to hide it.
-        (0, helpers_1.assert)(access.password !== null, 'Access must have a password for fetching.');
-        env.KRESUS_WOOB_PWD = access.password;
-        // Pass the session information as environment variable to hide it.
-        (0, helpers_1.assert)(sessionManager !== null, 'session manager must be provided for accounts/transactions.');
-        const session = await sessionManager.read(access);
-        if (session) {
-            env.KRESUS_WOOB_SESSION = JSON.stringify(session);
-        }
+        cliArgs.push('--module', access.vendorId);
+        let loginSet = false;
+        let passwordSet = false;
         const { fields = [] } = access;
         for (const { name, value } of fields) {
             if (typeof name === 'undefined' || typeof value === 'undefined') {
                 throw new helpers_1.KError(`Missing 'name' (${name}) or 'value' (${value}) for field`, null, errors_json_1.INVALID_PARAMETERS);
             }
-            cliArgs.push('--field', name, value);
+            switch (name) {
+                case 'login':
+                case 'username':
+                    loginSet = true;
+                    cliArgs.push('--login', value);
+                    break;
+                case 'password':
+                    passwordSet = true;
+                    // Pass the password via an environment variable to hide it.
+                    env.KRESUS_WOOB_PWD = value;
+                    break;
+                default:
+                    cliArgs.push('--field', name, value);
+            }
+        }
+        (0, helpers_1.assert)(loginSet, 'Access must have a login for fetching.');
+        (0, helpers_1.assert)(passwordSet, 'Access must have a password for fetching.');
+        // Pass the session information as environment variable to hide it.
+        (0, helpers_1.assert)(sessionManager !== null, 'session manager must be provided for accounts/transactions.');
+        const session = await sessionManager.read(access);
+        if (session) {
+            env.KRESUS_WOOB_SESSION = JSON.stringify(session);
         }
         if (command === CallWoobCommand.Transactions && options.fromDate !== null) {
             const timestamp = `${options.fromDate.getTime() / 1000}`;
@@ -232,14 +260,14 @@ async function callWoob(command, options, sessionManager, access = null) {
         log.info('Command returned an error code.');
         if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
             (0, helpers_1.assert)(sessionManager !== null, 'session manager required.');
-            log.warn(`Resetting session for access from bank ${access.vendorId} with login ${access.login}`);
+            log.warn(`Resetting session for access from bank ”${access.getLabel ? access.getLabel() : access.customLabel || 'No label'}” with vendorId ${access.vendorId}`);
             await sessionManager.reset(access);
         }
         throw new helpers_1.KError(response.error_message ? response.error_message : response.error_code, null, response.error_code, response.error_short);
     }
     if (access && response.session) {
         (0, helpers_1.assert)(sessionManager !== null, 'session manager required.');
-        log.info(`Saving session for access from bank ${access.vendorId} with login ${access.login}`);
+        log.info(`Saving session for access from bank ”${access.getLabel ? access.getLabel() : access.customLabel || 'No label'}” with vendorId ${access.vendorId}`);
         await sessionManager.save(access, response.session);
     }
     if (response.kind === 'user_action') {
@@ -275,6 +303,7 @@ async function callWoob(command, options, sessionManager, access = null) {
     return {
         kind: 'values',
         values: response.values,
+        errors: response.errors,
     };
 }
 let cachedVersion = helpers_1.UNKNOWN_WOOB_VERSION;
@@ -324,11 +353,14 @@ async function fetchTransactions({ access, debug, fromDate, isInteractive, userA
     }, sessionManager, access);
 }
 exports.SOURCE_NAME = 'woob';
+const getBankVendors = () => banks_json_1.default;
+exports.getBankVendors = getBankVendors;
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
 // expected, and use it.
 exports._ = {
-    SOURCE_NAME: 'woob',
+    SOURCE_NAME: exports.SOURCE_NAME,
+    getBankVendors: exports.getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

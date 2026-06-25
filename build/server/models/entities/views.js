@@ -55,7 +55,10 @@ let View = View_1 = class View {
         return !!found;
     }
     static async all(userId) {
-        return await View_1.repo().find({ where: { userId }, relations: ['accounts'] });
+        return await View_1.repo().find({
+            where: { userId },
+            relations: ['accounts'],
+        });
     }
     static async destroy(userId, viewId) {
         await View_1.repo().delete({ id: viewId, userId });
@@ -110,7 +113,11 @@ __decorate([
     __metadata("design:type", Number)
 ], View.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], View.prototype, "user", void 0);
@@ -127,7 +134,9 @@ __decorate([
     __metadata("design:type", Object)
 ], View.prototype, "createdByUser", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => view_accounts_1.default, viewAccount => viewAccount.view, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => view_accounts_1.default, viewAccount => viewAccount.view, {
+        cascade: ['insert'],
+    }),
     __metadata("design:type", Array)
 ], View.prototype, "accounts", void 0);
 View = View_1 = __decorate([

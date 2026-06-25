@@ -136,11 +136,13 @@ try:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
+        BrowserUnavailable,
         ModuleInstallError,
         ModuleLoadError,
         DecoupledValidation,
         NeedInteractiveFor2FA,
     )
+    from woob.browser.exceptions import ClientError
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
 except ImportError as first_exc:
@@ -156,11 +158,13 @@ except ImportError as first_exc:
             BrowserIncorrectPassword,
             BrowserPasswordExpired,
             BrowserQuestion,
+            BrowserUnavailable,
             ModuleInstallError,
             ModuleLoadError,
             DecoupledValidation,
             NeedInteractiveFor2FA,
         )
+        from weboob.browser.exceptions import ClientError
         from weboob.tools.backend import Module
         from weboob.tools.log import createColoredFormatter
     except ImportError as exc:
@@ -546,11 +550,26 @@ class Connector:
 
         :param backend: The Woob built backend to fetch data from.
 
-        :returns: A list of dicts representing the available accounts.
+        :returns: A tuple, first is a list of dicts representing the available accounts, second a list of errors.
         """
         results = []
+        errors = []
+        iter_count = 0
+
         with self.backend:
-            for account in list(self.backend.iter_accounts()):
+            accounts_iter = self.backend.iter_accounts()
+            while True:
+                iter_count += 1
+
+                try:
+                    account = next(accounts_iter)
+                except StopIteration:
+                    break
+                except (BrowserUnavailable, ClientError, AttributeError) as exc:
+                    logging.error("Skipping account due to unexpected error: %s", exc)
+                    errors.append(exc)
+                    continue
+
                 # The minimum dict keys for an account are :
                 # 'id', 'label', 'balance' and 'type'
                 # Retrieve extra information for the account.
@@ -574,7 +593,11 @@ class Connector:
                     }
                 )
 
-        return results
+        if len(results) == 0 and len(errors) > 0:
+            raise errors[0]
+
+        errors = ["Error while fetching accounts: " + str(exc) for exc in errors]
+        return results, errors
 
     def get_transactions(self, from_date=None):
         """
@@ -583,11 +606,26 @@ class Connector:
         :param from_date: The date until (in the past) which the transactions should be fetched.
         Optional, if not provided all transactions are returned.
 
-        :returns: A list of dicts representing the available transactions.
+        :returns: A tuple, first is a list of dicts representing the available transactions, second a list of errors.
         """
         results = []
+        errors = []
+        iter_count = 0
+
         with self.backend:
-            for account in list(self.backend.iter_accounts()):
+            accounts_iter = self.backend.iter_accounts()
+            while True:
+                iter_count += 1
+
+                try:
+                    account = next(accounts_iter)
+                except StopIteration:
+                    break
+                except (BrowserUnavailable, ClientError, AttributeError) as exc:
+                    logging.error("Skipping account due to unexpected error: %s", exc)
+                    errors.append(exc)
+                    continue
+
                 # Get all transactions for this account.
                 nyi_methods = []
                 transactions = []
@@ -685,7 +723,12 @@ class Connector:
                         }
                     )
 
-        return results
+        if len(results) == 0 and len(errors) > 0:
+            raise errors[0]
+
+        errors = ["Error while fetching transactions: " + str(exc) for exc in errors]
+
+        return results, errors
 
     def fetch(self, which, from_date=None):
         """
@@ -708,9 +751,9 @@ class Connector:
         results = {}
         try:
             if which == "accounts":
-                results["values"] = self.get_accounts()
+                results["values"], results["errors"] = self.get_accounts()
             elif which == "transactions":
-                results["values"] = self.get_transactions(from_date)
+                results["values"], results["errors"] = self.get_transactions(from_date)
             else:
                 raise Exception("Invalid fetch command.")
 

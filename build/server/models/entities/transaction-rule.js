@@ -46,7 +46,9 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
         return TransactionRule_1.repo().create(args);
     }
     static async find(userId, ruleId) {
-        return await TransactionRule_1.repo().findOne({ where: { id: ruleId, userId } });
+        return await TransactionRule_1.repo().findOne({
+            where: { id: ruleId, userId },
+        });
     }
     static async exists(userId, ruleId) {
         const found = await TransactionRule_1.find(userId, ruleId);
@@ -76,11 +78,17 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
         (0, helpers_1.assert)(attributes.conditions.length > 0, 'rule must have at least one condition');
         let i = 0;
         for (const action of attributes.actions) {
-            attributes.actions[i++] = __1.TransactionRuleAction.cast({ ...action, userId });
+            attributes.actions[i++] = __1.TransactionRuleAction.cast({
+                ...action,
+                userId,
+            });
         }
         i = 0;
         for (const condition of attributes.conditions) {
-            attributes.conditions[i++] = __1.TransactionRuleCondition.cast({ ...condition, userId });
+            attributes.conditions[i++] = __1.TransactionRuleCondition.cast({
+                ...condition,
+                userId,
+            });
         }
         const rule = TransactionRule_1.repo().create({ ...attributes, userId });
         return await TransactionRule_1.repo().save(rule);
@@ -125,7 +133,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRule.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], TransactionRule.prototype, "user", void 0);
@@ -138,11 +150,15 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRule.prototype, "position", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleCondition, condition => condition.rule, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleCondition, condition => condition.rule, {
+        cascade: ['insert'],
+    }),
     __metadata("design:type", Array)
 ], TransactionRule.prototype, "conditions", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleAction, action => action.rule, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleAction, action => action.rule, {
+        cascade: ['insert'],
+    }),
     __metadata("design:type", Array)
 ], TransactionRule.prototype, "actions", void 0);
 TransactionRule = TransactionRule_1 = __decorate([

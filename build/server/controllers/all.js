@@ -15,7 +15,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const models_1 = require("../models");
 const data_migrations_1 = __importDefault(require("../models/data-migrations"));
 const helpers_1 = require("../helpers");
-const bank_vendors_1 = require("../lib/bank-vendors");
+const providers_1 = require("../providers");
 const instance_1 = require("../lib/instance");
 const helpers_2 = require("../shared/helpers");
 const default_settings_1 = __importDefault(require("../shared/default-settings"));
@@ -25,6 +25,7 @@ const instance_2 = require("./instance");
 const ofx_1 = require("./ofx");
 const diff_accounts_1 = __importDefault(require("../lib/diff-accounts"));
 const diff_transactions_1 = __importDefault(require("../lib/diff-transactions"));
+const duplicates_manager_1 = require("../lib/duplicates-manager");
 const log = (0, helpers_1.makeLogger)('controllers/all');
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 // Startup tasks are cleanup tasks that will be run the next time a user will run the /all initial
@@ -45,6 +46,7 @@ async function runStartupTasks(userId) {
     }
 }
 async function getAllData(userId, options = {}) {
+    var _a;
     const { isExport = false, cleanPassword = true } = options;
     let ret = {
         accounts: [],
@@ -56,6 +58,7 @@ async function getAllData(userId, options = {}) {
         instance: {},
         recurringTransactions: [],
         views: [],
+        bankVendors: [],
     };
     const accesses = await models_1.Access.all(userId);
     for (const access of accesses) {
@@ -65,7 +68,7 @@ async function getAllData(userId, options = {}) {
             return { name, value };
         });
         if (cleanPassword) {
-            delete clientAccess.password;
+            clientAccess.fields = clientAccess.fields.filter(f => f.name !== 'password');
             delete clientAccess.session;
         }
         if (!isExport) {
@@ -73,7 +76,7 @@ async function getAllData(userId, options = {}) {
             clientAccess.enabled = access.isEnabled();
             delete clientAccess.session;
         }
-        const bank = (0, bank_vendors_1.bankVendorByUuid)(clientAccess.vendorId);
+        const bank = (0, providers_1.bankVendorByUuid)(clientAccess.vendorId);
         if (bank && bank.name) {
             clientAccess.label = bank.name;
         }
@@ -96,7 +99,41 @@ async function getAllData(userId, options = {}) {
         ret.appliedRecurringTransactions = await models_1.AppliedRecurringTransaction.byMonthAndYear(userId, now.getMonth(), now.getFullYear());
     }
     else {
+        ret.bankVendors = (0, providers_1.getBankVendors)();
         ret.instance = await (0, instance_1.getAll)();
+        // Find duplicates.
+        // First, map transactions to accounts
+        const accountTransactionsMap = new Map();
+        for (const tr of ret.transactions) {
+            if (!accountTransactionsMap.has(tr.accountId)) {
+                accountTransactionsMap.set(tr.accountId, [tr]);
+            }
+            else {
+                (_a = accountTransactionsMap.get(tr.accountId)) === null || _a === void 0 ? void 0 : _a.push(tr);
+            }
+        }
+        const duplicateThresholdSetting = ret.settings.find(s => s.key === settings_1.DUPLICATE_THRESHOLD);
+        const ignoreDuplicatesWithDifferentCustomFieldsSetting = ret.settings.find(s => s.key === settings_1.DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS);
+        const ignoreDuplicatesWithDifferentCustomFieldsSettingValue = ignoreDuplicatesWithDifferentCustomFieldsSetting
+            ? ignoreDuplicatesWithDifferentCustomFieldsSetting.value
+            : (0, helpers_1.unwrap)(default_settings_1.default.get(settings_1.DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS));
+        const threshold = Number.parseInt(duplicateThresholdSetting
+            ? duplicateThresholdSetting.value
+            : (0, helpers_1.unwrap)(default_settings_1.default.get(settings_1.DUPLICATE_THRESHOLD)), 10);
+        const ignoreDuplicatesWithDifferentCustomFields = ignoreDuplicatesWithDifferentCustomFieldsSettingValue === 'true';
+        const newDuplicates = [];
+        for (const [accountId, transactions] of accountTransactionsMap.entries()) {
+            const duplicates = (0, duplicates_manager_1.findRedundantPairs)(transactions, threshold, ignoreDuplicatesWithDifferentCustomFields);
+            if (duplicates.length > 0) {
+                newDuplicates.push({
+                    accountId,
+                    duplicates,
+                });
+            }
+        }
+        ret.duplicates = {
+            new: newDuplicates,
+        };
         const user = await models_1.User.find(userId);
         if (user) {
             ret.user = user;
@@ -173,7 +210,10 @@ async function export_(req, res) {
                 throw new helpers_1.KError('submitted passphrase is too weak', 400);
             }
         }
-        const data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
+        const data = await getAllData(userId, {
+            isExport: true,
+            cleanPassword: !passphrase,
+        });
         let ret = {};
         if (passphrase) {
             const encryptedData = encryptData(data, passphrase);
@@ -280,22 +320,6 @@ async function importData(userId, world, dontCreateAccess) {
         const accessId = access.id;
         delete access.id;
         delete access.userId;
-        // Try to match the vendor id and login against an existing pair in the database.
-        const foundKnown = await models_1.Access.byCredentials(userId, {
-            uuid: access.vendorId,
-            login: access.login,
-        });
-        if (foundKnown !== null) {
-            // The access was already known: don't reimport it.
-            accessMap[accessId] = {
-                id: foundKnown.id,
-                wasKnown: true,
-                vendorId: foundKnown.vendorId,
-            };
-            log.info(`Ignoring import of access ${access.vendorId} (${access.login}) as it already exists.`);
-            continue;
-        }
-        const sanitizedCustomFields = [];
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
             try {
@@ -305,28 +329,63 @@ async function importData(userId, world, dontCreateAccess) {
                 log.error('Invalid JSON customFields, ignoring fields:', e.toString());
             }
         }
-        for (const { name, value } of access.fields || []) {
+        if (!(access.fields instanceof Array)) {
+            access.fields = [];
+        }
+        // Support legacy 'login' and 'password' values.
+        if (access.login) {
+            if (!access.fields.some((f) => typeof f === 'object' && f && 'name' in f && f.name === 'login')) {
+                access.fields.push({ name: 'login', value: access.login });
+            }
+            delete access.login;
+        }
+        if (access.password) {
+            if (!access.fields.some((f) => typeof f === 'object' && f && 'name' in f && f.name === 'password')) {
+                access.fields.push({ name: 'password', value: access.password });
+            }
+            delete access.password;
+        }
+        const sanitizedCustomFields = [];
+        for (const { name, value } of access.fields) {
             if (typeof name !== 'string') {
-                log.warn('Ignoring customField because of non-string "name" property.');
+                log.warn('Ignoring access field because of non-string "name" property.');
                 continue;
             }
             if (typeof value !== 'string') {
-                log.warn(`Ignoring custom field for key ${name} because of non-string "value" property`);
+                log.warn(`Ignoring access field for key ${name} because of non-string "value" property`);
                 continue;
             }
             sanitizedCustomFields.push({ name, value });
         }
         access.fields = sanitizedCustomFields;
+        const accessLogin = sanitizedCustomFields.find(f => f.name === 'login');
+        // Try to match the vendor id and login against an existing pair in the database.
+        const foundKnown = accessLogin
+            ? await models_1.Access.byCredentials(userId, {
+                uuid: access.vendorId,
+                login: accessLogin.value,
+            })
+            : null;
+        if (foundKnown !== null) {
+            // The access was already known: don't reimport it.
+            accessMap[accessId] = {
+                id: foundKnown.id,
+                wasKnown: true,
+                vendorId: foundKnown.vendorId,
+            };
+            log.info(`Ignoring import of access ${access.vendorId} (${accessLogin ? accessLogin.value : 'no login'}) as it already exists.`);
+            continue;
+        }
         if (dontCreateAccess) {
             // The access id given from the `world` object is valid, according to this function's
             // contract, so the mapping doesn't need to redirect to another access we created.
             accessMap[accessId] = { id: accessId, wasKnown: true };
-            log.info(`Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`);
+            log.info(`Not creating new known access ${access.vendorId} (${accessLogin ? accessLogin.value : 'no login'}) because it's explicitly marked as known.`);
         }
         else {
             const created = await models_1.Access.create(userId, access);
             accessMap[accessId] = { id: created.id, wasKnown: false };
-            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
+            log.info(`Creating new unknown access ${access.vendorId} (${accessLogin ? accessLogin.value : 'no login'}).`);
         }
     }
     log.info('Done.');
@@ -365,7 +424,9 @@ async function importData(userId, world, dontCreateAccess) {
         const accessRemap = accessMap[accountCopy.accessId];
         accountCopy.accessId = accessRemap === null || accessRemap === void 0 ? void 0 : accessRemap.id;
         if (accessRemap === null || accessRemap === void 0 ? void 0 : accessRemap.wasKnown) {
-            const knownAccounts = await models_1.Account.byAccess(userId, { id: accessRemap.id });
+            const knownAccounts = await models_1.Account.byAccess(userId, {
+                id: accessRemap.id,
+            });
             if (typeof knownAccounts !== 'undefined') {
                 const vendorId = (_a = accessRemap.vendorId) !== null && _a !== void 0 ? _a : undefined;
                 const diffResult = (0, diff_accounts_1.default)(knownAccounts, [accountCopy], vendorId);
@@ -398,7 +459,7 @@ async function importData(userId, world, dontCreateAccess) {
             // Views created by the user are views created automatically by Kresus to group accounts.
             // Since new automatic views were created automatically when importing accounts, we
             // should not recreate them here.
-            // However, we still to map the view ids (for budgets at least).
+            // However, we still need to map the view ids (for budgets at least).
             // Try to retrieve the corresponding view created automatically.
             const viewAccountsRemapped = view.accounts.map((vAcc) => accountIdToAccount.get(vAcc.accountId));
             const correspondingView = existingViews.find(ev => {

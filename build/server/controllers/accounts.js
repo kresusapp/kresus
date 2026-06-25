@@ -119,7 +119,16 @@ async function resyncBalance(req, res) {
         const { id: userId } = req.user;
         const account = req.preloaded.account;
         const userActionFields = (0, accesses_1.extractUserActionFields)(req.body);
-        const response = await accounts_manager_1.default.resyncAccountBalance(userId, account, 
+        const access = (0, helpers_1.unwrap)(await models_1.Access.find(userId, account.accessId));
+        const providedFields = req.body.fields;
+        const isAccessEnabled = access.isEnabled();
+        if (!isAccessEnabled && typeof providedFields === 'undefined') {
+            throw new helpers_1.KError('when resyncing balance: access disabled and no fields provided by user', 403);
+        }
+        if (typeof providedFields !== 'undefined') {
+            access.fields = providedFields;
+        }
+        const response = await accounts_manager_1.default.resyncAccountBalance(userId, account, access, 
         /* interactive */ true, userActionFields);
         if (response.kind === 'user_action') {
             res.status(200).json(response);

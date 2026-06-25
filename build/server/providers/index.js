@@ -4,10 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProvider = getProvider;
+exports.getBankVendors = getBankVendors;
+exports.bankVendorByUuid = bankVendorByUuid;
 const fs_1 = __importDefault(require("fs"));
 const helpers_1 = require("../helpers");
-const banks_json_1 = __importDefault(require("../shared/banks.json"));
 const BANK_HANDLERS = new Map();
+const ALL_BANKS = [];
 function init() {
     const SOURCE_HANDLERS = {};
     function addBackend(handler) {
@@ -15,6 +17,16 @@ function init() {
             typeof handler.fetchAccounts === 'undefined' ||
             typeof handler.fetchTransactions === 'undefined') {
             throw new helpers_1.KError("Backend doesn't implement basic functionality.");
+        }
+        // Connect static bank information to their backends.
+        const vendors = handler.getBankVendors();
+        for (const bank of vendors) {
+            (0, helpers_1.assert)(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
+            BANK_HANDLERS.set(bank.uuid, handler);
+            ALL_BANKS.push({
+                ...bank,
+                backend: handler.SOURCE_NAME,
+            });
         }
         SOURCE_HANDLERS[handler.SOURCE_NAME] = handler;
     }
@@ -29,16 +41,14 @@ function init() {
         const handler = require(`./${fileOrDirName}`);
         addBackend(handler);
     }
-    // Connect static bank information to their backends.
-    for (const bank of banks_json_1.default) {
-        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
-            throw new helpers_1.KError('Bank handler not described or not imported.');
-        }
-        (0, helpers_1.assert)(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
-        BANK_HANDLERS.set(bank.uuid, SOURCE_HANDLERS[bank.backend]);
-    }
 }
 function getProvider(access) {
     return BANK_HANDLERS.get(access.vendorId);
+}
+function getBankVendors() {
+    return ALL_BANKS;
+}
+function bankVendorByUuid(uuid) {
+    return (0, helpers_1.unwrap)(ALL_BANKS.find(vendor => vendor.uuid === uuid));
 }
 init();

@@ -38,11 +38,16 @@ let AccessField = AccessField_1 = class AccessField {
         return await AccessField_1.repo().findBy({ userId });
     }
     static async exists(userId, fieldId) {
-        const found = await AccessField_1.repo().findOne({ where: { userId, id: fieldId } });
+        const found = await AccessField_1.repo().findOne({
+            where: { userId, id: fieldId },
+        });
         return !!found;
     }
     static async destroy(userId, fieldId) {
         await AccessField_1.repo().delete({ userId, id: fieldId });
+    }
+    static async destroyAllFromAccessId(userId, accessId) {
+        await AccessField_1.repo().delete({ userId, accessId });
     }
     static async destroyAll(userId) {
         await AccessField_1.repo().delete({ userId });
@@ -59,7 +64,11 @@ __decorate([
     __metadata("design:type", Number)
 ], AccessField.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], AccessField.prototype, "user", void 0);

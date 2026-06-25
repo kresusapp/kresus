@@ -18,10 +18,10 @@ const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const access_fields_1 = __importDefault(require("./access-fields"));
 const helpers_1 = require("../../helpers");
-const bank_vendors_1 = require("../../lib/bank-vendors");
+const providers_1 = require("../../providers");
+const helpers_2 = require("../helpers");
 let Access = Access_1 = class Access {
     constructor() {
-        this.password = null;
         // Text status indicating whether the last poll was successful or not.
         this.fetchStatus = helpers_1.FETCH_STATUS_SUCCESS;
         // Text label set by the user.
@@ -39,19 +39,22 @@ let Access = Access_1 = class Access {
         return Access_1.REPO;
     }
     // Entity methods.
-    hasPassword() {
-        return typeof this.password === 'string' && this.password.length > 0;
+    // Helper to get a field value by name
+    getFieldValue(fieldName) {
+        var _a, _b;
+        const field = (_a = this.fields) === null || _a === void 0 ? void 0 : _a.find(f => f.name === fieldName);
+        return (_b = field === null || field === void 0 ? void 0 : field.value) !== null && _b !== void 0 ? _b : null;
     }
     // Is the access enabled?
     isEnabled() {
-        return this.password !== null;
+        return (0, helpers_2.areFieldsComplete)(this.vendorId, this.fields);
     }
     // Returns a cleaned up label for this access.
     getLabel() {
         if (this.customLabel) {
             return this.customLabel;
         }
-        return (0, bank_vendors_1.bankVendorByUuid)(this.vendorId).name;
+        return (0, providers_1.bankVendorByUuid)(this.vendorId).name;
     }
     // Can the access be polled?
     canBePolled() {
@@ -61,6 +64,7 @@ let Access = Access_1 = class Access {
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
             this.fetchStatus !== 'INVALID_PARAMETERS' &&
             this.fetchStatus !== 'NO_PASSWORD' &&
+            this.fetchStatus !== 'MISSING_MANDATORY_FIELD' &&
             this.fetchStatus !== 'ACTION_NEEDED' &&
             this.fetchStatus !== 'AUTH_METHOD_NYI' &&
             this.fetchStatus !== 'REQUIRES_INTERACTIVE');
@@ -74,7 +78,11 @@ let Access = Access_1 = class Access {
             ...field,
             userId,
         }));
-        const entity = Access_1.repo().create({ ...other, userId, fields: fieldsWithUserId });
+        const entity = Access_1.repo().create({
+            ...other,
+            userId,
+            fields: fieldsWithUserId,
+        });
         const access = await Access_1.repo().save(entity);
         return access;
     }
@@ -85,10 +93,15 @@ let Access = Access_1 = class Access {
         });
     }
     static async all(userId) {
-        return await Access_1.repo().find({ where: { userId }, relations: ['fields'] });
+        return await Access_1.repo().find({
+            where: { userId },
+            relations: ['fields'],
+        });
     }
     static async exists(userId, accessId) {
-        const found = await Access_1.repo().findOne({ where: { userId, id: accessId } });
+        const found = await Access_1.repo().findOne({
+            where: { userId, id: accessId },
+        });
         return !!found;
     }
     static async destroy(userId, accessId) {
@@ -98,21 +111,21 @@ let Access = Access_1 = class Access {
         await Access_1.repo().delete({ userId });
     }
     static async update(userId, accessId, newAttributes) {
-        if (typeof newAttributes.fields !== 'undefined') {
-            throw new Error('API error: use AccessField model instead!');
+        if (Object.keys(newAttributes).length > 0) {
+            await Access_1.repo().update({ userId, id: accessId }, newAttributes);
         }
-        await Access_1.repo().update({ userId, id: accessId }, newAttributes);
         return (0, helpers_1.unwrap)(await Access_1.find(userId, accessId));
     }
     static async byVendorId(userId, { uuid: vendorId }) {
-        return await Access_1.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
-    }
-    static async byCredentials(userId, { uuid: vendorId, login }) {
-        const found = await Access_1.repo().findOne({
-            where: { userId, vendorId, login },
+        return await Access_1.repo().find({
+            where: { userId, vendorId },
             relations: ['fields'],
         });
-        return found;
+    }
+    static async byCredentials(userId, { uuid, login }) {
+        const accesses = await Access_1.byVendorId(userId, { uuid });
+        // Find the one with the matching login field
+        return accesses.find(access => access.getFieldValue('login') === login) || null;
     }
 };
 Access.REPO = null;
@@ -125,7 +138,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Access.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Access.prototype, "user", void 0);
@@ -138,14 +155,6 @@ __decorate([
     __metadata("design:type", String)
 ], Access.prototype, "vendorId", void 0);
 __decorate([
-    (0, typeorm_1.Column)('varchar'),
-    __metadata("design:type", String)
-], Access.prototype, "login", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
-    __metadata("design:type", Object)
-], Access.prototype, "password", void 0);
-__decorate([
     (0, typeorm_1.Column)('varchar', { default: helpers_1.FETCH_STATUS_SUCCESS }),
     __metadata("design:type", String)
 ], Access.prototype, "fetchStatus", void 0);
@@ -154,7 +163,9 @@ __decorate([
     __metadata("design:type", Object)
 ], Access.prototype, "customLabel", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => access_fields_1.default, accessField => accessField.access, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => access_fields_1.default, accessField => accessField.access, {
+        cascade: ['insert'],
+    }),
     __metadata("design:type", Array)
 ], Access.prototype, "fields", void 0);
 __decorate([

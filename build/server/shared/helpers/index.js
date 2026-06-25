@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = void 0;
+exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.NONE_CATEGORY_ID = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = void 0;
 exports.maybeHas = maybeHas;
 exports.getDefaultEnglishTranslator = getDefaultEnglishTranslator;
 exports.setupTranslator = setupTranslator;
 exports.localeComparator = localeComparator;
 exports.translate = translate;
 exports.validatePassword = validatePassword;
-const micro_memoize_1 = __importDefault(require("micro-memoize"));
+const micro_memoize_1 = require("micro-memoize");
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
@@ -30,7 +30,6 @@ const moment_1 = __importDefault(require("moment"));
 const account_types_json_1 = __importDefault(require("../account-types.json"));
 const transaction_types_json_1 = __importDefault(require("../../shared/transaction-types.json"));
 const dates_1 = require("./dates");
-// eslint-disable-next-line @typescript-eslint/ban-types
 function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
@@ -163,7 +162,7 @@ exports.currency = {
         }
         return found.symbol;
     },
-    makeFormat: (0, micro_memoize_1.default)((c) => {
+    makeFormat: (0, micro_memoize_1.memoize)((c) => {
         const found = (0, currency_formatter_1.findCurrency)(c);
         if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
@@ -177,6 +176,7 @@ exports.currency = {
 };
 exports.UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 exports.UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
+exports.NONE_CATEGORY_ID = -1;
 exports.MIN_WOOB_VERSION = '3.5';
 exports.UNKNOWN_WOOB_VERSION = null;
 // At least 8 chars, including one lowercase, one uppercase and one digit.

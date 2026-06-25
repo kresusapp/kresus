@@ -67,12 +67,14 @@ function cleanData(world) {
     for (const b of world.budgets) {
         if (typeof categoryMap[b.categoryId] === 'undefined') {
             log.warn(`unexpected category id for a budget: ${b.categoryId}`);
+            b.categoryId = -1;
         }
         else {
             b.categoryId = categoryMap[b.categoryId];
         }
         if (typeof viewMap[b.viewId] === 'undefined') {
             log.warn(`unexpected view id for a budget: ${b.viewId}`);
+            b.viewId = -1;
         }
         else {
             b.viewId = viewMap[b.viewId];
@@ -80,6 +82,8 @@ function cleanData(world) {
         delete b.id;
         delete b.userId;
     }
+    // Remove budgets without category or view id.
+    world.budgets = world.budgets.filter(b => b.categoryId >= 0 && b.viewId >= 0);
     world.transactions = world.transactions || [];
     for (const o of world.transactions) {
         if (o.categoryId !== null) {

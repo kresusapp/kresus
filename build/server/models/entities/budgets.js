@@ -53,7 +53,9 @@ let Budget = Budget_1 = class Budget {
         return await Budget_1.repo().findBy({ userId, viewId, year, month });
     }
     static async byCategoryAndYearAndMonth(userId, viewId, categoryId, year, month) {
-        return await Budget_1.repo().findOne({ where: { userId, viewId, categoryId, year, month } });
+        return await Budget_1.repo().findOne({
+            where: { userId, viewId, categoryId, year, month },
+        });
     }
     static async findAndUpdate(userId, viewId, categoryId, year, month, threshold) {
         const budget = await Budget_1.byCategoryAndYearAndMonth(userId, viewId, categoryId, year, month);
@@ -63,13 +65,18 @@ let Budget = Budget_1 = class Budget {
         return await Budget_1.update(userId, budget.id, { threshold });
     }
     static async replaceForCategory(userId, deletedCategoryId, replacementCategoryId) {
-        const budgets = await Budget_1.repo().findBy({ userId, categoryId: deletedCategoryId });
+        const budgets = await Budget_1.repo().findBy({
+            userId,
+            categoryId: deletedCategoryId,
+        });
         for (const budget of budgets) {
             const replacementCategoryBudget = await Budget_1.byCategoryAndYearAndMonth(userId, budget.viewId, replacementCategoryId, budget.year, budget.month);
             // If there is no budget for the existing replacement category, don't actually delete
             // the current budget, just update its category with the new one.
             if (!replacementCategoryBudget) {
-                await Budget_1.update(userId, budget.id, { categoryId: replacementCategoryId });
+                await Budget_1.update(userId, budget.id, {
+                    categoryId: replacementCategoryId,
+                });
                 // Do not delete the budget we just updated.
                 continue;
             }
@@ -104,7 +111,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Budget.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Budget.prototype, "user", void 0);
@@ -113,7 +124,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Budget.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => views_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => views_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", views_1.default)
 ], Budget.prototype, "view", void 0);
@@ -122,7 +137,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Budget.prototype, "viewId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => categories_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", categories_1.default)
 ], Budget.prototype, "category", void 0);

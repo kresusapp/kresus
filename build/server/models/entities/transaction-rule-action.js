@@ -32,7 +32,9 @@ let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleActio
         return TransactionRuleAction_1.repo().create(args);
     }
     static async find(userId, actionId) {
-        return await TransactionRuleAction_1.repo().findOne({ where: { id: actionId, userId } });
+        return await TransactionRuleAction_1.repo().findOne({
+            where: { id: actionId, userId },
+        });
     }
     static async exists(userId, actionId) {
         const found = await TransactionRuleAction_1.find(userId, actionId);
@@ -42,7 +44,10 @@ let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleActio
         return await TransactionRuleAction_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
-        const action = TransactionRuleAction_1.repo().create({ ...attributes, userId });
+        const action = TransactionRuleAction_1.repo().create({
+            ...attributes,
+            userId,
+        });
         return await TransactionRuleAction_1.repo().save(action);
     }
     static async destroy(userId, actionId) {
@@ -59,7 +64,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRuleAction.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], TransactionRuleAction.prototype, "user", void 0);
@@ -68,7 +77,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TransactionRuleAction.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => transaction_rule_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => transaction_rule_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", transaction_rule_1.default)
 ], TransactionRuleAction.prototype, "rule", void 0);
@@ -81,7 +94,11 @@ __decorate([
     __metadata("design:type", String)
 ], TransactionRuleAction.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => categories_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", categories_1.default)
 ], TransactionRuleAction.prototype, "category", void 0);

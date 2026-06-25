@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.KError = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.KError = exports.NONE_CATEGORY_ID = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.translate = exports.has = void 0;
 exports.makeLogger = makeLogger;
 exports.panic = panic;
 exports.assert = assert;
@@ -32,6 +32,7 @@ Object.defineProperty(exports, "FETCH_STATUS_SUCCESS", { enumerable: true, get: 
 Object.defineProperty(exports, "TRANSACTION_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.TRANSACTION_CARD_TYPE; } });
 Object.defineProperty(exports, "DEFERRED_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.DEFERRED_CARD_TYPE; } });
 Object.defineProperty(exports, "INTERNAL_TRANSFER_TYPE", { enumerable: true, get: function () { return helpers_1.INTERNAL_TRANSFER_TYPE; } });
+Object.defineProperty(exports, "NONE_CATEGORY_ID", { enumerable: true, get: function () { return helpers_1.NONE_CATEGORY_ID; } });
 const errors_json_1 = __importDefault(require("./shared/errors.json"));
 const logger_1 = __importDefault(require("./lib/logger"));
 function makeLogger(prefix) {
@@ -71,6 +72,7 @@ class KError extends Error {
             switch (errCode) {
                 case errors_json_1.default.INVALID_PARAMETERS:
                 case errors_json_1.default.NO_PASSWORD:
+                case errors_json_1.default.MISSING_MANDATORY_FIELD:
                 case errors_json_1.default.INVALID_ENCRYPTED_EXPORT:
                 case errors_json_1.default.INVALID_PASSWORD_JSON_EXPORT:
                     this.statusCode = 400;
@@ -133,6 +135,7 @@ function errorRequiresUserAction(err) {
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
         err.errCode === getErrorCode('INVALID_PARAMETERS') ||
         err.errCode === getErrorCode('NO_PASSWORD') ||
+        err.errCode === getErrorCode('MISSING_MANDATORY_FIELD') ||
         err.errCode === getErrorCode('ACTION_NEEDED') ||
         err.errCode === getErrorCode('REQUIRES_INTERACTIVE'));
 }

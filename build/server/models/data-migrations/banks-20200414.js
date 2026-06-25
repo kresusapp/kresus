@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateBanks = updateBanks;
-/* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
+/* eslint new-cap: ["error", { "capIsNewExceptions": ["In", "Not"] }]*/
 const typeorm_1 = require("typeorm");
 const __1 = require("../");
 const helpers_1 = require("../../helpers");
@@ -26,6 +26,8 @@ async function updateBanks(userId, manager) {
         await manager.delete(__1.AccessField, {
             accessId: (0, typeorm_1.In)(accesses.map(acc => acc.id)),
             ...userCondition,
+            // Once login is migrated from Access to AccessField, we want to keep it.
+            name: (0, typeorm_1.Not)((0, typeorm_1.In)(['login', 'password'])),
         });
         // Migrate cmmc to creditmutuel.
         await manager.update(__1.Access, {

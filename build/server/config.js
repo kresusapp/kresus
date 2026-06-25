@@ -53,7 +53,7 @@ const OPTIONS = [
         defaultVal: path_1.default.join(ospath_1.default.home(), '.kresus'),
         processPath: 'dataDir',
         doc: `This is where Kresus stores additional data, as the latest bank
-        scrapping modules. It should be writeable by the user which launches
+        scrapping modules. It should be writable by the user which launches
         the Kresus executable.`,
         defaultDoc: 'HOME_DIR/.kresus',
         docExample: '/home/ben/.kresus',
@@ -78,7 +78,27 @@ const OPTIONS = [
             }
             return asInteger;
         },
+        dependentCheck: (kresusConfig) => {
+            if (kresusConfig.providedUserId !== null && kresusConfig.userLoginHttpHeader !== null) {
+                crash('userid field cannot be used in conjunction with the userLoginHttpHeader field');
+            }
+        },
         docExample: '1',
+    },
+    {
+        envName: 'KRESUS_USER_LOGIN_HTTP_HEADER',
+        configPath: 'config.kresus.userLoginHttpHeader',
+        defaultVal: null,
+        processPath: 'userLoginHttpHeader',
+        doc: `A HTTP header name to check when trying to retrieve the login of a pre-authenticated
+        user. The HTTP header should then provide a valid login (one previously created from the
+        "kresus create-user" command).`,
+        dependentCheck: (kresusConfig) => {
+            if (kresusConfig.providedUserId !== null && kresusConfig.userLoginHttpHeader !== null) {
+                crash('userLoginHttpHeader field cannot be used in conjunction with the userid field');
+            }
+        },
+        docExample: 'YNH_USER',
     },
     {
         envName: 'PORT',
@@ -620,7 +640,7 @@ function apply(config) {
         process.env.NODE_ENV = 'development';
     }
     const kresusConfig = {
-        user: {
+        defaultUser: {
             // Put a fake value here until we get proper identity management.
             login: 'user',
         },
@@ -648,7 +668,6 @@ function apply(config) {
     const version = package_json_1.default.version;
     log.info(`Running Kresus ${version} with the following parameters:`);
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
-    log.info(`KRESUS_LOGIN = ${kresusConfig.user.login}`);
     for (const option of OPTIONS) {
         const value = kresusConfig[option.processPath];
         let displayed;

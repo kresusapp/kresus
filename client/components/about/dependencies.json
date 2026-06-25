@@ -1,1 +1,319 @@
-{}
+{
+    "woob": {
+        "website": "http://woob.tech",
+        "license": "LGPL-3.0-or-later"
+    },
+    "money (manual bank icon)": {
+        "website": "https://thenounproject.com/search/?q=money&i=798457",
+        "license": "CCBY",
+        "author": "Gregory Cresnar"
+    },
+    "currency-formatter": {
+        "license": "MIT",
+        "website": "https://github.com/smirzaei/currency-formatter#readme"
+    },
+    "express": {
+        "license": "MIT",
+        "website": "https://expressjs.com/"
+    },
+    "express-basic-auth": {
+        "license": "MIT",
+        "website": "https://github.com/LionC/express-basic-auth#readme"
+    },
+    "immer": {
+        "license": "MIT",
+        "website": "https://github.com/immerjs/immer#readme"
+    },
+    "ini": {
+        "license": "ISC",
+        "website": null
+    },
+    "log4js": {
+        "license": "Apache-2.0",
+        "website": "https://log4js-node.github.io/log4js-node/"
+    },
+    "micro-memoize": {
+        "license": "MIT",
+        "website": "https://github.com/planttheidea/micro-memoize#readme"
+    },
+    "moment": {
+        "license": "MIT",
+        "website": "https://momentjs.com"
+    },
+    "node-polyglot": {
+        "license": "BSD-2-Clause",
+        "website": null
+    },
+    "nodemailer": {
+        "license": "MIT-0",
+        "website": "https://nodemailer.com/"
+    },
+    "ofx-js": {
+        "license": "MIT",
+        "website": "https://github.com/bradenmacdonald/ofx-js"
+    },
+    "ospath": {
+        "license": "MIT",
+        "website": "https://github.com/jprichardson/ospath#readme"
+    },
+    "pg": {
+        "license": "MIT",
+        "website": "https://github.com/brianc/node-postgres"
+    },
+    "regex-escape": {
+        "license": "MIT",
+        "website": "https://github.com/IonicaBizau/regex-escape.js"
+    },
+    "semver": {
+        "license": "ISC",
+        "website": null
+    },
+    "typeorm": {
+        "license": "MIT",
+        "website": "https://typeorm.io"
+    },
+    "@reduxjs/toolkit": {
+        "license": "MIT",
+        "website": "https://redux-toolkit.js.org"
+    },
+    "@tippyjs/react": {
+        "license": "MIT",
+        "website": "https://github.com/atomiks/tippyjs-react#readme"
+    },
+    "@types/currency-formatter": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/currency-formatter"
+    },
+    "@types/errorhandler": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/errorhandler"
+    },
+    "@types/express": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/express"
+    },
+    "@types/lodash.debounce": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/lodash.debounce"
+    },
+    "@types/lodash.throttle": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/lodash.throttle"
+    },
+    "@types/method-override": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/method-override"
+    },
+    "@types/mocha": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mocha"
+    },
+    "@types/node": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node"
+    },
+    "@types/node-polyglot": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node-polyglot"
+    },
+    "@types/nodemailer": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/nodemailer"
+    },
+    "@types/react": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react"
+    },
+    "@types/react-dom": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-dom"
+    },
+    "@types/react-flatpickr": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-flatpickr"
+    },
+    "@types/react-redux": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-redux"
+    },
+    "@types/redux-logger": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/redux-logger"
+    },
+    "@types/semver": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/semver"
+    },
+    "better-sqlite3": {
+        "license": "MIT",
+        "website": "http://github.com/WiseLibs/better-sqlite3"
+    },
+    "chart.js": {
+        "license": "MIT",
+        "website": "https://www.chartjs.org"
+    },
+    "chartjs-adapter-moment": {
+        "license": "MIT",
+        "website": "https://www.chartjs.org"
+    },
+    "chartjs-plugin-zoom": {
+        "license": "MIT",
+        "website": "https://www.chartjs.org/chartjs-plugin-zoom/"
+    },
+    "concurrently": {
+        "license": "MIT",
+        "website": null
+    },
+    "eslint": {
+        "license": "MIT",
+        "website": "https://eslint.org"
+    },
+    "eslint-config-prettier": {
+        "license": "MIT",
+        "website": "https://github.com/prettier/eslint-config-prettier#readme"
+    },
+    "eslint-plugin-dependencies": {
+        "license": "MIT",
+        "website": null
+    },
+    "eslint-plugin-import": {
+        "license": "MIT",
+        "website": "https://github.com/import-js/eslint-plugin-import"
+    },
+    "eslint-plugin-prettier": {
+        "license": "MIT",
+        "website": "https://github.com/prettier/eslint-plugin-prettier#readme"
+    },
+    "eslint-plugin-react": {
+        "license": "MIT",
+        "website": "https://github.com/jsx-eslint/eslint-plugin-react"
+    },
+    "eslint-plugin-react-hooks": {
+        "license": "MIT",
+        "website": "https://react.dev/"
+    },
+    "font-awesome": {
+        "license": "(OFL-1.1 AND MIT)",
+        "website": "http://fontawesome.io/"
+    },
+    "globals": {
+        "license": "MIT",
+        "website": null
+    },
+    "ignore-styles": {
+        "license": "MIT",
+        "website": null
+    },
+    "indexof": {
+        "license": null,
+        "website": null
+    },
+    "lodash.debounce": {
+        "license": "MIT",
+        "website": "https://lodash.com/"
+    },
+    "lodash.throttle": {
+        "license": "MIT",
+        "website": "https://lodash.com/"
+    },
+    "mocha": {
+        "license": "MIT",
+        "website": "https://mochajs.org/"
+    },
+    "normalize.css": {
+        "license": "MIT",
+        "website": "https://necolas.github.io/normalize.css"
+    },
+    "onchange": {
+        "license": "MIT",
+        "website": "https://github.com/Qard/onchange"
+    },
+    "prettier": {
+        "license": "MIT",
+        "website": "https://prettier.io"
+    },
+    "primer-tooltips": {
+        "license": "MIT",
+        "website": "http://primer.github.io/"
+    },
+    "rc-color-picker": {
+        "license": "MIT",
+        "website": "http://github.com/react-component/color-picker"
+    },
+    "rc-slider": {
+        "license": "MIT",
+        "website": "http://github.com/react-component/slider/"
+    },
+    "react": {
+        "license": "MIT",
+        "website": "https://react.dev/"
+    },
+    "react-dom": {
+        "license": "MIT",
+        "website": "https://react.dev/"
+    },
+    "react-flatpickr": {
+        "license": "MIT",
+        "website": null
+    },
+    "react-redux": {
+        "license": "MIT",
+        "website": "https://github.com/reduxjs/react-redux"
+    },
+    "react-router": {
+        "license": "MIT",
+        "website": null
+    },
+    "react-select": {
+        "license": "MIT",
+        "website": null
+    },
+    "react-toastify": {
+        "license": "MIT",
+        "website": "https://github.com/fkhadra/react-toastify#readme"
+    },
+    "redux-logger": {
+        "license": "MIT",
+        "website": "https://github.com/theaqua/redux-logger#readme"
+    },
+    "rollup-plugin-sprite": {
+        "license": "MIT",
+        "website": "https://github.com/linjinying/rollup-plugin-sprite#readme"
+    },
+    "stylelint": {
+        "license": "MIT",
+        "website": "https://stylelint.io"
+    },
+    "stylelint-config-standard": {
+        "license": "MIT",
+        "website": null
+    },
+    "ts-node": {
+        "license": "MIT",
+        "website": "https://typestrong.org/ts-node"
+    },
+    "typescript": {
+        "license": "Apache-2.0",
+        "website": "https://www.typescriptlang.org/"
+    },
+    "typescript-eslint": {
+        "license": "MIT",
+        "website": "https://typescript-eslint.io/packages/typescript-eslint"
+    },
+    "vite": {
+        "license": "MIT",
+        "website": "https://vite.dev"
+    },
+    "vite-plugin-plain-text": {
+        "license": "MIT",
+        "website": null
+    },
+    "vite-plugin-react-refresh": {
+        "license": "MIT",
+        "website": "https://github.com/fengxinming/vite-plugins#readme"
+    },
+    "whatwg-fetch": {
+        "license": "MIT",
+        "website": null
+    }
+}

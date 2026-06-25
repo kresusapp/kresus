@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.preloadAccess = preloadAccess;
 exports.destroyWithData = destroyWithData;
@@ -38,7 +48,7 @@ exports.updateAndFetchAccounts = updateAndFetchAccounts;
 const models_1 = require("../models");
 const accounts_manager_1 = __importStar(require("../lib/accounts-manager"));
 const poller_1 = require("../lib/poller");
-const bank_vendors_1 = require("../lib/bank-vendors");
+const providers_1 = require("../providers");
 const all_1 = require("./all");
 const AccountController = __importStar(require("./accounts"));
 const instance_1 = require("./instance");
@@ -93,38 +103,53 @@ async function deleteSession(req, res) {
     }
 }
 function extractUserActionFields(body) {
+    if (!body) {
+        return null;
+    }
     const fields = (body.userActionFields || null);
     delete body.userActionFields;
     return fields;
 }
-async function createAndRetrieveData(userId, params) {
-    const error = (0, validators_1.hasMissingField)(params, ['vendorId', 'login', 'password']) ||
+async function createAndRetrieveData(userId, params, storeCredentials = true) {
+    const error = (0, validators_1.hasMissingField)(params, ['vendorId', 'fields']) ||
         (0, validators_1.hasForbiddenField)(params, [
             'vendorId',
-            'login',
-            'password',
             'fields',
             'customLabel',
             'userActionFields',
             'excludeFromPoll',
+            'accessId',
         ]);
     if (error) {
         throw new helpers_1.KError(`when creating a new access: ${error}`, 400);
     }
+    (0, helpers_1.assert)(Array.isArray(params.fields), 'fields should be an array');
     const userActionFields = extractUserActionFields(params);
     let access = null;
     try {
         if (userActionFields !== null) {
-            // The access must exist, as this is a second step of a 2FA; we don't have access (heh)
-            // to the access id, so use the uuid and login as unique identifiers.
-            access = (0, helpers_1.unwrap)(await models_1.Access.byCredentials(userId, {
-                uuid: params.vendorId,
-                login: params.login,
-            }));
+            // The access must exist, as this is a second step of a 2FA. Use the access id
+            // provided in the first step's response to find it.
+            (0, helpers_1.assert)(typeof params.accessId === 'number', 'accessId is required for 2FA continuation');
+            access = (0, helpers_1.unwrap)(await models_1.Access.find(userId, params.accessId));
         }
-        else {
+        else if (storeCredentials) {
             access = await models_1.Access.create(userId, params);
         }
+        else {
+            // Create the access without storing fields.
+            access = await models_1.Access.create(userId, {
+                ...params,
+                fields: undefined,
+            });
+        }
+        // Store the access enablement status now, before re-injecting fields.
+        const wasAccessEnabled = access.isEnabled();
+        // Re-inject fields in memory only for accesses that need it (storeCredentials set to false).
+        if (!wasAccessEnabled && params.fields) {
+            access.fields = params.fields;
+        }
+        let providerErrors = [];
         const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
             addNewAccounts: true,
             updateProvider: false, // TODO infer from setting?
@@ -152,13 +177,19 @@ async function createAndRetrieveData(userId, params) {
                     await models_1.Access.destroy(userId, prevAccess.id);
                 }
             });
-            return accountResponse;
+            return { ...accountResponse, accessId: access.id };
         }
         const accountInfoMap = accountResponse.value;
+        if (accountResponse.errors) {
+            providerErrors = providerErrors.concat(accountResponse.errors);
+        }
         const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
         /* ignoreLastFetchDate */ true, 
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
+        if (transactionResponse.errors) {
+            providerErrors = providerErrors.concat(transactionResponse.errors);
+        }
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
         // New views have automatically been created along with accounts.
         const views = await models_1.View.all(userId);
@@ -169,7 +200,9 @@ async function createAndRetrieveData(userId, params) {
                 accounts,
                 views,
                 newTransactions,
-                label: (0, bank_vendors_1.bankVendorByUuid)(access.vendorId).name,
+                label: (0, providers_1.bankVendorByUuid)(access.vendorId).name,
+                errors: providerErrors,
+                enabled: wasAccessEnabled,
             },
         };
     }
@@ -192,7 +225,9 @@ async function create(req, res) {
         if (await (0, instance_1.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("access creation isn't allowed in demo mode", 400);
         }
-        const data = await createAndRetrieveData(userId, req.body);
+        const storeCredentials = req.body.storeCredentials !== false;
+        delete req.body.storeCredentials;
+        const data = await createAndRetrieveData(userId, req.body, storeCredentials);
         if (data.kind === 'user_action') {
             res.status(200).json(data);
         }
@@ -206,70 +241,79 @@ async function create(req, res) {
 }
 // Do not use this method as a controller directly: express will pass a `next` middleware as third
 // argument, and `focusOnTransactionsFetch` will never default to false.
-const _fetchAccountsAndTransactions = async (req, res, 
+const _fetchAccountsAndTransactions = async (req, 
 // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
 // nor should we create new accounts, nor should we ignore the last fetch date.
 focusOnTransactionsFetch = false) => {
+    const { id: userId } = req.user;
+    const access = req.preloaded.access;
+    const bankVendor = (0, providers_1.bankVendorByUuid)(access.vendorId);
+    if (!access.isEnabled() || bankVendor.deprecated) {
+        const errcode = (0, helpers_1.getErrorCode)('DISABLED_ACCESS');
+        throw new helpers_1.KError('disabled access', 403, errcode);
+    }
+    const userActionFields = extractUserActionFields(req.body);
+    let providerErrors = [];
+    let accountResponse = null;
+    // To deal with banks that often throw errors when dealing with recurrent requests,
+    // we wrap the accounts update requests in a try/catch, and still fetch the transactions
+    // if it fails, if addnewsAccounts is true: we likely are in a poll and the updated accounts
+    // are really important: we should throw an error. Else, in a transactions fetch,
+    // the balance might be out of sync with the new transactions but we consider it
+    // a minor issue.
     try {
-        const { id: userId } = req.user;
-        const access = req.preloaded.access;
-        const bankVendor = (0, bank_vendors_1.bankVendorByUuid)(access.vendorId);
-        if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = (0, helpers_1.getErrorCode)('DISABLED_ACCESS');
-            throw new helpers_1.KError('disabled access', 403, errcode);
-        }
-        const userActionFields = extractUserActionFields(req.body);
-        let accountResponse = null;
-        // To deal with banks that often throw errors when dealing with recurrent requests,
-        // we wrap the accounts update requests in a try/catch, and still fetch the transactions
-        // if it fails, if addnewsAccounts is true: we likely are in a poll and the updated accounts
-        // are really important: we should throw an error. Else, in a transactions fetch,
-        // the balance might be out of sync with the new transactions but we consider it
-        // a minor issue.
-        try {
-            accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
-                addNewAccounts: focusOnTransactionsFetch === false,
-                updateProvider: false, // TODO shouldn't this be inferred from the settings?
-                isInteractive: true,
-                userActionFields,
-            });
-        }
-        catch (err) {
-            if (!focusOnTransactionsFetch) {
-                throw err;
-            }
-        }
-        if (accountResponse && accountResponse.kind === 'user_action') {
-            res.status(200).json(accountResponse);
-            return;
-        }
-        const accountInfoMap = accountResponse ? accountResponse.value : null;
-        const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-        /* ignoreLastFetchDate */ !focusOnTransactionsFetch, 
-        /* isInteractive */ true, userActionFields);
-        (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
-        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
-        // New views have automatically been created along with accounts.
-        const views = await models_1.View.all(userId);
-        res.status(200).json({
-            accounts,
-            views,
-            newTransactions,
+        accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
+            addNewAccounts: focusOnTransactionsFetch === false,
+            updateProvider: false, // TODO shouldn't this be inferred from the settings?
+            isInteractive: true,
+            userActionFields,
         });
     }
     catch (err) {
-        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts and transactions');
+        if (!focusOnTransactionsFetch) {
+            throw err;
+        }
     }
+    if (accountResponse && accountResponse.kind === 'user_action') {
+        return accountResponse;
+    }
+    const accountInfoMap = accountResponse ? accountResponse.value : null;
+    if (accountResponse && accountResponse.errors) {
+        providerErrors = providerErrors.concat(accountResponse.errors);
+    }
+    const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
+    /* ignoreLastFetchDate */ !focusOnTransactionsFetch, 
+    /* isInteractive */ true, userActionFields);
+    (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
+    if (transactionResponse.errors) {
+        providerErrors = providerErrors.concat(transactionResponse.errors);
+    }
+    const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
+    // New views have automatically been created along with accounts.
+    const views = await models_1.View.all(userId);
+    return { accounts, views, newTransactions, errors: providerErrors };
 };
 // Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
 async function fetchAccountsAndTransactions(req, res) {
-    return _fetchAccountsAndTransactions(req, res);
+    try {
+        const result = await _fetchAccountsAndTransactions(req);
+        res.status(200).json(result);
+    }
+    catch (err) {
+        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts and transactions');
+    }
 }
 // Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
 // Does not add new found accounts.
 async function fetchTransactions(req, res) {
-    return _fetchAccountsAndTransactions(req, res, true);
+    try {
+        const result = await _fetchAccountsAndTransactions(req, true);
+        res.status(200).json(result);
+    }
+    catch (err) {
+        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts and transactions');
+    }
 }
 // Fetch all the transactions / accounts for all the accesses, as is done during
 // any regular poll.
@@ -300,7 +344,7 @@ async function update(req, res) {
             throw new helpers_1.KError(`when updating an access: ${error}`, 400);
         }
         if (attrs.enabled === false) {
-            attrs.password = null;
+            await models_1.AccessField.destroyAllFromAccessId(userId, access.id);
             delete attrs.enabled;
         }
         if (attrs.customLabel === '') {
@@ -318,7 +362,13 @@ async function updateAndFetchAccounts(req, res) {
         const { id: userId } = req.user;
         const { access } = req.preloaded;
         const attrs = req.body;
-        const error = (0, validators_1.hasForbiddenField)(attrs, ['login', 'password', 'fields', 'userActionFields']);
+        const error = (0, validators_1.hasForbiddenField)(attrs, [
+            'login',
+            'password',
+            'fields',
+            'userActionFields',
+            'storeCredentials',
+        ]);
         if (error) {
             throw new helpers_1.KError(`when updating and polling an access: ${error}`, 400);
         }
@@ -326,34 +376,56 @@ async function updateAndFetchAccounts(req, res) {
         // ORM accepts it. Oh well.
         const { userActionFields } = attrs;
         delete attrs.userActionFields;
-        if (typeof attrs.fields !== 'undefined') {
-            const newFields = attrs.fields;
-            delete attrs.fields;
-            for (const { name, value } of newFields) {
-                const previous = access.fields.find(existing => existing.name === name);
-                if (value === null) {
-                    // Delete the custom field if necessary.
-                    if (typeof previous !== 'undefined') {
-                        await models_1.AccessField.destroy(userId, previous.id);
+        const providedAccessFields = attrs.fields;
+        delete attrs.fields;
+        const wasAccessEnabled = access.isEnabled();
+        const storeCredentials = !!attrs.storeCredentials;
+        delete attrs.storeCredentials;
+        if (typeof providedAccessFields !== 'undefined') {
+            if (storeCredentials) {
+                // Persist the credential updates to DB.
+                for (const { name, value } of providedAccessFields) {
+                    const previous = access.fields.find(existing => existing.name === name);
+                    if (value === null) {
+                        // Delete the custom field if necessary.
+                        if (typeof previous !== 'undefined') {
+                            await models_1.AccessField.destroy(userId, previous.id);
+                        }
                     }
-                }
-                else if (typeof previous !== 'undefined') {
-                    // Update the custom field if necessary.
-                    if (previous.value !== value) {
-                        await models_1.AccessField.update(userId, previous.id, { name, value });
+                    else if (typeof previous !== 'undefined') {
+                        // Update the custom field if necessary.
+                        if (previous.value !== value) {
+                            await models_1.AccessField.update(userId, previous.id, { name, value });
+                        }
                     }
-                }
-                else {
-                    // Create it.
-                    await models_1.AccessField.create(userId, { name, value, accessId: access.id });
+                    else {
+                        // Create it.
+                        await models_1.AccessField.create(userId, { name, value, accessId: access.id });
+                    }
                 }
             }
         }
+        else if (!wasAccessEnabled) {
+            throw new helpers_1.KError('when updating and fetching bank access: access disabled and no access fields provided by user', 401);
+        }
         // The preloaded access needs to be updated before calling fetchAccounts.
         req.preloaded.access = await models_1.Access.update(userId, access.id, attrs);
+        if (!storeCredentials) {
+            // Make sure previous credentials are erased.
+            await models_1.AccessField.destroyAllFromAccessId(userId, access.id);
+            // Since fields are not stored in DB, re-apply in-memory fields after the DB reload (Access.update reloads from DB).
+            if (providedAccessFields) {
+                req.preloaded.access.fields = providedAccessFields;
+            }
+        }
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
-        await _fetchAccountsAndTransactions(req, res);
+        const result = await _fetchAccountsAndTransactions(req);
+        if ('kind' in result) {
+            res.status(200).json(result);
+            return;
+        }
+        res.status(200).json({ ...result, enabled: storeCredentials });
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when updating and fetching bank access');

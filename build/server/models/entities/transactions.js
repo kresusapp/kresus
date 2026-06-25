@@ -69,7 +69,9 @@ let Transaction = Transaction_1 = class Transaction {
         return await (0, helpers_2.bulkInsert)(Transaction_1.repo(), fullTransactions);
     }
     static async find(userId, transactionId) {
-        return await Transaction_1.repo().findOne({ where: { userId, id: transactionId } });
+        return await Transaction_1.repo().findOne({
+            where: { userId, id: transactionId },
+        });
     }
     static async all(userId) {
         return await Transaction_1.repo().findBy({ userId });
@@ -97,7 +99,10 @@ let Transaction = Transaction_1 = class Transaction {
         return await Transaction_1.repo().find(options);
     }
     static async byAccounts(userId, accountIds) {
-        return await Transaction_1.repo().findBy({ userId, accountId: (0, typeorm_1.In)(accountIds) });
+        return await Transaction_1.repo().findBy({
+            userId,
+            accountId: (0, typeorm_1.In)(accountIds),
+        });
     }
     static async byBankSortedByDateBetweenDates(userId, account, minDate, maxDate) {
         return await Transaction_1.repo().find({
@@ -151,7 +156,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Transaction.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Transaction.prototype, "user", void 0);
@@ -160,7 +169,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Transaction.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => accounts_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => accounts_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accounts_1.default)
 ], Transaction.prototype, "account", void 0);
@@ -169,7 +182,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Transaction.prototype, "accountId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => categories_1.default, { cascade: true, onDelete: 'SET NULL', nullable: true }),
+    (0, typeorm_1.ManyToOne)(() => categories_1.default, {
+        cascade: true,
+        onDelete: 'SET NULL',
+        nullable: true,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Object)
 ], Transaction.prototype, "category", void 0);

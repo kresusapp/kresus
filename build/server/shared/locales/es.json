@@ -250,7 +250,6 @@
             "category": "Categoría",
             "last_sync_full": "Última sincronización :",
             "sync_now": "Sincronizar",
-            "sync_disabled": "Este acceso bancario está desactivado, vaya a la configuración de la cuenta bancaria para volver a activarlo",
             "type": "Tipo",
             "date": "Fecha real",
             "custom_label": "Redacción personalizada",
@@ -487,10 +486,8 @@
             "type": "Tipo:",
             "find_more": "Más información",
             "find_fewer": "Encontrar menos",
-            "threshold_desc": "Dos operaciones se considerarán posibles duplicados si la duración entre ellas es inferior al umbral de tiempo definido a continuación. Puede tambien cambiar este valor en los parámetros por defecto haciendo clic en el botón « Parámetros por defecto » en la esquina superior derecha.",
-            "hours": "horas",
-            "default_help": "Dos transacciones se considerarán duplicadas si se producen dentro de este periodo de tiempo (en horas).",
-            "default_threshold": "Umbral de duplicación",
+            "threshold_desc": "Dos operaciones se considerarán posibles duplicados si la duración entre ellas es inferior al umbral de tiempo definido a continuación.",
+            "days": "días",
             "ignore_different_custom_fields": "Ignorar diferentes campos personalizados",
             "ignore_different_custom_fields_desc": "Si ambas operaciones tienen definido un tipo, una categoría o una etiqueta personalizada, y uno de estos campos es diferente entre las dos operaciones, no las considere como duplicadas.",
             "confirm": "¿Confirma la fusión de estas dos operaciones ? Esta acción es irreversible !",
@@ -543,9 +540,6 @@
             "card_summary": "Tarjeta (diferida)",
             "deferred_card": "Débit différé",
             "internal_transfer": "Transferencia interna"
-        },
-        "units": {
-            "hours": "horas"
         },
         "addtransaction": {
             "label": "Redacción de la operación",
@@ -636,7 +630,6 @@
                 "no_new_transactions": "Durante este periodo no se importaron nuevas transacciones."
             },
             "fetch_error": {
-                "subject": "Error de recuperación de transacciones bancarias",
                 "UNKNOWN_WOOB_MODULE": "El módulo Woob es desconocido.",
                 "NO_PASSWORD": "La contraseña no está.",
                 "INVALID_PASSWORD": "La contraseña no está presente",
@@ -657,7 +650,6 @@
             }
         },
         "notification": {
-            "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
             "test_notification": {
                 "subject": "[Kresus] Notificación de la prueba",
                 "content": "Hola querido usuario de Kresus,\n\nSi está leyendo este mensaje, su configuración de notificaciones es correcta !\n\nQue tenga un buen día.\nKresus"

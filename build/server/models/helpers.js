@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DatetimeType = exports.ForceNumericColumn = void 0;
+exports.areFieldsComplete = exports.DatetimeType = exports.ForceNumericColumn = void 0;
 exports.mergeWith = mergeWith;
 exports.datetimeType = datetimeType;
 exports.isSqlite = isSqlite;
@@ -10,6 +10,7 @@ exports.idColumn = idColumn;
 exports.foreignKey = foreignKey;
 exports.foreignKeyUserId = foreignKeyUserId;
 const helpers_1 = require("../helpers");
+const providers_1 = require("../providers");
 const log = (0, helpers_1.makeLogger)('models/helpers');
 const hasCategory = (op) => op.categoryId !== null;
 const hasType = (op) => {
@@ -173,3 +174,24 @@ function foreignKey(constraintName, columnName, referencedTableName, referencedC
 function foreignKeyUserId(tableName) {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
+const areFieldsComplete = (vendorId, fields) => {
+    let vendorDescriptor;
+    try {
+        vendorDescriptor = (0, providers_1.bankVendorByUuid)(vendorId);
+    }
+    catch (_a) {
+        return false;
+    }
+    // Check that for every non-optional field, we do have a corresponding value.
+    if (!vendorDescriptor.customFields) {
+        return vendorDescriptor.noCredentials === true;
+    }
+    const mandatoryFields = vendorDescriptor.customFields
+        .filter(f => !('optional' in f) || f.optional === false)
+        .map(f => f.name);
+    if (fields.length < mandatoryFields.length) {
+        return false;
+    }
+    return mandatoryFields.every(fieldName => fields.find(f => f.name === fieldName && !!f.value));
+};
+exports.areFieldsComplete = areFieldsComplete;

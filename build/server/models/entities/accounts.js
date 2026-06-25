@@ -93,12 +93,18 @@ let Account = Account_1 = class Account {
         }
     }
     static async findMany(userId, accountIds) {
-        const accounts = await Account_1.repo().findBy({ userId, id: (0, typeorm_1.In)(accountIds) });
+        const accounts = await Account_1.repo().findBy({
+            userId,
+            id: (0, typeorm_1.In)(accountIds),
+        });
         await Promise.all(accounts.map(Account_1.ensureBalance));
         return accounts;
     }
     static async byAccess(userId, access) {
-        const accounts = await Account_1.repo().findBy({ userId, accessId: access.id });
+        const accounts = await Account_1.repo().findBy({
+            userId,
+            accessId: access.id,
+        });
         await Promise.all(accounts.map(Account_1.ensureBalance));
         return accounts;
     }
@@ -113,7 +119,9 @@ let Account = Account_1 = class Account {
         return account;
     }
     static async find(userId, accountId) {
-        const account = await Account_1.repo().findOne({ where: { userId, id: accountId } });
+        const account = await Account_1.repo().findOne({
+            where: { userId, id: accountId },
+        });
         if (account) {
             await Account_1.ensureBalance(account);
         }
@@ -127,7 +135,9 @@ let Account = Account_1 = class Account {
         return accounts;
     }
     static async exists(userId, accountId) {
-        const found = await Account_1.repo().findOne({ where: { userId, id: accountId } });
+        const found = await Account_1.repo().findOne({
+            where: { userId, id: accountId },
+        });
         return !!found;
     }
     static async destroy(userId, accountId) {
@@ -161,7 +171,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Account.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Account.prototype, "user", void 0);
@@ -170,7 +184,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Account.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => accesses_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => accesses_1.default, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accesses_1.default)
 ], Account.prototype, "access", void 0);
@@ -219,7 +237,11 @@ __decorate([
     __metadata("design:type", Object)
 ], Account.prototype, "excludeFromBalance", void 0);
 __decorate([
-    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', {
+        nullable: true,
+        default: null,
+        transformer: new helpers_2.ForceNumericColumn(),
+    }),
     __metadata("design:type", Object)
 ], Account.prototype, "balance", void 0);
 __decorate([

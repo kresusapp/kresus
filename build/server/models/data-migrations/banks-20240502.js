@@ -28,10 +28,17 @@ async function updateBanks(userId, manager) {
             ...userCondition,
         });
         // Also clear the password to force the user to update.
-        await manager.update(__1.Access, {
-            id: (0, typeorm_1.In)(accesses.map(acc => acc.id)),
-            ...userCondition,
-        }, { password: null });
+        // Disabled due to credentials migration to access fields.
+        /*
+        await manager.update(
+            Access,
+            {
+                id: In(accesses.map(acc => acc.id)),
+                ...userCondition,
+            },
+            { password: null }
+        );
+        */
     }
     log.info('Finished running data migration on banks (2024-05-02)');
 }
