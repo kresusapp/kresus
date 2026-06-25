@@ -22,14 +22,22 @@ export default class TransactionRuleAction {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
     @Column('integer')
     userId!: number;
 
-    @ManyToOne(() => TransactionRule, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => TransactionRule, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     rule!: TransactionRule;
 
@@ -39,7 +47,11 @@ export default class TransactionRuleAction {
     @Column('varchar')
     type!: TransactionRuleActionType;
 
-    @ManyToOne(() => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Category, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     category!: Category;
 
@@ -54,7 +66,9 @@ export default class TransactionRuleAction {
     }
 
     static async find(userId: number, actionId: number): Promise<TransactionRuleAction | null> {
-        return await TransactionRuleAction.repo().findOne({ where: { id: actionId, userId } });
+        return await TransactionRuleAction.repo().findOne({
+            where: { id: actionId, userId },
+        });
     }
 
     static async exists(userId: number, actionId: number): Promise<boolean> {
@@ -70,7 +84,10 @@ export default class TransactionRuleAction {
         userId: number,
         attributes: Partial<TransactionRuleAction>
     ): Promise<TransactionRuleAction> {
-        const action = TransactionRuleAction.repo().create({ ...attributes, userId });
+        const action = TransactionRuleAction.repo().create({
+            ...attributes,
+            userId,
+        });
         return await TransactionRuleAction.repo().save(action);
     }
 

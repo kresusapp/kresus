@@ -20,7 +20,10 @@ const TransactionLabel = (props: {
     const setCustomLabel = useCallback(
         async (label: string) => {
             await dispatch(
-                BanksStore.setTransactionCustomLabel({ transaction: item, customLabel: label })
+                BanksStore.setTransactionCustomLabel({
+                    transaction: item,
+                    customLabel: label,
+                })
             ).unwrap();
         },
         [dispatch, item]

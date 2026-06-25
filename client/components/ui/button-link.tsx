@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const ButtonLink = (props: {
     // URL the button links to.
@@ -17,12 +17,12 @@ const ButtonLink = (props: {
     // Extra class name for the button.
     className?: string;
 }) => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { to } = props;
     const handleClick = useCallback(() => {
-        history.push(to);
-    }, [history, to]);
+        navigate(to);
+    }, [navigate, to]);
 
     const { aria, label, icon, className } = props;
     const iconComponent = icon ? <span className={`fa fa-${icon}`} /> : null;

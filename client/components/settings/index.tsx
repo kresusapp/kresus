@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router';
 
 import URL from '../../urls';
 
@@ -13,24 +13,17 @@ import './settings.css';
 
 const SettingsComponents = () => {
     return (
-        <Switch>
-            <Route path={URL.settings.url('backup')}>
-                <BackupParameters />
-            </Route>
-            <Route path={URL.settings.url('customization')}>
-                <CustomizationParameters />
-            </Route>
-            <Route path={URL.settings.url('emails')}>
-                <EmailsParameters />
-            </Route>
-            <Route path={URL.settings.url('admin')}>
-                <AdminSection />
-            </Route>
-            <Route path={URL.settings.url('views')}>
-                <Views />
-            </Route>
-            <Redirect to={URL.settings.url('accounts')} push={false} />
-        </Switch>
+        <Routes>
+            <Route path="backup" element={<BackupParameters />} />
+            <Route path="customization" element={<CustomizationParameters />} />
+            <Route path="emails/*" element={<EmailsParameters />} />
+            <Route path="admin" element={<AdminSection />} />
+            <Route path="views/*" element={<Views />} />
+            <Route
+                path="*"
+                element={<Navigate to={URL.settings.url('accounts')} replace={true} />}
+            />
+        </Routes>
     );
 };
 

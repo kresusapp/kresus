@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access } from '../../server/models';
 import { bulkDelete } from '../../server/models/helpers';
@@ -7,7 +7,7 @@ describe('Models helpers', () => {
     let USER_ID = null;
     before(() => {
         // applyConfig must have already been called.
-        USER_ID = process.kresus.user.id;
+        USER_ID = process.kresus.defaultUser.id;
     });
 
     describe('bulkDelete should delete as expected', () => {
@@ -18,9 +18,11 @@ describe('Models helpers', () => {
         it('The entities should be removed from the database', async () => {
             // This should work for any repository but let's test the Access repository at least.
             const dummyAccessData = {
-                login: 'login',
-                password: 'password',
                 vendorId: 'gnagnagna',
+                fields: [
+                    { name: 'login', value: 'login' },
+                    { name: 'password', value: 'password' },
+                ],
             };
 
             const accessesIds = [];
@@ -34,11 +36,11 @@ describe('Models helpers', () => {
             accessesIds.push(access.id);
 
             let allAccesses = await Access.all(USER_ID);
-            allAccesses.length.should.equal(accessesIds.length);
+            assert.strictEqual(allAccesses.length, accessesIds.length);
 
             await bulkDelete(Access.repo(), accessesIds);
             allAccesses = await Access.all(USER_ID);
-            allAccesses.length.should.equal(0);
+            assert.strictEqual(allAccesses.length, 0);
         });
     });
 });

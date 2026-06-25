@@ -30,7 +30,11 @@ export default class View {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -46,7 +50,9 @@ export default class View {
     @Column('boolean', { default: false })
     createdByUser = false;
 
-    @OneToMany(() => ViewAccount, viewAccount => viewAccount.view, { cascade: ['insert'] })
+    @OneToMany(() => ViewAccount, viewAccount => viewAccount.view, {
+        cascade: ['insert'],
+    })
     accounts!: ViewAccount[];
 
     // Static methods.
@@ -86,7 +92,10 @@ export default class View {
     }
 
     static async all(userId: number): Promise<View[]> {
-        return await View.repo().find({ where: { userId }, relations: ['accounts'] });
+        return await View.repo().find({
+            where: { userId },
+            relations: ['accounts'],
+        });
     }
 
     static async destroy(userId: number, viewId: number): Promise<void> {

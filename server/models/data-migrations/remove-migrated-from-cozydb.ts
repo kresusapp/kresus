@@ -13,7 +13,10 @@ export async function run(userId: number | null, manager: EntityManager): Promis
         userCondition.userId = userId;
     }
 
-    await manager.delete(Setting, { key: 'migrated-from-cozydb', ...userCondition });
+    await manager.delete(Setting, {
+        key: 'migrated-from-cozydb',
+        ...userCondition,
+    });
 
     log.info('Finished data migration: remove unused migrated-from-cozydb');
 }

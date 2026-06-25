@@ -36,7 +36,7 @@ const randomType = (): number => randInt(0, 10);
 
 // Generates a map of the accounts belonging to the given access.
 const hashAccount = (access: Access): AccountsMap => {
-    const login = access.login;
+    const login = access.fields.find(f => f.name === 'login')?.value || '';
     const uuid = access.vendorId;
 
     const hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
@@ -91,7 +91,9 @@ export const fetchAccounts = async ({
         },
     ];
 
-    if (access.login === 'test-balance') {
+    const accessLogin = access.fields.find(f => f.name === 'login')?.value || '';
+
+    if (accessLogin === 'test-balance') {
         CHECKING_ACCOUNT_BALANCE += 10;
         values[0].balance = String(CHECKING_ACCOUNT_BALANCE);
     }
@@ -225,7 +227,9 @@ const selectRandomAccount = (access: Access): string => {
 const generate = (access: Access): ProviderTransaction[] => {
     const transactions: ProviderTransaction[] = [];
 
-    if (access.login === 'test-balance') {
+    const accessLogin = access.fields.find(f => f.name === 'login')?.value || '';
+
+    if (accessLogin === 'test-balance') {
         // Don't perturb the balance when testing it.
         return transactions;
     }
@@ -302,8 +306,27 @@ export const fetchTransactions = ({
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
 
+export const getBankVendors = () => [
+    {
+        customFields: [
+            {
+                name: 'login',
+                type: 'text',
+            },
+            {
+                name: 'password',
+                type: 'password',
+            },
+        ],
+        deprecated: false,
+        name: 'Demo bank',
+        uuid: 'demo',
+    },
+];
+
 export const _: Provider = {
     SOURCE_NAME,
+    getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

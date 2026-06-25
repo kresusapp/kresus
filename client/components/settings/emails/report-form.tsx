@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { assert, translate as $t } from '../../../helpers';
 import { useKresusDispatch } from '../../../store';
@@ -10,7 +10,7 @@ import { BackLink, Form } from '../../ui';
 import URL from './urls';
 
 const CreateReportForm = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch = useKresusDispatch();
 
     const refSelectFrequency = useRef<HTMLSelectElement>(null);
@@ -32,8 +32,8 @@ const CreateReportForm = () => {
                     frequency,
                 })
             ).unwrap();
-            history.push(URL.all);
-        }, [dispatch, history, refSelectAccount, refSelectFrequency])
+            navigate(URL.all);
+        }, [dispatch, navigate, refSelectAccount, refSelectFrequency])
     );
 
     return (

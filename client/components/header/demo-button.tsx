@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
@@ -7,13 +8,12 @@ import { translate as $t } from '../../helpers';
 
 import { Popconfirm } from '../ui';
 import { useGenericError } from '../../hooks';
-import { useHistory } from 'react-router-dom';
 import URL from '../../urls';
 
 export default () => {
     const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
     const dispatch = useKresusDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const handleDisable = useGenericError(
         useCallback(async () => {
             // Bad Hack: Go to the about/ page before disabling demo mode. The
@@ -33,15 +33,15 @@ export default () => {
             // assertions.
             //
             // In case of failure, revert back to the previous page.
-            history.push(URL.about.url());
+            navigate(URL.about.url());
 
             try {
                 await dispatch(GlobalStore.enableDemo(false)).unwrap();
             } catch (err) {
-                history.goBack();
+                navigate(-1);
                 throw err;
             }
-        }, [history, dispatch])
+        }, [navigate, dispatch])
     );
 
     if (!isDemoMode) {

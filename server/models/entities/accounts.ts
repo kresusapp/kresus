@@ -46,7 +46,11 @@ export default class Account {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -54,7 +58,11 @@ export default class Account {
     userId!: number;
 
     // Access instance containing the account.
-    @ManyToOne(() => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Access, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     access!: Access;
 
@@ -106,7 +114,11 @@ export default class Account {
     excludeFromBalance = false;
 
     // Balance on the account, updated at each account update.
-    @Column('numeric', { nullable: true, default: null, transformer: new ForceNumericColumn() })
+    @Column('numeric', {
+        nullable: true,
+        default: null,
+        transformer: new ForceNumericColumn(),
+    })
     balance: number | null = null;
 
     // Set to true if in the latest sync, this account didn't match any account on the provider's website.
@@ -181,13 +193,19 @@ export default class Account {
     };
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
-        const accounts = await Account.repo().findBy({ userId, id: In(accountIds) });
+        const accounts = await Account.repo().findBy({
+            userId,
+            id: In(accountIds),
+        });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
 
     static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
-        const accounts = await Account.repo().findBy({ userId, accessId: access.id });
+        const accounts = await Account.repo().findBy({
+            userId,
+            accessId: access.id,
+        });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
@@ -205,7 +223,9 @@ export default class Account {
     }
 
     static async find(userId: number, accountId: number): Promise<Account | null> {
-        const account = await Account.repo().findOne({ where: { userId, id: accountId } });
+        const account = await Account.repo().findOne({
+            where: { userId, id: accountId },
+        });
         if (account) {
             await Account.ensureBalance(account);
         }
@@ -221,7 +241,9 @@ export default class Account {
     }
 
     static async exists(userId: number, accountId: number): Promise<boolean> {
-        const found = await Account.repo().findOne({ where: { userId, id: accountId } });
+        const found = await Account.repo().findOne({
+            where: { userId, id: accountId },
+        });
         return !!found;
     }
 

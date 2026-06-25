@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { KError } from '../../server/helpers';
 import { testing } from '../../server/providers/woob';
@@ -19,13 +19,25 @@ const { callWoob, defaultOptions, CallWoobCommand } = testing;
 
 const VALID_FAKE_ACCESS = {
     vendorId: 'fakewoobbank',
-    password: 'password',
-    login: 'noerror',
     fields: [
+        { name: 'login', value: 'noerror' },
+        { name: 'password', value: 'password' },
         { name: 'website', value: 'par' },
         { name: 'foobar', value: 'toto' },
         { name: 'secret', value: 'topsikret' },
     ],
+};
+
+const setAccessField = (access, fieldName, fieldValue) => {
+    const copy = structuredClone(access);
+    let field = copy.fields.find(f => f.name === fieldName);
+    if (field) {
+        field.value = fieldValue;
+    } else {
+        copy.fields.push({ name: fieldName, value: fieldValue });
+    }
+
+    return copy;
 };
 
 // A simple class implementing a dummy SessionManager.
@@ -56,11 +68,11 @@ async function callWoobBefore(command, access, session) {
 }
 
 function checkError(result, errCode) {
-    should.not.exist(result.success);
-    should.exist(result.error);
-    result.error.should.instanceof(KError);
-    should.exist(result.error.errCode);
-    result.error.errCode.should.equal(errCode);
+    assert.ok(!('success' in result));
+    assert.ok('error' in result);
+    assert.ok(result.error instanceof KError);
+    assert.ok('errCode' in result.error);
+    assert.strictEqual(result.error.errCode, errCode);
 }
 
 // Test different defect situations. `command` must be transactions or accounts.
@@ -94,9 +106,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'unknown',
-                    login: 'login',
-                    password: 'password',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'password' },
+                    ],
                 },
                 new TestSession()
             );
@@ -109,9 +122,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    login: 'login',
-                    password: '',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: '' },
+                    ],
                 },
                 new TestSession()
             );
@@ -124,9 +138,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'password',
-                    login: '',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: '' },
+                        { name: 'password', value: 'password' },
+                    ],
                 },
                 new TestSession()
             );
@@ -139,9 +154,11 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [{ name: 'field' }],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                        { name: 'field' },
+                    ],
                 },
                 new TestSession()
             );
@@ -154,9 +171,11 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [{ value: 'field' }],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                        { value: 'field' },
+                    ],
                 },
                 new TestSession()
             );
@@ -169,9 +188,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                    ],
                 },
                 new TestSession()
             );
@@ -184,9 +204,10 @@ async function makeDefectSituation(command) {
                 command,
                 {
                     vendorId: 'fakewoobbank',
-                    password: 'test',
-                    login: 'login',
-                    fields: [],
+                    fields: [
+                        { name: 'login', value: 'login' },
+                        { name: 'password', value: 'test' },
+                    ],
                 },
                 new TestSession()
             );
@@ -197,7 +218,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'invalidpassword' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'invalidpassword'),
                 new TestSession()
             );
             checkError(result, INVALID_PASSWORD);
@@ -206,7 +227,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'expiredpassword' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'expiredpassword'),
                 new TestSession()
             );
             checkError(result, EXPIRED_PASSWORD);
@@ -215,7 +236,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: 'actionneeded' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'actionneeded'),
                 new TestSession()
             );
             checkError(result, ACTION_NEEDED);
@@ -224,9 +245,7 @@ async function makeDefectSituation(command) {
         it(`call "${textCmd}" command, the configured auth method is not supported should raise "AUTH_METHOD_NYI"`, async () => {
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, {
-                    login: 'authmethodnotimplemented',
-                }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', 'authmethodnotimplemented'),
                 new TestSession()
             );
             checkError(result, AUTH_METHOD_NYI);
@@ -237,15 +256,15 @@ async function makeDefectSituation(command) {
 
             let result = await callWoobBefore(
                 command,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: '2fa' }),
+                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa'),
                 sessionManager
             );
 
-            should.exist(result.success);
-            should.exist(result.success.kind);
-            result.success.kind.should.equal('user_action');
-            should.exist(result.success.fields);
-            result.success.fields.should.instanceof(Array);
+            assert.ok('success' in result);
+            assert.ok('kind' in result.success);
+            assert.strictEqual(result.success.kind, 'user_action');
+            assert.ok('fields' in result.success);
+            assert.ok(result.success.fields instanceof Array);
 
             // And re-calling with the same session and fields should be
             // sufficient to launch the sync.
@@ -260,13 +279,13 @@ async function makeDefectSituation(command) {
                 command,
                 woobOptions,
                 sessionManager,
-                Object.assign({}, VALID_FAKE_ACCESS, { login: '2fa' })
+                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
             );
 
-            should.exist(woobResponse);
-            should.exist(woobResponse.kind);
-            woobResponse.kind.should.equal('values');
-            should.exist(woobResponse.values);
+            assert.ok(woobResponse);
+            assert.ok('kind' in woobResponse);
+            assert.strictEqual(woobResponse.kind, 'values');
+            assert.ok('values' in woobResponse);
         });
     });
 }
@@ -276,7 +295,6 @@ describe('Testing kresus/woob integration', function () {
     // These tests can be long
     this.slow(4000);
     this.timeout(10000);
-
     describe('with woob not installed.', () => {
         it('call "test" should raise "WOOB_NOT_INSTALLED" error, if woob is not globally installed. WARNING: if this test fails, make sure Woob is not installed globally before opening an issue.', async () => {
             applyTestConfig();
@@ -310,17 +328,16 @@ describe('Testing kresus/woob integration', function () {
         describe('Normal uses', () => {
             it('call test should not throw and return nothing', async () => {
                 let { error, success } = await callWoobBefore(CallWoobCommand.Test);
-                should.not.exist(error);
-                should.exist(success);
+                assert.ok(!error);
+                assert.ok(success);
             });
 
             it('call version should not raise and return a non empty string', async () => {
                 let { error, success } = await callWoobBefore(CallWoobCommand.Version);
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(String);
-                success.values.length.should.be.aboveOrEqual(1);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(typeof success.values === 'string');
+                assert.ok(success.values.length >= 1);
             });
 
             it('call "transactions" should not raise and should return an array of transaction-like shaped objects', async () => {
@@ -330,51 +347,56 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
             it('call "transactions" with a password containing special characters should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        password: 'a`&/.:\'?!#>b"',
-                    }),
+                    setAccessField(VALID_FAKE_ACCESS, 'password', 'a`&/.:\'?!#>b"'),
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
             it('call "transactions" with a password containing only spaces should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        password: '     ',
-                    }),
+                    setAccessField(VALID_FAKE_ACCESS, 'password', '     '),
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
+                    assert.ok('date' in element);
+                    assert.ok('amount' in element);
+                    assert.ok('label' in element);
+                    assert.ok('type' in element);
+                    assert.ok('account' in element);
                 }
             });
 
@@ -385,20 +407,17 @@ describe('Testing kresus/woob integration', function () {
                     new TestSession()
                 );
 
-                should.not.exist(error);
-                should.exist(success);
-                should.exist(success.values);
-                success.values.should.instanceof(Array);
+                assert.ok(!error);
+                assert.ok(success);
+                assert.ok(success.values instanceof Array);
 
                 for (let element of success.values) {
-                    element.should.have.keys(
-                        'vendorAccountId',
-                        'label',
-                        'currency',
-                        'balance',
-                        'iban',
-                        'type'
-                    );
+                    assert.ok('vendorAccountId' in element);
+                    assert.ok('label' in element);
+                    assert.ok('currency' in element);
+                    assert.ok('balance' in element);
+                    assert.ok('iban' in element);
+                    assert.ok('type' in element);
                 }
             });
         });
@@ -411,36 +430,42 @@ describe('Testing kresus/woob integration', function () {
             });
 
             it('call "accounts" on an account which supports session saving should add session information to the SessionMap', async () => {
-                session.map.has('accessId').should.equal(false);
+                assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Accounts,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
+
+                    Object.assign(setAccessField(VALID_FAKE_ACCESS, 'login', 'session'), {
                         id: 'accessId',
-                        login: 'session',
-                        password: 'password',
                     }),
                     session
                 );
-                session.map.has('accessId').should.equal(true);
-                should.deepEqual(session.map.get('accessId'), {
+
+                assert.ok(session.map.has('accessId'));
+                assert.deepStrictEqual(session.map.get('accessId'), {
                     backends: { fakewoobbank: { browser_state: { password: 'password' } } },
                 });
             });
 
             it('call "transactions" on an account which supports session saving should add session information to the SessionMap', async () => {
-                session.map.has('accessId').should.equal(false);
+                assert.ok(!session.map.has('accessId'));
                 await callWoobBefore(
                     CallWoobCommand.Transactions,
-                    Object.assign({}, VALID_FAKE_ACCESS, {
-                        id: 'accessId',
-                        login: 'session',
-                        password: 'password2',
-                    }),
+                    Object.assign(
+                        setAccessField(
+                            setAccessField(VALID_FAKE_ACCESS, 'login', 'session'),
+                            'password',
+                            'password2'
+                        ),
+                        { id: 'accessId' }
+                    ),
                     session
                 );
-                session.map.has('accessId').should.equal(true);
-                should.deepEqual(session.map.get('accessId'), {
-                    backends: { fakewoobbank: { browser_state: { password: 'password2' } } },
+
+                assert.ok(session.map.has('accessId'));
+                assert.deepStrictEqual(session.map.get('accessId'), {
+                    backends: {
+                        fakewoobbank: { browser_state: { password: 'password2' } },
+                    },
                 });
             });
         });

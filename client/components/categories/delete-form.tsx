@@ -1,7 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
@@ -10,7 +11,7 @@ import URL from './urls';
 import { BackLink, Form } from '../ui';
 
 const DeleteForm = () => {
-    const { categoryId: categoryStringId } = useParams<{ categoryId: string }>();
+    const { categoryId: categoryStringId } = useRequiredParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryStringId, 10);
 
     const category = useKresusState(state => CategoriesStore.fromId(state.categories, categoryId));
@@ -19,7 +20,7 @@ const DeleteForm = () => {
         state => BanksStore.transactionIdsByCategoryId(state.banks, categoryId).length
     );
 
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch = useKresusDispatch();
 
     const refReplace = useRef<HTMLSelectElement>(null);
@@ -34,7 +35,7 @@ const DeleteForm = () => {
         // the category may not exist anymore!
         // So, we have to first push the history entry, then delete, and get
         // back to the current form if the deletion failed somehow.
-        history.push(URL.list);
+        navigate(URL.list);
         try {
             await dispatch(
                 CategoriesStore.destroy({ id: categoryId, replaceById: replaceBy })
@@ -42,9 +43,9 @@ const DeleteForm = () => {
             notify.success($t('client.category.deletion_success'));
         } catch (error) {
             notify.error($t('client.category.deletion_error', { error: error.message }));
-            history.push(URL.delete(categoryId));
+            navigate(URL.delete(categoryId));
         }
-    }, [dispatch, history, refReplace, categoryId]);
+    }, [dispatch, navigate, refReplace, categoryId]);
 
     let explainer;
     let replaceForm;

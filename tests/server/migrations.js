@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { Access, Account, Budget, Category, User, Transaction } from '../../server/models';
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
@@ -7,29 +7,30 @@ import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../serve
 import { AddViews1734262035140 as AddViewsMigration } from '../../server/models/migrations/23';
 import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
 import { AddViewIdInBudget1737381056464 as AddViewIdInBudgetMigration } from '../../server/models/migrations/25';
+import { MoveLoginPasswordToFields1756391927839 as MoveLoginPasswordToFields } from '../../server/models/migrations/27';
+
+import { checkObjectIsSubsetOf } from '../helpers';
 
 async function cleanAll(userId) {
     await Budget.destroyAll(userId);
     await Category.destroyAll(userId);
 }
 
-let USER_ID = null;
-before(async () => {
-    // Reload the USER_ID from the database, since process.kresus.user.id which
-    // might have been clobbered by another test.
-    // TODO: this is bad for testing and we should fix this properly later.
-    const users = await User.all();
-    if (!users.length) {
-        throw new Error('user should have been created!');
-    }
-    USER_ID = users[0].id;
-    if (typeof USER_ID !== 'number') {
-        throw new Error('missing user id in test.');
-    }
-});
-
 describe('migrations', () => {
+    let USER_ID = null;
     before(async () => {
+        // Reload the USER_ID from the database, since process.kresus.defaultUser.id which
+        // might have been clobbered by another test.
+        // TODO: this is bad for testing and we should fix this properly later.
+        const users = await User.all();
+        if (!users.length) {
+            throw new Error('user should have been created!');
+        }
+        USER_ID = users[0].id;
+        if (typeof USER_ID !== 'number') {
+            throw new Error('missing user id in test.');
+        }
+
         await cleanAll(USER_ID);
     });
 
@@ -39,16 +40,16 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         let table = await queryRunner.getTable('budget');
-        table.uniques.length.should.equal(1);
-        should(table.uniques[0].columnNames.includes('viewId')).be.true();
+        assert.strictEqual(table.uniques.length, 1);
+        assert.ok(table.uniques[0].columnNames.includes('viewId'));
 
         // There is a unique constraint but the columnNames do not include 'viewId' anymore.
         const constraintMigration = new AddViewIdInBudgetMigration();
         await constraintMigration.down(queryRunner);
 
         table = await queryRunner.getTable('budget');
-        table.uniques.length.should.equal(1);
-        should(table.uniques[0].columnNames.includes('viewId')).be.false();
+        assert.strictEqual(table.uniques.length, 1);
+        assert.ok(!table.uniques[0].columnNames.includes('viewId'));
     });
 
     // Run before test on migration 7 (we need the unique constraint removed before faking duplicates).
@@ -57,13 +58,13 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         let table = await queryRunner.getTable('budget');
-        should(table.uniques.length).equal(1);
+        assert.strictEqual(table.uniques.length, 1);
 
         const constraintMigration = new BudgetsConstraintMigration();
         await constraintMigration.down(queryRunner);
 
         table = await queryRunner.getTable('budget');
-        should(table.uniques.length).equal(0);
+        assert.strictEqual(table.uniques.length, 0);
     });
 
     it('should run migration 7 (removing budgets duplicates) properly', async () => {
@@ -74,13 +75,15 @@ describe('migrations', () => {
             id: 0,
         });
         const allCategories = await Category.all(USER_ID);
-        allCategories.length.should.equal(1);
+        assert.strictEqual(allCategories.length, 1);
 
         // Then an account, that will create an associated view, mandatory since migration 24.
         const someAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'whatever' },
+            ],
         });
 
         await Account.create(USER_ID, {
@@ -119,7 +122,7 @@ describe('migrations', () => {
                 userId: USER_ID,
             },
         });
-        allBudgets.length.should.equal(2);
+        assert.strictEqual(allBudgets.length, 2);
 
         // Then run the migration
         const duplicatesRemoval = new BudgetsDuplicatesRemoval();
@@ -134,14 +137,16 @@ describe('migrations', () => {
                 userId: USER_ID,
             },
         });
-        allBudgets.length.should.equal(1);
+        assert.strictEqual(allBudgets.length, 1);
     });
 
     it('should run migration 13 (setting default bank accounts balance) properly', async () => {
         const manualAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'manual',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         const manualAccount = await Account.create(USER_ID, {
@@ -154,9 +159,11 @@ describe('migrations', () => {
         });
 
         const classicAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         const classicAccount = await Account.create(USER_ID, {
@@ -189,13 +196,13 @@ describe('migrations', () => {
         let account = await Account.repo().findOne({
             where: { userId: USER_ID, id: manualAccount.id },
         });
-        should(account.balance).be.null();
+        assert.strictEqual(account.balance, null);
 
         // For other accounts it should be initialBalance minus the sum of transactions
         account = await Account.repo().findOne({
             where: { userId: USER_ID, id: classicAccount.id },
         });
-        account.balance.should.equal(376.5);
+        assert.strictEqual(account.balance, 376.5);
     });
 
     it('should run migration 23 and create views for existing accounts', async () => {
@@ -232,22 +239,20 @@ describe('migrations', () => {
         await migration.up(queryRunner);
 
         // Check that at least one view exists
-        const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = $1', [
-            USER_ID,
-        ]);
-        views.length.should.be.above(0);
+        const views = await queryRunner.query('SELECT * FROM "view" WHERE "userId" = ?', [USER_ID]);
+        assert.ok(views.length > 0);
 
         // Check that the view-accounts link exists
         const viewAccounts = await queryRunner.query(
-            'SELECT * FROM "view-accounts" WHERE "accountId" = $1',
+            'SELECT * FROM "view-accounts" WHERE "accountId" = ?',
             [account.id]
         );
-        viewAccounts.length.should.be.above(0);
+        assert.ok(viewAccounts.length > 0);
     });
 
     it('should run migration 24 (adding isAdmin field to user model & set current users as admin) properly', async () => {
         let allUsers = await User.all();
-        allUsers.length.should.equal(1);
+        assert.strictEqual(allUsers.length, 1);
 
         // Drop unique constraint first
         const connection = User.repo().manager.connection;
@@ -261,7 +266,7 @@ describe('migrations', () => {
         await newColMigration.up(queryRunner);
 
         allUsers = await User.all();
-        allUsers.length.should.equal(1);
+        assert.strictEqual(allUsers.length, 1);
     });
 
     it('should run migration 25 and guess the best account on which to migrate budgets', async () => {
@@ -269,9 +274,11 @@ describe('migrations', () => {
         const queryRunner = connection.createQueryRunner();
 
         const someAccess = await Access.create(USER_ID, {
-            login: 'login',
-            password: 'password',
             vendorId: 'whatever',
+            fields: [
+                { name: 'login', value: 'login' },
+                { name: 'password', value: 'password' },
+            ],
         });
 
         // First with account but none of type 'account-type.savings'.
@@ -301,7 +308,7 @@ describe('migrations', () => {
         );
 
         // Should return the first account.
-        bestGuessAccountId.should.equal(savingAccount.id);
+        assert.strictEqual(bestGuessAccountId, savingAccount.id);
 
         // Now create a checking account
         const checkingAccount = await Account.create(USER_ID, {
@@ -319,7 +326,7 @@ describe('migrations', () => {
             USER_ID
         );
 
-        bestGuessAccountId.should.equal(checkingAccount.id);
+        assert.strictEqual(bestGuessAccountId, checkingAccount.id);
     });
 
     it('should run migration 25 without throwing where there are no accounts', async () => {
@@ -332,7 +339,91 @@ describe('migrations', () => {
             queryRunner,
             USER_ID
         );
-        // eslint-disable-next-line new-cap
-        bestGuessId.should.equal(-1);
+
+        assert.strictEqual(bestGuessId, -1);
+    });
+
+    describe('should run migration 27', async () => {
+        beforeEach(async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+
+            await queryRunner.query('DELETE FROM access_fields');
+            await queryRunner.query('DELETE FROM access');
+        });
+
+        it('and move login & password fields to access fields on "up"', async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+            const migration = new MoveLoginPasswordToFields();
+
+            // First migrate down to allow login/password properties in access table.
+            await migration.down(queryRunner);
+
+            // Insert test data
+            const createdAccessId = await queryRunner.query(
+                `INSERT INTO access (userId, vendorId, login, password) VALUES (${USER_ID}, 'fakeVendorId', 'foo', 'bar')`
+            );
+
+            if (typeof createdAccessId !== 'number') {
+                throw new Error('createdAccessId should be a number (in SQLite)');
+            }
+
+            // Create an account
+            await queryRunner.query(
+                `INSERT INTO account (userId, accessId, vendorAccountId, type, importDate, initialBalance, lastCheckDate, label, excludeFromBalance, isOrphan, gracePeriod) VALUES
+                (${USER_ID}, ${createdAccessId}, 'fakeAccountVendorId', 'account-type.unknown', '2015-11-20 07:42:39', 0, 0, 'Some label', 0, false, 0)`
+            );
+
+            await migration.up(queryRunner);
+
+            // Check access_field
+            const fields = await queryRunner.query(
+                `SELECT name, value FROM access_fields WHERE accessId = ${createdAccessId}`
+            );
+            assert.strictEqual(fields.length, 2);
+            assert.ok(fields.some(f => f.name === 'login' && f.value === 'foo'));
+            assert.ok(fields.some(f => f.name === 'password' && f.value === 'bar'));
+
+            // Check columns are dropped
+            const table = await queryRunner.getTable('access');
+            const columnNames = table.columns.map(c => c.name);
+            assert.ok(!columnNames.includes('login'));
+            assert.ok(!columnNames.includes('password'));
+
+            // Check accounts still exist (sqlite drops tables when altering them, deleting data
+            // by cascade)
+            const accounts = await queryRunner.query('SELECT * FROM account');
+            assert.strictEqual(accounts.length, 1);
+        });
+
+        it('and restore login and password from access_fields on "down"', async () => {
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+            const migration = new MoveLoginPasswordToFields();
+
+            // Prepare access and access_field
+            await queryRunner.query(
+                `INSERT INTO access (id, userId, vendorId) VALUES (2, ${USER_ID}, 'fakeVendorId')`
+            );
+            await queryRunner.query(
+                `INSERT INTO access_fields (accessId, userId, name, value) VALUES (2, ${USER_ID}, 'login', 'baz'), (2, ${USER_ID}, 'password', 'qux')`
+            );
+
+            await migration.down(queryRunner);
+
+            // Check access table
+            const access = await queryRunner.query(
+                'SELECT login, password FROM access WHERE id = 2'
+            );
+            assert.strictEqual(access.length, 1);
+            assert.ok(checkObjectIsSubsetOf({ login: 'baz', password: 'qux' }, access[0]));
+
+            // Check fields are deleted
+            const fields = await queryRunner.query(
+                'SELECT * FROM access_fields WHERE accessId = 2'
+            );
+            assert.strictEqual(fields.length, 0);
+        });
     });
 });

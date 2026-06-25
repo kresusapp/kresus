@@ -168,21 +168,23 @@ export function exportInstance(maybePassword?: string) {
 // /api/accesses
 export function createAccess(
     vendorId: string,
-    login: string,
-    password: string,
     customFields: AccessCustomField[],
     customLabel: string | null,
-    userActionFields: FinishUserActionFields | null = null
+    storeCredentials: boolean,
+    userActionFields: FinishUserActionFields | null = null,
+    accessId?: number // Needed only when the server sent it back for 2FA.
 ) {
-    const data = {
+    const data: Record<string, unknown> = {
         vendorId,
-        login,
-        password,
         customLabel,
         fields: customFields,
+        storeCredentials,
         // TODO would be nice to separate the access' fields from the user action fields.
         userActionFields,
     };
+    if (accessId !== undefined) {
+        data.accessId = accessId;
+    }
     return new Request('api/accesses').post().json(data).run();
 }
 
@@ -197,13 +199,17 @@ export function updateAccess(accessId: number, update: Partial<Access>) {
 export function updateAndFetchAccess(
     accessId: number,
     access: {
-        login: string;
-        password: string;
         customFields: AccessCustomField[];
+        storeCredentials?: boolean;
     },
     userActionFields: FinishUserActionFields | null = null
 ) {
-    const error = hasForbiddenField(access, ['login', 'password', 'customFields']);
+    const error = hasForbiddenField(access, [
+        'login',
+        'password',
+        'customFields',
+        'storeCredentials',
+    ]);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }
@@ -263,11 +269,19 @@ export function deleteAccount(accountId: number) {
 }
 export async function resyncBalance(
     accountId: number,
-    userActionFields: FinishUserActionFields | null = null
+    userActionFields: FinishUserActionFields | null = null,
+    fields: AccessCustomField[] | null = null
 ) {
-    let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
+    const body: Record<string, unknown> = {};
     if (userActionFields !== null) {
-        request = request.json({ userActionFields });
+        body.userActionFields = userActionFields;
+    }
+    if (fields !== null) {
+        body.fields = fields;
+    }
+    let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
+    if (Object.keys(body).length > 0) {
+        request = request.json(body);
     }
     return request.run();
 }
@@ -464,4 +478,9 @@ export function updateView(viewId: number, attributes: Partial<ServerView>) {
 }
 export function deleteView(viewId: number) {
     return new Request(`api/views/${viewId}`).delete().run();
+}
+
+// /api/duplicates
+export function fetchDuplicates() {
+    return new Request('api/duplicates').run();
 }

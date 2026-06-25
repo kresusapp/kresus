@@ -42,13 +42,13 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
 
         const accesses = await Access.all(userId);
         accesses.forEach(acc => {
-            if (acc.login) {
-                sensitiveKeywords.add(acc.login);
-            }
-
-            if (acc.password) {
-                passwords.add(acc.password);
-            }
+            acc.fields.forEach(field => {
+                if (field.name === 'password') {
+                    passwords.add(field.value);
+                } else if (field.name === 'login') {
+                    sensitiveKeywords.add(field.value);
+                }
+            });
         });
 
         if (process.kresus.smtpUser) {

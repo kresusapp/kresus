@@ -1,4 +1,5 @@
-import should from 'should';
+import assert from 'node:assert';
+
 import {
     UNKNOWN_TRANSACTION_TYPE,
     DEFERRED_CARD_TYPE,
@@ -24,12 +25,12 @@ describe('filtering duplicate transactions', () => {
         const { toCreate, toUpdate } = filterDuplicateTransactions([
             [knownTransaction, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        should.exist(toUpdate[0].known);
-        toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate.length.should.equal(1);
-        should.deepEqual(toUpdate[0].update, { type: updatedType });
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+        assert.ok('known' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].known.id, transactionId);
+        assert.ok('update' in toUpdate[0]);
+        assert.deepStrictEqual(toUpdate[0].update, { type: updatedType });
     });
 
     it('the provided transaction differing by more than just the type, should be created (rawLabel change)', () => {
@@ -37,9 +38,9 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        should.deepEqual(toCreate[0], providedTransaction);
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction differing by more than just the type, should be created (date change)', () => {
@@ -47,9 +48,9 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        should.deepEqual(toCreate[0], providedTransaction);
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction differing by more than just the type, should be created (amount change)', () => {
@@ -57,9 +58,9 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        toCreate[0].should.deepEqual(providedTransaction);
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction differing by the type (other than card type change), and the known transaction was not modified by the user, should be created', () => {
@@ -68,9 +69,9 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        toCreate[0].should.deepEqual(providedTransaction);
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction differing by the type (other than card type change), and the known transaction with a known type was modified by the user, the pair should be ignored', () => {
@@ -79,8 +80,8 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(0);
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 0);
     });
 
     it('the provided transaction differing by the type (other than card type change), and the known transaction was with an unknown type modified by the user, the type should be updated.', () => {
@@ -93,10 +94,11 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        toUpdate[0].known.should.deepEqual(knownTransaction2);
-        toUpdate[0].update.should.deepEqual({ type: providedTransaction.type });
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+
+        assert.deepStrictEqual(toUpdate[0].known, knownTransaction2);
+        assert.deepStrictEqual(toUpdate[0].update, { type: providedTransaction.type });
     });
 
     it('the provided transaction changing the type from DEFERRED_CARD_TYPE to TRANSACTION_CARD_TYPE, but with no debitDate should be created', () => {
@@ -105,9 +107,10 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        toCreate[0].should.deepEqual(providedTransaction);
+
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction changing the type from DEFERRED_CARD_TYPE to TRANSACTION_CARD_TYPE, should be created, if the debitDate is after now', () => {
@@ -120,9 +123,10 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
-        toCreate.length.should.equal(1);
-        toCreate[0].should.deepEqual(providedTransaction);
+
+        assert.strictEqual(toCreate.length, 1);
+        assert.strictEqual(toUpdate.length, 0);
+        assert.deepStrictEqual(toCreate[0], providedTransaction);
     });
 
     it('the provided transaction changing the type from DEFERRED_CARD_TYPE to TRANSACTION_CARD_TYPE, should be updated, if the debitDate is before now', () => {
@@ -136,11 +140,14 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        should.exist(toUpdate[0].known);
-        toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate[0].update.should.deepEqual({ type: TRANSACTION_CARD_TYPE.name });
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+
+        assert.ok('known' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].known.id, transactionId);
+        assert.ok('update' in toUpdate[0]);
+        assert.deepStrictEqual(toUpdate[0].update, { type: TRANSACTION_CARD_TYPE.name });
     });
 
     it('the provided transaction changing the type from DEFERRED_CARD_TYPE to TRANSACTION_CARD_TYPE, should be updated, if the debitDate is before now, even if the known transaction has isUserDefinedType === true', () => {
@@ -154,11 +161,14 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        should.exist(toUpdate[0].known);
-        toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate[0].update.should.deepEqual({ type: TRANSACTION_CARD_TYPE.name });
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+
+        assert.ok('known' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].known.id, transactionId);
+        assert.ok('update' in toUpdate[0]);
+        assert.deepStrictEqual(toUpdate[0].update, { type: TRANSACTION_CARD_TYPE.name });
     });
 
     it('the known transaction has type INTERNAL_TRANSFER_TYPE, the transaction should be ignored', () => {
@@ -171,8 +181,9 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(0);
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 0);
     });
 
     it('the known transaction has a type but not the provided one, and it is a perfect match, the transaction should be ignored', () => {
@@ -182,8 +193,9 @@ describe('filtering duplicate transactions', () => {
         };
         const withoutType = knownTransaction;
         const { toUpdate, toCreate } = filterDuplicateTransactions([[withType, withoutType]]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(0);
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 0);
     });
 
     it('the createdByUser flag should be reset to false if either the known or provided transaction has it set to false', () => {
@@ -199,11 +211,13 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        should.exist(toUpdate[0].known);
-        toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate[0].update.createdByUser.should.equal(false);
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+        assert.ok('known' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].known.id, transactionId);
+        assert.ok('update' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].update.createdByUser, false);
     });
 
     it('the createdByUser flag should not be set to false if both the known and provided transactions have it set to true', () => {
@@ -219,7 +233,7 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
+        assert.strictEqual(toUpdate.length, 0);
     });
 
     it('the isRecurrentTransaction flag should be reset to false if either the known or provided transaction has it set to false', () => {
@@ -235,11 +249,14 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate, toCreate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toCreate.length.should.equal(0);
-        toUpdate.length.should.equal(1);
-        should.exist(toUpdate[0].known);
-        toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate[0].update.isRecurrentTransaction.should.equal(false);
+
+        assert.strictEqual(toCreate.length, 0);
+        assert.strictEqual(toUpdate.length, 1);
+
+        assert.ok('known' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].known.id, transactionId);
+        assert.ok('update' in toUpdate[0]);
+        assert.strictEqual(toUpdate[0].update.isRecurrentTransaction, false);
     });
 
     it('the isRecurrentTransaction flag should not be set to false if both the known and provided transactions have it set to true', () => {
@@ -255,6 +272,6 @@ describe('filtering duplicate transactions', () => {
         const { toUpdate } = filterDuplicateTransactions([
             [knownTransaction2, providedTransaction],
         ]);
-        toUpdate.length.should.equal(0);
+        assert.strictEqual(toUpdate.length, 0);
     });
 });

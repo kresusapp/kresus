@@ -20,6 +20,7 @@ const Errors = {
     INVALID_PASSWORD: get('INVALID_PASSWORD'),
     NO_ACCOUNTS: get('NO_ACCOUNTS'),
     NO_PASSWORD: get('NO_PASSWORD'),
+    MISSING_MANDATORY_FIELD: get('MISSING_MANDATORY_FIELD'),
     UNKNOWN_MODULE: get('UNKNOWN_WOOB_MODULE'),
     WOOB_NOT_INSTALLED: get('WOOB_NOT_INSTALLED'),
     INTERNAL_ERROR: get('INTERNAL_ERROR'),
@@ -117,6 +118,9 @@ export const handleSyncError = (err: any) => {
             break;
         case Errors.NO_PASSWORD:
             notify.error($t('client.sync.no_password'));
+            break;
+        case Errors.MISSING_MANDATORY_FIELD:
+            notify.error($t('client.sync.missing_mandatory_field'));
             break;
         default:
             handleFirstSyncError(err);

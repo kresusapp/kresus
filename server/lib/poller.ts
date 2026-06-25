@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { Access, Setting } from '../models';
+import { Access, Setting, User } from '../models';
+import { bankVendorByUuid } from '../providers';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
 import AlertManager from './alert-manager';
-import { bankVendorByUuid } from './bank-vendors';
 
 import {
     assert,
@@ -23,30 +23,73 @@ import { getTranslator } from './translator';
 
 const log = makeLogger('poller');
 
-async function managePollingErrors(userId: number, access: Access, err: KError): Promise<void> {
-    assert(!!err.errCode, 'should have an error code to call managePollingErrors');
-
+async function managePollingErrors(
+    userId: number,
+    accessLabel: string,
+    type: 'blocking' | 'non_blocking',
+    errorMessages: string[],
+    requiresUserAction = false
+): Promise<void> {
     const i18n = await getTranslator(userId);
 
-    // Retrieve the human readable error code.
-    const error = $t(i18n, `server.email.fetch_error.${err.errCode}`);
-    const subject = $t(i18n, 'server.email.fetch_error.subject');
+    const blockingStatusLocale = $t(i18n, `server.email.fetch_error.${type}`, {
+        // eslint-disable-next-line camelcase
+        smart_count: errorMessages.length,
+    });
+    const subject = $t(i18n, 'server.email.fetch_error.subject', {
+        // eslint-disable-next-line camelcase
+        smart_count: errorMessages.length,
 
-    let content = $t(i18n, 'server.email.fetch_error.text', {
-        bank: access.getLabel(),
-        error,
+        type: blockingStatusLocale,
     });
 
-    if (errorRequiresUserAction(err)) {
+    let content = $t(i18n, 'server.email.fetch_error.text', {
+        bank: accessLabel,
+        error:
+            errorMessages.length > 1
+                ? errorMessages.map(e => `– ${e}`).join('\n')
+                : errorMessages[0],
+    });
+
+    if (requiresUserAction) {
         content += '\n';
         content += $t(i18n, 'server.email.fetch_error.pause_poll');
     }
 
-    log.info('Warning the user that an error was detected');
+    log.info('Warning the user that errors were detected');
     await AlertManager.send(userId, i18n, {
         subject,
         text: content,
     });
+}
+
+async function manageBlockingPollingErrors(
+    userId: number,
+    access: Access,
+    err: KError
+): Promise<void> {
+    assert(!!err.errCode, 'should have an error code to call manageBlockingPollingErrors');
+
+    const i18n = await getTranslator(userId);
+
+    await managePollingErrors(
+        userId,
+        access.getLabel(),
+        'blocking',
+        [
+            // Retrieve the human readable error code.
+            $t(i18n, `server.email.fetch_error.${err.errCode}`),
+        ],
+        errorRequiresUserAction(err)
+    );
+}
+
+async function managePartialPollingErrors(
+    userId: number,
+    access: Access,
+    errors: string[]
+): Promise<void> {
+    await managePollingErrors(userId, access.getLabel(), 'non_blocking', errors);
 }
 
 // Can throw.
@@ -58,13 +101,13 @@ export async function fullPoll(userId: number) {
     const accesses = await Access.all(userId);
     for (const access of accesses) {
         try {
-            const { vendorId, login } = access;
+            const { vendorId } = access;
 
             // Don't try to fetch accesses for deprecated modules.
             const staticBank = bankVendorByUuid(vendorId);
             if (!staticBank || staticBank.deprecated) {
                 log.info(
-                    `Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`
+                    `Won't poll, module for bank ”${access.getLabel()}” with vendorId ${vendorId} is deprecated.`
                 );
                 continue;
             }
@@ -89,6 +132,10 @@ export async function fullPoll(userId: number) {
 
                 const accountInfoMap = accountResponse.value;
 
+                if (accountResponse.errors && accountResponse.errors.length) {
+                    await managePartialPollingErrors(userId, access, accountResponse.errors);
+                }
+
                 // Update the repos only once.
                 needUpdate = false;
 
@@ -104,20 +151,24 @@ export async function fullPoll(userId: number) {
                     transactionResponse.kind !== 'user_action',
                     'Unexpected action requirement after accounts have been successfully polled'
                 );
+
+                if (transactionResponse.errors && transactionResponse.errors.length) {
+                    await managePartialPollingErrors(userId, access, transactionResponse.errors);
+                }
             } else if (!access.isEnabled() || access.excludeFromPoll) {
                 log.info(
-                    `Won't poll, access from bank ${vendorId} with login ${login} is disabled or shouldn't be polled.`
+                    `Won't poll, access from bank ”${access.getLabel()}” with vendorId ${vendorId} is disabled or shouldn't be polled.`
                 );
             } else {
                 const error = access.fetchStatus;
                 log.info(
-                    `Won't poll, access from bank ${vendorId} with login ${login} last fetch raised: ${error}.`
+                    `Won't poll, access from bank ”${access.getLabel()}” with vendorId ${vendorId} last fetch raised: ${error}.`
                 );
             }
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode) {
-                await managePollingErrors(userId, access, err);
+                await manageBlockingPollingErrors(userId, access, err);
             }
         }
     }
@@ -162,12 +213,16 @@ class Poller {
             log.error(`Error when preparing the next check: ${err.message}`);
         }
 
-        // Only polls accounts for the current user, not for all users, until
-        // proper support for multiple users has been implemented.
-        try {
-            await fullPoll(process.kresus.user.id);
-        } catch (err) {
-            log.error(`Error when doing an automatic poll: ${err.message}`);
+        // Polls accounts for every user.
+        const users = await User.all();
+        for (const user of users) {
+            try {
+                await fullPoll(user.id);
+            } catch (err) {
+                log.error(
+                    `Error when doing an automatic poll for user ${user.login}: ${err.message}`
+                );
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import log4js from 'log4js';
 import { makeUrlPrefixRegExp } from './helpers';
 import routes from './controllers/routes';
 import init from './init';
+import { User } from './models';
 
 async function start() {
     // Spawn the Express app.
@@ -97,10 +98,35 @@ async function start() {
 
     // Use a passportjs compatible middleware for logging the only current
     // user.
-    app.use((req, _res, next) => {
-        req.user = {
-            id: process.kresus.user.id,
-        };
+    app.use(async (req, res, next) => {
+        const { userLoginHttpHeader, defaultUser } = process.kresus;
+
+        if (userLoginHttpHeader) {
+            // Try to retrieve the user login from this header name.
+            const userLogin = req.get(userLoginHttpHeader);
+            if (!userLogin) {
+                res.status(401).json({
+                    code: 401,
+                    message: `missing "${userLoginHttpHeader}" header`,
+                });
+                return;
+            }
+
+            // Then check if this user actually exists.
+            const user = await User.findByLogin(userLogin);
+            if (!user) {
+                res.status(401).json({
+                    code: 401,
+                    message: `user "${userLogin}" could not be found`,
+                });
+                return;
+            }
+
+            req.user = user;
+        } else {
+            req.user = defaultUser;
+        }
+
         next();
     });
 

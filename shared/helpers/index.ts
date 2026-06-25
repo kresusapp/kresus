@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
-import memoize from 'micro-memoize';
+import { memoize } from 'micro-memoize';
 
 import { SharedTransaction } from '../types';
 
@@ -27,7 +27,6 @@ import ACCOUNT_TYPES from '../account-types.json';
 import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
 import { endOfMonth } from './dates';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function maybeHas(obj: object, prop: string): boolean {
     return obj && obj.hasOwnProperty(prop);
 }
@@ -210,6 +209,8 @@ export const currency = {
 
 export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
+
+export const NONE_CATEGORY_ID = -1;
 
 export const MIN_WOOB_VERSION = '3.5';
 export const UNKNOWN_WOOB_VERSION = null;

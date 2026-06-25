@@ -50,7 +50,7 @@ const Form = (props: FormProps) => {
 
 interface FormInputProps {
     // A single component to be used as the input, in the form.
-    children: JSX.Element;
+    children: React.JSX.Element;
 
     // The HTML id used to connect the label and the input component.
     id: string;
@@ -70,10 +70,10 @@ interface FormInputProps {
     inline?: boolean;
 
     // Another component to put just below the input, with no width limitation.
-    sub?: JSX.Element;
+    sub?: React.JSX.Element;
 
     // An optional component to display below the input itself.
-    help?: JSX.Element | string;
+    help?: React.JSX.Element | string;
 }
 
 Form.Input = (props: FormInputProps) => {

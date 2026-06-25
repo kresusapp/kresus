@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Route, Switch, Redirect, useHistory, useParams } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router';
 
 import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
@@ -66,14 +67,14 @@ const SharedForm = (props: {
 };
 
 const NewForm = (props: { categoryToName?: Map<number, string> }) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch = useKresusDispatch();
 
     const {
         label: rawPredefinedLabel,
         amount: rawPredefinedAmount,
         categoryId: categoryIdStr,
-    } = useParams<{
+    } = useRequiredParams<{
         label?: string;
         amount?: string;
         categoryId?: string;
@@ -108,12 +109,12 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
                 assert(label !== null, 'label must be set at this point');
                 await dispatch(RulesStore.create({ label, amount, categoryId })).unwrap();
                 notify.success($t('client.rules.creation_success'));
-                history.push(URL.list);
+                navigate(URL.list);
             } catch (err) {
                 notify.error($t('client.rules.creation_error', { err: err.message }));
             }
         },
-        [history, dispatch]
+        [navigate, dispatch]
     );
 
     return (
@@ -129,9 +130,9 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
 };
 
 const EditForm = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
-    const { ruleId: ruleIdStr } = useParams<{ ruleId: string }>();
+    const { ruleId: ruleIdStr } = useRequiredParams<{ ruleId: string }>();
     const ruleId = Number.parseInt(ruleIdStr, 10);
 
     const rule = useKresusState(state => {
@@ -154,17 +155,17 @@ const EditForm = () => {
                     RulesStore.update({ rule, arg: { label, amount, categoryId } })
                 ).unwrap();
                 notify.success($t('client.rules.edit_success'));
-                history.push(URL.list);
+                navigate(URL.list);
             } catch (err) {
                 notify.error($t('client.rules.edit_error', { err: err.message }));
             }
         },
-        [rule, history, dispatch]
+        [rule, navigate, dispatch]
     );
 
     if (Number.isNaN(ruleId)) {
         notify.error($t('client.rules.rule_not_found'));
-        history.push(URL.list);
+        navigate(URL.list);
         return null;
     }
 
@@ -429,27 +430,29 @@ export default () => {
     }
 
     return (
-        <Switch>
-            <Route path={URL.predefinedNew.pattern} exact={true}>
-                <NewForm categoryToName={categoryToName} />
-            </Route>
-            <Route path={URL.new}>
-                <NewForm />
-            </Route>
-            <Route path={URL.edit.pattern}>
-                <EditForm />
-            </Route>
-            <Route path={URL.list}>
-                <ButtonLink
-                    to={URL.new}
-                    aria={$t('client.rules.new_rule')}
-                    label={$t('client.rules.new_rule')}
-                    icon="plus"
-                />
-                <hr />
-                <List categoryToName={categoryToName} />
-            </Route>
-            <Redirect to={URL.list} push={false} />
-        </Switch>
+        <Routes>
+            <Route
+                path="new/:label/:amount/:categoryId"
+                element={<NewForm categoryToName={categoryToName} />}
+            />
+            <Route path="new" element={<NewForm />} />
+            <Route path="edit/:ruleId" element={<EditForm />} />
+            <Route
+                path="/"
+                element={
+                    <>
+                        <ButtonLink
+                            to={URL.new}
+                            aria={$t('client.rules.new_rule')}
+                            label={$t('client.rules.new_rule')}
+                            icon="plus"
+                        />
+                        <hr />
+                        <List categoryToName={categoryToName} />
+                    </>
+                }
+            />
+            <Route path="*" element={<Navigate to={URL.list} replace={true} />} />
+        </Routes>
     );
 };

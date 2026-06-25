@@ -1,12 +1,11 @@
-import { Chart } from 'chart.js';
-import type { LegendItem } from 'chart.js/dist/types/index';
+import { Chart, type LegendItem } from 'chart.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, localeComparator, round2, translate as $t } from '../../helpers';
 import { Hideable } from './hidable-chart';
 import type { TransactionsChartProps } from './category-barchart';
 
 const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
-    const container = useRef<Chart<'pie'>>();
+    const container = useRef<Chart<'pie'> | null>(null);
 
     const redraw = useCallback(() => {
         const catMap = new Map<number, number>();

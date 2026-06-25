@@ -39,6 +39,7 @@ export const instanceSlice = createSlice({
     initialState: makeInitialState({
         WOOB_INSTALLED: 'false',
         WOOB_VERSION: null,
+        DEV_ENV: 'false',
     }),
     reducers: {
         reset: resetStoreReducer<InstanceState>,

@@ -18,6 +18,6 @@
         "outDir": null, // Unset the target directory, to be consistent with noEmit.
         "incremental": false, // incremental cannot be set if noEmit is true.
         "tsBuildInfoFile": null, // Unset the cache file.
-        "checkJs": false, /* Report errors in .js files. */
+        "checkJs": false /* Report errors in .js files. */
     }
 }

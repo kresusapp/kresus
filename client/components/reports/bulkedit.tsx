@@ -140,7 +140,11 @@ const BulkEditComponent = (props: {
 
             const transactions = Array.from(items.values());
 
-            const newFields: { type?: string; categoryId?: number; customLabel?: string } = {};
+            const newFields: {
+                type?: string;
+                categoryId?: number;
+                customLabel?: string;
+            } = {};
             if (type !== NO_TYPE_ID) {
                 newFields.type = type;
             }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router';
 
 import List from './list';
 import DeleteForm from './delete-form';
@@ -8,21 +8,12 @@ import URL from './urls';
 
 export default () => {
     return (
-        <Switch>
-            <Route path={URL.new}>
-                {' '}
-                <NewForm />
-            </Route>
-            <Route path={URL.EDIT_PATTERN}>
-                <EditForm />
-            </Route>
-            <Route path={URL.DELETE_PATTERN}>
-                <DeleteForm />
-            </Route>
-            <Route path={URL.list}>
-                <List />
-            </Route>
-            <Redirect to={URL.list} push={false} />
-        </Switch>
+        <Routes>
+            <Route path="new" element={<NewForm />} />
+            <Route path="edit/:categoryId" element={<EditForm />} />
+            <Route path="delete/:categoryId" element={<DeleteForm />} />
+            <Route path="/" element={<List />} />
+            <Route path="*" element={<Navigate to={URL.list} replace={true} />} />
+        </Routes>
     );
 };

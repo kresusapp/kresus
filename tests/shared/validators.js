@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import {
     hasMissingField,
@@ -15,41 +15,48 @@ const listOfProps = Object.keys(objectToCheck);
 
 describe('hasMissingField', () => {
     it('should return an error description if the object misses a field.', () => {
-        hasMissingField(objectToCheck, listOfProps.concat(['prop3'])).should.be.type('string');
+        assert.strictEqual(
+            typeof hasMissingField(objectToCheck, listOfProps.concat(['prop3'])),
+            'string'
+        );
     });
     it('should return null if the list of properties of the object and the list of property names match.', () => {
-        should.equal(hasMissingField(objectToCheck, listOfProps), null);
+        assert.strictEqual(hasMissingField(objectToCheck, listOfProps), null);
     });
     it('should return null if the list of properties of the object includes the list of property names.', () => {
         const objectToCheck2 = { ...objectToCheck, prop3: 'prop3' };
-        should.equal(hasMissingField(objectToCheck2, listOfProps), null);
+        assert.strictEqual(hasMissingField(objectToCheck2, listOfProps), null);
     });
 });
 
 describe('hasForbiddenField', () => {
     it('should return an error description if the list of properties of the object includes the list of property names.', () => {
         const objectToCheck2 = { ...objectToCheck, prop3: 'prop3' };
-        hasForbiddenField(objectToCheck2, listOfProps).should.be.type('string');
+        assert.strictEqual(typeof hasForbiddenField(objectToCheck2, listOfProps), 'string');
     });
     it('should return null if the list of properties of the object and the list of property names match.', () => {
-        should.equal(hasForbiddenField(objectToCheck, listOfProps), null);
+        assert.strictEqual(hasForbiddenField(objectToCheck, listOfProps), null);
     });
     it('should return null if the object misses a field.', () => {
-        should.equal(hasForbiddenField(objectToCheck, listOfProps.concat(['prop3'])), null);
+        assert.strictEqual(hasForbiddenField(objectToCheck, listOfProps.concat(['prop3'])), null);
     });
 });
 
 describe('hasForbiddenOrMissingField', () => {
     it('should return an error description if the list of properties of the object exactly matches the list of allowed names.', () => {
         const objectToCheck2 = { ...objectToCheck, prop3: 'prop3' };
-        hasForbiddenOrMissingField(objectToCheck2, listOfProps).should.be.type('string');
+        assert.strictEqual(
+            typeof hasForbiddenOrMissingField(objectToCheck2, listOfProps),
+            'string'
+        );
     });
     it('should return an error description if the object misses a field.', () => {
-        hasForbiddenOrMissingField(objectToCheck, listOfProps.concat(['prop3'])).should.be.type(
+        assert.strictEqual(
+            typeof hasForbiddenOrMissingField(objectToCheck, listOfProps.concat(['prop3'])),
             'string'
         );
     });
     it('should return null if the list of properties of the object and the list of property names match.', () => {
-        should.equal(hasForbiddenOrMissingField(objectToCheck, listOfProps), null);
+        assert.strictEqual(hasForbiddenOrMissingField(objectToCheck, listOfProps), null);
     });
 });

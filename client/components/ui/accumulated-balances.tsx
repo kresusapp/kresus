@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { translate as $t } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import URL from '../../urls';
 import { DriverType } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';
@@ -29,7 +30,7 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
     const totalEntries = Object.entries(props.totals);
 
     const { pathname } = useLocation();
-    const { driver = null, value: driverValue } = useParams<{
+    const { driver = null, value: driverValue } = useRequiredParams<{
         driver?: string;
         value: string;
     }>();
@@ -40,33 +41,32 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
             .map(([key, value]): React.ReactNode => {
                 if (props.isCurrencyLink) {
                     /* eslint-disable prettier/prettier */
-                        const newPathName =
-                            driver !== null
-                                ? pathname
-                                    .replace(driver, DriverType.Currency)
-                                    .replace(driverValue, key)
-                                : URL.reports.url(new DriverCurrency(key));
-                        return (
-                            <span className="total-balance-item" key={`item-${key}`}>
-                                <NavLink to={newPathName} key={`link-report-${key}`}>
-                                    <ColoredAmount
-                                        key={key}
-                                        amount={value.total}
-                                        formatCurrency={value.formatCurrency}
-                                    />
-                                </NavLink>
-                            </span>
-                        );
-                    }
+                    const newPathName =
+                        driver !== null
+                            ? pathname
+                                  .replace(driver, DriverType.Currency)
+                                  .replace(driverValue, key)
+                            : URL.reports.url(new DriverCurrency(key));
                     return (
-                        <ColoredAmount
-                            key={key}
-                            amount={value.total}
-                            formatCurrency={value.formatCurrency}
-                        />
+                        <span className="total-balance-item" key={`item-${key}`}>
+                            <NavLink to={newPathName} key={`link-report-${key}`}>
+                                <ColoredAmount
+                                    key={key}
+                                    amount={value.total}
+                                    formatCurrency={value.formatCurrency}
+                                />
+                            </NavLink>
+                        </span>
                     );
                 }
-            )
+                return (
+                    <ColoredAmount
+                        key={key}
+                        amount={value.total}
+                        formatCurrency={value.formatCurrency}
+                    />
+                );
+            })
             .reduce((prev, curr) => [prev, ' | ', curr]);
     } else {
         totalElement = 'N/A';
@@ -83,9 +83,9 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
 
 export const OverallTotalBalance = (props: {
     // Activate links on currencies
-    isCurrencyLink: boolean,
+    isCurrencyLink: boolean;
     // The class to be applied to the wrapping component.
-    className?: string,
+    className?: string;
 }) => {
     const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
     const totals = useKresusState(state => {
@@ -107,23 +107,29 @@ export const OverallTotalBalance = (props: {
         return totalMap;
     });
 
-    return (<AccumulatedBalances
-        totals={totals}
-        label={$t('client.menu.overall_balance')}
-        isCurrencyLink={props.isCurrencyLink}
-        className={props.className} />);
+    return (
+        <AccumulatedBalances
+            totals={totals}
+            label={$t('client.menu.overall_balance')}
+            isCurrencyLink={props.isCurrencyLink}
+            className={props.className}
+        />
+    );
 };
 
-export const AccessTotalBalance = (props: { accessId: number, className?: string }) => {
+export const AccessTotalBalance = (props: { accessId: number; className?: string }) => {
     const totals = useKresusState(state => {
         if (!BanksStore.accessExists(state.banks, props.accessId)) {
             return {};
         }
         return BanksStore.computeAccessTotal(state.banks, props.accessId);
     });
-    return (<AccumulatedBalances
-        className={props.className}
-        totals={totals}
-        label={$t('client.menu.total')}
-        isCurrencyLink={false} />);
+    return (
+        <AccumulatedBalances
+            className={props.className}
+            totals={totals}
+            label={$t('client.menu.total')}
+            isCurrencyLink={false}
+        />
+    );
 };

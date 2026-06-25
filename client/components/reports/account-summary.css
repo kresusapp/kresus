@@ -79,7 +79,7 @@
     font-size: 1.75em;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .account-summary {
         display: block;
         padding: 0.5em;

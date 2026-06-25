@@ -7,13 +7,13 @@ body {
 
 body.dark {
     --wells-received-color: #00CA62;
-    --wells-saved-color: #FFFFFF;
+    --wells-saved-color: #FFF;
 }
 
 form.search > * {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    grid-column-gap: 1em;
+    column-gap: 1em;
     align-items: center;
     margin: 0.5em 0;
 }
@@ -45,14 +45,14 @@ form.search p.search-buttons button:first-child {
     grid-column-start: -3;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     form.search > .search-keywords,
     form.search > .search-amounts {
-        grid-column-gap: 0.6em;
+        column-gap: 0.6em;
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     form.search > .search-keywords,
     form.search > .search-categories-types,
     form.search > .search-amounts,
@@ -73,13 +73,13 @@ form.search p.search-buttons button:first-child {
 }
 
 body.dark form.search .Select input[type='checkbox'] {
-    border-color: #000000;
+    border-color: #000;
     background-color: transparent;
 }
 
 body.dark form.search .Select input[type='checkbox']:checked {
-    color: #FFFFFF;
-    background-color: #666666;
+    color: #FFF;
+    background-color: #666;
 }
 
 .search-summary {
@@ -101,7 +101,7 @@ body.dark form.search .Select input[type='checkbox']:checked {
     border: 1px solid currentColor;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .search-summary li {
         margin: 0 0.25em;
     }
@@ -123,7 +123,7 @@ body.dark form.search .Select input[type='checkbox']:checked {
     margin-left: 1ex;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .search-summary li {
         display: inline-block;
     }
@@ -155,7 +155,7 @@ body.dark form.search .Select input[type='checkbox']:checked {
     background-color: transparent;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .search-summary li span {
         text-align: center;
     }

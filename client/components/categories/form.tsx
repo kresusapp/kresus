@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';
@@ -11,7 +12,7 @@ import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 const CategoryForm = (props: { id?: number }) => {
     const dispatch = useKresusDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const labelRef = useRef<ValidatedTextInputRef>(null);
 
@@ -43,7 +44,7 @@ const CategoryForm = (props: { id?: number }) => {
             try {
                 await dispatch(CategoriesStore.create(newFields)).unwrap();
                 notify.success($t('client.category.creation_success'));
-                history.push(URL.list);
+                navigate(URL.list);
             } catch (error) {
                 notify.error($t('client.category.creation_error', { error: error.message }));
             }
@@ -55,11 +56,11 @@ const CategoryForm = (props: { id?: number }) => {
                 CategoriesStore.update({ former: category, category: newFields })
             ).unwrap();
             notify.success($t('client.category.edition_success'));
-            history.push(URL.list);
+            navigate(URL.list);
         } catch (error) {
             notify.error($t('client.category.edition_error', { error: error.message }));
         }
-    }, [history, dispatch, label, color, category]);
+    }, [navigate, dispatch, label, color, category]);
 
     // On mount, focus on (resp. select in edit mode) the label field.
     useEffect(() => {
@@ -99,7 +100,7 @@ const CategoryForm = (props: { id?: number }) => {
 };
 
 const EditForm = () => {
-    const { categoryId: categoryIdStr } = useParams<{ categoryId: string }>();
+    const { categoryId: categoryIdStr } = useRequiredParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryIdStr, 10);
     return <CategoryForm id={categoryId} />;
 };

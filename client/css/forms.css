@@ -26,8 +26,8 @@ textarea {
     font-size: 14px;
     line-height: 1.4286;
     padding: 6px 12px;
-    color: #555555;
-    background-color: #FFFFFF;
+    color: #555;
+    background-color: #FFF;
     border: 1px solid #CFD9DB;
     border-radius: 4px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -109,7 +109,7 @@ select {
 input:disabled,
 select:disabled,
 textarea:disabled {
-    background-color: #CCCCCC;
+    background-color: #CCC;
     cursor: not-allowed;
 }
 
@@ -118,8 +118,8 @@ input[type='checkbox'] {
     cursor: pointer;
     width: 1.15em;
     height: 1.15em;
-    background-color: #FFFFFF;
-    border: 1px solid #666666;
+    background-color: #FFF;
+    border: 1px solid #666;
     border-radius: 2px;
     vertical-align: middle;
     display: inline-flex;
@@ -128,8 +128,8 @@ input[type='checkbox'] {
 }
 
 input[type='checkbox']:checked {
-    color: #FFFFFF;
-    background-color: #666666;
+    color: #FFF;
+    background-color: #666;
 }
 
 input[type='checkbox']:checked::after {
@@ -141,7 +141,7 @@ input[type='checkbox']:checked::after {
 }
 
 input[type='checkbox'].switch {
-    background-color: #555555;
+    background-color: #555;
     width: 3rem;
     height: 1.5rem;
     margin-top: 0.25em;
@@ -171,7 +171,7 @@ label > input[type='checkbox'] {
 /* Smart selector (react-select) */
 .Select__control,
 .Select__menu {
-    color: #555555;
+    color: #555;
 }
 
 .valid-date input,

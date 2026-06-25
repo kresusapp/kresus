@@ -1,0 +1,502 @@
+import { defineConfig, globalIgnores } from 'eslint/config';
+import importPlugin from 'eslint-plugin-import';
+import prettierPlugin from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+
+export default defineConfig([
+    globalIgnores(['**/build/', 'shared/locales', '**/*.d.ts']),
+
+    // Base config for all linted files.
+    {
+        plugins: {
+            import: importPlugin,
+            prettier: prettierPlugin,
+            '@typescript-eslint': tseslint.plugin,
+        },
+
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...globals.browser,
+            },
+        },
+
+        settings: {
+            'import/resolver': {
+                node: {
+                    extensions: ['.js', '.ts', '.tsx'],
+                },
+            },
+        },
+
+        rules: {
+            'prettier/prettier': 2,
+
+            // Possible errors
+            'no-cond-assign': [2, 'always'],
+            'no-console': 2,
+            'no-constant-condition': 2,
+            'no-control-regex': 2,
+            'no-debugger': 2,
+            'no-dupe-args': 2,
+            'no-dupe-keys': 2,
+            'no-duplicate-case': 2,
+            'no-empty-character-class': 2,
+            'no-empty': 2,
+            'no-ex-assign': 2,
+            'no-extra-boolean-cast': 2,
+            'no-extra-parens': 0,
+            'no-extra-semi': 2,
+            'no-func-assign': 2,
+            'no-inner-declarations': [2, 'both'],
+            'no-invalid-regexp': 2,
+            'no-irregular-whitespace': 2,
+            'no-obj-calls': 2,
+            'no-prototype-builtins': 0,
+            'no-regex-spaces': 2,
+            'no-sparse-arrays': 2,
+            'no-template-curly-in-string': 2,
+            'no-unexpected-multiline': 2,
+            'no-unreachable': 2,
+            'no-unsafe-finally': 2,
+            'no-unsafe-negation': 2,
+            'use-isnan': 2,
+            'valid-typeof': 2,
+
+            // Best practices
+            'accessor-pairs': 2,
+            'array-callback-return': 2,
+            'block-scoped-var': 2,
+            'class-methods-use-this': 0,
+            complexity: 0,
+            'consistent-return': 0,
+            curly: [2, 'all'],
+            'default-case': 2,
+            'dot-location': 0,
+            'dot-notation': 2,
+            eqeqeq: 2,
+            'guard-for-in': 2,
+            'no-alert': 0,
+            'no-caller': 2,
+            'no-case-declarations': 2,
+            'no-div-regex': 2,
+            'no-else-return': 2,
+            'no-empty-function': 2,
+            'no-empty-pattern': 2,
+            'no-eq-null': 2,
+            'no-eval': 2,
+            'no-extend-native': 2,
+            'no-extra-bind': 2,
+            'no-extra-label': 2,
+            'no-fallthrough': 2,
+            'no-floating-decimal': 2,
+            'no-global-assign': 2,
+            'no-implicit-coercion': 0,
+            'no-implied-eval': 2,
+            'no-invalid-this': 0,
+            'no-iterator': 2,
+            'no-labels': 0,
+            'no-lone-blocks': 2,
+            'no-loop-func': 2,
+            'no-magic-numbers': 0,
+            'no-multi-spaces': 2,
+            'no-multi-str': 2,
+            'no-new-func': 2,
+            'no-new-wrappers': 2,
+            'no-new': 2,
+            'no-octal-escape': 2,
+            'no-octal': 2,
+            'no-param-reassign': 2,
+            'no-proto': 2,
+            'no-redeclare': 2,
+            'no-restricted-properties': 0,
+            'no-return-assign': 2,
+            'no-script-url': 2,
+            'no-self-assign': 2,
+            'no-self-compare': 2,
+            'no-sequences': 2,
+            'no-throw-literal': 0,
+            'no-unmodified-loop-condition': 2,
+            'no-unused-expressions': 2,
+            'no-unused-labels': 2,
+            'no-useless-call': 2,
+            'no-useless-concat': 2,
+            'no-useless-escape': 2,
+            'no-useless-return': 2,
+            'no-void': 0,
+            'no-warning-comments': 0,
+            'no-with': 2,
+            radix: [2, 'always'],
+            'vars-on-top': 2,
+            'wrap-iife': [2, 'inside'],
+            yoda: 2,
+
+            // Strict Mode
+            strict: [2, 'never'],
+
+            // Variables
+            'init-declarations': 0,
+            'no-delete-var': 2,
+            'no-label-var': 2,
+            'no-restricted-globals': [2, 'event'],
+            'no-shadow-restricted-names': 2,
+            'no-shadow': 0,
+            '@typescript-eslint/no-shadow': 2,
+            'no-undef-init': 2,
+            'no-undef': 2,
+            'no-undefined': 0,
+            // Explicitly set caughtErrors to 'none' to preserve ESLint v8 behaviour.
+            'no-unused-vars': [2, { caughtErrors: 'none' }],
+            'no-use-before-define': 0,
+            '@typescript-eslint/no-use-before-define': 2,
+
+            // Stylistic issues
+            'array-bracket-spacing': [2, 'never'],
+            'block-spacing': [2, 'always'],
+            'brace-style': [2, '1tbs'],
+            camelcase: 2,
+            'comma-dangle': [
+                2,
+                {
+                    arrays: 'always-multiline',
+                    objects: 'always-multiline',
+                    imports: 'always-multiline',
+                    exports: 'always-multiline',
+                    functions: 'never',
+                },
+            ],
+            'comma-spacing': [2, { before: false, after: true }],
+            'comma-style': [2, 'last'],
+            'computed-property-spacing': [2, 'never'],
+            'consistent-this': [2, 'that'],
+            'eol-last': 2,
+            'func-call-spacing': [2, 'never'],
+            'func-name-matching': 2,
+            'func-names': 0,
+            'func-style': 0,
+            'id-length': 0,
+            'id-match': 0,
+            indent: [2, 4, { SwitchCase: 1 }],
+            'jsx-quotes': 0,
+            'key-spacing': [2, { beforeColon: false, afterColon: true, mode: 'strict' }],
+            'keyword-spacing': [2, { before: true, after: true }],
+            'line-comment-position': 0,
+            'linebreak-style': [2, 'unix'],
+            'lines-around-comment': 0,
+            'max-depth': 0,
+            'max-len': [2, { code: 100, tabWidth: 4, ignoreTemplateLiterals: true }],
+            'max-lines': 0,
+            'max-nested-callbacks': [2, 3],
+            'max-params': 0,
+            'max-statements-per-line': 2,
+            'max-statements': 0,
+            'multiline-ternary': 0,
+            'new-cap': 2,
+            'new-parens': 0,
+            'newline-per-chained-call': 0,
+            'no-array-constructor': 2,
+            'no-bitwise': 0,
+            'no-continue': 0,
+            'no-inline-comments': 0,
+            'no-lonely-if': 2,
+            'no-mixed-operators': 0,
+            'no-mixed-spaces-and-tabs': 2,
+            'no-multiple-empty-lines': [2, { max: 1, maxEOF: 0, maxBOF: 0 }],
+            'no-negated-condition': 0,
+            'no-nested-ternary': 2,
+            'no-new-object': 2,
+            'no-plusplus': 0,
+            'no-restricted-syntax': 0,
+            'no-tabs': 2,
+            'no-ternary': 0,
+            'no-trailing-spaces': 2,
+            'no-underscore-dangle': 0,
+            'no-unneeded-ternary': 2,
+            'no-whitespace-before-property': 2,
+            'object-curly-newline': 0,
+            'object-curly-spacing': [2, 'always'],
+            'object-property-newline': [2, { allowMultiplePropertiesPerLine: true }],
+            'one-var-declaration-per-line': 0,
+            'one-var': 0,
+            'operator-assignment': [2, 'always'],
+            'operator-linebreak': 0,
+            'padded-blocks': 0,
+            'quote-props': 0,
+            quotes: [2, 'single', 'avoid-escape'],
+            'semi-spacing': [2, { before: false, after: true }],
+            semi: [2, 'always'],
+            'sort-keys': 0,
+            'sort-vars': 0,
+            'space-before-blocks': [2, 'always'],
+            // There's an incompatibility between eslint and prettier (which forces spaces before
+            // parens for declaration functions and arrow functions), so just accept spaces in
+            // these cases.
+            'space-before-function-paren': [
+                2,
+                { anonymous: 'always', named: 'never', asyncArrow: 'always' },
+            ],
+            'space-in-parens': [2, 'never'],
+            'space-infix-ops': 2,
+            'space-unary-ops': [2, { words: true, nonwords: false }],
+            'spaced-comment': [2, 'always'],
+            'unicode-bom': 0,
+            'wrap-regex': 0,
+
+            // ECMAScript 6
+            'arrow-body-style': 0,
+            'arrow-parens': [2, 'as-needed'],
+            'arrow-spacing': [2, { before: true, after: true }],
+            'constructor-super': 2,
+            'generator-star-spacing': [2, { before: false, after: true }],
+            'no-class-assign': 2,
+            'no-confusing-arrow': 2,
+            'no-const-assign': 2,
+            'no-dupe-class-members': 2,
+            'no-duplicate-imports': 2,
+            'no-new-symbol': 2,
+            'no-restricted-imports': 0,
+            'no-this-before-super': 2,
+            'no-useless-computed-key': 2,
+            'no-useless-constructor': 2,
+            'no-useless-rename': 2,
+            'no-var': 2,
+            'object-shorthand': 2,
+            'prefer-arrow-callback': 2,
+            'prefer-const': 0,
+            'prefer-numeric-literals': 2,
+            'prefer-rest-params': 2,
+            'prefer-spread': 2,
+            'prefer-template': 2,
+            'require-yield': 2,
+            'rest-spread-spacing': [2, 'never'],
+            'sort-imports': 0,
+            'symbol-description': 2,
+            'template-curly-spacing': [2, 'never'],
+            'yield-star-spacing': [2, 'after'],
+
+            // Import plugin rules
+            'import/no-unresolved': 2,
+            'import/default': 0,
+            'import/namespace': 0,
+            'import/no-restricted-paths': 0,
+            'import/no-absolute-path': 2,
+            'import/no-dynamic-require': 2,
+            'import/no-internal-modules': 0,
+            'import/no-webpack-loader-syntax': 0,
+            'import/export': 2,
+            'import/no-named-as-default': 2,
+            'import/no-named-as-default-member': 2,
+            'import/no-deprecated': 2,
+            'import/no-extraneous-dependencies': 0,
+            'import/no-mutable-exports': 2,
+            'import/unambiguous': 2,
+            'import/no-commonjs': 0,
+            'import/no-amd': 0,
+            'import/no-nodejs-modules': 0,
+            'import/first': 0,
+            'import/no-duplicates': 2,
+            'import/no-namespace': 0,
+            'import/extensions': [
+                2,
+                'ignorePackages',
+                { json: 'always', js: 'never', ts: 'never', tsx: 'never' },
+            ],
+            'import/order': 0,
+            'import/newline-after-import': 2,
+            'import/prefer-default-export': 0,
+            'import/max-dependencies': 0,
+            'import/no-unassigned-import': [
+                2,
+                { allow: ['**/*.css', '*moment/dist/locale/*', '*flatpickr/dist/l10n/*'] },
+            ],
+            'import/no-named-default': 2,
+            'import/no-cycle': [2, { commonjs: true }],
+        },
+    },
+
+    // Test files: TypeScript parsing without project-level type checking.
+    {
+        files: ['tests/**/*'],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module',
+            },
+            globals: {
+                ...globals.mocha,
+            },
+        },
+        rules: {
+            // Mocha nesting and long test strings are idiomatic in test files.
+            'max-nested-callbacks': 0,
+            'max-len': 0,
+            // Config test fixtures use ini-style snake_case property names.
+            camelcase: 0,
+        },
+    },
+
+    // TypeScript: turn off base ESLint rules that TypeScript handles.
+    tseslint.configs.eslintRecommended,
+
+    // TypeScript files: parser, plugin, recommended rules, and project overrides.
+    {
+        files: ['**/*.ts', '**/*.tsx'],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module',
+                project: ['./tsconfig.json', './client/tsconfig.json'],
+            },
+        },
+        plugins: {
+            '@typescript-eslint': tseslint.plugin,
+        },
+        rules: {
+            // @typescript-eslint recommended rules
+            ...tseslint.configs.recommended[2].rules,
+            // Disable formatting rules (prettier handles these)
+            ...prettierConfig.rules,
+            // Project-specific overrides
+            '@typescript-eslint/no-unused-vars': 0,
+            '@typescript-eslint/no-floating-promises': 2,
+            '@typescript-eslint/explicit-module-boundary-types': 0,
+            '@typescript-eslint/no-explicit-any': 1,
+            // v8 recommended added no-require-imports; turn off as the codebase uses require()
+            '@typescript-eslint/no-require-imports': 0,
+            // TypeORM decorators are uppercase function calls without `new`; TypeScript's type
+            // system enforces correct constructor usage, so the capIsNew check is not needed.
+            'new-cap': [2, { capIsNew: false }],
+        },
+    },
+
+    // Client files: React and JSX.
+    {
+        files: ['client/**/*.{ts,tsx,js,jsx}'],
+        plugins: {
+            react: reactPlugin,
+            // Cast: eslint-plugin-react-hooks' nested `configs.flat` namespace does not match
+            // ESLint's Plugin.configs index signature.
+            // See https://github.com/react/react/issues/35045
+            'react-hooks': /** @type {import('eslint').ESLint.Plugin} */ (reactHooksPlugin),
+        },
+        settings: {
+            'import/ignore': [
+                'package.json',
+                '../shared/errors.json',
+                'lodash.throttle',
+                'react',
+                'react-dom',
+                'redux',
+            ],
+            react: {
+                version: 'detect',
+            },
+        },
+        languageOptions: {
+            parserOptions: {
+                ecmaFeatures: { jsx: true },
+            },
+            globals: {
+                $: 'writable',
+            },
+        },
+        rules: {
+            // Override parent rules.
+            'no-extra-parens': 0,
+            '@typescript-eslint/no-use-before-define': 0,
+
+            // React plugin rules.
+            'react/display-name': 0,
+            'react/forbid-component-props': 0,
+            'react/forbid-prop-types': [2, { forbid: ['any'] }],
+            'react/forbid-foreign-prop-types': 2,
+            'react/no-children-prop': 2,
+            'react/no-danger': 2,
+            'react/no-danger-with-children': 2,
+            'react/no-deprecated': 2,
+            'react/no-did-mount-set-state': 2,
+            'react/no-did-update-set-state': 2,
+            'react/no-direct-mutation-state': 2,
+            'react/no-find-dom-node': 0,
+            'react/no-is-mounted': 2,
+            'react/no-multi-comp': 0,
+            'react/no-render-return-value': 2,
+            'react/no-set-state': 0,
+            'react/no-string-refs': 2,
+            'react/no-unescaped-entities': 2,
+            'react/no-unknown-property': 2,
+            'react/no-unused-prop-types': 2,
+            'react/prefer-es6-class': 2,
+            'react/prefer-stateless-function': 2,
+            'react/prop-types': 0,
+            'react/react-in-jsx-scope': 2,
+            'react/require-optimization': 0,
+            'react/require-render-return': 2,
+            'react/self-closing-comp': 2,
+            'react/sort-comp': 0,
+            'react/sort-prop-types': 0,
+            'react/style-prop-object': 2,
+
+            // JSX-specific rules.
+            'react/jsx-boolean-value': [2, 'always'],
+            'react/jsx-closing-bracket-location': 0,
+            'react/jsx-curly-spacing': 0,
+            'react/jsx-equals-spacing': 2,
+            'react/jsx-filename-extension': 0,
+            'react/jsx-first-prop-new-line': [2, 'multiline-multiprop'],
+            'react/jsx-handler-names': 0,
+            'react/jsx-indent': [2, 4],
+            'react/jsx-indent-props': 0,
+            'react/jsx-key': 2,
+            'react/jsx-max-props-per-line': 0,
+            'react/jsx-no-bind': 2,
+            'react/jsx-no-comment-textnodes': 2,
+            'react/jsx-no-duplicate-props': 2,
+            'react/jsx-no-literals': 0,
+            'react/jsx-no-target-blank': 2,
+            'react/jsx-no-undef': 2,
+            'react/jsx-pascal-case': 2,
+            'react/jsx-sort-props': 0,
+            'react/jsx-tag-spacing': [
+                2,
+                { closingSlash: 'never', beforeSelfClosing: 'always', afterOpening: 'never' },
+            ],
+            'react/jsx-uses-react': 2,
+            'react/jsx-uses-vars': 2,
+            'react/jsx-wrap-multilines': 2,
+
+            // Import overrides for client.
+            'import/no-unresolved': 2,
+            'import/namespace': 2,
+
+            // React hooks.
+            'react-hooks/rules-of-hooks': 2,
+            'react-hooks/exhaustive-deps': 2,
+        },
+    },
+
+    // Server JS files: enforce prefer-const.
+    {
+        files: ['server/**/*.js'],
+        rules: {
+            'prefer-const': 2,
+        },
+    },
+
+    // bin/kresus.js is a CommonJS entry point (not an ESM module).
+    {
+        files: ['bin/*.js'],
+        languageOptions: {
+            sourceType: 'commonjs',
+        },
+        rules: {
+            'import/unambiguous': 0,
+        },
+    },
+]);

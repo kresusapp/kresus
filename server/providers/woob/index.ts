@@ -31,6 +31,8 @@ import {
     ProviderTransactionResponse,
 } from '../';
 
+import BankVendors from './banks.json';
+
 const log = makeLogger('providers/woob');
 
 // Subcommand error code indicating malformed argparse parameters.
@@ -110,9 +112,11 @@ interface WoobUserActionResponse extends PythonResponse {
 
 // Successful execution of woob, with a range of values, to be interpreted in
 // the context of the caller's query.
+// While the execution worked, there still might be partial errors.
 interface WoobSuccessResponse extends PythonResponse {
     kind: 'success';
     values: [Record<string, unknown>];
+    errors: string[];
 }
 
 type WoobResponse = WoobErrorResponse | WoobSuccessResponse | WoobUserActionResponse;
@@ -293,21 +297,10 @@ async function callWoob(
     if (command === CallWoobCommand.Accounts || command === CallWoobCommand.Transactions) {
         assert(access !== null, 'Access must not be null for accounts/transactions.');
 
-        cliArgs.push('--module', access.vendorId, '--login', access.login);
+        cliArgs.push('--module', access.vendorId);
 
-        // Pass the password via an environment variable to hide it.
-        assert(access.password !== null, 'Access must have a password for fetching.');
-        env.KRESUS_WOOB_PWD = access.password;
-
-        // Pass the session information as environment variable to hide it.
-        assert(
-            sessionManager !== null,
-            'session manager must be provided for accounts/transactions.'
-        );
-        const session = await sessionManager.read(access);
-        if (session) {
-            env.KRESUS_WOOB_SESSION = JSON.stringify(session);
-        }
+        let loginSet = false;
+        let passwordSet = false;
 
         const { fields = [] } = access;
         for (const { name, value } of fields) {
@@ -318,7 +311,36 @@ async function callWoob(
                     INVALID_PARAMETERS
                 );
             }
-            cliArgs.push('--field', name, value);
+
+            switch (name) {
+                case 'login':
+                case 'username':
+                    loginSet = true;
+                    cliArgs.push('--login', value);
+                    break;
+
+                case 'password':
+                    passwordSet = true;
+                    // Pass the password via an environment variable to hide it.
+                    env.KRESUS_WOOB_PWD = value;
+                    break;
+
+                default:
+                    cliArgs.push('--field', name, value);
+            }
+        }
+
+        assert(loginSet, 'Access must have a login for fetching.');
+        assert(passwordSet, 'Access must have a password for fetching.');
+
+        // Pass the session information as environment variable to hide it.
+        assert(
+            sessionManager !== null,
+            'session manager must be provided for accounts/transactions.'
+        );
+        const session = await sessionManager.read(access);
+        if (session) {
+            env.KRESUS_WOOB_SESSION = JSON.stringify(session);
         }
 
         if (command === CallWoobCommand.Transactions && options.fromDate !== null) {
@@ -336,7 +358,9 @@ async function callWoob(
         if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
             assert(sessionManager !== null, 'session manager required.');
             log.warn(
-                `Resetting session for access from bank ${access.vendorId} with login ${access.login}`
+                `Resetting session for access from bank ”${
+                    access.getLabel ? access.getLabel() : access.customLabel || 'No label'
+                }” with vendorId ${access.vendorId}`
             );
             await sessionManager.reset(access);
         }
@@ -352,7 +376,9 @@ async function callWoob(
     if (access && response.session) {
         assert(sessionManager !== null, 'session manager required.');
         log.info(
-            `Saving session for access from bank ${access.vendorId} with login ${access.login}`
+            `Saving session for access from bank ”${
+                access.getLabel ? access.getLabel() : access.customLabel || 'No label'
+            }” with vendorId ${access.vendorId}`
         );
         await sessionManager.save(access, response.session);
     }
@@ -395,6 +421,7 @@ async function callWoob(
     return {
         kind: 'values',
         values: response.values,
+        errors: response.errors,
     };
 }
 
@@ -476,11 +503,14 @@ export async function fetchTransactions(
 
 export const SOURCE_NAME = 'woob';
 
+export const getBankVendors = () => BankVendors;
+
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
 // expected, and use it.
 export const _: Provider = {
-    SOURCE_NAME: 'woob',
+    SOURCE_NAME,
+    getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

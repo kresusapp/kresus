@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { displayLabel, formatDate, NONE_CATEGORY_ID, notify, translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -52,9 +52,9 @@ interface TransactionRef extends HTMLTableRowElement {
 
 export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemProps>(
     (props, ref) => {
-        const innerDomRef = useRef<any>();
+        const innerDomRef = useRef<any>(null);
         const driver = useContext(DriverContext);
-        const history = useHistory();
+        const navigate = useNavigate();
         const dispatch = useKresusDispatch();
 
         const transaction = useKresusState(state => {
@@ -67,44 +67,38 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
         const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
         // Expose some methods related to the transactions.
-        useImperativeHandle(
-            ref,
-            () => {
-                return Object.assign(innerDomRef.current, {
-                    openDetailsView() {
-                        if (!transaction) {
-                            return;
+        useImperativeHandle(ref, () => {
+            return Object.assign(innerDomRef.current, {
+                openDetailsView() {
+                    if (!transaction) {
+                        return;
+                    }
+
+                    navigate(TransactionUrls.details.url(driver, transaction.id));
+                },
+
+                async delete() {
+                    if (!transaction) {
+                        return;
+                    }
+
+                    const confirmMessage = $t('client.transactions.are_you_sure', {
+                        label: displayLabel(transaction),
+                        amount: formatCurrency(transaction.amount),
+                        date: formatDate.toDayString(transaction.date),
+                    });
+
+                    if (window.confirm(confirmMessage)) {
+                        try {
+                            await dispatch(BanksStore.deleteTransaction(transaction.id)).unwrap();
+                            notify.success($t('client.transactions.deletion_success'));
+                        } catch (error) {
+                            notify.error($t('client.transactions.deletion_error'));
                         }
-
-                        history.push(TransactionUrls.details.url(driver, transaction.id));
-                    },
-
-                    async delete() {
-                        if (!transaction) {
-                            return;
-                        }
-
-                        const confirmMessage = $t('client.transactions.are_you_sure', {
-                            label: displayLabel(transaction),
-                            amount: formatCurrency(transaction.amount),
-                            date: formatDate.toDayString(transaction.date),
-                        });
-
-                        if (window.confirm(confirmMessage)) {
-                            try {
-                                await dispatch(
-                                    BanksStore.deleteTransaction(transaction.id)
-                                ).unwrap();
-                                notify.success($t('client.transactions.deletion_success'));
-                            } catch (error) {
-                                notify.error($t('client.transactions.deletion_error'));
-                            }
-                        }
-                    },
-                });
-            },
-            [dispatch, transaction, history, driver, formatCurrency]
-        );
+                    }
+                },
+            });
+        }, [dispatch, transaction, navigate, driver, formatCurrency]);
 
         const categoryColor = useKresusState(state => {
             if (!transaction || transaction.categoryId === NONE_CATEGORY_ID) {
@@ -214,7 +208,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
 );
 
 export const SwipeableTransactionItem = (props: TransactionItemProps) => {
-    let ref: React.RefObject<TransactionRef> | null = null;
+    let ref: React.RefObject<TransactionRef | null> | null = null;
 
     const openTransactionDetails = useCallback(async () => {
         if (!ref || !ref.current) {

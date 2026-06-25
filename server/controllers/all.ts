@@ -9,6 +9,7 @@ import {
     Category,
     RecurringTransaction,
     Setting,
+    MinimalTransaction,
     Transaction,
     TransactionRule,
     AppliedRecurringTransaction,
@@ -30,11 +31,16 @@ import {
     unwrap,
 } from '../helpers';
 
-import { bankVendorByUuid } from '../lib/bank-vendors';
+import { bankVendorByUuid, getBankVendors } from '../providers';
 import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
-import { DEFAULT_ACCOUNT_ID, DEMO_MODE } from '../../shared/settings';
+import {
+    DEFAULT_ACCOUNT_ID,
+    DEMO_MODE,
+    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
+    DUPLICATE_THRESHOLD,
+} from '../../shared/settings';
 
 import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
 import { isDemoEnabled } from './instance';
@@ -42,6 +48,7 @@ import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
 import diffAccount from '../lib/diff-accounts';
 import diffTransactions from '../lib/diff-transactions';
+import { findRedundantPairs } from '../lib/duplicates-manager';
 
 const log = makeLogger('controllers/all');
 
@@ -88,6 +95,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         instance: {},
         recurringTransactions: [],
         views: [],
+        bankVendors: [],
     };
 
     const accesses = await Access.all(userId);
@@ -100,7 +108,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         });
 
         if (cleanPassword) {
-            delete clientAccess.password;
+            clientAccess.fields = clientAccess.fields.filter(f => f.name !== 'password');
             delete clientAccess.session;
         }
 
@@ -141,7 +149,60 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
             now.getFullYear()
         );
     } else {
+        ret.bankVendors = getBankVendors();
+
         ret.instance = await getAllInstanceProperties();
+
+        // Find duplicates.
+        // First, map transactions to accounts
+        const accountTransactionsMap = new Map<number, Transaction[]>();
+        for (const tr of ret.transactions) {
+            if (!accountTransactionsMap.has(tr.accountId)) {
+                accountTransactionsMap.set(tr.accountId, [tr]);
+            } else {
+                accountTransactionsMap.get(tr.accountId)?.push(tr);
+            }
+        }
+
+        const duplicateThresholdSetting = ret.settings.find(s => s.key === DUPLICATE_THRESHOLD);
+        const ignoreDuplicatesWithDifferentCustomFieldsSetting = ret.settings.find(
+            s => s.key === DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
+        );
+
+        const ignoreDuplicatesWithDifferentCustomFieldsSettingValue =
+            ignoreDuplicatesWithDifferentCustomFieldsSetting
+                ? ignoreDuplicatesWithDifferentCustomFieldsSetting.value
+                : unwrap(DefaultSettings.get(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS));
+
+        const threshold = Number.parseInt(
+            duplicateThresholdSetting
+                ? duplicateThresholdSetting.value
+                : unwrap(DefaultSettings.get(DUPLICATE_THRESHOLD)),
+            10
+        );
+        const ignoreDuplicatesWithDifferentCustomFields =
+            ignoreDuplicatesWithDifferentCustomFieldsSettingValue === 'true';
+
+        const newDuplicates: NonNullable<AllData['duplicates']>['new'] = [];
+
+        for (const [accountId, transactions] of accountTransactionsMap.entries()) {
+            const duplicates = findRedundantPairs(
+                transactions,
+                threshold,
+                ignoreDuplicatesWithDifferentCustomFields
+            );
+
+            if (duplicates.length > 0) {
+                newDuplicates.push({
+                    accountId,
+                    duplicates,
+                });
+            }
+        }
+
+        ret.duplicates = {
+            new: newDuplicates,
+        };
 
         const user = await User.find(userId);
         if (user) {
@@ -242,7 +303,10 @@ export async function export_(req: IdentifiedRequest<any>, res: express.Response
             }
         }
 
-        const data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
+        const data = await getAllData(userId, {
+            isExport: true,
+            cleanPassword: !passphrase,
+        });
 
         let ret = {};
         if (passphrase) {
@@ -374,27 +438,6 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         delete access.id;
         delete access.userId;
 
-        // Try to match the vendor id and login against an existing pair in the database.
-        const foundKnown: Access | null = await Access.byCredentials(userId, {
-            uuid: access.vendorId,
-            login: access.login,
-        });
-
-        if (foundKnown !== null) {
-            // The access was already known: don't reimport it.
-            accessMap[accessId] = {
-                id: foundKnown.id,
-                wasKnown: true,
-                vendorId: foundKnown.vendorId,
-            };
-            log.info(
-                `Ignoring import of access ${access.vendorId} (${access.login}) as it already exists.`
-            );
-            continue;
-        }
-
-        const sanitizedCustomFields: { name: string; value: string }[] = [];
-
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
             try {
@@ -404,14 +447,46 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             }
         }
 
-        for (const { name, value } of access.fields || []) {
+        if (!(access.fields instanceof Array)) {
+            access.fields = [];
+        }
+
+        // Support legacy 'login' and 'password' values.
+        if (access.login) {
+            if (
+                !access.fields.some(
+                    (f: unknown) => typeof f === 'object' && f && 'name' in f && f.name === 'login'
+                )
+            ) {
+                access.fields.push({ name: 'login', value: access.login });
+            }
+
+            delete access.login;
+        }
+
+        if (access.password) {
+            if (
+                !access.fields.some(
+                    (f: unknown) =>
+                        typeof f === 'object' && f && 'name' in f && f.name === 'password'
+                )
+            ) {
+                access.fields.push({ name: 'password', value: access.password });
+            }
+
+            delete access.password;
+        }
+
+        const sanitizedCustomFields: { name: string; value: string }[] = [];
+
+        for (const { name, value } of access.fields) {
             if (typeof name !== 'string') {
-                log.warn('Ignoring customField because of non-string "name" property.');
+                log.warn('Ignoring access field because of non-string "name" property.');
                 continue;
             }
             if (typeof value !== 'string') {
                 log.warn(
-                    `Ignoring custom field for key ${name} because of non-string "value" property`
+                    `Ignoring access field for key ${name} because of non-string "value" property`
                 );
                 continue;
             }
@@ -420,17 +495,48 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
 
         access.fields = sanitizedCustomFields;
 
+        const accessLogin = sanitizedCustomFields.find(f => f.name === 'login');
+
+        // Try to match the vendor id and login against an existing pair in the database.
+        const foundKnown: Access | null = accessLogin
+            ? await Access.byCredentials(userId, {
+                  uuid: access.vendorId,
+                  login: accessLogin.value,
+              })
+            : null;
+
+        if (foundKnown !== null) {
+            // The access was already known: don't reimport it.
+            accessMap[accessId] = {
+                id: foundKnown.id,
+                wasKnown: true,
+                vendorId: foundKnown.vendorId,
+            };
+            log.info(
+                `Ignoring import of access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }) as it already exists.`
+            );
+            continue;
+        }
+
         if (dontCreateAccess) {
             // The access id given from the `world` object is valid, according to this function's
             // contract, so the mapping doesn't need to redirect to another access we created.
             accessMap[accessId] = { id: accessId, wasKnown: true };
             log.info(
-                `Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`
+                `Not creating new known access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }) because it's explicitly marked as known.`
             );
         } else {
             const created = await Access.create(userId, access);
             accessMap[accessId] = { id: created.id, wasKnown: false };
-            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
+            log.info(
+                `Creating new unknown access ${access.vendorId} (${
+                    accessLogin ? accessLogin.value : 'no login'
+                }).`
+            );
         }
     }
     log.info('Done.');
@@ -477,7 +583,9 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         accountCopy.accessId = accessRemap?.id;
 
         if (accessRemap?.wasKnown) {
-            const knownAccounts = await Account.byAccess(userId, { id: accessRemap.id });
+            const knownAccounts = await Account.byAccess(userId, {
+                id: accessRemap.id,
+            });
             if (typeof knownAccounts !== 'undefined') {
                 const vendorId = accessRemap.vendorId ?? undefined;
 
@@ -522,7 +630,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             // Views created by the user are views created automatically by Kresus to group accounts.
             // Since new automatic views were created automatically when importing accounts, we
             // should not recreate them here.
-            // However, we still to map the view ids (for budgets at least).
+            // However, we still need to map the view ids (for budgets at least).
 
             // Try to retrieve the corresponding view created automatically.
             const viewAccountsRemapped = view.accounts.map((vAcc: any) =>
@@ -711,7 +819,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     }
 
     log.info('Import transactions...');
-    const newByAccountId: Map<number, any[]> = new Map();
+    const newByAccountId: Map<number, MinimalTransaction[]> = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
         const tr = world.transactions[i];
 
@@ -805,7 +913,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     for (const [accountId, provided] of newByAccountId) {
         const known = await Transaction.byAccount(userId, accountId);
 
-        const diffResult = diffTransactions(known, provided as Partial<Transaction>[]);
+        const diffResult = diffTransactions(known, provided);
 
         // Ignore perfect matches and knownOrphans. Only import the "provider" (import) orphans
         // and the duplicate candidates, since we're not too sure about those.

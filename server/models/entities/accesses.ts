@@ -14,7 +14,8 @@ import User from './users';
 import AccessField from './access-fields';
 
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
-import { bankVendorByUuid } from '../../lib/bank-vendors';
+import { bankVendorByUuid } from '../../providers';
+import { areFieldsComplete } from '../helpers';
 
 @Entity('access')
 export default class Access {
@@ -30,7 +31,11 @@ export default class Access {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -41,13 +46,6 @@ export default class Access {
     @Column('varchar')
     vendorId!: string;
 
-    // Credentials to connect to the bank's website.
-    @Column('varchar')
-    login!: string;
-
-    @Column('varchar', { nullable: true, default: null })
-    password: string | null = null;
-
     // Text status indicating whether the last poll was successful or not.
     @Column('varchar', { default: FETCH_STATUS_SUCCESS })
     fetchStatus: string = FETCH_STATUS_SUCCESS;
@@ -56,7 +54,9 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(() => AccessField, accessField => accessField.access, { cascade: ['insert'] })
+    @OneToMany(() => AccessField, accessField => accessField.access, {
+        cascade: ['insert'],
+    })
     fields!: AccessField[];
 
     // A JSON-serialized session's content.
@@ -70,13 +70,15 @@ export default class Access {
 
     // Entity methods.
 
-    hasPassword(): boolean {
-        return typeof this.password === 'string' && this.password.length > 0;
+    // Helper to get a field value by name
+    getFieldValue(fieldName: string): string | null {
+        const field = this.fields?.find(f => f.name === fieldName);
+        return field?.value ?? null;
     }
 
     // Is the access enabled?
     isEnabled(): boolean {
-        return this.password !== null;
+        return areFieldsComplete(this.vendorId, this.fields);
     }
 
     // Returns a cleaned up label for this access.
@@ -96,6 +98,7 @@ export default class Access {
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
             this.fetchStatus !== 'INVALID_PARAMETERS' &&
             this.fetchStatus !== 'NO_PASSWORD' &&
+            this.fetchStatus !== 'MISSING_MANDATORY_FIELD' &&
             this.fetchStatus !== 'ACTION_NEEDED' &&
             this.fetchStatus !== 'AUTH_METHOD_NYI' &&
             this.fetchStatus !== 'REQUIRES_INTERACTIVE'
@@ -121,7 +124,11 @@ export default class Access {
             ...field,
             userId,
         }));
-        const entity = Access.repo().create({ ...other, userId, fields: fieldsWithUserId });
+        const entity = Access.repo().create({
+            ...other,
+            userId,
+            fields: fieldsWithUserId,
+        });
         const access = await Access.repo().save(entity);
         return access;
     }
@@ -134,11 +141,16 @@ export default class Access {
     }
 
     static async all(userId: number): Promise<Access[]> {
-        return await Access.repo().find({ where: { userId }, relations: ['fields'] });
+        return await Access.repo().find({
+            where: { userId },
+            relations: ['fields'],
+        });
     }
 
     static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await Access.repo().findOne({ where: { userId, id: accessId } });
+        const found = await Access.repo().findOne({
+            where: { userId, id: accessId },
+        });
         return !!found;
     }
 
@@ -155,10 +167,10 @@ export default class Access {
         accessId: number,
         newAttributes: Partial<Access>
     ): Promise<Access> {
-        if (typeof newAttributes.fields !== 'undefined') {
-            throw new Error('API error: use AccessField model instead!');
+        if (Object.keys(newAttributes).length > 0) {
+            await Access.repo().update({ userId, id: accessId }, newAttributes);
         }
-        await Access.repo().update({ userId, id: accessId }, newAttributes);
+
         return unwrap(await Access.find(userId, accessId));
     }
 
@@ -166,17 +178,19 @@ export default class Access {
         userId: number,
         { uuid: vendorId }: { uuid: string }
     ): Promise<Access[]> {
-        return await Access.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
+        return await Access.repo().find({
+            where: { userId, vendorId },
+            relations: ['fields'],
+        });
     }
 
     static async byCredentials(
         userId: number,
-        { uuid: vendorId, login }: { uuid: string; login: string }
+        { uuid, login }: { uuid: string; login: string }
     ): Promise<Access | null> {
-        const found = await Access.repo().findOne({
-            where: { userId, vendorId, login },
-            relations: ['fields'],
-        });
-        return found;
+        const accesses = await Access.byVendorId(userId, { uuid });
+
+        // Find the one with the matching login field
+        return accesses.find(access => access.getFieldValue('login') === login) || null;
     }
 }

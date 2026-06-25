@@ -1,30 +1,26 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 
 import AccessesList from './accesses-list';
 import NewAccess from './new-access';
 import EditAccess from './edit-access';
 import EditAccount from './edit-account';
+import ManualSync from './manual-sync';
+import ManualResyncAccount from './manual-resync-account';
 
 import URL from './urls';
 import './accesses.css';
 
 export default () => {
     return (
-        <Switch>
-            <Route path={URL.newAccess}>
-                <NewAccess />
-            </Route>
-            <Route path={URL.EDIT_ACCESS_PATTERN}>
-                <EditAccess />
-            </Route>
-            <Route path={URL.EDIT_ACCOUNT_PATTERN}>
-                <EditAccount />
-            </Route>
-            <Route path={URL.accessList}>
-                <AccessesList />
-            </Route>
-            <Redirect to={URL.accessList} />
-        </Switch>
+        <Routes>
+            <Route path="new" element={<NewAccess />} />
+            <Route path="edit-access/:accessId" element={<EditAccess />} />
+            <Route path="edit-account/:accountId" element={<EditAccount />} />
+            <Route path="manual-sync/:accessId" element={<ManualSync />} />
+            <Route path="manual-resync-account/:accountId" element={<ManualResyncAccount />} />
+            <Route path="/" element={<AccessesList />} />
+            <Route path="*" element={<Navigate to={URL.accessList} replace={true} />} />
+        </Routes>
     );
 };

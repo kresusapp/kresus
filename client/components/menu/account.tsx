@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
 import { displayLabel, translate as $t, currency } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 
@@ -37,7 +38,7 @@ const AccountItem = (props: AccountItemProps) => {
     });
 
     const { pathname } = useLocation();
-    const { driver = null, value } = useParams<{ driver?: string; value: string }>();
+    const { driver = null, value } = useRequiredParams<{ driver?: string; value?: string }>();
 
     if (account === null || view === null) {
         // Zombie child: return nothing.
@@ -49,12 +50,12 @@ const AccountItem = (props: AccountItemProps) => {
 
     const newPathname =
         driver !== null
-            ? pathname.replace(driver, DriverType.Account).replace(value, view.id.toString())
+            ? pathname.replace(driver, DriverType.Account).replace(value!, view.id.toString())
             : URL.reports.url(new DriverAccount(view.id));
 
     return (
         <li key={`account-details-account-list-item-${accountId}`}>
-            <NavLink to={newPathname} activeClassName="active">
+            <NavLink to={newPathname}>
                 <span>{displayLabel(account)}</span>
                 &ensp;
                 <ColoredAmount amount={balance} formatCurrency={formatCurrency} />

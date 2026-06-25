@@ -1,13 +1,13 @@
 # Note: We use --silent argument on yarn invocations to keep the output simple
 # and readable through email notifications.
 default:
-    image: node:18
+    image: node:24.12
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
 variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    APT_CACHE_DIR: "$CI_PROJECT_DIR/apt-cache"
+    PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
+    APT_CACHE_DIR: '$CI_PROJECT_DIR/apt-cache'
 
 ci:
     before_script:
@@ -57,19 +57,19 @@ ci:
         - KRESUS_WOOB_DIR=.woob yarn run --silent ci:test
 
 .docker: &docker
-  cache: {}
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-  script:
-    - /kaniko/executor --context $CI_PROJECT_DIR/support/docker --dockerfile $CI_PROJECT_DIR/support/docker/Dockerfile-nightly --destination bnjbvr/kresus-nightly:prod --build-arg VCS_REF=$CI_VCS_REF --build-arg BUILD_DATE=$CI_JOB_TIMESTAMP
+    cache: {}
+    image:
+        name: gcr.io/kaniko-project/executor:debug
+        entrypoint: ['']
+    before_script:
+        - mkdir -p /kaniko/.docker
+        - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
+    script:
+        - /kaniko/executor --context $CI_PROJECT_DIR/support/docker --dockerfile $CI_PROJECT_DIR/support/docker/Dockerfile-nightly --destination bnjbvr/kresus-nightly:prod --build-arg VCS_REF=$CI_VCS_REF --build-arg BUILD_DATE=$CI_JOB_TIMESTAMP
 
 build-docker-main:
-  <<: *docker
-  rules:
-    - if: '$CI_PROJECT_NAMESPACE != "kresusapp"'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    <<: *docker
+    rules:
+        - if: '$CI_PROJECT_NAMESPACE != "kresusapp"'
+          when: never
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'

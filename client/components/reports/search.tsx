@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { matchPath } from 'react-router';
 import debounce from 'lodash.debounce';
 
 import {
@@ -22,7 +23,6 @@ import MultipleSelect from '../ui/multiple-select';
 import MinMaxInput, { MinMaxInputRef } from '../ui/min-max-input';
 
 import './search.css';
-import { matchPath, useHistory } from 'react-router-dom';
 
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
@@ -179,7 +179,6 @@ const MaxDatePicker = (props: { id: string }) => {
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
-    const history = useHistory();
     const displaySearchDetails = useKresusState(state => UiStore.getDisplaySearchDetails(state.ui));
     const searchFields = useKresusState(state => UiStore.getSearchFields(state.ui));
 
@@ -279,15 +278,17 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     useEffect(() => {
         return () => {
             // On unmount, reset the search, unless we're going to a
-            // transaction's detail page. We already know what the next path
-            // will be, because this effect is triggered asynchronously, after
-            // we've requested to leave the current route/component.
-            const nextPath = history.location.pathname;
-            if (matchPath(nextPath, URL.transactions.pattern) === null) {
+            // transaction's detail page.
+            // To know which page will then be rendered, we use window.location.hash
+            // as it is updated synchronously by HashRouter before React's cleanup phase.
+            // useLocation would return the stale URL.
+            // Since we use the URL hash, no need to strip the URL prefix.
+            const nextPath = window.location.hash.slice(1); // strip leading '#'
+            if (matchPath({ path: URL.transactions.pattern, end: false }, nextPath) === null) {
                 resetAll(false);
             }
         };
-    }, [resetAll, history]);
+    }, [resetAll]);
 
     return (
         <form className="search" hidden={!displaySearchDetails}>

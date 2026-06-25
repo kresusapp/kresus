@@ -143,7 +143,7 @@ const URLs = {
     sections: {
         pattern: '/:part1/:part2?/:part3?/:part4?',
         genericPattern: [] as string[],
-        title(params?: { part1: string; part2: string; part3: string; part4: string }) {
+        title(params?: Record<string, string | undefined>) {
             if (!params) {
                 return null;
             }
@@ -155,7 +155,7 @@ const URLs = {
                 // View URLs look like: /view/{driverType}/{driverValue}/:subsection
                 return params.part4;
             }
-            if (SECTIONS.includes(params.part1)) {
+            if (params.part1 && SECTIONS.includes(params.part1)) {
                 return params.part1;
             }
             return null;

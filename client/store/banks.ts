@@ -39,7 +39,7 @@ import {
 
 import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
-import { UserActionResponse } from '../../shared/types';
+import type { BankVendor, UserActionResponse } from '../../shared/types';
 import TransactionTypes from '../../shared/transaction-types.json';
 
 import * as UiStore from './ui';
@@ -49,7 +49,6 @@ import * as SettingsStore from './settings';
 
 import { mergeInArray, removeInArrayById, mergeInObject, removeInArray } from './helpers';
 
-import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
@@ -106,7 +105,10 @@ export const setTransactionType = createAsyncThunk(
 );
 
 // Set a transaction's custom label.
-type setTransactionCustomLabelError = { error: unknown; formerCustomLabel: string };
+type setTransactionCustomLabelError = {
+    error: unknown;
+    formerCustomLabel: string;
+};
 export const setTransactionCustomLabel = createAsyncThunk(
     'banks/setTransactionCustomLabel',
     async (params: { transaction: Transaction; customLabel: string }, { rejectWithValue }) => {
@@ -140,7 +142,11 @@ type setTransactionDateError = setTransactionBudgetDateError & {
 export const setTransactionDate = createAsyncThunk(
     'banks/setTransactionDate',
     async (
-        params: { transaction: Transaction; date: Date | null; budgetDate: Date | null },
+        params: {
+            transaction: Transaction;
+            date: Date | null;
+            budgetDate: Date | null;
+        },
         { rejectWithValue }
     ) => {
         const { transaction, date, budgetDate } = params;
@@ -295,30 +301,30 @@ export const mergeTransactions = createAsyncThunk(
 // Creates a new access.
 type AccessParams = {
     uuid: string;
-    login: string;
-    password: string;
     fields: AccessCustomField[];
     customLabel: string | null;
     shouldCreateDefaultAlerts: boolean;
+    storeCredentials: boolean;
 };
 export const createAccess = createAsyncThunk(
     'banks/createAccess',
     async (params: AccessParams, { dispatch, getState }) => {
-        const { uuid, login, password, fields, customLabel } = params;
-        let results = await backend.createAccess(uuid, login, password, fields, customLabel);
+        const { uuid, fields, customLabel, storeCredentials } = params;
+        let results = await backend.createAccess(uuid, fields, customLabel, storeCredentials);
 
         const defaultCurrency = (getState() as any).banks.defaultCurrency;
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
+            const accessId = results.accessId;
             const userActionFields = await userAction;
             results = await backend.createAccess(
                 uuid,
-                login,
-                password,
                 fields,
                 customLabel,
-                userActionFields
+                storeCredentials,
+                userActionFields,
+                accessId
             );
         }
 
@@ -331,14 +337,22 @@ export const createAccess = createAsyncThunk(
 );
 
 // Deletes the given access.
-export const deleteAccess = createAsyncThunk('banks/deleteAccess', async (accessId: number) => {
-    await backend.deleteAccess(accessId);
-    return accessId;
-});
+export const deleteAccess = createAsyncThunk(
+    'banks/deleteAccess',
+    async (accessId: number, { getState }) => {
+        const access: Access = (getState() as any).banks.accessMap[accessId];
+        await backend.deleteAccess(accessId);
+        return access;
+    }
+);
 
 // Resyncs the balance of the given account according to the real balance read
 // from a provider.
-type ResyncBalanceParams = { accountId: number; initialBalance?: number; balance?: number };
+type ResyncBalanceParams = {
+    accountId: number;
+    initialBalance?: number;
+    balance?: number;
+};
 type ResyncBalanceError = { accountId: number; error: unknown };
 export const resyncBalance = createAsyncThunk(
     'banks/resyncBalance',
@@ -346,17 +360,18 @@ export const resyncBalance = createAsyncThunk(
         params: {
             accountId: number;
             userActionFields?: FinishUserActionFields;
+            fields?: AccessCustomField[];
         },
         { dispatch, rejectWithValue }
     ) => {
-        const { accountId } = params;
+        const { accountId, fields = null } = params;
         try {
-            let results = await backend.resyncBalance(accountId);
+            let results = await backend.resyncBalance(accountId, null, fields);
 
             const userAction = maybeGetUserAction(dispatch, results);
             if (userAction) {
                 const userActionFields = await userAction;
-                results = await backend.resyncBalance(accountId, userActionFields);
+                results = await backend.resyncBalance(accountId, userActionFields, fields);
             }
 
             return results as ResyncBalanceParams;
@@ -441,26 +456,24 @@ export const updateAndFetchAccess = createAsyncThunk(
     async (
         params: {
             accessId: number;
-            login: string;
-            password: string;
             customFields: AccessCustomField[];
+            storeCredentials?: boolean;
         },
         { dispatch }
     ) => {
-        const { accessId, login, password, customFields } = params;
-        const newFields = {
-            login,
-            customFields,
-        };
+        const { accessId, customFields, storeCredentials } = params;
 
-        let results = await backend.updateAndFetchAccess(accessId, { password, ...newFields });
+        let results = await backend.updateAndFetchAccess(accessId, {
+            customFields,
+            storeCredentials,
+        });
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
             const userActionFields = await userAction;
             results = await backend.updateAndFetchAccess(
                 accessId,
-                { password, ...newFields },
+                { customFields, storeCredentials },
                 userActionFields
             );
         }
@@ -471,8 +484,8 @@ export const updateAndFetchAccess = createAsyncThunk(
                 accessId,
             },
             newFields: {
-                ...newFields,
-                enabled: true,
+                customFields: results.enabled === false ? [] : customFields,
+                enabled: results.enabled,
             },
         };
     }
@@ -493,7 +506,11 @@ export const updateAccess = createAsyncThunk(
 );
 
 export function disableAccess(accessId: number) {
-    return updateAccess({ accessId, newFields: { enabled: false }, prevFields: { enabled: true } });
+    return updateAccess({
+        accessId,
+        newFields: { enabled: false },
+        prevFields: { enabled: true },
+    });
 }
 
 const createDefaultAlerts = createAsyncThunk(
@@ -933,6 +950,7 @@ function makeInitialState(
         defaultAccountId: string;
         isOngoingLimitedToCurrentMonth: boolean;
     },
+    bankVendors: BankVendor[],
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
     allTransactions: Partial<Transaction>[],
@@ -951,7 +969,7 @@ function makeInitialState(
         defaultAccountId = parseInt(defaultAccountIdStr, 10);
     }
 
-    const banks = StaticBanks.map(b => createValidBank(b));
+    const banks = bankVendors.map(b => createValidBank(b));
     sortBanks(banks);
 
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
@@ -1052,16 +1070,26 @@ const banksSlice = createSlice({
         [],
         [],
         [],
+        [],
         []
     ),
     reducers: {
         reset(_state, action) {
             // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
             // Returning a value here will overwrite the state.
-            const { external, accesses, accounts, transactions, alerts, recurringTransactions } =
-                action.payload;
+            const {
+                external,
+                bankVendors,
+                accesses,
+                accounts,
+                transactions,
+                alerts,
+                recurringTransactions,
+            } = action.payload;
+
             return makeInitialState(
                 external,
+                bankVendors,
                 accesses,
                 accounts,
                 transactions,
@@ -1073,18 +1101,28 @@ const banksSlice = createSlice({
     extraReducers: builder => {
         builder
             .addCase(createAccess.fulfilled, (state, action) => {
-                const { uuid, login, fields, customLabel } = action.meta.arg;
-                const { accessId, label, accounts, newTransactions, excludeFromPoll } =
+                const { uuid, fields, customLabel } = action.meta.arg;
+                const { accessId, label, accounts, newTransactions, excludeFromPoll, enabled } =
                     action.payload;
+
+                if (enabled) {
+                    // Locally remove the password from the list of fields, before saving it in the
+                    // UI's model.
+                    const passwordIndex = fields.findIndex(f => f.name === 'password');
+                    if (passwordIndex !== -1) {
+                        fields.splice(passwordIndex, 1);
+                    }
+                } else {
+                    fields.length = 0;
+                }
 
                 const access = {
                     id: accessId,
                     vendorId: uuid,
-                    login,
                     fields,
                     label,
                     customLabel,
-                    enabled: true,
+                    enabled,
                     excludeFromPoll,
                 };
 
@@ -1098,7 +1136,9 @@ const banksSlice = createSlice({
             .addCase(updateAccess.pending, (state, action) => {
                 // Optimistic update
                 const { accessId, newFields } = action.meta.arg;
-                updateAccessFieldsAndSort(state, accessId, newFields);
+                const mergedFields: Partial<Access> =
+                    newFields.enabled === false ? { ...newFields, customFields: [] } : newFields;
+                updateAccessFieldsAndSort(state, accessId, mergedFields);
             })
             .addCase(updateAccess.rejected, (state, action) => {
                 // Revert to previous fields
@@ -1106,8 +1146,7 @@ const banksSlice = createSlice({
                 updateAccessFieldsAndSort(state, accessId, prevFields);
             })
             .addCase(deleteAccess.fulfilled, (state, action) => {
-                const accessId = action.payload;
-                removeAccess(state, accessId);
+                removeAccess(state, action.payload.id);
             })
             .addCase(resyncBalance.fulfilled, (state, action) => {
                 if (!action.payload) {
@@ -1202,7 +1241,9 @@ const banksSlice = createSlice({
             })
             .addCase(setTransactionType.rejected, (state, action) => {
                 const { formerType, transactionId } = action.meta.arg;
-                mergeInObject(state.transactionMap, transactionId, { type: formerType });
+                mergeInObject(state.transactionMap, transactionId, {
+                    type: formerType,
+                });
             })
             .addCase(setTransactionCustomLabel.pending, (state, action) => {
                 // Optimistic update.
@@ -1284,6 +1325,15 @@ const banksSlice = createSlice({
                     newFields.customFields = newFields.customFields.filter(
                         field => field.value !== null
                     );
+
+                    // Locally remove the password from the list of fields, before saving it in the
+                    // UI's model.
+                    const passwordIndex = newFields.customFields.findIndex(
+                        f => f.name === 'password'
+                    );
+                    if (passwordIndex !== -1) {
+                        newFields.customFields.splice(passwordIndex, 1);
+                    }
                 }
 
                 mergeInObject(state.accessMap, results.accessId, newFields);

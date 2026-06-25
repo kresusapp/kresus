@@ -27,14 +27,22 @@ export default class ViewAccount {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => View, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => View, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     view!: View;
 
     @Column('integer')
     viewId!: number;
 
-    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     account!: Account;
 

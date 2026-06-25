@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router';
 
 import rulesUrl from '../rules/urls';
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -13,7 +13,7 @@ import {
     currency,
 } from '../../helpers';
 import MainURLs from '../../urls';
-import { useNotifyError } from '../../hooks';
+import { useNotifyError, useRequiredParams } from '../../hooks';
 
 import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
 import Label from '../reports/label';
@@ -52,15 +52,15 @@ const TransactionDetails = (props: { transactionId: number }) => {
 
     const reportUrl = MainURLs.reports.url(driver);
 
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch = useKresusDispatch();
     const deleteTransaction = useNotifyError(
         'client.transactions.deletion_error',
         useCallback(async () => {
             await dispatch(BanksStore.deleteTransaction(transactionId)).unwrap();
             notify.success($t('client.transactions.deletion_success'));
-            history.replace(reportUrl);
-        }, [history, dispatch, transactionId, reportUrl])
+            navigate(reportUrl, { replace: true });
+        }, [navigate, dispatch, transactionId, reportUrl])
     );
 
     if (transaction === null) {
@@ -189,14 +189,14 @@ TransactionDetails.displayName = 'TransactionDetails';
 export default () => {
     const driver = useContext(DriverContext);
 
-    const { transactionId: strTransactionId } = useParams<{ transactionId: string }>();
+    const { transactionId: strTransactionId } = useRequiredParams<{ transactionId: string }>();
     const transactionId = Number.parseInt(strTransactionId, 10);
 
     const exists = useKresusState(state =>
         BanksStore.transactionExists(state.banks, transactionId)
     );
     if (!exists) {
-        return <Redirect to={MainURLs.reports.url(driver)} />;
+        return <Navigate to={MainURLs.reports.url(driver)} replace={true} />;
     }
 
     return <TransactionDetails transactionId={transactionId} />;

@@ -16,6 +16,7 @@ import {
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
+    NONE_CATEGORY_ID,
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -36,6 +37,7 @@ export {
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
+    NONE_CATEGORY_ID,
 };
 
 export function makeLogger(prefix: string): Logger {
@@ -97,6 +99,7 @@ export class KError extends Error {
             switch (errCode) {
                 case errors.INVALID_PARAMETERS:
                 case errors.NO_PASSWORD:
+                case errors.MISSING_MANDATORY_FIELD:
                 case errors.INVALID_ENCRYPTED_EXPORT:
                 case errors.INVALID_PASSWORD_JSON_EXPORT:
                     this.statusCode = 400;
@@ -166,6 +169,7 @@ export function errorRequiresUserAction(err: KError): boolean {
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
         err.errCode === getErrorCode('INVALID_PARAMETERS') ||
         err.errCode === getErrorCode('NO_PASSWORD') ||
+        err.errCode === getErrorCode('MISSING_MANDATORY_FIELD') ||
         err.errCode === getErrorCode('ACTION_NEEDED') ||
         err.errCode === getErrorCode('REQUIRES_INTERACTIVE')
     );

@@ -6,7 +6,7 @@ import React, {
     useLayoutEffect,
 } from 'react';
 
-import { Range } from 'rc-slider';
+import Slider from 'rc-slider';
 
 import 'rc-slider/assets/index.css';
 import './min-max-input.css';
@@ -177,7 +177,10 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
     }, [highText, setHighText, validateHigh, highNumber]);
 
     const handleSlider = useCallback(
-        (values: number[]) => {
+        (values: number | number[]) => {
+            if (!Array.isArray(values)) {
+                return;
+            }
             // Only one slider value can be changed at a time.
             if (values[0] !== Infinity && values[0] !== lowNumber) {
                 updateLow(values[0]);
@@ -200,7 +203,8 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
                 onBlur={handleLowBlur}
             />
 
-            <Range
+            <Slider
+                range={true}
                 allowCross={false}
                 min={props.min}
                 max={props.max}

@@ -41,7 +41,7 @@
                 "demo_action": "Dene"
             }
         },
-        "accountwizard" :{
+        "accountwizard": {
             "bank": "Bankanız",
             "default_categories": "Varsayılan kategoriler",
             "default_categories_desc": "Bu, başlamanıza yardımcı olmak için temel ve sık kullanılan kategorilerin bir listesini ekleyecektir.",
@@ -119,10 +119,10 @@
             "success": "Banka erişiminiz başarıyla güncellendi",
             "error": "Banka erişiminiz güncellenemedi.",
             "disable_access": "Erişimi devre dışı bırak",
-            "this_access":"Bu erişim şu anda",
-            "enabled":"aktif",
-            "disabled":"devre dışı",
-            "fill_the_fields":"Yeniden etkinleştirmek için aşağıdaki alanları doldurun.",
+            "this_access": "Bu erişim şu anda",
+            "enabled": "aktif",
+            "disabled": "devre dışı",
+            "fill_the_fields": "Yeniden etkinleştirmek için aşağıdaki alanları doldurun.",
             "danger_zone_title": "Tehlikeli alan",
             "sync_title": "Senkronizasyon",
             "delete_session": "Oturum çerezlerini sil",
@@ -252,7 +252,6 @@
             "category": "Kategori",
             "last_sync_full": "Son senkronizasyon:",
             "sync_now": "Senkronize",
-            "sync_disabled": "Bu banka hesabı etkinleştirilmemiştir, ayarladan etkin hale getirin",
             "type": "Tür",
             "date": "Gerçek tarih",
             "custom_label": "Özel etiket",
@@ -271,11 +270,10 @@
             "broaden_search": "Aramanızı genişletmeyi deneyin.",
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
-            "deletion_error":"Işlem silinirken hata: %{error}.",
+            "deletion_error": "Işlem silinirken hata: %{error}.",
             "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir.",
             "warning_merge_all": "Gerçekten tüm kopyaları birleştirmek istiyor musunuz?",
             "warning_irrevocable": "Bu işlem geri alınamaz"
-
         },
         "budget": {
             "amount": "Gerçek miktar",
@@ -489,10 +487,8 @@
             "type": "Tür:",
             "find_more": "Daha fazla bul",
             "find_fewer": "Daha az bul",
-            "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir. Bu değeri sağ üstteki \"Varsayılan ayarlar\" düğmesine tıklayarak varsayılan ayarlarda da ayarlayabilirsiniz.",
-            "hours": "saat",
-            "default_help": "Iki işlem çift olarak kabul edilecektir, bu süre içinde (saat olarak) gerçekleşmişseler.",
-            "default_threshold": "Çiftleme eşiği",
+            "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir.",
+            "days": "gün",
             "ignore_different_custom_fields": "Farklı özel alanları yoksay",
             "ignore_different_custom_fields_desc": "İki işlemin tanımlanmış bir özel türü, kategorisi veya etiketi varsa ve bu alanlardan biri iki işlem arasında farklıysa, bunları yineleme olarak kabul etme.",
             "confirm": "Bu iki işlemi birleştirmeyi onaylıyor musunuz? Bu eylem geri alınamaz!",
@@ -545,9 +541,6 @@
             "card_summary": "Kart (ertelenmiş)",
             "deferred_card": "Ertelenmiş akış",
             "internal_transfer": "Iç havale"
-        },
-        "units": {
-            "hours": "saat"
         },
         "addtransaction": {
             "label": "Işlemin etiketi",
@@ -636,7 +629,6 @@
                 "no_new_transactions": "Bu dönemde hiçbir yeni işlem içe aktarılmadı."
             },
             "fetch_error": {
-                "subject": "Bankacılık işlemleri alınırken hata oluştu",
                 "UNKNOWN_WOOB_MODULE": "Woob modülü bilinmiyor.",
                 "NO_PASSWORD": "Şifre eksik.",
                 "INVALID_PASSWORD": "Şifre geçersiz.",
@@ -657,7 +649,6 @@
             }
         },
         "notification": {
-            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
             "test_notification": {
                 "subject": "[Kresus] Test bildirimi",
                 "content": "Merhaba, sevgili Kresus kullanıcısı,\n\nBu mesajı okuyorsanız, bildirim yapılandırmanız doğrudur!\n\nIyi günler.\nKresus"

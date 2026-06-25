@@ -464,7 +464,9 @@ const Reports = () => {
                 </DisplayIf>
 
                 <div className="swipeable-table-wrapper">
-                    <table className="swipeable-table transaction-table" ref={refTransactionTable}>
+                    <table
+                        className="swipeable-table no-vertical-border transaction-table"
+                        ref={refTransactionTable}>
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { Chart } from 'chart.js';
-import type { ScriptableLineSegmentContext } from 'chart.js/dist/types/index';
+import { Chart, type ScriptableLineSegmentContext } from 'chart.js';
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
@@ -189,7 +188,7 @@ function createChartBalance(
 }
 
 const BalanceChart = (props: { balance: number; transactions: Transaction[] }) => {
-    const container = useRef<Chart>();
+    const container = useRef<Chart | null>(null);
 
     const redraw = useCallback(() => {
         container.current = createChartBalance('barchart', props.balance, props.transactions);

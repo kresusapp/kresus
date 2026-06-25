@@ -24,7 +24,7 @@ import { Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import moment from 'moment';
-import type { LegendItem } from 'chart.js/dist/types/index';
+import type { LegendItem } from 'chart.js';
 
 interface AllPieChartsProps extends BaseChartProps {
     rawIncomeOps: Transaction[];

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import { amountAndLabelAndDateMatch } from './diff-transactions';
-import { Transaction } from '../models';
+import { getDuplicatePairScore } from './duplicates-manager';
+import { Transaction, MinimalTransaction } from '../models';
 import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
@@ -18,22 +18,22 @@ import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } f
       is by definition a transaction which debit date is in the future).
 */
 export default function filterDuplicateTransactions(
-    duplicates: [Transaction, Partial<Transaction>][]
+    duplicates: [Transaction, MinimalTransaction][]
 ): {
-    toCreate: Partial<Transaction>[];
+    toCreate: MinimalTransaction[];
     toUpdate: {
         known: Transaction;
         update: Partial<Transaction>;
     }[];
 } {
-    const toCreate: Partial<Transaction>[] = [];
+    const toCreate: MinimalTransaction[] = [];
     const toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
     const today = new Date();
 
     for (const [known, provided] of duplicates) {
         // We ignore transactions which differ from more than just the type.
-        if (!amountAndLabelAndDateMatch(known, provided)) {
+        if (getDuplicatePairScore(known, provided, 0, false) < 1) {
             toCreate.push(provided);
             continue;
         }
@@ -54,17 +54,10 @@ export default function filterDuplicateTransactions(
 
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === UNKNOWN_TRANSACTION_TYPE && provided.type !== UNKNOWN_TRANSACTION_TYPE) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: provided.type,
-                },
-            });
-            continue;
+            updateBase.type = provided.type;
         }
 
-        // The transaction type which was "deferred_card", is now "card", and the debitDate is now
+        // If the transaction type which was "deferred_card" is now "card", and the debitDate is now
         // in the past (ie. the change of type is legitimate), update the transaction.
         if (
             known.debitDate &&
@@ -72,14 +65,7 @@ export default function filterDuplicateTransactions(
             provided.type === TRANSACTION_CARD_TYPE.name &&
             moment(known.debitDate).isSameOrBefore(today, 'day')
         ) {
-            toUpdate.push({
-                known,
-                update: {
-                    ...updateBase,
-                    type: TRANSACTION_CARD_TYPE.name,
-                },
-            });
-            continue;
+            updateBase.type = TRANSACTION_CARD_TYPE.name;
         }
 
         if (Object.keys(updateBase).length > 0) {

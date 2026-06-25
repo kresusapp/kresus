@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Route, Switch, Redirect, NavLink, useLocation, useHistory } from 'react-router-dom';
+import { Navigate, NavLink, useLocation, useNavigate } from 'react-router';
 
 export interface TabDescriptor {
     name: string;
@@ -18,34 +18,25 @@ const TabsContainer = (props: {
     selectedTab?: string;
 }) => {
     const location = useLocation();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const onChange = useCallback(
         (event: React.ChangeEvent<HTMLSelectElement>) => {
             const newPath = event.target.value;
             // Only modify current path if necessary
             if (location.pathname !== newPath) {
-                history.push(newPath);
+                navigate(newPath);
             }
         },
-        [location, history]
+        [location, navigate]
     );
 
-    const routes = [];
     const tabsLinks = [];
     const tabsOptions = [];
     for (const [path, tab] of props.tabs) {
-        routes.push(
-            <Route key={path} path={path}>
-                {tab.component()}
-            </Route>
-        );
-
         tabsLinks.push(
             <li key={path}>
-                <NavLink activeClassName="active" to={path}>
-                    {tab.name}
-                </NavLink>
+                <NavLink to={path}>{tab.name}</NavLink>
             </li>
         );
 
@@ -54,6 +45,11 @@ const TabsContainer = (props: {
                 {tab.name}
             </option>
         );
+    }
+
+    const currentTab = props.tabs.get(location.pathname);
+    if (!currentTab) {
+        return <Navigate to={props.defaultTab} replace={true} />;
     }
 
     return (
@@ -67,12 +63,7 @@ const TabsContainer = (props: {
                     {tabsOptions}
                 </select>
             </div>
-            <div className="tab-content">
-                <Switch>
-                    {routes}
-                    <Redirect to={props.defaultTab} push={false} />
-                </Switch>
-            </div>
+            <div className="tab-content">{currentTab.component()}</div>
         </>
     );
 };

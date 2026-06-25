@@ -29,7 +29,7 @@
     max-width: 18em;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     /* Put the input and label on different lines. */
     .form-input .input {
         margin-left: 0;
@@ -67,6 +67,7 @@
     margin-left: calc(25% + 1rem);
 }
 
+.form-center > .sub-form,
 .form-center > .form-input {
     margin-left: 0;
 }
@@ -75,7 +76,7 @@
     width: 25%;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .form-center > *,
     .form-center > .form-input .form-help,
     .form-center > .form-input .sub {
@@ -113,7 +114,7 @@
     gap: 1em;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .form-toolbar > * {
         flex-grow: 1;
     }

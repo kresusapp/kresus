@@ -153,7 +153,10 @@ export async function update(req: PreloadedRequest<TransactionRule>, res: expres
 
             if (!dbCondition) {
                 // Create it
-                await TransactionRuleCondition.create(userId, { ...condition, ruleId: rule.id });
+                await TransactionRuleCondition.create(userId, {
+                    ...condition,
+                    ruleId: rule.id,
+                });
             } else {
                 if (dbCondition.ruleId !== rule.id) {
                     throw new KError("a condition isn't tied to the given rule", 400);

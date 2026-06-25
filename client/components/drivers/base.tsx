@@ -1,4 +1,4 @@
-import memoize from 'micro-memoize';
+import { memoize } from 'micro-memoize';
 
 import * as BankStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
@@ -74,7 +74,7 @@ export class Driver {
             return currency.makeFormat(accounts[0].currency);
         }
 
-        return Number.toString;
+        return String;
     }
 
     getTransactions(state: GlobalState): Transaction[] {

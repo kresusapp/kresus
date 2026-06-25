@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { mergeWith } from '../../server/models/helpers';
 import { UNKNOWN_TRANSACTION_TYPE } from '../../server/helpers';
@@ -25,149 +25,149 @@ describe('Merging two transactions together', () => {
         let update = mergeWith(target, {
             importDate: someDate,
         });
-        update.importDate.should.equal(someDate);
+        assert.strictEqual(update.importDate, someDate);
 
         update = mergeWith(target, {
             importDate: null,
         });
-        should.not.exist(update.importDate);
+        assert.ok(!('importDate' in update));
 
         update = mergeWith(target, {
             customLabel: '13',
         });
-        should.not.exist(update.importDate);
+        assert.ok(!('importDate' in update));
     });
 
     it("should replace the categoryId only when it's not set in the target", () => {
         let update = mergeWith(target, {
             categoryId: 45,
         });
-        should.not.exist(update.categoryId);
+        assert.ok(!('categoryId' in update));
 
         update = mergeWith(target, {
             categoryId: null,
         });
-        should.not.exist(update.categoryId);
+        assert.ok(!('categoryId' in update));
 
         let copy = Object.assign({}, target, { categoryId: null });
 
         update = mergeWith(copy, {
             categoryId: 10,
         });
-        update.categoryId.should.equal(10);
+        assert.strictEqual(update.categoryId, 10);
 
         update = mergeWith(copy, {
             categoryId: null,
         });
-        should.not.exist(update.categoryId);
+        assert.ok(!('categoryId' in update));
     });
 
     it("should replace the type only when it's not set in the target", () => {
         let update = mergeWith(target, {
             type: '1',
         });
-        should.not.exist(update.type);
+        assert.ok(!('type' in update));
 
         update = mergeWith(target, {
             type: UNKNOWN_TRANSACTION_TYPE,
         });
-        should.not.exist(update.type);
+        assert.ok(!('type' in update));
 
         let copy = Object.assign({}, target, { type: UNKNOWN_TRANSACTION_TYPE });
 
         update = mergeWith(copy, {
             type: '1',
         });
-        update.type.should.equal('1');
+        assert.strictEqual(update.type, '1');
 
         update = mergeWith(copy, {
             type: UNKNOWN_TRANSACTION_TYPE,
         });
-        should.not.exist(update.type);
+        assert.ok(!('type' in update));
     });
 
     it("should replace the custom label only when it's not set in the target", () => {
         let update = mergeWith(target, {
             customLabel: 'horsejs',
         });
-        should.not.exist(update.customLabel);
+        assert.ok(!('customLabel' in update));
 
         update = mergeWith(target, {
             customLabel: null,
         });
-        should.not.exist(update.customLabel);
+        assert.ok(!('customLabel' in update));
 
         let copy = Object.assign({}, target, { customLabel: null });
 
         update = mergeWith(copy, {
             customLabel: 'horsejs',
         });
-        update.customLabel.should.equal('horsejs');
+        assert.strictEqual(update.customLabel, 'horsejs');
 
         update = mergeWith(copy, {
             customLabel: null,
         });
-        should.not.exist(update.customLabel);
+        assert.ok(!('customLabel' in update));
 
         update = mergeWith(copy, {
             label: 'poneyjs',
             createdByUser: true,
         });
-        update.customLabel.should.equal('poneyjs');
+        assert.strictEqual(update.customLabel, 'poneyjs');
 
         update = mergeWith(copy, {
             label: 'poneyjs',
             createdByUser: false,
         });
-        should.not.exist(update.customLabel);
+        assert.ok(!('customLabel' in update));
     });
 
     it("should replace the budget date only when it's not set in the target", () => {
         let update = mergeWith(target, {
             budgetDate: someDate,
         });
-        should.not.exist(update.budgetDate);
+        assert.ok(!('budgetDate' in update));
 
         update = mergeWith(target, {
             budgetDate: null,
         });
-        should.not.exist(update.budgetDate);
+        assert.ok(!('budgetDate' in update));
 
         let copy = Object.assign({}, target, { budgetDate: null });
 
         update = mergeWith(copy, {
             budgetDate: someDate,
         });
-        update.budgetDate.should.equal(someDate);
+        assert.strictEqual(update.budgetDate, someDate);
 
         update = mergeWith(copy, {
             budgetDate: null,
         });
-        should.not.exist(update.budgetDate);
+        assert.ok(!('budgetDate' in update));
     });
 
     it("should replace the debit date only when it's not set in the target", () => {
         let update = mergeWith(target, {
             debitDate: someDate,
         });
-        should.not.exist(update.debitDate);
+        assert.ok(!('debitDate' in update));
 
         update = mergeWith(target, {
             debitDate: null,
         });
-        should.not.exist(update.debitDate);
+        assert.ok(!('debitDate' in update));
 
         let copy = Object.assign({}, target, { debitDate: null });
 
         update = mergeWith(copy, {
             debitDate: someDate,
         });
-        update.debitDate.should.equal(someDate);
+        assert.strictEqual(update.debitDate, someDate);
 
         update = mergeWith(copy, {
             debitDate: null,
         });
-        should.not.exist(update.debitDate);
+        assert.ok(!('debitDate' in update));
     });
 
     it('should merge several fields at once', () => {
@@ -181,7 +181,7 @@ describe('Merging two transactions together', () => {
             categoryId: 14,
         });
 
-        update.should.deepEqual({
+        assert.deepStrictEqual(update, {
             importDate: someDate,
             categoryId: 14,
         });
@@ -191,11 +191,11 @@ describe('Merging two transactions together', () => {
         const copy = Object.assign({}, target, {
             createdByUser: true,
         });
-        copy.createdByUser.should.equal(true);
+        assert.strictEqual(copy.createdByUser, true);
 
         const update = mergeWith(copy, {
             createdByUser: false,
         });
-        update.createdByUser.should.equal(false);
+        assert.strictEqual(update.createdByUser, false);
     });
 });

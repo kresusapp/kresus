@@ -1,4 +1,4 @@
-import should from 'should';
+import assert from 'node:assert';
 
 import { cleanData } from '../../server/controllers/helpers';
 import DefaultSettings from '../../shared/default-settings';
@@ -27,15 +27,15 @@ describe('Ensure settings without default values are removed when exporting data
     };
     let all = cleanData(world);
     it('The unknown setting should be removed from the list', () => {
-        DefaultSettings.has(UNKNOWN_SETTING).should.equal(false);
-        all.settings.some(s => s.key === UNKNOWN_SETTING).should.equal(false);
+        assert.ok(!DefaultSettings.has(UNKNOWN_SETTING));
+        assert.ok(!all.settings.some(s => s.key === UNKNOWN_SETTING));
     });
     it('The known setting should be kept in the list', () => {
-        DefaultSettings.has(KNOWN_SETTING).should.equal(true);
-        all.settings.some(s => s.key === KNOWN_SETTING).should.equal(true);
+        assert.ok(DefaultSettings.has(KNOWN_SETTING));
+        assert.ok(all.settings.some(s => s.key === KNOWN_SETTING));
     });
     it('The ghost setting should be removed from the list', () => {
-        all.settings.some(s => s.key === GHOST_SETTING).should.equal(false);
+        assert.ok(!all.settings.some(s => s.key === GHOST_SETTING));
     });
 });
 
@@ -64,14 +64,14 @@ describe('Ensure transaction rules conditions are properly exported', () => {
 
     it('Should not throw if all conditions types are known', () => {
         const func = () => cleanData(world);
-        should.doesNotThrow(func);
+        assert.doesNotThrow(func);
     });
 
     it('Should throw if a condition type is unknown', () => {
         const newWorld = JSON.parse(JSON.stringify(world));
         newWorld.transactionRules[0].conditions[0].type = 'UNKNOWN';
         const func = () => cleanData(newWorld);
-        should.throws(func);
+        assert.throws(func);
     });
 });
 
@@ -217,7 +217,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const transaction of betterWorld.transactions) {
-            accountsIds.should.containEql(transaction.accountId);
+            assert.ok(accountsIds.includes(transaction.accountId));
         }
     });
 
@@ -225,7 +225,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const rt of betterWorld.recurringTransactions) {
-            accountsIds.should.containEql(rt.accountId);
+            assert.ok(accountsIds.includes(rt.accountId));
         }
     });
 
@@ -233,7 +233,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const art of betterWorld.appliedRecurringTransactions) {
-            accountsIds.should.containEql(art.accountId);
+            assert.ok(accountsIds.includes(art.accountId));
         }
     });
 
@@ -241,7 +241,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const al of betterWorld.alerts) {
-            accountsIds.should.containEql(al.accountId);
+            assert.ok(accountsIds.includes(al.accountId));
         }
     });
 
@@ -250,7 +250,7 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
         const accountsIds = betterWorld.accounts.map(a => a.id);
         for (const view of betterWorld.views) {
             for (const acc of view.accounts) {
-                accountsIds.should.containEql(acc.accountId);
+                assert.ok(accountsIds.includes(acc.accountId));
             }
         }
     });
@@ -322,7 +322,7 @@ describe('Ensure recurring transaction ids are properly remapped after re-indexi
         const betterWorld = cleanData(world);
         const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
         for (const rt of betterWorld.recurringTransactions) {
-            recurringTransactionIds.should.containEql(rt.id);
+            assert.ok(recurringTransactionIds.includes(rt.id));
         }
     });
 
@@ -330,7 +330,7 @@ describe('Ensure recurring transaction ids are properly remapped after re-indexi
         const betterWorld = cleanData(world);
         const recurringTransactionIds = betterWorld.recurringTransactions.map(a => a.id);
         for (const art of betterWorld.appliedRecurringTransactions) {
-            recurringTransactionIds.should.containEql(art.recurringTransactionId);
+            assert.ok(recurringTransactionIds.includes(art.recurringTransactionId));
         }
     });
 });
@@ -423,7 +423,137 @@ describe('Ensure views ids are properly remapped after re-indexing', () => {
         const betterWorld = cleanData(world);
         const viewIds = betterWorld.views.map(v => v.id);
         for (const budget of betterWorld.budgets) {
-            viewIds.should.containEql(budget.viewId);
+            assert.ok(viewIds.includes(budget.viewId));
         }
+    });
+});
+
+describe('Ensure budgets without valid view/category ids are ignored', () => {
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+            },
+        ],
+        accounts: [
+            {
+                id: 10,
+                name: 'Account 1',
+                balance: 100,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+            {
+                id: 20,
+                name: 'Account 2',
+                balance: 200,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+        ],
+        views: [
+            {
+                id: 100,
+                name: 'View 1',
+                accounts: [
+                    {
+                        id: 1,
+                        viewId: 100,
+                        accountId: 10,
+                    },
+                ],
+            },
+            {
+                id: 101,
+                name: 'View 2',
+                accounts: [
+                    {
+                        id: 2,
+                        viewId: 101,
+                        accountId: 20,
+                    },
+                ],
+            },
+            {
+                id: 102,
+                name: 'View 3',
+                accounts: [
+                    {
+                        id: 3,
+                        viewId: 102,
+                        accountId: 10,
+                    },
+                    {
+                        id: 4,
+                        viewId: 102,
+                        accountId: 20,
+                    },
+                ],
+            },
+        ],
+        categories: [
+            {
+                label: 'Groceries',
+                color: '#1b9d68',
+                id: 0,
+            },
+            {
+                label: 'Whatever',
+                color: '#4b1F68',
+                id: 1,
+            },
+        ],
+        budgets: [
+            {
+                threshold: -140,
+                viewId: 100,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                viewId: 102,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -140,
+                viewId: 100,
+                categoryId: -1,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -140,
+                viewId: 100,
+                // no category
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                viewId: -1,
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+            {
+                threshold: -120,
+                // no view id
+                categoryId: 0,
+                year: 2025,
+                month: 9,
+            },
+        ],
+    };
+
+    it('Should be properly remapped in budgets', () => {
+        const betterWorld = cleanData(world);
+        assert.strictEqual(betterWorld.budgets.length, 2, 'There should be exactly 2 budgets kept');
     });
 });

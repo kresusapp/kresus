@@ -4,6 +4,7 @@ import {
     Access,
     Account,
     Setting,
+    MinimalTransaction,
     Transaction,
     TransactionRule,
     RecurringTransaction,
@@ -16,7 +17,7 @@ import { transactionTypeIdToName } from './transaction-types';
 import applyRules from './rule-engine';
 import errors from '../shared/errors.json';
 
-import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
+import { bankVendorByUuid, getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 
 import {
@@ -25,7 +26,6 @@ import {
     makeLogger,
     currency,
     assert,
-    unwrap,
     UNKNOWN_TRANSACTION_TYPE,
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
@@ -70,6 +70,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
 interface Value<T> {
     kind: 'value';
     value: T;
+    errors?: string[];
 }
 
 export type UserActionOrValue<T> = UserActionResponse | Value<T>;
@@ -185,13 +186,20 @@ async function pollAccounts(
     access: Access,
     config: PollAccountsConfig
 ): Promise<UserActionOrValue<Partial<Account>[]>> {
-    if (!access.hasPassword()) {
-        log.warn("Skipping accounts fetching -- password isn't present");
-        const errcode = getErrorCode('NO_PASSWORD');
-        throw new KError("Access' password is not set", 500, errcode);
+    if (!access.isEnabled()) {
+        // If the access has no password, check if it's an access that doesn't require
+        // credentials.
+        const bankVendor = bankVendorByUuid(access.vendorId);
+        if (!bankVendor.noCredentials) {
+            log.warn('Skipping transactions fetching -- access is disabled');
+            const errcode = getErrorCode('MISSING_MANDATORY_FIELD');
+            throw new KError('Access is lacking mandatory fields', 500, errcode);
+        }
     }
 
-    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
+    log.info(
+        `Retrieve all accounts from access ”${access.getLabel()}” with vendorId ${access.vendorId}`
+    );
 
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
@@ -204,10 +212,11 @@ async function pollAccounts(
     const userSession = ctx.getUserSession(userId);
 
     let sourceAccounts: ProviderAccount[];
+    let sourceErrors: string[] | undefined;
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await getProvider(access).fetchAccounts(
+            return await getProvider(access)?.fetchAccounts(
                 {
                     access,
                     debug,
@@ -219,6 +228,10 @@ async function pollAccounts(
             );
         });
 
+        if (!providerResponse) {
+            throw new KError('Could not retrieve provider');
+        }
+
         if (providerResponse.kind === 'user_action') {
             // User action response.
             return providerResponse;
@@ -226,6 +239,10 @@ async function pollAccounts(
 
         // Real values.
         sourceAccounts = providerResponse.values;
+
+        if (providerResponse.errors && providerResponse.errors.length) {
+            sourceErrors = providerResponse.errors;
+        }
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -240,7 +257,7 @@ async function pollAccounts(
     );
     log.info(`-> ${accounts.length} bank account(s) found`);
 
-    return { kind: 'value', value: accounts };
+    return { kind: 'value', value: accounts, errors: sourceErrors };
 }
 
 interface AccountInfo {
@@ -315,7 +332,7 @@ function normalizeTransaction(
     startOfPoll: Date,
     vendorToOwnAccountIdMap: Map<string, number>,
     providerTr: ProviderTransaction
-): Partial<Transaction> | null {
+): MinimalTransaction | null {
     if (!vendorToOwnAccountIdMap.has(providerTr.account)) {
         log.error(
             `Transaction attached to an unknown account (vendor id: ${providerTr.account}), skipping`
@@ -328,12 +345,13 @@ function normalizeTransaction(
         return null;
     }
 
-    const tr: Partial<Transaction> = {
+    const tr: MinimalTransaction = {
         accountId: vendorToOwnAccountIdMap.get(providerTr.account),
         amount: Number.parseFloat(providerTr.amount),
         rawLabel: providerTr.rawLabel || providerTr.label,
         date: new Date(providerTr.date),
         label: providerTr.label || providerTr.rawLabel,
+        importDate: startOfPoll,
     };
 
     if (typeof tr.amount === 'undefined' || Number.isNaN(tr.amount)) {
@@ -368,8 +386,6 @@ function normalizeTransaction(
         tr.debitDate = debitDate;
     }
 
-    tr.importDate = startOfPoll;
-
     const transactionType = transactionTypeIdToName(providerTr.type);
     if (transactionType !== null) {
         tr.type = transactionType;
@@ -391,7 +407,7 @@ async function pollTransactions(
     vendorToOwnAccountIdMap: Map<string, number>,
     access: Access,
     config: PollTransactionsConfig
-): Promise<UserActionOrValue<Partial<Transaction>[]>> {
+): Promise<UserActionOrValue<MinimalTransaction[]>> {
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
     const autoRetryFetch = await Setting.findOrCreateDefaultBooleanValue(
@@ -403,10 +419,11 @@ async function pollTransactions(
     const sessionManager = GLOBAL_CONTEXT.getUserSession(userId);
 
     let providerTransactions: ProviderTransaction[];
+    let providerErrors: string[] | undefined;
 
     try {
         const providerResponse = await retryCallProvider(numRetries, async () => {
-            return await getProvider(access).fetchTransactions(
+            return await getProvider(access)?.fetchTransactions(
                 {
                     access,
                     debug,
@@ -418,12 +435,20 @@ async function pollTransactions(
             );
         });
 
+        if (!providerResponse) {
+            throw new KError('Could not retrieve provider');
+        }
+
         if (providerResponse.kind === 'user_action') {
             return providerResponse;
         }
 
         // Real values.
         providerTransactions = providerResponse.values;
+
+        if (providerResponse.errors && providerResponse.errors.length) {
+            providerErrors = providerResponse.errors;
+        }
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -434,7 +459,7 @@ async function pollTransactions(
     }
 
     log.info('Normalizing source information...');
-    const transactions: Partial<Transaction>[] = providerTransactions
+    const transactions: MinimalTransaction[] = providerTransactions
         .map(tr => normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, tr))
         .filter(tr => tr !== null) as any;
 
@@ -442,6 +467,7 @@ async function pollTransactions(
     return {
         kind: 'value',
         value: transactions,
+        errors: providerErrors,
     };
 }
 
@@ -586,10 +612,15 @@ merging as per request`);
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
-        if (!access.hasPassword()) {
-            log.warn("Skipping transactions fetching -- password isn't present");
-            const errcode = getErrorCode('NO_PASSWORD');
-            throw new KError("Access' password is not set", 500, errcode);
+        if (!access.isEnabled()) {
+            // If the access has no password, check if it's an access that doesn't require
+            // credentials.
+            const bankVendor = bankVendorByUuid(access.vendorId);
+            if (!bankVendor.noCredentials) {
+                log.warn('Skipping transactions fetching -- access is disabled');
+                const errcode = getErrorCode('MISSING_MANDATORY_FIELD');
+                throw new KError('Access is lacking mandatory fields', 500, errcode);
+            }
         }
 
         const startOfPoll = new Date();
@@ -614,6 +645,7 @@ merging as per request`);
         if (result.kind === 'user_action') {
             return result;
         }
+        const providerErrors = result.errors;
         let transactions = result.value;
 
         const currentMoment = Date.now();
@@ -640,7 +672,7 @@ merging as per request`);
         );
 
         log.info('Comparing with database to ignore already known transactions…');
-        let toCreate: Partial<Transaction>[] = [];
+        let toCreate: MinimalTransaction[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
         const now = new Date();
@@ -706,8 +738,8 @@ merging as per request`);
             // Split the provider transactions into two parts: those related to
             // this account go in `providerTransactions`, the rest goes to
             // `otherTransactions`.
-            const providerTransactions: Partial<Transaction>[] = [];
-            const otherTransactions: Partial<Transaction>[] = [];
+            const providerTransactions: MinimalTransaction[] = [];
+            const otherTransactions: MinimalTransaction[] = [];
             for (const op of filteredTransactions) {
                 if (op.accountId === account.id) {
                     providerTransactions.push(op);
@@ -856,20 +888,21 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForTransactions(userId, access, createdTransactions);
         }
 
-        await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
+        await Access.update(userId, access.id, {
+            fetchStatus: FETCH_STATUS_SUCCESS,
+        });
         log.info('Post process: done.');
 
-        return { kind: 'value', value: { accounts, createdTransactions } };
+        return { kind: 'value', value: { accounts, createdTransactions }, errors: providerErrors };
     }
 
     async resyncAccountBalance(
         userId: number,
         account: Account,
+        access: Access,
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<Account>> {
-        const access = unwrap(await Access.find(userId, account.accessId));
-
         // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
 

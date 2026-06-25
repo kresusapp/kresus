@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 
 import List from './list';
 import NewRecurringTransaction from './new-recurring-transaction';
@@ -10,20 +10,18 @@ import URL from '../../urls';
 
 export default () => {
     return (
-        <Switch>
-            <Route path={URL.newAccountRecurringTransaction.pattern}>
-                <NewRecurringTransaction />
-            </Route>
-            <Route path={URL.editRecurringTransaction.pattern}>
-                <EditRecurringTransaction />
-            </Route>
-            <Route path={URL.accountRecurringTransactions.pattern}>
-                <AccountRecurringTransactionsList />
-            </Route>
-            <Route path={URL.recurringTransactions.pattern}>
-                <List />
-            </Route>
-            <Redirect to={URL.recurringTransactions.pattern} />
-        </Switch>
+        <Routes>
+            <Route
+                path="account/:accountId/new/:label?/:amount?/:day?/:type?"
+                element={<NewRecurringTransaction />}
+            />
+            <Route path="edit/:id" element={<EditRecurringTransaction />} />
+            <Route path="account/:accountId" element={<AccountRecurringTransactionsList />} />
+            <Route path="/" element={<List />} />
+            <Route
+                path="*"
+                element={<Navigate to={URL.recurringTransactions.pattern} replace={true} />}
+            />
+        </Routes>
     );
 };

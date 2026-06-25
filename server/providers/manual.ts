@@ -67,8 +67,35 @@ export const fetchTransactions = (): Promise<ProviderTransactionResponse> => {
     return Promise.resolve({ kind: 'values', values: [] });
 };
 
+export const getBankVendors = () => [
+    {
+        customFields: [
+            {
+                default: 'EUR',
+                name: 'currency',
+                type: 'select',
+                values: [
+                    {
+                        label: 'Euro',
+                        value: 'EUR',
+                    },
+                    {
+                        label: 'Dollar',
+                        value: 'USD',
+                    },
+                ],
+            },
+        ],
+        deprecated: false,
+        name: 'Manual Bank',
+        noCredentials: true,
+        uuid: 'manual',
+    },
+];
+
 export const _: Provider = {
     SOURCE_NAME,
+    getBankVendors,
     fetchAccounts,
     fetchTransactions,
 };

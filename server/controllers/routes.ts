@@ -17,6 +17,7 @@ import * as rules from './rules';
 import * as settings from './settings';
 import * as recurringTransactions from './recurring-transactions';
 import * as views from './views';
+import * as duplicates from './duplicates';
 
 const namespace = 'api';
 
@@ -231,6 +232,11 @@ const routes: RoutesDescriptor = {
     'views/:viewId': {
         put: views.update,
         delete: views.destroy,
+    },
+
+    // Duplicates
+    duplicates: {
+        get: duplicates.getDuplicates,
     },
 };
 

@@ -36,6 +36,7 @@ export interface UserActionResponse {
     actionKind: UserActionKind;
     message?: string;
     fields?: UserActionField[];
+    accessId?: number;
 }
 
 // Transaction rules.
@@ -45,3 +46,19 @@ export type TransactionRuleConditionType =
     | 'label_matches_regexp'
     | 'amount_equals';
 export type TransactionRuleActionType = 'categorize';
+
+export type Duplicates = {
+    new: Array<{
+        accountId: number;
+        duplicates: Array<[number, number]>;
+    }>;
+};
+
+export type BankVendor = {
+    backend: string;
+    customFields?: { name: string; type: string; [key: string]: unknown }[];
+    deprecated?: boolean;
+    name: string;
+    uuid: string;
+    noCredentials?: boolean;
+};

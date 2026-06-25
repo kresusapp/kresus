@@ -32,7 +32,11 @@ export default class Budget {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -40,14 +44,22 @@ export default class Budget {
     userId!: number;
 
     // Internal view id, to which the transaction is attached
-    @ManyToOne(() => View, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => View, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     view!: View;
 
     @Column('integer')
     viewId!: number;
 
-    @ManyToOne(() => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Category, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     category!: Category;
 
@@ -105,7 +117,9 @@ export default class Budget {
         year: number,
         month: number
     ): Promise<Budget | null> {
-        return await Budget.repo().findOne({ where: { userId, viewId, categoryId, year, month } });
+        return await Budget.repo().findOne({
+            where: { userId, viewId, categoryId, year, month },
+        });
     }
 
     static async findAndUpdate(
@@ -134,7 +148,10 @@ export default class Budget {
         deletedCategoryId: number,
         replacementCategoryId: number
     ): Promise<void> {
-        const budgets = await Budget.repo().findBy({ userId, categoryId: deletedCategoryId });
+        const budgets = await Budget.repo().findBy({
+            userId,
+            categoryId: deletedCategoryId,
+        });
         for (const budget of budgets) {
             const replacementCategoryBudget = await Budget.byCategoryAndYearAndMonth(
                 userId,
@@ -147,7 +164,9 @@ export default class Budget {
             // If there is no budget for the existing replacement category, don't actually delete
             // the current budget, just update its category with the new one.
             if (!replacementCategoryBudget) {
-                await Budget.update(userId, budget.id, { categoryId: replacementCategoryId });
+                await Budget.update(userId, budget.id, {
+                    categoryId: replacementCategoryId,
+                });
                 // Do not delete the budget we just updated.
                 continue;
             }

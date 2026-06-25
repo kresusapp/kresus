@@ -27,13 +27,13 @@ table.alerts-and-reports .input-group-money {
     margin-left: 1em;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     table.alerts-and-reports .input-group-money > input {
         width: 50px;
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (width >= 992px) {
     table.alerts-and-reports td.frequency select {
         width: 270px;
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Redirect, Route, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router';
 
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
@@ -11,8 +11,6 @@ import LocaleSelector from '../settings/customization/locale-selector';
 import Admin from '../settings/admin';
 
 import Demo from './demo';
-import WoobInstallIndex from './woob-readme';
-
 import './onboarding.css';
 
 const BASE_PATH = URL.onboarding.url();
@@ -197,33 +195,16 @@ const Onboarding = () => {
         <div className="onboarding">
             <div className="onboarding-content">
                 <div>
-                    <Switch>
-                        <Route path={NEW_BANK_PATH}>
-                            <NewAccessPane />
-                        </Route>
-                        <Route path={NEW_SYNC_BANK_PATH}>
-                            <NewSyncAccessPane />
-                        </Route>
-                        <Route path={NEW_MANUAL_BANK_PATH}>
-                            <NewManualAccessPane />
-                        </Route>
-                        <Route path={IMPORT_PATH}>
-                            <ImportPane />
-                        </Route>
-                        <Route path={DEMO_PATH}>
-                            <Demo />
-                        </Route>
-                        <Route path={ADMIN_PATH}>
-                            <AdminPane />
-                        </Route>
-                        <Route path={BASE_PATH}>
-                            <Menu />
-                        </Route>
-                        <Route path={URL.woobReadme.url()}>
-                            <WoobInstallIndex />
-                        </Route>
-                        <Redirect to={BASE_PATH} />
-                    </Switch>
+                    <Routes>
+                        <Route path="new-bank" element={<NewAccessPane />} />
+                        <Route path="new-sync-bank" element={<NewSyncAccessPane />} />
+                        <Route path="new-manual-bank" element={<NewManualAccessPane />} />
+                        <Route path="import" element={<ImportPane />} />
+                        <Route path="demo-mode" element={<Demo />} />
+                        <Route path="admin" element={<AdminPane />} />
+                        <Route index={true} element={<Menu />} />
+                        <Route path="*" element={<Navigate to={BASE_PATH} replace={true} />} />
+                    </Routes>
                 </div>
             </div>
         </div>

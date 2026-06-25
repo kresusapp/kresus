@@ -41,7 +41,11 @@ export default class Transaction {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -49,7 +53,11 @@ export default class Transaction {
     userId!: number;
 
     // Internal account id, to which the transaction is attached
-    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     account!: Account;
 
@@ -57,7 +65,11 @@ export default class Transaction {
     accountId!: number;
 
     // internal category id.
-    @ManyToOne(() => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
+    @ManyToOne(() => Category, {
+        cascade: true,
+        onDelete: 'SET NULL',
+        nullable: true,
+    })
     @JoinColumn()
     category: Category | null = null;
 
@@ -158,7 +170,9 @@ export default class Transaction {
     }
 
     static async find(userId: number, transactionId: number): Promise<Transaction | null> {
-        return await Transaction.repo().findOne({ where: { userId, id: transactionId } });
+        return await Transaction.repo().findOne({
+            where: { userId, id: transactionId },
+        });
     }
 
     static async all(userId: number): Promise<Transaction[]> {
@@ -202,7 +216,10 @@ export default class Transaction {
     }
 
     static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
-        return await Transaction.repo().findBy({ userId, accountId: In(accountIds) });
+        return await Transaction.repo().findBy({
+            userId,
+            accountId: In(accountIds),
+        });
     }
 
     static async byBankSortedByDateBetweenDates(

@@ -198,7 +198,11 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
 
     useImperativeHandle(ref, () => ({
         clear() {
-            setNumberComponents({ value: NaN, isNegative: initiallyNegative, afterPeriod: '' });
+            setNumberComponents({
+                value: NaN,
+                isNegative: initiallyNegative,
+                afterPeriod: '',
+            });
         },
 
         reset() {

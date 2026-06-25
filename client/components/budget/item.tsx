@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import URL from '../../urls';
 
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -182,7 +182,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
     let amountText = amount.toString();
     let remainingText = '-';
-    let thresholdText: JSX.Element | null = null;
+    let thresholdText: React.JSX.Element | null = null;
 
     if (threshold !== null && threshold !== 0) {
         if (props.displayPercent) {
@@ -203,7 +203,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
         }
     }
 
-    const bars: JSX.Element[] = [];
+    const bars: React.JSX.Element[] = [];
     // TODO: the "75" value should be editable by the user.
     const barsMap = getBars(threshold, amount, 75);
     if (barsMap) {

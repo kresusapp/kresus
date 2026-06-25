@@ -22,14 +22,22 @@ export default class RecurringTransaction {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
     @Column('integer')
     userId!: number;
 
-    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     account!: Account;
 
@@ -90,11 +98,15 @@ export default class RecurringTransaction {
         userId: number,
         accountId: number
     ): Promise<RecurringTransaction[] | null> {
-        return await RecurringTransaction.repo().find({ where: { userId, accountId } });
+        return await RecurringTransaction.repo().find({
+            where: { userId, accountId },
+        });
     }
 
     static async find(userId: number, recurringTrId: number): Promise<RecurringTransaction | null> {
-        return await RecurringTransaction.repo().findOne({ where: { id: recurringTrId, userId } });
+        return await RecurringTransaction.repo().findOne({
+            where: { id: recurringTrId, userId },
+        });
     }
 
     static async exists(userId: number, recurringTrId: number): Promise<boolean> {
@@ -125,7 +137,10 @@ export default class RecurringTransaction {
             'recurring transaction must have a valid list of months'
         );
 
-        const recurringTransaction = RecurringTransaction.repo().create({ ...attributes, userId });
+        const recurringTransaction = RecurringTransaction.repo().create({
+            ...attributes,
+            userId,
+        });
         return await RecurringTransaction.repo().save(recurringTransaction);
     }
 

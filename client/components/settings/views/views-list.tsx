@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { useKresusState, useKresusDispatch } from '../../../store';
 import * as ViewsStore from '../../../store/views';
@@ -35,7 +35,11 @@ const ViewItem = (props: { view: View }) => {
                             <span className={'fa fa-trash'} />
                         </button>
                     }>
-                    <p>{$t('client.settings.views.delete_confirmation', { label: view.label })}</p>
+                    <p>
+                        {$t('client.settings.views.delete_confirmation', {
+                            label: view.label,
+                        })}
+                    </p>
                 </Popconfirm>
             </td>
         </tr>

@@ -165,7 +165,11 @@ const BudgetsList = (): ReactElement => {
         useCallback(
             async (viewIdentifier, year, month) => {
                 await dispatch(
-                    BudgetsStore.fetchFromYearAndMonth({ viewId: viewIdentifier, year, month })
+                    BudgetsStore.fetchFromYearAndMonth({
+                        viewId: viewIdentifier,
+                        year,
+                        month,
+                    })
                 ).unwrap();
             },
             [dispatch]

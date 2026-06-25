@@ -202,7 +202,7 @@ const BarChart = (
         transactions: Transaction[];
     } & BarChartDateProps
 ) => {
-    const container = useRef<Chart>();
+    const container = useRef<Chart | null>(null);
 
     const redraw = useCallback(() => {
         container.current = createChartPositiveNegative(

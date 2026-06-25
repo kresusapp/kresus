@@ -27,7 +27,11 @@ export default class TransactionRule {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     user!: User;
 
@@ -38,10 +42,14 @@ export default class TransactionRule {
     @Column('integer')
     position!: number;
 
-    @OneToMany(() => TransactionRuleCondition, condition => condition.rule, { cascade: ['insert'] })
+    @OneToMany(() => TransactionRuleCondition, condition => condition.rule, {
+        cascade: ['insert'],
+    })
     conditions!: TransactionRuleCondition[];
 
-    @OneToMany(() => TransactionRuleAction, action => action.rule, { cascade: ['insert'] })
+    @OneToMany(() => TransactionRuleAction, action => action.rule, {
+        cascade: ['insert'],
+    })
     actions!: TransactionRuleAction[];
 
     // Static methods.
@@ -69,7 +77,9 @@ export default class TransactionRule {
     }
 
     static async find(userId: number, ruleId: number): Promise<TransactionRule | null> {
-        return await TransactionRule.repo().findOne({ where: { id: ruleId, userId } });
+        return await TransactionRule.repo().findOne({
+            where: { id: ruleId, userId },
+        });
     }
 
     static async exists(userId: number, ruleId: number): Promise<boolean> {
@@ -110,11 +120,17 @@ export default class TransactionRule {
 
         let i = 0;
         for (const action of attributes.actions) {
-            attributes.actions[i++] = TransactionRuleAction.cast({ ...action, userId });
+            attributes.actions[i++] = TransactionRuleAction.cast({
+                ...action,
+                userId,
+            });
         }
         i = 0;
         for (const condition of attributes.conditions) {
-            attributes.conditions[i++] = TransactionRuleCondition.cast({ ...condition, userId });
+            attributes.conditions[i++] = TransactionRuleCondition.cast({
+                ...condition,
+                userId,
+            });
         }
 
         const rule = TransactionRule.repo().create({ ...attributes, userId });

@@ -17,8 +17,7 @@ import DisplayIf from '../../ui/display-if';
 
 import './alerts.css';
 
-import { Route, Switch } from 'react-router-dom';
-import URL from './urls';
+import { Route, Routes } from 'react-router';
 
 const AlertsAndReports = () => {
     const areEmailsEnabled = useKresusState(state => {
@@ -76,16 +75,10 @@ AlertsAndReports.displayName = 'AlertsAndReports';
 
 export default () => {
     return (
-        <Switch>
-            <Route path={URL.newAlert.pattern}>
-                <AlertForm />
-            </Route>
-            <Route path={URL.newReport.pattern}>
-                <ReportForm />
-            </Route>
-            <Route path={URL.all}>
-                <AlertsAndReports />
-            </Route>
-        </Switch>
+        <Routes>
+            <Route path="alert/new/:type" element={<AlertForm />} />
+            <Route path="report/new" element={<ReportForm />} />
+            <Route path="/" element={<AlertsAndReports />} />
+        </Routes>
     );
 };

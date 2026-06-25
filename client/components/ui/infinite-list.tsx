@@ -37,7 +37,7 @@ const InfiniteList = (props: Props) => {
         last: (window.innerHeight / props.itemHeight) | 0,
     });
 
-    const container = useRef<HTMLElement>();
+    const container = useRef<HTMLElement | null>(null);
 
     const { items, containerId, renderItems, heightAbove, itemHeight, ballast } = props;
     const numItems = items.length;

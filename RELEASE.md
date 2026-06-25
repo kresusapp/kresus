@@ -15,17 +15,17 @@
 
 ## Publish on npm
 
-- Just after this on the same branch, run `npm publish` (make sure there are no local files that should not be published and are not ignored by the *.npmignore* file with `npm publish --dry-run`).
+- Just after this on the same branch, run `npm publish` (make sure there are no local files that should not be published and are not ignored by the _.npmignore_ file with `npm publish --dry-run`).
 - Test the npm release:
-  - install with `npm -g install --production --prefix /tmp kresus`.
-  - run Kresus from there:
-    - If you use sqlite for testing, install it there too: `npm -g install --production --prefix better-sqlite3`
-    - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
+    - install with `npm -g install --production --prefix /tmp kresus`.
+    - run Kresus from there:
+        - If you use sqlite for testing, install it there too: `npm -g install --production --prefix /tmp better-sqlite3`
+        - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
 
-*This doesn't need to run from any branch in particular, since the script to build the Docker
-stable image will use the latest version of Kresus pushed to npm.*
+_This doesn't need to run from any branch in particular, since the script to build the Docker
+stable image will use the latest version of Kresus pushed to npm._
 
 - Run `yarn docker:release` (ensure it doesn't use cached images).
 - Test the docker build:
