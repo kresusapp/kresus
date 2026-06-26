@@ -129,12 +129,19 @@ export function findRedundantPairs(
     log.debug(`${similar.length} pairs of similar transactions found`);
     log.debug(`findRedundantPairs took ${Date.now() - before}ms.`);
 
-    // The duplicates are sorted from last imported to first imported
-    similar.sort(
-        (a, b) =>
+    similar.sort((a, b) => {
+        // The duplicates are sorted from last imported to first imported.
+        // Fallback on date sorting if import dates are identical.
+        const importDiff =
             Math.max(+b[0].importDate, +b[1].importDate) -
-            Math.max(+a[0].importDate, +a[1].importDate)
-    );
+            Math.max(+a[0].importDate, +a[1].importDate);
+
+        if (importDiff !== 0) {
+            return importDiff;
+        }
+
+        return Math.max(+b[0].date, +b[1].date) - Math.max(+a[0].date, +a[1].date);
+    });
 
     return similar.map(([trA, trB]) => [trA.id, trB.id]);
 }
