@@ -70,11 +70,6 @@ export function getDuplicatePairScore(
 
     let score = 1;
 
-    // If the dates differ, decrease the score.
-    if (datediff > 0) {
-        score -= 0.1;
-    }
-
     // If the labels do not match exactly, decrease the score.
     // TODO: build score based on labels & levenshtein distance
     const trRawLabel = tr.rawLabel.replace(/ /g, '').toLowerCase();

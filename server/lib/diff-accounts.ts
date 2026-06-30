@@ -1,5 +1,5 @@
 import { assert } from '../helpers';
-import makeDiff from './diff-list';
+import makeDiff, { DiffParams } from './diff-list';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 import { Account } from '../models';
 
@@ -30,7 +30,7 @@ const HEURISTICS = {
 // some banks sometimes provide two different accounts with the same IBAN.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 
-function computePairScore(known: Account, provided: Partial<Account>, vendorId?: string): number {
+function computePairScore(known: Account, provided: Partial<Account>, params?: DiffParams): number {
     assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
 
     // Normalize data.
@@ -44,7 +44,7 @@ function computePairScore(known: Account, provided: Partial<Account>, vendorId?:
         oldLabel === newLabel ||
         (known.vendorAccountId === provided.vendorAccountId &&
             known.accessId === provided.accessId &&
-            vendorId === MANUAL_BANK_NAME)
+            params?.vendorId === MANUAL_BANK_NAME)
     ) {
         labelScore = HEURISTICS.SAME_LABEL;
     }

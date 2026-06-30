@@ -1,15 +1,25 @@
+export interface DiffParams {
+    // Used by the accounts diff function to detect manual bank accesses (for which the labels might
+    // change when the local changes).
+    vendorId?: string;
+
+    // Used by the isPerfectMatch function as the max date threshold between two possibles
+    // transactions duplicates. Fallbacks to 0.
+    perfectMatchMaxDateThreshold?: number;
+}
+
 function findOptimalMerges<T, PT = Partial<T>>(
-    computePairScore: (lhs: T, rhs: PT, parent?: string) => number,
+    computePairScore: (lhs: T, rhs: PT, params?: DiffParams) => number,
     minSimilarity: number,
     knowns: T[],
     provideds: PT[],
-    parentId?: string
+    params?: DiffParams
 ): [T, PT][] {
     const scoreMatrix: number[][] = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
         for (let j = 0; j < provideds.length; j++) {
-            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], parentId);
+            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], params);
         }
     }
 
@@ -59,7 +69,7 @@ interface DiffReturn<T, PT = Partial<T>> {
 }
 
 interface MakeDiffReturn<T, PT = Partial<T>> {
-    (known: T[], provided: PT[], parentId?: string): DiffReturn<T, PT>;
+    (known: T[], provided: PT[], params?: DiffParams): DiffReturn<T, PT>;
 }
 
 // Given a list of `known` objects (known to Kresus and saved into the
@@ -79,11 +89,11 @@ interface MakeDiffReturn<T, PT = Partial<T>> {
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 export default function makeDiff<T, PT = Partial<T>>(
-    isPerfectMatch: (lhs: T, rhs: PT) => boolean,
-    computePairScore: (lhs: T, rhs: PT, parentId?: string) => number,
+    isPerfectMatch: (lhs: T, rhs: PT, params?: DiffParams) => boolean,
+    computePairScore: (lhs: T, rhs: PT, params?: DiffParams) => number,
     minSimilarity: number
 ): MakeDiffReturn<T, PT> {
-    return (known: T[], provided: PT[], parentId?: string): DiffReturn<T, PT> => {
+    return (known: T[], provided: PT[], params?: DiffParams): DiffReturn<T, PT> => {
         let unprocessed = known;
         const nextUnprocessed: T[] = [];
 
@@ -92,7 +102,7 @@ export default function makeDiff<T, PT = Partial<T>>(
         for (const target of unprocessed) {
             let matchIndex: number | null = null;
             for (let i = 0; i < provided.length; i++) {
-                if (isPerfectMatch(target, provided[i])) {
+                if (isPerfectMatch(target, provided[i], params)) {
                     matchIndex = i;
                     break;
                 }
@@ -114,7 +124,7 @@ export default function makeDiff<T, PT = Partial<T>>(
             minSimilarity,
             unprocessed,
             provided,
-            parentId
+            params
         );
 
         // 3. Conclude.
