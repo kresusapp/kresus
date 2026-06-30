@@ -660,9 +660,13 @@ merging as per request`);
             if (!account) {
                 continue;
             }
+
+            const gracePeriod = account.gracePeriod ?? 0;
+
             if (
+                gracePeriod <= 0 ||
                 (transaction.date?.getTime() ?? 0) <
-                currentMoment - (account.gracePeriod ?? 0) * 24 * 60 * 60 * 1000
+                    currentMoment - gracePeriod * 24 * 60 * 60 * 1000
             ) {
                 filteredTransactions.push(transaction);
             }

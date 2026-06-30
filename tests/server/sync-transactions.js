@@ -66,89 +66,185 @@ const world = {
     ],
 };
 
-let USER_ID = null;
-before(async () => {
-    // Reload the USER_ID from the database, since process.kresus.defaultUser.id
-    // might have been clobbered by another test.
-    const users = await User.all();
-    if (!users.length) {
-        throw new Error('user should have been created!');
-    }
-    USER_ID = users[0].id;
-    if (typeof USER_ID !== 'number') {
-        throw new Error('missing user id in test.');
-    }
-});
-
-describe('syncTransactions and the duplicate lax mode', () => {
-    // Stub the demo provider so the bank "returns" a single transaction that is
-    // a near-duplicate (one day off) of the known one.
-    let access = null;
-    let account = null;
-
-    beforeEach(async () => {
-        await cleanAll(USER_ID);
-
-        await importData(USER_ID, structuredClone(world));
-
-        account = (await Account.all(USER_ID))[0];
-        access = await Access.find(USER_ID, account.accessId);
-
-        mock.method(demoProvider, 'fetchTransactions', () =>
-            Promise.resolve({
-                kind: 'values',
-                values: [
-                    {
-                        account: account.vendorAccountId,
-                        amount: '-300',
-                        label: 'Loyer',
-                        rawLabel: 'Loyer',
-                        date: PROVIDED_DATE,
-                        type: TRANSACTION_CARD_TYPE.woob_id,
-                    },
-                ],
-            })
-        );
+describe('syncTransactions', () => {
+    let USER_ID = null;
+    before(async () => {
+        // Reload the USER_ID from the database, since process.kresus.defaultUser.id
+        // might have been clobbered by another test.
+        const users = await User.all();
+        if (!users.length) {
+            throw new Error('user should have been created!');
+        }
+        USER_ID = users[0].id;
+        if (typeof USER_ID !== 'number') {
+            throw new Error('missing user id in test.');
+        }
     });
 
-    afterEach(() => {
-        mock.reset();
+    describe('duplicate lax mode', () => {
+        // Stub the demo provider so the bank "returns" a single transaction that is
+        // a near-duplicate (one day off) of the known one.
+        let access = null;
+        let account = null;
+
+        beforeEach(async () => {
+            await cleanAll(USER_ID);
+
+            await importData(USER_ID, structuredClone(world));
+
+            account = (await Account.all(USER_ID))[0];
+            access = await Access.find(USER_ID, account.accessId);
+
+            mock.method(demoProvider, 'fetchTransactions', () =>
+                Promise.resolve({
+                    kind: 'values',
+                    values: [
+                        {
+                            account: account.vendorAccountId,
+                            amount: '-300',
+                            label: 'Loyer',
+                            rawLabel: 'Loyer',
+                            date: PROVIDED_DATE,
+                            type: TRANSACTION_CARD_TYPE.woob_id,
+                        },
+                    ],
+                })
+            );
+        });
+
+        afterEach(() => {
+            mock.reset();
+        });
+
+        async function runSync() {
+            const accountInfoMap = new Map();
+            accountInfoMap.set(account.id, { account, balanceOffset: 0 });
+
+            const result = await accountsManager.syncTransactions(
+                USER_ID,
+                access,
+                accountInfoMap,
+                /* ignoreLastFetchDate */ true,
+                /* isInteractive */ false,
+                /* userActionFields */ null
+            );
+
+            assert.strictEqual(result.kind, 'value');
+            return result.value;
+        }
+
+        it('should create the near-duplicate transaction when lax mode is disabled', async () => {
+            const { createdTransactions } = await runSync();
+
+            assert.strictEqual(createdTransactions.length, 1);
+
+            const transactions = await Transaction.byAccount(USER_ID, account.id);
+            assert.strictEqual(transactions.length, 2);
+        });
+
+        it('should ignore the near-duplicate transaction when lax mode is enabled', async () => {
+            await Setting.updateByKey(USER_ID, DUPLICATE_LAX_MODE, 'true');
+
+            const { createdTransactions } = await runSync();
+
+            assert.strictEqual(createdTransactions.length, 0);
+
+            const transactions = await Transaction.byAccount(USER_ID, account.id);
+            assert.strictEqual(transactions.length, 1);
+        });
     });
 
-    async function runSync() {
-        const accountInfoMap = new Map();
-        accountInfoMap.set(account.id, { account, balanceOffset: 0 });
+    describe('grace period', () => {
+        const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000;
+        const tomorrow = new Date(Date.now() + MILLISECONDS_IN_A_DAY);
 
-        const result = await accountsManager.syncTransactions(
-            USER_ID,
-            access,
-            accountInfoMap,
-            /* ignoreLastFetchDate */ true,
-            /* isInteractive */ false,
-            /* userActionFields */ null
-        );
+        let access = null;
+        let account = null;
 
-        assert.strictEqual(result.kind, 'value');
-        return result.value;
-    }
+        beforeEach(async () => {
+            await cleanAll(USER_ID);
 
-    it('should create the near-duplicate transaction when lax mode is disabled', async () => {
-        const { createdTransactions } = await runSync();
+            await importData(USER_ID, structuredClone(world));
 
-        assert.strictEqual(createdTransactions.length, 1);
+            account = (await Account.all(USER_ID))[0];
+            access = await Access.find(USER_ID, account.accessId);
+        });
 
-        const transactions = await Transaction.byAccount(USER_ID, account.id);
-        assert.strictEqual(transactions.length, 2);
-    });
+        afterEach(() => {
+            mock.reset();
+        });
 
-    it('should ignore the near-duplicate transaction when lax mode is enabled', async () => {
-        await Setting.updateByKey(USER_ID, DUPLICATE_LAX_MODE, 'true');
+        function mockProvidedTransaction(date) {
+            mock.method(demoProvider, 'fetchTransactions', () =>
+                Promise.resolve({
+                    kind: 'values',
+                    values: [
+                        {
+                            account: account.vendorAccountId,
+                            amount: '-50',
+                            label: 'Coffee',
+                            rawLabel: 'Coffee',
+                            date,
+                            type: TRANSACTION_CARD_TYPE.woob_id,
+                        },
+                    ],
+                })
+            );
+        }
 
-        const { createdTransactions } = await runSync();
+        async function runSync() {
+            const accountInfoMap = new Map();
+            accountInfoMap.set(account.id, { account, balanceOffset: 0 });
 
-        assert.strictEqual(createdTransactions.length, 0);
+            const result = await accountsManager.syncTransactions(
+                USER_ID,
+                access,
+                accountInfoMap,
+                /* ignoreLastFetchDate */ true,
+                /* isInteractive */ false,
+                /* userActionFields */ null
+            );
 
-        const transactions = await Transaction.byAccount(USER_ID, account.id);
-        assert.strictEqual(transactions.length, 1);
+            assert.strictEqual(result.kind, 'value');
+            return result.value;
+        }
+
+        it('should create a transaction dated in the future when gracePeriod is 0/undefined', async () => {
+            mockProvidedTransaction(tomorrow);
+
+            const { createdTransactions } = await runSync();
+
+            assert.strictEqual(createdTransactions.length, 1);
+
+            const transactions = await Transaction.byAccount(USER_ID, account.id);
+            assert.strictEqual(transactions.length, 2);
+        });
+
+        it('should create a transaction older than the grace period', async () => {
+            account = await Account.update(USER_ID, account.id, { gracePeriod: 2 });
+
+            const fiveDaysAgo = new Date(Date.now() - 5 * MILLISECONDS_IN_A_DAY);
+            mockProvidedTransaction(fiveDaysAgo);
+
+            const { createdTransactions } = await runSync();
+
+            assert.strictEqual(createdTransactions.length, 1);
+
+            const transactions = await Transaction.byAccount(USER_ID, account.id);
+            assert.strictEqual(transactions.length, 2);
+        });
+
+        it('should not create a transaction younger than the grace period', async () => {
+            account = await Account.update(USER_ID, account.id, { gracePeriod: 2 });
+
+            mockProvidedTransaction(tomorrow);
+
+            const { createdTransactions } = await runSync();
+
+            assert.strictEqual(createdTransactions.length, 0);
+
+            const transactions = await Transaction.byAccount(USER_ID, account.id);
+            assert.strictEqual(transactions.length, 1);
+        });
     });
 });
