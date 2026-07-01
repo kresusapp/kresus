@@ -143,7 +143,6 @@ export async function fullPoll(userId: number) {
                     userId,
                     access,
                     accountInfoMap,
-                    /* ignoreLastFetchDate */ false,
                     /* isInteractive */ false,
                     null
                 );

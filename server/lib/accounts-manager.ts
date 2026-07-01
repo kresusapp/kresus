@@ -276,7 +276,6 @@ interface AccountsAndTransactions {
 async function preparePollTransactions(
     userId: number,
     accounts: Account[],
-    ignoreLastFetchDate: boolean,
     accountInfoMap: Map<number, AccountInfo>
 ) {
     let oldestLastFetchDate: Date | null = null;
@@ -292,10 +291,7 @@ async function preparePollTransactions(
             balanceOffset: 0,
         });
 
-        if (
-            !ignoreLastFetchDate &&
-            (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)
-        ) {
+        if (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate) {
             oldestLastFetchDate = account.lastCheckDate;
         }
     }
@@ -609,7 +605,6 @@ merging as per request`);
         userId: number,
         access: Access,
         pAccountInfoMap: AccountInfoMap | null,
-        ignoreLastFetchDate: boolean,
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
@@ -632,7 +627,6 @@ merging as per request`);
         const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(
             userId,
             allAccounts,
-            ignoreLastFetchDate,
             accountInfoMap
         );
 

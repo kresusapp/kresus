@@ -197,7 +197,6 @@ export async function createAndRetrieveData(
             userId,
             access,
             accountInfoMap,
-            /* ignoreLastFetchDate */ true,
             /* isInteractive */ true,
             userActionFields
         );
@@ -328,7 +327,6 @@ const _fetchAccountsAndTransactions = async (
         userId,
         access,
         accountInfoMap,
-        /* ignoreLastFetchDate */ false,
         /* isInteractive */ true,
         userActionFields
     );

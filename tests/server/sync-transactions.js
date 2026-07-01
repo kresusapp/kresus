@@ -124,7 +124,6 @@ describe('syncTransactions', () => {
                 USER_ID,
                 access,
                 accountInfoMap,
-                /* ignoreLastFetchDate */ true,
                 /* isInteractive */ false,
                 /* userActionFields */ null
             );
@@ -200,7 +199,6 @@ describe('syncTransactions', () => {
                 USER_ID,
                 access,
                 accountInfoMap,
-                /* ignoreLastFetchDate */ true,
                 /* isInteractive */ false,
                 /* userActionFields */ null
             );
