@@ -268,13 +268,16 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
 }
 
 // Do not use this method as a controller directly: express will pass a `next` middleware as third
-// argument, and `focusOnTransactionsFetch` will never default to false.
+// argument instead of the expected params object.
 const _fetchAccountsAndTransactions = async (
     req: PreloadedRequest<Access>,
-    // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
-    // nor should we create new accounts, nor should we ignore the last fetch date.
-    focusOnTransactionsFetch = false
+    params: {
+        // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
+        // nor should we create new accounts, nor should we ignore the last fetch date.
+        focusOnTransactionsFetch?: boolean;
+    } = {}
 ): Promise<UserActionResponse | FetchAccountsAndTransactionsResult> => {
+    const { focusOnTransactionsFetch = false } = params;
     const { id: userId } = req.user;
     const access = req.preloaded.access;
     const bankVendor = bankVendorByUuid(access.vendorId);
@@ -362,7 +365,7 @@ export async function fetchAccountsAndTransactions(
 // Does not add new found accounts.
 export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
     try {
-        const result = await _fetchAccountsAndTransactions(req, true);
+        const result = await _fetchAccountsAndTransactions(req, { focusOnTransactionsFetch: true });
         res.status(200).json(result);
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
