@@ -272,12 +272,19 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
 const _fetchAccountsAndTransactions = async (
     req: PreloadedRequest<Access>,
     params: {
-        // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
-        // nor should we create new accounts, nor should we ignore the last fetch date.
-        focusOnTransactionsFetch?: boolean;
-    } = {}
+        // Whether accounts returned by the fetch and absent from database should be created.
+        addNewAccounts: boolean;
+
+        // Whether an error while fetching accounts should stop the whole fetch (there are cases
+        // where we still want to fetch the transactions from working accounts).
+        requiresSuccessfulAccountsSync: boolean;
+
+        // When fetching transactions, by default only the transactions since the last fetch, minus a threshold,
+        // are fetched. If true, this bypasses this last fetch date limitation.
+        ignoreLastFetchDate: boolean;
+    }
 ): Promise<UserActionResponse | FetchAccountsAndTransactionsResult> => {
-    const { focusOnTransactionsFetch = false } = params;
+    const { addNewAccounts, requiresSuccessfulAccountsSync, ignoreLastFetchDate } = params;
     const { id: userId } = req.user;
     const access = req.preloaded.access;
     const bankVendor = bankVendorByUuid(access.vendorId);
@@ -300,13 +307,13 @@ const _fetchAccountsAndTransactions = async (
     // a minor issue.
     try {
         accountResponse = await accountManager.syncAccounts(userId, access, {
-            addNewAccounts: focusOnTransactionsFetch === false,
+            addNewAccounts,
             updateProvider: false, // TODO shouldn't this be inferred from the settings?
             isInteractive: true,
             userActionFields,
         });
     } catch (err) {
-        if (!focusOnTransactionsFetch) {
+        if (requiresSuccessfulAccountsSync) {
             throw err;
         }
     }
@@ -325,7 +332,7 @@ const _fetchAccountsAndTransactions = async (
         userId,
         access,
         accountInfoMap,
-        /* ignoreLastFetchDate */ !focusOnTransactionsFetch,
+        ignoreLastFetchDate,
         /* isInteractive */ true,
         userActionFields
     );
@@ -354,7 +361,11 @@ export async function fetchAccountsAndTransactions(
     res: express.Response
 ) {
     try {
-        const result = await _fetchAccountsAndTransactions(req);
+        const result = await _fetchAccountsAndTransactions(req, {
+            addNewAccounts: true,
+            requiresSuccessfulAccountsSync: true,
+            ignoreLastFetchDate: true,
+        });
         res.status(200).json(result);
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
@@ -365,7 +376,11 @@ export async function fetchAccountsAndTransactions(
 // Does not add new found accounts.
 export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
     try {
-        const result = await _fetchAccountsAndTransactions(req, { focusOnTransactionsFetch: true });
+        const result = await _fetchAccountsAndTransactions(req, {
+            addNewAccounts: false,
+            requiresSuccessfulAccountsSync: false,
+            ignoreLastFetchDate: false,
+        });
         res.status(200).json(result);
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
@@ -494,7 +509,11 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
 
-        const result = await _fetchAccountsAndTransactions(req);
+        const result = await _fetchAccountsAndTransactions(req, {
+            addNewAccounts: true,
+            requiresSuccessfulAccountsSync: true,
+            ignoreLastFetchDate: true,
+        });
         if ('kind' in result) {
             res.status(200).json(result);
             return;
