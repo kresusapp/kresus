@@ -278,13 +278,9 @@ const _fetchAccountsAndTransactions = async (
         // Whether an error while fetching accounts should stop the whole fetch (there are cases
         // where we still want to fetch the transactions from working accounts).
         requiresSuccessfulAccountsSync: boolean;
-
-        // When fetching transactions, by default only the transactions since the last fetch, minus a threshold,
-        // are fetched. If true, this bypasses this last fetch date limitation.
-        ignoreLastFetchDate: boolean;
     }
 ): Promise<UserActionResponse | FetchAccountsAndTransactionsResult> => {
-    const { addNewAccounts, requiresSuccessfulAccountsSync, ignoreLastFetchDate } = params;
+    const { addNewAccounts, requiresSuccessfulAccountsSync } = params;
     const { id: userId } = req.user;
     const access = req.preloaded.access;
     const bankVendor = bankVendorByUuid(access.vendorId);
@@ -332,7 +328,7 @@ const _fetchAccountsAndTransactions = async (
         userId,
         access,
         accountInfoMap,
-        ignoreLastFetchDate,
+        /* ignoreLastFetchDate */ false,
         /* isInteractive */ true,
         userActionFields
     );
@@ -364,7 +360,6 @@ export async function fetchAccountsAndTransactions(
         const result = await _fetchAccountsAndTransactions(req, {
             addNewAccounts: true,
             requiresSuccessfulAccountsSync: true,
-            ignoreLastFetchDate: true,
         });
         res.status(200).json(result);
     } catch (err) {
@@ -379,7 +374,6 @@ export async function fetchTransactions(req: PreloadedRequest<Access>, res: expr
         const result = await _fetchAccountsAndTransactions(req, {
             addNewAccounts: false,
             requiresSuccessfulAccountsSync: false,
-            ignoreLastFetchDate: false,
         });
         res.status(200).json(result);
     } catch (err) {
@@ -512,7 +506,6 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         const result = await _fetchAccountsAndTransactions(req, {
             addNewAccounts: true,
             requiresSuccessfulAccountsSync: true,
-            ignoreLastFetchDate: true,
         });
         if ('kind' in result) {
             res.status(200).json(result);
