@@ -116,6 +116,21 @@ describe('getDuplicatePairScore', () => {
         const score = getDuplicatePairScore(comparison, BaseTransaction, 2, false);
         assert.ok(score > 0);
     });
+
+    it('should return 0 when both transactions are flagged as recurring transactions', () => {
+        const base = { ...BaseTransaction, isRecurrentTransaction: true };
+        const comparison = { ...BaseTransaction, isRecurrentTransaction: true };
+
+        const score = getDuplicatePairScore(comparison, base, 1, false);
+        assert.strictEqual(score, 0);
+    });
+
+    it('should return non-zero when only one transaction is flagged as recurring transaction', () => {
+        const base = { ...BaseTransaction, isRecurrentTransaction: true };
+
+        const score = getDuplicatePairScore(BaseTransaction, base, 1, false);
+        assert.ok(score > 0);
+    });
 });
 
 describe('findRedundantPairs', () => {

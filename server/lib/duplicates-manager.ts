@@ -40,6 +40,12 @@ export function getDuplicatePairScore(
         return 0;
     }
 
+    // Recurring transactions are created manually by the user. Surely two recurring transactions
+    // are not duplicates.
+    if (tr.isRecurrentTransaction && next.isRecurrentTransaction) {
+        return 0;
+    }
+
     if (ignoreDuplicatesWithDifferentCustomFields) {
         // If both transactions have a defined type, category or custom label and one of
         // these fields differ between the two transactions, do no count it as a
