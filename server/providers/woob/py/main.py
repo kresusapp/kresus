@@ -557,7 +557,7 @@ class Connector:
         iter_count = 0
 
         with self.backend:
-            accounts_iter = self.backend.iter_accounts()
+            accounts_iter = iter(self.backend.iter_accounts())
             while True:
                 iter_count += 1
 
@@ -613,7 +613,7 @@ class Connector:
         iter_count = 0
 
         with self.backend:
-            accounts_iter = self.backend.iter_accounts()
+            accounts_iter = iter(self.backend.iter_accounts())
             while True:
                 iter_count += 1
 
