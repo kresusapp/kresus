@@ -143,6 +143,7 @@ try:
         NeedInteractiveFor2FA,
     )
     from woob.browser.exceptions import ClientError
+    from woob.browser.pages import FormNotFound
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
 except ImportError as first_exc:
@@ -165,6 +166,7 @@ except ImportError as first_exc:
             NeedInteractiveFor2FA,
         )
         from weboob.browser.exceptions import ClientError
+        from weboob.browser.pages import FormNotFound
         from weboob.tools.backend import Module
         from weboob.tools.log import createColoredFormatter
     except ImportError as exc:
@@ -565,7 +567,13 @@ class Connector:
                     account = next(accounts_iter)
                 except StopIteration:
                     break
-                except (BrowserUnavailable, ClientError, AttributeError) as exc:
+                # Keep this list of errors in sync with `get_transactions`!
+                except (
+                    BrowserUnavailable,
+                    ClientError,
+                    AttributeError,
+                    FormNotFound,
+                ) as exc:
                     logging.error("Skipping account due to unexpected error: %s", exc)
                     errors.append(exc)
                     continue
@@ -621,8 +629,17 @@ class Connector:
                     account = next(accounts_iter)
                 except StopIteration:
                     break
-                except (BrowserUnavailable, ClientError, AttributeError) as exc:
-                    logging.error("Skipping account due to unexpected error: %s", exc)
+                # Keep this list of errors in sync with that below and in `get_accounts`!
+                except (
+                    BrowserUnavailable,
+                    ClientError,
+                    AttributeError,
+                    FormNotFound,
+                ) as exc:
+                    logging.error(
+                        "Skipping account (iter_history) due to unexpected error: %s",
+                        exc,
+                    )
                     errors.append(exc)
                     continue
 
@@ -631,7 +648,28 @@ class Connector:
                 transactions = []
 
                 try:
-                    for hist_tr in self.backend.iter_history(account):
+                    # Manual iteration, to catch errors by hand.
+                    transaction_iter = self.backend.iter_history(account)
+
+                    while True:
+                        try:
+                            hist_tr = next(transaction_iter)
+                        except StopIteration:
+                            break
+                        # Keep this list of errors in sync with that below and in `get_accounts`!
+                        except (
+                            BrowserUnavailable,
+                            ClientError,
+                            AttributeError,
+                            FormNotFound,
+                        ) as exc:
+                            logging.error(
+                                "Skipping transaction (history) due to unexpected error: %s",
+                                exc,
+                            )
+                            errors.append(exc)
+                            continue
+
                         transactions.append(hist_tr)
 
                         # Ensure all the dates are datetime objects, so that we can compare them.
@@ -659,19 +697,39 @@ class Connector:
                 except NotImplementedError:
                     nyi_methods.append("iter_history")
 
+                # Now, fetch incoming transactions.
                 try:
-                    transactions += [
-                        tr
-                        for tr in self.backend.iter_coming(account)
-                        if tr.type
-                        in [
-                            Transaction.TYPE_DEFERRED_CARD,
-                            Transaction.TYPE_CARD_SUMMARY,
-                        ]
-                    ]
+                    # Manual iteration, to catch errors by hand.
+                    coming_transaction_iter = self.backend.iter_coming(account)
+
+                    while True:
+                        try:
+                            coming_tr = next(coming_transaction_iter)
+                            if coming_tr.type in [
+                                Transaction.TYPE_DEFERRED_CARD,
+                                Transaction.TYPE_CARD_SUMMARY,
+                            ]:
+                                transactions.append(coming_tr)
+                        except StopIteration:
+                            break
+                        # Keep this list of errors in sync with that below and in `get_accounts`!
+                        except (
+                            BrowserUnavailable,
+                            ClientError,
+                            AttributeError,
+                            FormNotFound,
+                        ) as exc:
+                            logging.error(
+                                "Skipping transaction (history) due to unexpected error: %s",
+                                exc,
+                            )
+                            errors.append(exc)
+                            continue
+
                 except NotImplementedError:
                     nyi_methods.append("iter_coming")
 
+                # Show errors about NYI methods.
                 for method_name in nyi_methods:
                     logging.error(
                         ("%s not implemented for this account: %s."),
