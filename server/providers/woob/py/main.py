@@ -556,13 +556,10 @@ class Connector:
         """
         results = []
         errors = []
-        iter_count = 0
 
         with self.backend:
             accounts_iter = iter(self.backend.iter_accounts())
             while True:
-                iter_count += 1
-
                 try:
                     account = next(accounts_iter)
                 except StopIteration:
@@ -618,13 +615,10 @@ class Connector:
         """
         results = []
         errors = []
-        iter_count = 0
 
         with self.backend:
             accounts_iter = iter(self.backend.iter_accounts())
             while True:
-                iter_count += 1
-
                 try:
                     account = next(accounts_iter)
                 except StopIteration:
