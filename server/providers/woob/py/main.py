@@ -643,7 +643,7 @@ class Connector:
 
                 try:
                     # Manual iteration, to catch errors by hand.
-                    transaction_iter = self.backend.iter_history(account)
+                    transaction_iter = iter(self.backend.iter_history(account))
 
                     while True:
                         try:
@@ -694,7 +694,7 @@ class Connector:
                 # Now, fetch incoming transactions.
                 try:
                     # Manual iteration, to catch errors by hand.
-                    coming_transaction_iter = self.backend.iter_coming(account)
+                    coming_transaction_iter = iter(self.backend.iter_coming(account))
 
                     while True:
                         try:
@@ -714,7 +714,7 @@ class Connector:
                             FormNotFound,
                         ) as exc:
                             logging.error(
-                                "Skipping transaction (history) due to unexpected error: %s",
+                                "Skipping transaction (coming) due to unexpected error: %s",
                                 exc,
                             )
                             errors.append(exc)
