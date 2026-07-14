@@ -29,10 +29,8 @@ export default () => {
         type?: string;
     }>();
 
-    let predefinedLabel = rawPredefinedLabel;
-    if (predefinedLabel) {
-        predefinedLabel = window.decodeURIComponent(predefinedLabel);
-    }
+    // Already URI decoded by useParams, see https://github.com/remix-run/react-router/issues/10814
+    const predefinedLabel = rawPredefinedLabel;
 
     let predefinedAmount = 0;
     if (rawPredefinedAmount) {
