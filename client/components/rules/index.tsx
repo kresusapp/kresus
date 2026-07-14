@@ -80,10 +80,8 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
         categoryId?: string;
     }>();
 
-    let predefinedLabel = rawPredefinedLabel;
-    if (predefinedLabel) {
-        predefinedLabel = window.decodeURIComponent(predefinedLabel);
-    }
+    // Already URI decoded by useParams, see https://github.com/remix-run/react-router/issues/10814
+    const predefinedLabel = rawPredefinedLabel;
 
     let predefinedAmount = null;
     if (rawPredefinedAmount) {

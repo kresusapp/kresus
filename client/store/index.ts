@@ -68,6 +68,7 @@ duplicatesMiddleware.startListening({
         BankStore.createAccess.fulfilled,
         BankStore.deleteAccess.fulfilled,
         BankStore.applyBulkEdit.fulfilled,
+        BankStore.updateAndFetchAccess.fulfilled,
         SettingsStore.setPair.fulfilled
     ),
     effect: async (action, { dispatch }) => {

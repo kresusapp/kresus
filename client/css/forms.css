@@ -187,3 +187,11 @@ select.check-validity:invalid,
 input.check-validity:invalid {
     border: 1px solid #D75353;
 }
+
+/**
+ * By default the z-index is set to 1, making the handle visible above other elements such as
+ * the category dropdown.
+ */
+.rc-slider-handle {
+    z-index: inherit;
+}

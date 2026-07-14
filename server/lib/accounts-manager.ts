@@ -32,6 +32,8 @@ import {
 } from '../helpers';
 import {
     DEFAULT_ACCOUNT_ID,
+    DUPLICATE_LAX_MODE,
+    DUPLICATE_THRESHOLD,
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_ENABLE_DEBUG,
@@ -146,7 +148,6 @@ const MAX_PROVIDER_RETRIES = 3;
 async function retryCallProvider<T>(paramNumRetries: number, func: () => Promise<T>): Promise<T> {
     let numRetries = paramNumRetries;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         numRetries--;
 
@@ -275,7 +276,6 @@ interface AccountsAndTransactions {
 async function preparePollTransactions(
     userId: number,
     accounts: Account[],
-    ignoreLastFetchDate: boolean,
     accountInfoMap: Map<number, AccountInfo>
 ) {
     let oldestLastFetchDate: Date | null = null;
@@ -291,10 +291,7 @@ async function preparePollTransactions(
             balanceOffset: 0,
         });
 
-        if (
-            !ignoreLastFetchDate &&
-            (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)
-        ) {
+        if (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate) {
             oldestLastFetchDate = account.lastCheckDate;
         }
     }
@@ -501,7 +498,7 @@ class AccountManager {
         }
 
         const polledAccounts = result.value;
-        const diff = diffAccounts(oldAccounts, polledAccounts, access.vendorId);
+        const diff = diffAccounts(oldAccounts, polledAccounts, { vendorId: access.vendorId });
 
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
@@ -532,7 +529,7 @@ class AccountManager {
         const accounts = result.value;
         const oldAccounts = await Account.byAccess(userId, access);
 
-        const diff = diffAccounts(oldAccounts, accounts, access.vendorId);
+        const diff = diffAccounts(oldAccounts, accounts, { vendorId: access.vendorId });
 
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
@@ -608,7 +605,6 @@ merging as per request`);
         userId: number,
         access: Access,
         pAccountInfoMap: AccountInfoMap | null,
-        ignoreLastFetchDate: boolean,
         isInteractive: boolean,
         userActionFields: Record<string, string> | null
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
@@ -631,7 +627,6 @@ merging as per request`);
         const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(
             userId,
             allAccounts,
-            ignoreLastFetchDate,
             accountInfoMap
         );
 
@@ -659,9 +654,13 @@ merging as per request`);
             if (!account) {
                 continue;
             }
+
+            const gracePeriod = account.gracePeriod ?? 0;
+
             if (
+                gracePeriod <= 0 ||
                 (transaction.date?.getTime() ?? 0) <
-                currentMoment - (account.gracePeriod ?? 0) * 24 * 60 * 60 * 1000
+                    currentMoment - gracePeriod * 24 * 60 * 60 * 1000
             ) {
                 filteredTransactions.push(transaction);
             }
@@ -674,6 +673,22 @@ merging as per request`);
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate: MinimalTransaction[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
+
+        let perfectMatchMaxDateThreshold = 0;
+
+        // If the user chose to loosen the duplicate detection algo, use the duplicate threshold for the perfect match algo instead of default 0 value
+        const enableDuplicateLaxMode = await Setting.findOrCreateDefaultBooleanValue(
+            userId,
+            DUPLICATE_LAX_MODE
+        );
+        if (enableDuplicateLaxMode) {
+            // The duplicate threshold is stored in hours, convert it to days
+            const duplicateThreshold = (
+                await Setting.findOrCreateDefault(userId, DUPLICATE_THRESHOLD)
+            ).value;
+
+            perfectMatchMaxDateThreshold = Math.round(Number.parseInt(duplicateThreshold, 10) / 24);
+        }
 
         const now = new Date();
         const currentMonth = now.getMonth();
@@ -783,7 +798,8 @@ merging as per request`);
             );
             const { providerOrphans, duplicateCandidates } = diffTransactions(
                 knowns,
-                providerTransactions
+                providerTransactions,
+                { perfectMatchMaxDateThreshold }
             );
 
             // Try to be smart to reduce the number of new transactions.

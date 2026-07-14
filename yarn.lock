@@ -1130,14 +1130,6 @@
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-19.2.3.tgz#c1e305d15a52a3e508d54dca770d202cb63abf2c"
   integrity sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==
 
-"@types/react-flatpickr@~3.8.11":
-  version "3.8.11"
-  resolved "https://registry.yarnpkg.com/@types/react-flatpickr/-/react-flatpickr-3.8.11.tgz#cec7d9afa535bff0631842b286e149f47fbeadfb"
-  integrity sha512-wXGyGRpUjiGknioxWzWJdNvF2XxKw5lAI7H64Iv7w4iL+1iT7QvAzrigz5FkW4lTg9IJOww6t7g21FzsrmRV6A==
-  dependencies:
-    "@types/react" "*"
-    flatpickr "^4.0.6"
-
 "@types/react-redux@~7.1.34":
   version "7.1.34"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.1.34.tgz#83613e1957c481521e6776beeac4fd506d11bd0e"
@@ -1617,10 +1609,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-better-sqlite3@~12.9.0:
-  version "12.9.0"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.9.0.tgz#32498c99ba3fb36f604fbb5c70667c5f68c00414"
-  integrity sha512-wqUv4Gm3toFpHDQmaKD4QhZm3g1DjUBI0yzS4UBl6lElUmXFYdTQmmEDpAFa5o8FiFiymURypEnfVHzILKaxqQ==
+better-sqlite3@^12.11.1:
+  version "12.11.1"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.11.1.tgz#067846efabf7671957fc8a9e8df3be39c6cc0b84"
+  integrity sha512-dq9AtApgg5PGFtBzPFSBl3HZQjHok5gaQCM6zh2Yk0aSmDCs1CbnVI8/HgASQkNKsWFpseIO9beg5xxpYhbIfA==
   dependencies:
     bindings "^1.5.0"
     prebuild-install "^7.1.1"
@@ -2954,7 +2946,7 @@ flat@^5.0.2:
   resolved "https://registry.yarnpkg.com/flat/-/flat-5.0.2.tgz#8ca6fe332069ffa9d324c327198c598259ceb241"
   integrity sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==
 
-flatpickr@^4.0.6, flatpickr@^4.6.13, flatpickr@~4.6.13:
+flatpickr@^4.6.13, flatpickr@~4.6.13:
   version "4.6.13"
   resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.13.tgz#8a029548187fd6e0d670908471e43abe9ad18d94"
   integrity sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==

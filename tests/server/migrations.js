@@ -138,6 +138,12 @@ describe('migrations', () => {
             },
         });
         assert.strictEqual(allBudgets.length, 1);
+
+        // Restore migration 25 now…
+        const table = await queryRunner.getTable('budget');
+        if (table && !table.columns.some(c => c.name === 'viewId')) {
+            await migration25ConstraintMigration.up(queryRunner);
+        }
     });
 
     it('should run migration 13 (setting default bank accounts balance) properly', async () => {

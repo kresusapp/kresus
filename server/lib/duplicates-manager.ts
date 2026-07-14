@@ -40,6 +40,12 @@ export function getDuplicatePairScore(
         return 0;
     }
 
+    // Recurring transactions are created manually by the user. Surely two recurring transactions
+    // are not duplicates.
+    if (tr.isRecurrentTransaction && next.isRecurrentTransaction) {
+        return 0;
+    }
+
     if (ignoreDuplicatesWithDifferentCustomFields) {
         // If both transactions have a defined type, category or custom label and one of
         // these fields differ between the two transactions, do no count it as a
@@ -69,11 +75,6 @@ export function getDuplicatePairScore(
     }
 
     let score = 1;
-
-    // If the dates differ, decrease the score.
-    if (datediff > 0) {
-        score -= 0.1;
-    }
 
     // If the labels do not match exactly, decrease the score.
     // TODO: build score based on labels & levenshtein distance
@@ -129,12 +130,19 @@ export function findRedundantPairs(
     log.debug(`${similar.length} pairs of similar transactions found`);
     log.debug(`findRedundantPairs took ${Date.now() - before}ms.`);
 
-    // The duplicates are sorted from last imported to first imported
-    similar.sort(
-        (a, b) =>
+    similar.sort((a, b) => {
+        // The duplicates are sorted from last imported to first imported.
+        // Fallback on date sorting if import dates are identical.
+        const importDiff =
             Math.max(+b[0].importDate, +b[1].importDate) -
-            Math.max(+a[0].importDate, +a[1].importDate)
-    );
+            Math.max(+a[0].importDate, +a[1].importDate);
+
+        if (importDiff !== 0) {
+            return importDiff;
+        }
+
+        return Math.max(+b[0].date, +b[1].date) - Math.max(+a[0].date, +a[1].date);
+    });
 
     return similar.map(([trA, trB]) => [trA.id, trB.id]);
 }

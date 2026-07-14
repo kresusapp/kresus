@@ -13,6 +13,7 @@ export const DEMO_MODE = 'demo-mode';
 export const DISCOVERY_MODE = 'discovery-mode';
 export const DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS = 'duplicate-ignore-different-custom-fields';
 export const DUPLICATE_THRESHOLD = 'duplicate-threshold';
+export const DUPLICATE_LAX_MODE = 'duplicate-lax-mode';
 export const EMAIL_RECIPIENT = 'email-recipient';
 export const FLUID_LAYOUT = 'fluid-layout';
 export const LOCALE = 'locale';

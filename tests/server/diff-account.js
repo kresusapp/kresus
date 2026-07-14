@@ -276,9 +276,9 @@ describe('diffing account when there are several accounts', () => {
         const { computePairScore } = testing;
 
         // Without a manual bank.
-        assert.strictEqual(computePairScore(first, same, 'whatever'), 7);
+        assert.strictEqual(computePairScore(first, same, { vendorId: 'whatever' }), 7);
 
         // Without a manual bank.
-        assert.strictEqual(computePairScore(first, same, MANUAL_BANK_NAME), 12);
+        assert.strictEqual(computePairScore(first, same, { vendorId: MANUAL_BANK_NAME }), 12);
     });
 });

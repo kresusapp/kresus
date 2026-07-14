@@ -19,3 +19,8 @@
 .Select__multiple-select-menu input + label {
     margin-left: 0.5em;
 }
+
+body.dark .Select__multiple-select-menu input[type="checkbox"] {
+    border-color: unset;
+    background-color: unset;
+}

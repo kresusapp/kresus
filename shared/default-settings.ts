@@ -13,6 +13,7 @@ import {
     DISCOVERY_MODE,
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
+    DUPLICATE_LAX_MODE,
     EMAIL_RECIPIENT,
     FLUID_LAYOUT,
     LOCALE,
@@ -41,6 +42,7 @@ DefaultSettings.set(DEMO_MODE, 'false');
 DefaultSettings.set(DISCOVERY_MODE, 'true');
 DefaultSettings.set(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true');
 DefaultSettings.set(DUPLICATE_THRESHOLD, '24');
+DefaultSettings.set(DUPLICATE_LAX_MODE, 'false');
 DefaultSettings.set(EMAIL_RECIPIENT, '');
 DefaultSettings.set(LOCALE, 'en');
 DefaultSettings.set(LIMIT_ONGOING_TO_CURRENT_MONTH, 'false');
