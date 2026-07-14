@@ -17,6 +17,7 @@ DefaultSettings.set(settings_1.DEMO_MODE, 'false');
 DefaultSettings.set(settings_1.DISCOVERY_MODE, 'true');
 DefaultSettings.set(settings_1.DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true');
 DefaultSettings.set(settings_1.DUPLICATE_THRESHOLD, '24');
+DefaultSettings.set(settings_1.DUPLICATE_LAX_MODE, 'false');
 DefaultSettings.set(settings_1.EMAIL_RECIPIENT, '');
 DefaultSettings.set(settings_1.LOCALE, 'en');
 DefaultSettings.set(settings_1.LIMIT_ONGOING_TO_CURRENT_MONTH, 'false');

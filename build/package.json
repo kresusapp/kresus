@@ -1,6 +1,6 @@
 {
     "name": "kresus",
-    "version": "0.24.0",
+    "version": "0.25.0",
     "engines": {
         "node": ">=24"
     },
@@ -44,11 +44,10 @@
         "@types/nodemailer": "^8.0.0",
         "@types/react": "~19.2.14",
         "@types/react-dom": "~19.2.3",
-        "@types/react-flatpickr": "~3.8.11",
         "@types/react-redux": "~7.1.34",
         "@types/redux-logger": "~3.0.13",
         "@types/semver": "^7.7.1",
-        "better-sqlite3": "~12.9.0",
+        "better-sqlite3": "^12.11.1",
         "chart.js": "^4.5.1",
         "chartjs-adapter-moment": "~1.0.1",
         "chartjs-plugin-zoom": "^2.2.0",

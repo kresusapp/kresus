@@ -128,10 +128,6 @@
         "license": "MIT",
         "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-dom"
     },
-    "@types/react-flatpickr": {
-        "license": "MIT",
-        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-flatpickr"
-    },
     "@types/react-redux": {
         "license": "MIT",
         "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-redux"

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = makeDiff;
-function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, parentId) {
+function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, params) {
     const scoreMatrix = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
         for (let j = 0; j < provideds.length; j++) {
-            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], parentId);
+            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], params);
         }
     }
     // Use a greedy strategy: find the first pairing that maximizes similarity,
@@ -55,7 +55,7 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, p
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
-    return (known, provided, parentId) => {
+    return (known, provided, params) => {
         let unprocessed = known;
         const nextUnprocessed = [];
         // 1. Find perfect matches.
@@ -63,7 +63,7 @@ function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
         for (const target of unprocessed) {
             let matchIndex = null;
             for (let i = 0; i < provided.length; i++) {
-                if (isPerfectMatch(target, provided[i])) {
+                if (isPerfectMatch(target, provided[i], params)) {
                     matchIndex = i;
                     break;
                 }
@@ -78,7 +78,7 @@ function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
         }
         unprocessed = nextUnprocessed;
         // 2. Find potential duplicates.
-        const duplicateCandidates = findOptimalMerges(computePairScore, minSimilarity, unprocessed, provided, parentId);
+        const duplicateCandidates = findOptimalMerges(computePairScore, minSimilarity, unprocessed, provided, params);
         // 3. Conclude.
         const knownOrphans = unprocessed;
         const providerOrphans = provided;

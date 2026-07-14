@@ -579,6 +579,8 @@
             "days": "jours",
             "ignore_different_custom_fields": "Ignorer les champs personnalisés différents",
             "ignore_different_custom_fields_desc": "Si les deux opérations ont un type, une catégorie ou un label personnalisé défini, et qu'un de ces champs est différent entre les deux opérations, ne pas les considérer comme des doublons.",
+            "lax_level": "Assouplir la détection des doublons à l'import",
+            "lax_level_desc": "Lorsque cette option est activée, l'algorithme de détection automatique des doublons sera plus permissif. En particulier il réutilisera le seuil utilisateur temporel au lieu de ne permettre aucun écart de date.",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
             "will_be_removed": "Cette opération sera supprimée."

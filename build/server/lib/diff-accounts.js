@@ -28,7 +28,7 @@ const HEURISTICS = {
 // The minimum similarity to consider two accounts are the same. We can't only rely on the IBAN:
 // some banks sometimes provide two different accounts with the same IBAN.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
-function computePairScore(known, provided, vendorId) {
+function computePairScore(known, provided, params) {
     (0, helpers_1.assert)(typeof provided.label !== 'undefined', 'account label must be defined at this point');
     // Normalize data.
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
@@ -39,7 +39,7 @@ function computePairScore(known, provided, vendorId) {
     if (oldLabel === newLabel ||
         (known.vendorAccountId === provided.vendorAccountId &&
             known.accessId === provided.accessId &&
-            vendorId === manual_1.SOURCE_NAME)) {
+            (params === null || params === void 0 ? void 0 : params.vendorId) === manual_1.SOURCE_NAME)) {
         labelScore = HEURISTICS.SAME_LABEL;
     }
     const accountIdScore = known.vendorAccountId === provided.vendorAccountId ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;

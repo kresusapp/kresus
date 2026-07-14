@@ -86,7 +86,6 @@ async function fullPoll(userId) {
                 // Update the repos only once.
                 needUpdate = false;
                 const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-                /* ignoreLastFetchDate */ false, 
                 /* isInteractive */ false, null);
                 (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'Unexpected action requirement after accounts have been successfully polled');
                 if (transactionResponse.errors && transactionResponse.errors.length) {

@@ -89,7 +89,6 @@ const MAX_PROVIDER_RETRIES = 3;
 // could be spurious), or a generic exception based on flagging scrapping.
 async function retryCallProvider(paramNumRetries, func) {
     let numRetries = paramNumRetries;
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         numRetries--;
         try {
@@ -174,7 +173,7 @@ async function pollAccounts(ctx, userId, access, config) {
     log.info(`-> ${accounts.length} bank account(s) found`);
     return { kind: 'value', value: accounts, errors: sourceErrors };
 }
-async function preparePollTransactions(userId, accounts, ignoreLastFetchDate, accountInfoMap) {
+async function preparePollTransactions(userId, accounts, accountInfoMap) {
     let oldestLastFetchDate = null;
     const vendorToOwnAccountIdMap = new Map();
     for (const account of accounts) {
@@ -186,8 +185,7 @@ async function preparePollTransactions(userId, accounts, ignoreLastFetchDate, ac
             account,
             balanceOffset: 0,
         });
-        if (!ignoreLastFetchDate &&
-            (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)) {
+        if (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate) {
             oldestLastFetchDate = account.lastCheckDate;
         }
     }
@@ -328,7 +326,7 @@ class AccountManager {
             return [];
         }
         const polledAccounts = result.value;
-        const diff = (0, diff_accounts_1.default)(oldAccounts, polledAccounts, access.vendorId);
+        const diff = (0, diff_accounts_1.default)(oldAccounts, polledAccounts, { vendorId: access.vendorId });
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
             if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
@@ -349,7 +347,7 @@ class AccountManager {
         }
         const accounts = result.value;
         const oldAccounts = await models_1.Account.byAccess(userId, access);
-        const diff = (0, diff_accounts_1.default)(oldAccounts, accounts, access.vendorId);
+        const diff = (0, diff_accounts_1.default)(oldAccounts, accounts, { vendorId: access.vendorId });
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
             let accountUpdate = null;
@@ -403,7 +401,7 @@ merging as per request`);
         }
         return { kind: 'value', value: accountInfoMap };
     }
-    async syncTransactions(userId, access, pAccountInfoMap, ignoreLastFetchDate, isInteractive, userActionFields) {
+    async syncTransactions(userId, access, pAccountInfoMap, isInteractive, userActionFields) {
         var _a, _b, _c;
         if (!access.isEnabled()) {
             // If the access has no password, check if it's an access that doesn't require
@@ -418,7 +416,7 @@ merging as per request`);
         const startOfPoll = new Date();
         const allAccounts = await models_1.Account.byAccess(userId, access);
         const accountInfoMap = pAccountInfoMap !== null && pAccountInfoMap !== void 0 ? pAccountInfoMap : new Map();
-        const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(userId, allAccounts, ignoreLastFetchDate, accountInfoMap);
+        const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(userId, allAccounts, accountInfoMap);
         const result = await pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, { fromDate, isInteractive, userActionFields });
         if (result.kind === 'user_action') {
             return result;
@@ -435,8 +433,10 @@ merging as per request`);
             if (!account) {
                 continue;
             }
-            if (((_b = (_a = transaction.date) === null || _a === void 0 ? void 0 : _a.getTime()) !== null && _b !== void 0 ? _b : 0) <
-                currentMoment - ((_c = account.gracePeriod) !== null && _c !== void 0 ? _c : 0) * 24 * 60 * 60 * 1000) {
+            const gracePeriod = (_a = account.gracePeriod) !== null && _a !== void 0 ? _a : 0;
+            if (gracePeriod <= 0 ||
+                ((_c = (_b = transaction.date) === null || _b === void 0 ? void 0 : _b.getTime()) !== null && _c !== void 0 ? _c : 0) <
+                    currentMoment - gracePeriod * 24 * 60 * 60 * 1000) {
                 filteredTransactions.push(transaction);
             }
         }
@@ -444,6 +444,14 @@ merging as per request`);
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate = [];
         let toUpdate = [];
+        let perfectMatchMaxDateThreshold = 0;
+        // If the user chose to loosen the duplicate detection algo, use the duplicate threshold for the perfect match algo instead of default 0 value
+        const enableDuplicateLaxMode = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.DUPLICATE_LAX_MODE);
+        if (enableDuplicateLaxMode) {
+            // The duplicate threshold is stored in hours, convert it to days
+            const duplicateThreshold = (await models_1.Setting.findOrCreateDefault(userId, settings_1.DUPLICATE_THRESHOLD)).value;
+            perfectMatchMaxDateThreshold = Math.round(Number.parseInt(duplicateThreshold, 10) / 24);
+        }
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentMonthDay = now.getDate();
@@ -517,7 +525,7 @@ merging as per request`);
                 return Math.max(+op.date, max);
             }, +providerTransactions[0].date));
             const knowns = await models_1.Transaction.byBankSortedByDateBetweenDates(userId, account, minDate, maxDate);
-            const { providerOrphans, duplicateCandidates } = (0, diff_transactions_1.default)(knowns, providerTransactions);
+            const { providerOrphans, duplicateCandidates } = (0, diff_transactions_1.default)(knowns, providerTransactions, { perfectMatchMaxDateThreshold });
             // Try to be smart to reduce the number of new transactions.
             const { toCreate: newToCreate, toUpdate: newToUpdate } = (0, filter_duplicate_transactions_1.default)(duplicateCandidates);
             toUpdate = toUpdate.concat(newToUpdate);

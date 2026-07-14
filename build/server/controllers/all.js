@@ -429,7 +429,9 @@ async function importData(userId, world, dontCreateAccess) {
             });
             if (typeof knownAccounts !== 'undefined') {
                 const vendorId = (_a = accessRemap.vendorId) !== null && _a !== void 0 ? _a : undefined;
-                const diffResult = (0, diff_accounts_1.default)(knownAccounts, [accountCopy], vendorId);
+                const diffResult = (0, diff_accounts_1.default)(knownAccounts, [accountCopy], {
+                    vendorId,
+                });
                 // There can be at most one perfect match, since we provided only one account.
                 if (diffResult.perfectMatches.length === 1) {
                     const firstMatchPair = diffResult.perfectMatches[0];
@@ -608,6 +610,20 @@ async function importData(userId, world, dontCreateAccess) {
         importedTypesMap.set(type.id.toString(), type.name);
     }
     log.info('Import transactions...');
+    let perfectMatchMaxDateThreshold = 0;
+    // If the user chose to loosen the duplicate detection algo, use the duplicate threshold for the perfect match algo instead of default 0 value
+    const enableDuplicateLaxModeSetting = world.settings.find((s) => s.key === settings_1.DUPLICATE_LAX_MODE);
+    const enableDuplicateLaxMode = (enableDuplicateLaxModeSetting
+        ? enableDuplicateLaxModeSetting.value
+        : (0, helpers_1.unwrap)(default_settings_1.default.get(settings_1.DUPLICATE_LAX_MODE))) === 'true';
+    if (enableDuplicateLaxMode) {
+        const duplicateThresholdSetting = world.settings.find((s) => s.key === settings_1.DUPLICATE_THRESHOLD);
+        // The duplicate threshold is stored in hours, convert it to days.
+        const duplicateThreshold = duplicateThresholdSetting
+            ? duplicateThresholdSetting.value
+            : (0, helpers_1.unwrap)(default_settings_1.default.get(settings_1.DUPLICATE_THRESHOLD));
+        perfectMatchMaxDateThreshold = Math.round(Number.parseInt(duplicateThreshold, 10) / 24);
+    }
     const newByAccountId = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
         const tr = world.transactions[i];
@@ -690,7 +706,7 @@ async function importData(userId, world, dontCreateAccess) {
     }
     for (const [accountId, provided] of newByAccountId) {
         const known = await models_1.Transaction.byAccount(userId, accountId);
-        const diffResult = (0, diff_transactions_1.default)(known, provided);
+        const diffResult = (0, diff_transactions_1.default)(known, provided, { perfectMatchMaxDateThreshold });
         // Ignore perfect matches and knownOrphans. Only import the "provider" (import) orphans
         // and the duplicate candidates, since we're not too sure about those.
         const transactions = diffResult.providerOrphans;
@@ -856,7 +872,6 @@ async function importData(userId, world, dontCreateAccess) {
         const hash = models_1.RecurringTransaction.easyHash(rt);
         const exists = existingRecurringTransactionsHashMap.has(hash);
         if (exists) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             recurringTransactionsMap.set(rt.id, existingRecurringTransactionsHashMap.get(hash));
         }
         else {
