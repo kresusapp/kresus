@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 
-import Flatpickr from './flatpickr';
+import Flatpickr, { type DateTimePickerHandle } from './flatpickr';
 
 import moment from 'moment';
 
@@ -37,6 +37,8 @@ const DateRange = (props: {
 
     const value: Date[] | null = props.value || null;
 
+    const fp = useRef<DateTimePickerHandle>(null);
+
     const { onSelect } = props;
     const onChange = useCallback(
         (dateArray: Date[] | null) => {
@@ -52,8 +54,8 @@ const DateRange = (props: {
     );
 
     const onClear = useCallback(() => {
-        onChange(null);
-    }, [onChange]);
+        fp.current?.flatpickr?.clear();
+    }, []);
 
     const placeholder =
         typeof props.placeholder !== 'undefined'
@@ -64,6 +66,23 @@ const DateRange = (props: {
 
     const minDate = props.minDate || undefined;
     const maxDate = props.maxDate || undefined;
+
+    const { id } = props;
+
+    // Use a custom uncontrolled input to allow manual typing input.
+    // See https://github.com/haoxins/react-flatpickr#flatpickr-instance
+    const customInput = useCallback(
+        (renderProps: { defaultValue?: string }, ref: (node: HTMLInputElement | null) => void) => (
+            <input
+                id={id}
+                ref={ref}
+                type="text"
+                defaultValue={renderProps.defaultValue}
+                placeholder={placeholder}
+            />
+        ),
+        [id, placeholder]
+    );
 
     const options: { mode: 'range'; [key: string]: any } = {
         dateFormat: $t('client.datepicker.flatpickr_format'),
@@ -83,11 +102,11 @@ const DateRange = (props: {
         <>
             <div className={`input-with-addon ${maybeClassName}`}>
                 <Flatpickr
+                    ref={fp}
                     options={options}
-                    id={props.id}
                     onChange={onChange}
                     value={value || undefined}
-                    placeholder={placeholder}
+                    render={customInput}
                 />
                 <button
                     type="button"

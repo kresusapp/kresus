@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 
-import Flatpickr from './flatpickr';
+import Flatpickr, { type DateTimePickerHandle } from './flatpickr';
 
 import moment from 'moment';
 
@@ -41,6 +41,8 @@ const DatePickerWrapper = (props: {
 
     const value = props.value || null;
 
+    const fp = useRef<DateTimePickerHandle>(null);
+
     const { onSelect } = props;
     const handleChange = useCallback(
         (dateArray: Date[]) => {
@@ -58,9 +60,9 @@ const DatePickerWrapper = (props: {
 
     const handleClear = useCallback(() => {
         if (props.clearable) {
-            handleChange([]);
+            fp.current?.flatpickr?.clear();
         }
-    }, [handleChange, props.clearable]);
+    }, [props.clearable]);
 
     const placeholder =
         typeof props.placeholder !== 'undefined'
@@ -71,6 +73,23 @@ const DatePickerWrapper = (props: {
 
     const minDate = props.minDate || undefined;
     const maxDate = props.maxDate || undefined;
+
+    const { id } = props;
+
+    // Use a custom uncontrolled input to allow manual typing input.
+    // See https://github.com/haoxins/react-flatpickr#flatpickr-instance
+    const customInput = useCallback(
+        (renderProps: { defaultValue?: string }, ref: (node: HTMLInputElement | null) => void) => (
+            <input
+                id={id}
+                ref={ref}
+                type="text"
+                defaultValue={renderProps.defaultValue}
+                placeholder={placeholder}
+            />
+        ),
+        [id, placeholder]
+    );
 
     const options = {
         dateFormat: $t('client.datepicker.flatpickr_format'),
@@ -88,11 +107,11 @@ const DatePickerWrapper = (props: {
     return (
         <div className={`input-with-addon ${maybeClassName}`}>
             <Flatpickr
+                ref={fp}
                 options={options}
-                id={props.id}
                 onChange={handleChange}
                 value={value || undefined}
-                placeholder={placeholder}
+                render={customInput}
             />
             <DisplayIf condition={props.clearable}>
                 <button
