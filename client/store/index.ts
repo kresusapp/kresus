@@ -119,9 +119,6 @@ export const reduxStore = configureStore({
 export type GlobalState = ReturnType<typeof reduxStore.getState>;
 
 // A pre-typed useSelector that embeds the app's global state.
-//
-// The line below is necessary for eslint and prettier to behave.
-// eslint-disable-next-line space-before-function-paren
 export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
     return useSelector<GlobalState, T>(func);
 };
