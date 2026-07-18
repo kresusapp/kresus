@@ -1,3 +1,0 @@
-# CSS files are managed by stylelint which requires uppercase hex colors,
-# conflicting with prettier's normalization.
-**/*.css
