@@ -8,7 +8,7 @@
     "license": "AGPL-3.0-or-later",
     "repository": {
         "type": "git",
-        "url": "https://framagit.org/kresusapp/kresus"
+        "url": "https://codeberg.org/kresus/kresus"
     },
     "main": "client/main.js",
     "dependencies": {
