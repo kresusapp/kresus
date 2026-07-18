@@ -382,17 +382,19 @@ const NewAccessForm = (props: {
                 </DisplayIf>
             </DisplayIf>
 
-            <Form.Input
-                inline={true}
-                id="store-credentials"
-                label={$t('client.accountwizard.store_credentials')}
-                help={$t('client.accountwizard.store_credentials_desc')}>
-                <Switch
-                    ariaLabel={$t('client.accountwizard.store_credentials')}
-                    checked={storeCredentials}
-                    onChange={setStoreCredentials}
-                />
-            </Form.Input>
+            <DisplayIf condition={!noCredentials}>
+                <Form.Input
+                    inline={true}
+                    id="store-credentials"
+                    label={$t('client.accountwizard.store_credentials')}
+                    help={$t('client.accountwizard.store_credentials_desc')}>
+                    <Switch
+                        ariaLabel={$t('client.accountwizard.store_credentials')}
+                        checked={storeCredentials}
+                        onChange={setStoreCredentials}
+                    />
+                </Form.Input>
+            </DisplayIf>
 
             <input
                 type="submit"
