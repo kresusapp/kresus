@@ -371,9 +371,11 @@ export default () => {
                     </div>
                 </Form.Input>
 
-                <h4>{$t('client.editaccess.grace_period')}</h4>
-                <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
-                <GracePeriodForm account={account} />
+                <DisplayIf condition={!isManualAccess(access)}>
+                    <h4>{$t('client.editaccess.grace_period')}</h4>
+                    <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
+                    <GracePeriodForm account={account} />
+                </DisplayIf>
 
                 <hr />
 
