@@ -6,7 +6,7 @@ import * as ViewStore from '../../store/views';
 import { assert, currency } from '../../helpers';
 
 import type { GlobalState } from '../../store';
-import type { Account, Transaction, View } from '../../models';
+import { MANUAL_BANK_ID, type Account, type Transaction, type View } from '../../models';
 
 export enum DriverType {
     None = 'none',
@@ -63,6 +63,11 @@ export class Driver {
         const view = this.getView(state.views);
         assert(view !== null, 'view must exist');
         return memoizedGetAccounts(state.banks, view.accounts);
+    }
+
+    isManualAccount(account: Account, state: GlobalState) {
+        const access = BankStore.accessById(state.banks, account.accessId);
+        return access.vendorId === MANUAL_BANK_ID;
     }
 
     getCurrencyFormatter(state: GlobalState) {
