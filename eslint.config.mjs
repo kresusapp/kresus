@@ -1,7 +1,5 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
-import prettierPlugin from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
@@ -14,7 +12,6 @@ export default defineConfig([
     {
         plugins: {
             import: importPlugin,
-            prettier: prettierPlugin,
             '@typescript-eslint': tseslint.plugin,
         },
 
@@ -34,8 +31,6 @@ export default defineConfig([
         },
 
         rules: {
-            'prettier/prettier': 2,
-
             // Possible errors
             'no-cond-assign': [2, 'always'],
             'no-console': 2,
@@ -360,8 +355,6 @@ export default defineConfig([
         rules: {
             // @typescript-eslint recommended rules
             ...tseslint.configs.recommended[2].rules,
-            // Disable formatting rules (prettier handles these)
-            ...prettierConfig.rules,
             // Project-specific overrides
             '@typescript-eslint/no-unused-vars': 0,
             '@typescript-eslint/no-floating-promises': 2,
