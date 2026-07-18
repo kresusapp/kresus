@@ -154,12 +154,23 @@ export async function createAndRetrieveData(
 
         let providerErrors: string[] = [];
 
-        const accountResponse = await accountManager.syncAccounts(userId, access, {
+        let accountResponse = await accountManager.syncAccounts(userId, access, {
             addNewAccounts: true,
             updateProvider: false, // TODO infer from setting?
             isInteractive: true,
             userActionFields,
         });
+
+        if (accountResponse.kind === 'user_action' && accountResponse.actionKind === 'decoupled_validation') {
+            // Refresh and restart!
+            accountResponse = await accountManager.syncAccounts(userId, access, {
+                addNewAccounts: true,
+                updateProvider: false, // TODO shouldn't this be inferred from the settings?
+                isInteractive: true,
+                // Pretend the response has already arrived.
+                userActionFields: {},
+            });
+        }
 
         if (accountResponse.kind === 'user_action') {
             // The whole system relies on the Access object existing (in
@@ -314,7 +325,22 @@ const _fetchAccountsAndTransactions = async (
     }
 
     if (accountResponse && accountResponse.kind === 'user_action') {
-        return accountResponse;
+        if (accountResponse.actionKind === 'decoupled_validation') {
+            // Refresh and restart!
+            accountResponse = await accountManager.syncAccounts(userId, access, {
+                addNewAccounts,
+                updateProvider: false, // TODO shouldn't this be inferred from the settings?
+                isInteractive: true,
+                // Pretend the response has already arrived.
+                userActionFields: {},
+            });
+
+            if (accountResponse.kind === 'user_action') {
+                return accountResponse;
+            }
+        } else {
+            return accountResponse;
+        }
     }
 
     const accountInfoMap = accountResponse ? accountResponse.value : null;
