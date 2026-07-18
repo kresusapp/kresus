@@ -1,9 +1,5 @@
 /* eslint-disable no-console */
 
-// There's a bug between eslint and prettier with spacing around async arrow
-// functions, so we need to explicitly use async functions instead.
-/* eslint-disable prefer-arrow-callback */
-
 import * as fs from 'fs';
 import * as path from 'path';
 

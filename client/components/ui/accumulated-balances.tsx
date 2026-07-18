@@ -40,7 +40,6 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
         totalElement = totalEntries
             .map(([key, value]): React.ReactNode => {
                 if (props.isCurrencyLink) {
-                    /* eslint-disable prettier/prettier */
                     const newPathName =
                         driver !== null
                             ? pathname
