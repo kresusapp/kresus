@@ -2,6 +2,7 @@
 set -e
 
 FIX=""
+BIOME_WRITE=""
 QUIET="--quiet"
 TARGET=""
 
@@ -14,6 +15,7 @@ case $key in
     ;;
     -f|--fix)
     FIX="--fix"
+    BIOME_WRITE="--write"
     ;;
     *)
     TARGET="$TARGET $key"
@@ -28,5 +30,6 @@ then
 fi
 
 concurrently \
-    "yarn run -- eslint --cache $QUIET $FIX $TARGET"\
-    "yarn run ci:lint-css $QUIET $FIX"
+    "yarn run -- eslint --cache $QUIET $FIX $TARGET" \
+    "yarn run ci:lint-css $QUIET $FIX" \
+    "yarn biome format $BIOME_WRITE"

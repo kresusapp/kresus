@@ -2,6 +2,7 @@
 set -e
 
 concurrently \
+    "yarn run biome format" \
     "yarn run ci:lint" \
     "yarn run ci:banks" \
     "yarn run ci:locales" \
