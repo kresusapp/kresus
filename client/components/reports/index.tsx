@@ -331,12 +331,15 @@ const Reports = () => {
     const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state));
     const balance = useKresusState(state => driver.getBalance(state));
     const outstandingSum = useKresusState(state => driver.getOutstandingSum(state));
-    const accounts = useKresusState(state => {
-        if (isAccountDriver(driver)) {
-            return driver.getAccounts(state);
-        }
 
-        return [];
+    const [accounts, onlyOneManualAccount] = useKresusState(state => {
+        if (isAccountDriver(driver)) {
+            const driverAccounts = driver.getAccounts(state);
+            const onlyOne =
+                driverAccounts.length === 1 && driver.isManualAccount(driverAccounts[0], state);
+            return [driverAccounts, onlyOne];
+        }
+        return [[], false];
     });
 
     const lastCheckDateTooltip = `${$t(
@@ -344,7 +347,7 @@ const Reports = () => {
     )} ${formatDate.toLongString(lastCheckDate)}`;
 
     let syncButton;
-    if (accounts.length === 1) {
+    if (accounts.length === 1 && !onlyOneManualAccount) {
         syncButton = (
             <li>
                 <SyncButton account={accounts[0]} />
