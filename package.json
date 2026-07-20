@@ -16,7 +16,7 @@
         "express": "~5.2.1",
         "express-basic-auth": "~1.2.1",
         "immer": "^11.1.15",
-        "ini": "^6.0.0",
+        "ini": "^7.0.0",
         "log4js": "^6.9.1",
         "micro-memoize": "^5.1.2",
         "moment": "^2.30.1",
