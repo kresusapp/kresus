@@ -10,32 +10,32 @@ while true; do
     esac
 done
 
-echo "Removing node_modules for ensuring dev dependencies..."
+echo "Removing node_modules for ensuring dev dependencies…"
 rm -rf node_modules/
 (which yarn > /dev/null && yarn) || npm install
 
-echo "Cleaning 'build' directory..."
+echo "Cleaning 'build' directory…"
 rm -fr ./build
 
-echo "Updating dependencies licenses..."
+echo "Updating dependencies licenses…"
 npm run fix:licenses
 git add client/components/about/dependencies.json
 
-echo "Building..."
+echo "Building…"
 npm run build:prod
 
 # Avoid shipping unused files
-echo "Deleting temporary sprite files..."
+echo "Deleting temporary sprite files…"
 rm -rf ./build/spritesmith-generated
 
 git add -f build/
 
-echo "Removing dev dependencies and installing production dependencies before shrinkwrap..."
+echo "Removing dev dependencies and installing production dependencies…·"
 rm -rf node_modules/ npm-shrinkwrap.json
-npm install --production --legacy-peer-deps # yarn doesn't allow shrinkwrap.
+npm install --omit=dev --legacy-peer-deps
 
-npm shrinkwrap
-git add npm-shrinkwrap.json
+echo "Regenerating package-lock.json…"
+npm install --omit=dev --legacy-peer-deps --package-lock-only
 
 git status
 
