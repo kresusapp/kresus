@@ -397,6 +397,7 @@ export default defineConfig([
             react: {
                 version: 'detect',
             },
+            'import/core-modules': ['react-router'],
         },
         languageOptions: {
             parserOptions: {
