@@ -17,9 +17,9 @@
 
 - Just after this on the same branch, run `npm publish` (make sure there are no local files that should not be published and are not ignored by the _.npmignore_ file with `npm publish --dry-run`).
 - Test the npm release:
-    - install with `npm -g install --production --prefix /tmp kresus`.
+    - install with `npm -g install --omit=dev --prefix /tmp kresus`.
     - run Kresus from there:
-        - If you use sqlite for testing, install it there too: `npm -g install --production --prefix /tmp better-sqlite3`
+        - If you use sqlite for testing, install it there too: `npm -g install --omit-dev --allow-script=better-sqlite3 --prefix /tmp better-sqlite3`
         - Then run Kresus with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
@@ -56,9 +56,8 @@ stable image will use the latest version of Kresus pushed to npm._
 
 ## Extra communication
 
-- Create social media messages for Mastodon / Twitter and publish them with a
-  link to the blog post.
+- Create social media messages for Mastodon and publish them with a link to the blog post.
 - Ideally, re-publish social media updates a few hours / days later.
 - Let package maintainers know about the update, and try to give instructions
   to make it easier to upgrade their packages (ArchLinux / YNH).
-- Update the latest stable version number in the topic of the Matrix room
+- Update the latest stable version number in the topic of the Matrix room.
