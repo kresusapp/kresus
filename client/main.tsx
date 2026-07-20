@@ -29,7 +29,7 @@ import * as ViewStore from './store/views';
 import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import { useRequiredParams } from './hooks';
 import URL from './urls';
-import { DEV_ENV, FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
+import { DEV_ENV, FORCE_DEMO_MODE, WOOB_INSTALLED } from '../shared/instance';
 
 // Components
 import About from './components/about';
@@ -200,14 +200,6 @@ const Kresus = () => {
         );
     }
 
-    // Retrieve the URL prefix and remove a potential trailing '/'.
-    const urlPrefix = useKresusState(state => {
-        const prefix = InstanceStore.get(state.instance, URL_PREFIX);
-        if (prefix === null) {
-            return '';
-        }
-        return prefix.replace(/\/$/g, '');
-    });
     const initialViewId = useKresusState(state => {
         const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
         if (initialAccountId !== null) {
@@ -276,7 +268,7 @@ const Kresus = () => {
 
     return (
         <ErrorReporter>
-            <HashRouter basename={urlPrefix}>
+            <HashRouter>
                 <Routes>
                     <Route
                         path={URL.woobReadme.pattern}
