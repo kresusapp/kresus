@@ -2834,10 +2834,10 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.3.0.tgz#ece407fa550a64d638536cd727e129c61616e0f0"
   integrity sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==
 
-fast-equals@^5.3.3:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/fast-equals/-/fast-equals-5.4.0.tgz#b60073b8764f27029598447f05773c7534ba7f1e"
-  integrity sha512-jt2DW/aNFNwke7AUd+Z+e6pz39KO5rzdbbFCg2sGafS4mk13MI7Z8O5z9cADNn5lhGODIgLwug6TZO2ctf7kcw==
+fast-equals@^5.4.0:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/fast-equals/-/fast-equals-5.4.1.tgz#a9174b03eece5307dbd675be6d6d42f7fa1d00ed"
+  integrity sha512-DjlFSM5Pk9cGcL0q5QXl66eGzx0N6szNgaswwc5ZphlBohjTVJSnGgI+rJVOgOi65qUoQnDZN4nDqi33udtydQ==
 
 fast-glob@^3.2.12, fast-glob@^3.3.3:
   version "3.3.3"
@@ -4173,12 +4173,12 @@ merge2@^1.3.0:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-micro-memoize@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/micro-memoize/-/micro-memoize-5.1.1.tgz#4a5f9e29189fa2a4d8c3c3c5bf13227698caeeb4"
-  integrity sha512-QDwluos8YeMijiKxZGwaV4f4tzj0soS6+xcsJhJ3+4wdEIHMyKbIKVUziebOgWX3e6yiijdoaHo+9tyhbnaWXA==
+micro-memoize@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/micro-memoize/-/micro-memoize-5.1.2.tgz#6930d7f61f7d0b3ec1925fc9512528685006d7fd"
+  integrity sha512-dbWHvnmuOCClNkneO6OIIXjEUJCIE0Ftar4DE36aJzXw3SqJCbgGTRxrbjrHq8fR+O3nZiLZmXdODczOnifK6w==
   dependencies:
-    fast-equals "^5.3.3"
+    fast-equals "^5.4.0"
     fast-stringify "^4.0.0"
 
 micromatch@^4.0.8:
