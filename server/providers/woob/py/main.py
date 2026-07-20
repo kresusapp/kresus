@@ -42,7 +42,6 @@ import io
 
 from copy import deepcopy
 from datetime import datetime, date
-from requests import ConnectionError, HTTPError
 
 # Ensure unicode is also defined in python 3.
 try:
@@ -146,6 +145,7 @@ try:
     from woob.browser.pages import FormNotFound
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
+    from requests import ConnectionError, HTTPError
 except ImportError as first_exc:
     try:
         from weboob.core import Weboob as Woob
@@ -169,6 +169,7 @@ except ImportError as first_exc:
         from weboob.browser.pages import FormNotFound
         from weboob.tools.backend import Module
         from weboob.tools.log import createColoredFormatter
+        from requests import ConnectionError, HTTPError
     except ImportError as exc:
         fail(
             WOOB_NOT_INSTALLED,

@@ -204,23 +204,8 @@ jobs:
           restore-keys: |
             yarn-
 
-      - name: Cache apt packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.APT_CACHE_DIR }}
-          key: apt-tests
-          restore-keys: |
-            apt-
-
       - name: Install JS dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Install minimal Python (no woob)
-        run: |
-          mkdir -p "$APT_CACHE_DIR"
-          apt-get update
-          apt-get install -o dir::cache::archives="$APT_CACHE_DIR" -y python3-requests
-          update-alternatives --install /usr/bin/python python $(which python3) 1
 
       - name: Run test suite without woob
         run: |
