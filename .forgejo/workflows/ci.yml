@@ -52,7 +52,7 @@ jobs:
             pip-
 
       - name: Install JS dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: JS code lint
         run: yarn run --silent ci:lint-full
@@ -105,7 +105,7 @@ jobs:
             pip-
 
       - name: Install JS dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Install Python and Woob
         run: |
@@ -181,7 +181,7 @@ jobs:
             pip-
 
       - name: Install JS dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Install Python and weboob
         run: |
