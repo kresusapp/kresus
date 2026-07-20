@@ -4492,12 +4492,10 @@ object.values@^1.1.6, object.values@^1.2.1:
     define-properties "^1.2.1"
     es-object-atoms "^1.0.0"
 
-ofx-js@~0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/ofx-js/-/ofx-js-0.2.0.tgz#57f09b0f91bc09bdbf0110c2a009fc541f141220"
-  integrity sha512-iQ6Fecnu0/kmitoAv9Vn9drHKd3lT+uCpSISAImLvEjVXHeLyT3hPwWFKxyk+4fdBQOo4zk9csVU+pT6YEBvAA==
-  dependencies:
-    xml2js "^0.6.2"
+ofx-js@~1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/ofx-js/-/ofx-js-1.1.1.tgz#374f5255045aa53c939c63abb5ac671d48ab6971"
+  integrity sha512-4ITJY2LuEq1fTV4FrsUgeVyEZOGz4vw9otaqPj1V2hfjN2c4RWYj8VVX6f3u6pSCwCie/ZH15VsGftWv08IsfQ==
 
 omggif@^1.0.5:
   version "1.0.10"
@@ -5458,11 +5456,6 @@ save-pixels@~2.3.0:
     ndarray-ops "^1.2.2"
     pngjs-nozlib "^1.0.0"
     through "^2.3.4"
-
-sax@>=0.6.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/sax/-/sax-1.4.1.tgz#44cc8988377f126304d3b3fc1010c733b929ef0f"
-  integrity sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==
 
 scheduler@^0.27.0:
   version "0.27.0"
@@ -6621,19 +6614,6 @@ write@^1.0.3:
   integrity sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==
   dependencies:
     mkdirp "^0.5.1"
-
-xml2js@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.6.2.tgz#dd0b630083aa09c161e25a4d0901e2b2a929b499"
-  integrity sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "~11.0.0"
-
-xmlbuilder@~11.0.0:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
-  integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
