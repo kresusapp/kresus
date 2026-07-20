@@ -41,7 +41,7 @@
         "@types/mocha": "~10.0.10",
         "@types/node": "^25.6.0",
         "@types/node-polyglot": "^2.5.0",
-        "@types/nodemailer": "^8.0.0",
+        "@types/nodemailer": "^8.0.1",
         "@types/react": "~19.2.14",
         "@types/react-dom": "~19.2.3",
         "@types/react-redux": "~7.1.34",
