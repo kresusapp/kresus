@@ -28,7 +28,6 @@ yarn-error.log
 .vscode
 nbproject
 Thumbs.db
-package-lock.json
 jsconfig.json
 
 # Misc folders
