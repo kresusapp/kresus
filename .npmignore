@@ -14,14 +14,18 @@
 /tests/
 /scripts/
 
+support/Browserstack-logo.png
+
+eslint.config.mjs
 .eslintignore
 .eslintrc.yml
 .eslintcache
-.gitlab-ci.yml
 .pylintrc
 .stylelintrc
 .stylelintcache
 .stylelintignore
+.prettierrc
+.prettierignore
 tsconfig.json
 global.d.ts
 .tsbuildinfo
@@ -30,6 +34,9 @@ vite.config.js
 .gitlab/
 .github/
 .gitpod.yml
+.claude/
+.forgejo/
+.dockerignore
 
 yarn.lock
 
