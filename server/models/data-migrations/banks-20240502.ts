@@ -19,7 +19,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
     }
 
     const accesses: Access[] = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: 'banquepopulaire',
             ...userCondition,

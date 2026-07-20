@@ -23,7 +23,7 @@ export async function resetManualBankAccountsBalance(
     }
 
     const accesses = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: In(['manual', 'demo']),
             ...userCondition,

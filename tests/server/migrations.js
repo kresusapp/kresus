@@ -117,7 +117,7 @@ describe('migrations', () => {
         `);
 
         let allBudgets = await queryRunner.manager.find(Budget, {
-            select: ['id'],
+            select: { id: true },
             where: {
                 userId: USER_ID,
             },
@@ -132,7 +132,7 @@ describe('migrations', () => {
         await migration8ConstraintMigration.up(queryRunner);
 
         allBudgets = await queryRunner.manager.find(Budget, {
-            select: ['id'],
+            select: { id: true },
             where: {
                 userId: USER_ID,
             },

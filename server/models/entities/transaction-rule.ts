@@ -90,7 +90,7 @@ export default class TransactionRule {
     static async allOrdered(userId: number): Promise<TransactionRule[]> {
         return await TransactionRule.repo().find({
             where: { userId },
-            relations: ['conditions', 'actions'],
+            relations: { conditions: true, actions: true },
             order: {
                 position: 'ASC',
             },

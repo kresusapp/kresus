@@ -209,7 +209,10 @@ export default class Transaction {
         };
 
         if (columns && columns.length) {
-            options.select = columns;
+            options.select = columns.reduce<Record<string, boolean>>((acc, col) => {
+                acc[col] = true;
+                return acc;
+            }, {});
         }
 
         return await Transaction.repo().find(options);

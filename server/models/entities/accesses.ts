@@ -136,14 +136,14 @@ export default class Access {
     static async find(userId: number, accessId: number): Promise<Access | null> {
         return await Access.repo().findOne({
             where: { userId, id: accessId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 
     static async all(userId: number): Promise<Access[]> {
         return await Access.repo().find({
             where: { userId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 
@@ -180,7 +180,7 @@ export default class Access {
     ): Promise<Access[]> {
         return await Access.repo().find({
             where: { userId, vendorId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 

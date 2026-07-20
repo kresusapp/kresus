@@ -24,7 +24,7 @@ export async function setDefaultRealBalance(
 
     // Filter non-manual accesses.
     const accesses = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: Not(In(['manual', 'demo', 'fakewoobbank'])),
             ...userCondition,
@@ -35,7 +35,7 @@ export async function setDefaultRealBalance(
         const accessesIds = accesses.map(acc => acc.id);
 
         const accounts = await manager.find(Account, {
-            select: ['initialBalance', 'id', 'userId', 'type'], // type is used in Account::computeBalance
+            select: { initialBalance: true, id: true, userId: true, type: true }, // type is used in Account::computeBalance
             where: {
                 accessId: In(accessesIds),
                 ...userCondition,

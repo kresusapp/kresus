@@ -24,7 +24,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
 
     log.info('> Removing auth_type on creditcooperatif/btpbanque...');
     let accesses: Access[] = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: In(['creditcooperatif', 'btpbanque']),
             ...userCondition,
@@ -43,7 +43,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
 
     log.info('> Removing website on bred...');
     accesses = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: 'bred',
             ...userCondition,

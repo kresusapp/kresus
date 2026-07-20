@@ -82,7 +82,7 @@ export default class View {
     static async find(userId: number, viewId: number): Promise<View | null> {
         return await View.repo().findOne({
             where: { id: viewId, userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
 
@@ -94,7 +94,7 @@ export default class View {
     static async all(userId: number): Promise<View[]> {
         return await View.repo().find({
             where: { userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
 

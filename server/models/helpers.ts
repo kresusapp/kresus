@@ -122,7 +122,7 @@ const NUM_ENTITIES_IN_BATCH = 1000;
 
 export function isSqlite(connection: DataSource): boolean {
     const dbType = connection.driver.options.type;
-    return dbType === 'sqlite' || dbType === 'better-sqlite3';
+    return dbType === 'better-sqlite3';
 }
 
 // Note: doesn't return the inserted entities.

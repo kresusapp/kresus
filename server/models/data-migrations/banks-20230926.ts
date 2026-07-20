@@ -43,7 +43,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
 
     // Remove access fields from allianzbank and milleis.
     const accesses: Access[] = await manager.find(Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: In(['allianzbanque', 'milleis']),
             ...userCondition,
