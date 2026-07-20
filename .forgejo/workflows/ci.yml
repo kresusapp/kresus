@@ -15,9 +15,9 @@ env:
   APT_CACHE_DIR: '${{ github.workspace }}/apt-cache'
 
 jobs:
-  ci:
+  build:
+    name: Build and lint
     runs-on: node-lts
-
     container:
       image: node:24.15
 
@@ -48,7 +48,6 @@ jobs:
       - name: Install JS dependencies
         run: yarn install
 
-      # Lint and check last commit in a dedicated task.
       - name: JS code lint
         run: yarn run --silent ci:lint-full
 
@@ -65,10 +64,42 @@ jobs:
       - name: Check config
         run: yarn run --silent ci:config
 
-      # Build the server and client code in development and production. Also install python dependencies
-      # for further jobs.
+      # Build the server and client code in development and production.
       - name: Build server and client
         run: yarn run --silent build:ci
+
+  python:
+    name: Python tests
+    runs-on: node-lts
+    container:
+      image: node:24.15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn-cache
+            node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-
+
+      - name: Cache pip and woob
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache/pip
+            .woob
+          key: pip-${{ hashFiles('**/requirements*.txt') }}-${{ github.sha }}
+          restore-keys: |
+            pip-
+
+      - name: Install JS dependencies
+        run: yarn install
 
       - name: Install Python and weboob
         run: |
@@ -85,6 +116,81 @@ jobs:
           pip3 install woob -t .woob
           pip3 install black
 
+      - name: Lint Python code
+        env:
+          LANG: en_US.UTF-8
+          LANGUAGE: en_US:en
+          LC_ALL: en_US.UTF-8
+          KRESUS_WOOB_DIR: .woob
+        run: |
+          . venv/bin/activate
+          yarn run --silent ci:python
+
+      - name: Generate EN locale
+        # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
+        run: |
+          mkdir -p "$APT_CACHE_DIR"
+          apt-get update && apt-get install -o dir::cache::archives="$APT_CACHE_DIR" -y locales
+          echo "en_US UTF-8" > /etc/locale.gen
+          locale-gen C.UTF-8 && update-locale C.UTF-8
+
+      - name: Run test suite with woob
+        env:
+          LANG: en_US.UTF-8
+          LANGUAGE: en_US:en
+          LC_ALL: en_US.UTF-8
+          KRESUS_WOOB_DIR: .woob
+        run: |
+          . venv/bin/activate
+          yarn run --silent ci:test
+
+  tests:
+    name: JS tests
+    runs-on: node-lts
+    container:
+      image: node:24.15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn-cache
+            node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-
+
+      - name: Cache pip and woob
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache/pip
+            .woob
+          key: pip-${{ hashFiles('**/requirements*.txt') }}-${{ github.sha }}
+          restore-keys: |
+            pip-
+
+      - name: Install JS dependencies
+        run: yarn install
+
+      - name: Install Python and weboob
+        run: |
+          # Install lxml, dev and yaml to prevent weboob from compiling them.
+          apt-get update && apt-get install -y python3-pip python3-virtualenv python3-lxml python3-dev python3-yaml
+          update-alternatives --install /usr/bin/python python $(which python3) 1
+          # Create a virtualenv to cache installed modules.
+          python -m virtualenv -p /usr/bin/python3 venv
+          . venv/bin/activate
+          # Fix for outdated pip and setuptools.
+          pip3 install --upgrade requests
+          # Install weboob.
+          mkdir -p .woob
+          pip3 install woob -t .woob
+
       - name: Generate EN locale
         # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
         run: |
@@ -98,26 +204,6 @@ jobs:
           LANG: en_US.UTF-8
           LANGUAGE: en_US:en
           LC_ALL: en_US.UTF-8
-        run: |
-          . venv/bin/activate
-          yarn run --silent ci:test
-
-      - name: Lint Python code
-        env:
-          LANG: en_US.UTF-8
-          LANGUAGE: en_US:en
-          LC_ALL: en_US.UTF-8
-          KRESUS_WOOB_DIR: .woob
-        run: |
-          . venv/bin/activate
-          yarn run --silent ci:python
-
-      - name: Run test suite with woob
-        env:
-          LANG: en_US.UTF-8
-          LANGUAGE: en_US:en
-          LC_ALL: en_US.UTF-8
-          KRESUS_WOOB_DIR: .woob
         run: |
           . venv/bin/activate
           yarn run --silent ci:test
