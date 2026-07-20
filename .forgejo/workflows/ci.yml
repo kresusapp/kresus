@@ -8,6 +8,12 @@ on:
       - main
   pull_request:
 
+# Cancel superseded runs on the same ref so we don't waste CI minutes building
+# commits that are no longer the head of a branch/PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   # Change pip's cache directory to be inside the project directory since we can
   # only cache local items.
