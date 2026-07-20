@@ -92,10 +92,7 @@
         "whatwg-fetch": "~3.6.20"
     },
     "resolutions": {
-        "flatpickr": "~4.6.13",
-        "rollup-plugin-sprite/**/tough-cookie": "~6.0.2",
-        "rollup-plugin-sprite/**/form-data": "~4.0.6",
-        "@types/react": "~19.2.17"
+        "rollup-plugin-sprite/**/form-data": "~2.5.6"
     },
     "scripts": {
         "build:ci": "./scripts/build/ci.sh",
