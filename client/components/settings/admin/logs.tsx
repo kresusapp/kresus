@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { translate as $t, notify, copyContentToClipboard } from '../../../helpers';
 import * as backend from '../../../store/backend';

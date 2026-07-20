@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
+import { createRef, useCallback, useContext, useEffect, useState, useMemo } from 'react';
 
 import { translate as $t, localeComparator, formatDate } from '../../helpers';
 
@@ -212,8 +212,8 @@ const Reports = () => {
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const transactionHeight = getTransactionHeight(isSmallScreen);
 
-    const refTransactionTable = React.createRef<HTMLTableElement>();
-    const refThead = React.createRef<HTMLTableSectionElement>();
+    const refTransactionTable = createRef<HTMLTableElement>();
+    const refThead = createRef<HTMLTableSectionElement>();
 
     const [heightAbove, setHeightAbove] = useState(0);
     const [inBulkEditMode, setInBulkEditMode] = useState(false);

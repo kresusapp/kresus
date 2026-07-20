@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router';
 
 import { translate as $t } from '../../helpers';

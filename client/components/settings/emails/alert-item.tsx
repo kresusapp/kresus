@@ -1,4 +1,5 @@
-import React, { createRef, useCallback } from 'react';
+import { createRef, useCallback } from 'react';
+import * as React from 'react';
 
 import { assert, translate as $t, displayLabel } from '../../../helpers';
 import { useKresusDispatch, useKresusState } from '../../../store';

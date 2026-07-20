@@ -1,4 +1,5 @@
-import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
+import { useCallback, useContext, useRef, useImperativeHandle } from 'react';
+import * as React from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { displayLabel, formatDate, NONE_CATEGORY_ID, notify, translate as $t } from '../../helpers';

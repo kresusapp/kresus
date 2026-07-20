@@ -1,4 +1,5 @@
-import React, {
+import {
+    createRef,
     forwardRef,
     useCallback,
     useEffect,
@@ -34,10 +35,10 @@ interface AllPieChartsProps extends BaseChartProps {
 }
 
 const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
-    const refRawIncome = React.createRef<Hideable>();
-    const refRawSpendings = React.createRef<Hideable>();
-    const refNetIncome = React.createRef<Hideable>();
-    const refNetSpendings = React.createRef<Hideable>();
+    const refRawIncome = createRef<Hideable>();
+    const refRawSpendings = createRef<Hideable>();
+    const refNetIncome = createRef<Hideable>();
+    const refNetSpendings = createRef<Hideable>();
 
     useImperativeHandle(ref, () => ({
         show() {

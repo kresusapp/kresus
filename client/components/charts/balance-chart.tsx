@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useRef } from 'react';
 
 import { Chart, type ScriptableLineSegmentContext } from 'chart.js';
 
@@ -212,10 +212,10 @@ const BalanceChart = (props: { balance: number; transactions: Transaction[] }) =
     }, [redraw]);
 
     return (
-        <React.Fragment>
+        <Fragment>
             <DiscoveryMessage message={$t('client.charts.balance_desc')} />
             <canvas id="barchart" style={{ width: '100%' }} onDoubleClick={resetZoom} />
-        </React.Fragment>
+        </Fragment>
     );
 };
 

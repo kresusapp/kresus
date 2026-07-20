@@ -1,4 +1,5 @@
-import React, { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
+import { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
+import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import {
     HashRouter,

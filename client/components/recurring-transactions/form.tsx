@@ -1,4 +1,4 @@
-import React, { useCallback, useState, ReactElement } from 'react';
+import { useCallback, useState, ReactElement } from 'react';
 import moment from 'moment';
 
 import {

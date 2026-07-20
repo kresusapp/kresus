@@ -1,4 +1,5 @@
-import React, {
+import {
+    forwardRef,
     useState,
     useImperativeHandle,
     ChangeEvent,
@@ -34,7 +35,7 @@ export interface MinMaxInputRef {
     clear: () => void;
 }
 
-const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
+const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
     const currentLow = props.low || props.min;
     const currentMax = props.high || props.max;
     const [lowText, setLowText] = useState<string>(`${currentLow}`);

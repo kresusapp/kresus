@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 import * as UiStore from '../../store/ui';
 import { notify, translate as $t } from '../../helpers';

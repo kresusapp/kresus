@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
 

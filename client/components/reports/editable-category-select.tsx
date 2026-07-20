@@ -3,7 +3,7 @@ import CategorySelect from './category-select';
 import { NONE_CATEGORY_ID } from '../../helpers';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface Props {
     // The unique identifier of the transaction for which the category has to be changed.

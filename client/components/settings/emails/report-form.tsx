@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import { assert, translate as $t } from '../../../helpers';

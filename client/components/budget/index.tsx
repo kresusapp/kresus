@@ -1,11 +1,4 @@
-import React, {
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    ChangeEvent,
-    ReactElement,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, ChangeEvent, ReactElement } from 'react';
 import moment from 'moment';
 
 import { useKresusDispatch, useKresusState } from '../../store';

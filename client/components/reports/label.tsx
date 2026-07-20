@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { shortLabel } from '../../../shared/helpers';
 import { Transaction } from '../../models';

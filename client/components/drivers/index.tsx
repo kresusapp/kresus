@@ -1,4 +1,4 @@
-import React from 'react';
+import { createContext } from 'react';
 import { DriverAccount } from './account';
 import { DriverCurrency } from './currency';
 import { assert } from '../../helpers';
@@ -28,7 +28,7 @@ export function getDriver(driverTypeStr: string, driverValue: DriverValueType | 
     return DriverFactory[driverType](driverValue);
 }
 
-export const DriverContext = React.createContext(NoDriver);
+export const DriverContext = createContext(NoDriver);
 
 const DriverFactory: Record<DriverType, (value: string) => Driver> = {
     [DriverType.None]: () => NoDriver,

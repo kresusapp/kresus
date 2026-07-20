@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { createRef, Component, ReactNode } from 'react';
 
 import { copyContentToClipboard, translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
@@ -14,12 +14,12 @@ interface ErrorReporterState {
     error: string | null;
 }
 
-class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterState> {
+class ErrorReporter extends Component<ErrorReporterProps, ErrorReporterState> {
     state = {
         error: null,
     };
 
-    refErrorContent = React.createRef<HTMLPreElement>();
+    refErrorContent = createRef<HTMLPreElement>();
 
     static getDerivedStateFromError(error: Error) {
         let err = error.toString();

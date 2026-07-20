@@ -1,5 +1,3 @@
-import React from 'react';
-
 import './colored-amount.css';
 
 const ColoredAmount = (props: {

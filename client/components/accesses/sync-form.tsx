@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { assert, assertDefined, translate as $t } from '../../helpers';
 import { AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';

@@ -1,4 +1,4 @@
-import React, {
+import {
     useState,
     useImperativeHandle,
     ReactNode,
@@ -6,6 +6,8 @@ import React, {
     useCallback,
     useEffect,
 } from 'react';
+
+import * as React from 'react';
 import Tippy, { TippyProps } from '@tippyjs/react/headless';
 
 import './popover.css';

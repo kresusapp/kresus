@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { cloneElement, useCallback, useEffect, useState } from 'react';
 import { Route, Routes, Navigate, useNavigate } from 'react-router';
 
 import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
@@ -275,9 +275,9 @@ const RuleText = (props: { categoryToName: Map<number, string>; rule: Rule }) =>
     return (
         <p>
             {$t('client.rules.If')}&nbsp;
-            {conditionsText.map(el => React.cloneElement(el, { ...el.props, key: i++ }))}
+            {conditionsText.map(el => cloneElement(el, { ...el.props, key: i++ }))}
             {$t('client.rules.then')}&nbsp;
-            {actionsText.map(el => React.cloneElement(el, { ...el.props, key: i++ }))}
+            {actionsText.map(el => cloneElement(el, { ...el.props, key: i++ }))}
         </p>
     );
 };

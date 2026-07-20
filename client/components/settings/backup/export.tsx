@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react';
+import { createRef, useCallback, useReducer, useState } from 'react';
 
 import { assert, translate as $t, validatePassword } from '../../../helpers';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
@@ -92,7 +92,7 @@ const Export = () => {
 
     const [passwordInputObserver, dispatchPasswordInputEvent] = useReducer((x: number) => x + 1, 0);
 
-    const refPassword = React.createRef<HTMLInputElement>();
+    const refPassword = createRef<HTMLInputElement>();
 
     // Update export button disabled state on every password change.
     const handleChangePassword = useCallback(() => {

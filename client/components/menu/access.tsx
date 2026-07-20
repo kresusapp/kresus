@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';

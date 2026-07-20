@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import DisplayIf from './display-if';
 
 import './loading-button.css';
@@ -20,7 +20,7 @@ interface LoadingButtonProps {
     disabled?: boolean;
 }
 
-const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
+const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
     ({ onClick, label, className = '', disabled = false, isLoading }: LoadingButtonProps, ref) => {
         return (
             <button

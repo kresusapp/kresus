@@ -1,5 +1,5 @@
 import { Chart, type LegendItem } from 'chart.js';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, localeComparator, round2, translate as $t } from '../../helpers';
 import { Hideable } from './hidable-chart';
 import type { TransactionsChartProps } from './category-barchart';

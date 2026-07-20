@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';

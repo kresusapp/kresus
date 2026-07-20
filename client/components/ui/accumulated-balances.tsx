@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';

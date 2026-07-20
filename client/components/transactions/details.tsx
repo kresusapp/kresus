@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 
 import rulesUrl from '../rules/urls';

@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
+import * as React from 'react';
 import { NavLink, useLocation, matchPath } from 'react-router';
 
 import URL from '../../urls';

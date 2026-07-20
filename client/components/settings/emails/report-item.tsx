@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { displayLabel, assert, assertHas, translate as $t } from '../../../helpers';
 import { useKresusDispatch, useKresusState } from '../../../store';

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { translate as $t, UNKNOWN_WOOB_VERSION, notify } from '../../../helpers';
 import {

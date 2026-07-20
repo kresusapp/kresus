@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';

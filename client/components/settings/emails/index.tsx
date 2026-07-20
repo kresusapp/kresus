@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useKresusState } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';

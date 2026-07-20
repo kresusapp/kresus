@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import moment from 'moment';
 
 import { useKresusDispatch } from '../../store';

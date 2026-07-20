@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';

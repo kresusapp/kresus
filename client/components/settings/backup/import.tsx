@@ -1,6 +1,3 @@
-import React from 'react';
-
-// Global variables
 import { useKresusState } from '../../../store';
 import * as UiStore from '../../../store/ui';
 import { translate as $t } from '../../../helpers';

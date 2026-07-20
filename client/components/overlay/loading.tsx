@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { translate as $t } from '../../helpers';
 
 const LoadingMessage = (props: {

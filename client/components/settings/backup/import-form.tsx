@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react';
+import { useRef, createRef, useCallback, useReducer, useState } from 'react';
 
 // Global variables
 import { useKresusDispatch, useKresusState } from '../../../store';
@@ -54,8 +54,8 @@ const ImportForm = (props: {
 
     const [password, setPassword] = useState<string | null>(null);
 
-    const refFileInput = React.useRef<FileInputRef>(null);
-    const refPassword = React.createRef<HTMLInputElement>();
+    const refFileInput = useRef<FileInputRef>(null);
+    const refPassword = createRef<HTMLInputElement>();
     const [observeFormReset, dispatchFormReset] = useReducer((x: number) => x + 1, 0);
     const [observeShowPassword, dispatchShowPassword] = useReducer((x: number) => x + 1, 0);
 

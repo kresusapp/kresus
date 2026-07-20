@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';

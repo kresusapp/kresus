@@ -1,4 +1,5 @@
-import React, { useCallback, useRef, useImperativeHandle } from 'react';
+import { useCallback, useRef, useImperativeHandle } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router';
 import moment from 'moment';
 

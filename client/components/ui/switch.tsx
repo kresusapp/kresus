@@ -1,4 +1,4 @@
-import React, { useCallback, ChangeEvent, ReactElement } from 'react';
+import { useCallback, ChangeEvent, ReactElement } from 'react';
 
 interface SwitchProps {
     // Function called when the value changes.

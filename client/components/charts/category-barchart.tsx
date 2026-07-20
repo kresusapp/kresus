@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { Chart, type LegendItem } from 'chart.js';
 
 import { assert, round2, localeComparator } from '../../helpers';

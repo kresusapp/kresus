@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
 import { translate as $t } from '../../helpers';
 import { DUPLICATE_THRESHOLD } from '../../../shared/settings';
@@ -123,7 +123,7 @@ const Duplicates = () => {
     }
 
     return (
-        <React.Fragment>
+        <Fragment>
             <p className="form-toolbar right">
                 <DefaultParameters />
                 <MergeAll pairs={Array.from(pairsByAccount.values()).flat()} />
@@ -152,7 +152,7 @@ const Duplicates = () => {
 
                 {sim}
             </div>
-        </React.Fragment>
+        </Fragment>
     );
 };
 

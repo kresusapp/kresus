@@ -1,4 +1,5 @@
-import React, { useCallback, useImperativeHandle, useRef } from 'react';
+import { useCallback, useImperativeHandle, useRef } from 'react';
+import * as React from 'react';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';

@@ -1,4 +1,5 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import * as React from 'react';
 
 import { assert, translate as $t } from '../../helpers';
 

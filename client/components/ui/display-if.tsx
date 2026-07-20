@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 

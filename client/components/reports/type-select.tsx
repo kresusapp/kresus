@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 

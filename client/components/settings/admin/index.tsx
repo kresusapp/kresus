@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { getCurrentUser } from '../../../store/global';
 import { translate as $t } from '../../../helpers';
@@ -10,7 +10,7 @@ export default () => {
     const currentUser = getCurrentUser();
 
     return (
-        <React.Fragment>
+        <Fragment>
             <div>
                 <h2>{$t('client.settings.admin_connectors')}</h2>
                 <Woob />
@@ -22,6 +22,6 @@ export default () => {
                     <Logs />
                 </div>
             </DisplayIf>
-        </React.Fragment>
+        </Fragment>
     );
 };
