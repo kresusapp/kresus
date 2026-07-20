@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncErr, KError } from '../helpers';
+import { asString, asyncErr, KError } from '../helpers';
 import { Account, RecurringTransaction } from '../models';
 import { hasForbiddenOrMissingField } from '../shared/validators';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
@@ -29,7 +29,7 @@ export async function preload(
 export async function getByAccountId(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const userId = req.user.id;
-        const accountId = parseInt(req.params.accountId, 10);
+        const accountId = parseInt(asString(req.params.accountId), 10);
         if (isNaN(accountId)) {
             throw new KError('Invalid account id', 400);
         }
@@ -49,7 +49,7 @@ export async function getByAccountId(req: IdentifiedRequest<any>, res: express.R
 export async function create(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const userId = req.user.id;
-        const accountId = parseInt(req.params.accountId, 10);
+        const accountId = parseInt(asString(req.params.accountId), 10);
         if (isNaN(accountId)) {
             throw new KError('Invalid account id', 400);
         }

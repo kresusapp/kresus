@@ -251,3 +251,9 @@ export function currencyFormatter(someCurrency: string): CurrencyFormatter {
     }
     return currencyFormatterCache[someCurrency];
 }
+
+// Express types a route param as `string | string[]`; in practice a single value is always
+// provided, so coerce it to a plain string for parsing.
+export function asString(value: string | string[] | undefined): string {
+    return Array.isArray(value) ? value[0] : (value ?? '');
+}
