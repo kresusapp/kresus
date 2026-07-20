@@ -7,6 +7,7 @@ import {
 } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import { useDispatch, useSelector } from 'react-redux';
+import type { AnyAction } from 'redux';
 
 import * as BankStore from './banks';
 import * as BudgetStore from './budgets';
@@ -44,7 +45,7 @@ resetStateMiddleware.startListening({
         GlobalStore.importInstance.fulfilled,
         GlobalStore.enableDemo.fulfilled
     ),
-    effect: async (action, { dispatch }) => {
+    effect: async (action: AnyAction, { dispatch }) => {
         const newGlobalState = action.payload as any;
         storesToReset.forEach(store => {
             if (newGlobalState[store.name]) {
@@ -71,7 +72,7 @@ duplicatesMiddleware.startListening({
         BankStore.updateAndFetchAccess.fulfilled,
         SettingsStore.setPair.fulfilled
     ),
-    effect: async (action, { dispatch }) => {
+    effect: async (action: AnyAction, { dispatch }) => {
         // Check if the setting that was modified is related to duplicates.
         if (action.type === SettingsStore.setPair.fulfilled.toString()) {
             if (

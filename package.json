@@ -30,7 +30,7 @@
         "typeorm": "0.3.28"
     },
     "devDependencies": {
-        "@reduxjs/toolkit": "^2.11.2",
+        "@reduxjs/toolkit": "^2.12.0",
         "@tippyjs/react": "~4.2.6",
         "@types/currency-formatter": "~1.5.4",
         "@types/errorhandler": "~1.5.3",
