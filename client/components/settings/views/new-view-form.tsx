@@ -104,7 +104,8 @@ const NewViewForm = (props: {
             <Form.Input
                 id="custom-label-text"
                 label={$t('client.settings.views.label')}
-                optional={false}>
+                optional={false}
+            >
                 <TextInput onChange={setLabel} initialValue={label || ''} required={true} />
             </Form.Input>
 

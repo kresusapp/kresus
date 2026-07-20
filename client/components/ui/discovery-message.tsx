@@ -37,7 +37,8 @@ const DiscoveryMessage = (props: DiscoveryMessageProps) => {
                 <Popconfirm
                     trigger={<button className="fa fa-times-circle" />}
                     onConfirm={handleDisable}
-                    confirmClass="success">
+                    confirmClass="success"
+                >
                     <p>{$t('client.settings.customization.confirm_disable_discovery')}</p>
                 </Popconfirm>
             </p>

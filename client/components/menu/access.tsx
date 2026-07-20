@@ -85,11 +85,13 @@ const AccessItem = (props: AccessItemProps) => {
                             !isBankVendorDeprecated &&
                             enabled &&
                             fetchStatus !== FETCH_STATUS_SUCCESS
-                        }>
+                        }
+                    >
                         <span
                             className="tooltipped tooltipped-se tooltipped-multiline
                                            tooltipped-small"
-                            aria-label={statusLabel}>
+                            aria-label={statusLabel}
+                        >
                             <span className="fa fa-exclamation-triangle status fail" />
                         </span>
                     </DisplayIf>

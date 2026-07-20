@@ -74,7 +74,8 @@ const Logs = () => {
                     trigger={
                         <button className="btn danger">{$t('client.settings.logs.clear')}</button>
                     }
-                    onConfirm={clearLogs}>
+                    onConfirm={clearLogs}
+                >
                     <p>{$t('client.settings.logs.confirm_clear')}</p>
                 </Popconfirm>
 

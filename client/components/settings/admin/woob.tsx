@@ -154,7 +154,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-merge-accounts"
                 label={$t('client.settings.woob_auto_merge_accounts')}
-                help={$t('client.settings.woob_auto_merge_accounts_desc')}>
+                help={$t('client.settings.woob_auto_merge_accounts_desc')}
+            >
                 <Switch
                     onChange={setAutoMergeAccounts}
                     ariaLabel={$t('client.settings.woob_auto_merge_accounts')}
@@ -166,7 +167,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-update-woob"
                 label={$t('client.settings.woob_auto_update')}
-                help={$t('client.settings.woob_auto_update_desc')}>
+                help={$t('client.settings.woob_auto_update_desc')}
+            >
                 <Switch
                     onChange={setAutoUpdate}
                     ariaLabel={$t('client.settings.woob_auto_update')}
@@ -178,7 +180,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-retry"
                 label={$t('client.settings.provider_auto_retry')}
-                help={$t('client.settings.provider_auto_retry_desc')}>
+                help={$t('client.settings.provider_auto_retry_desc')}
+            >
                 <Switch
                     onChange={setAutoRetry}
                     ariaLabel={$t('client.settings.provider_auto_retry')}
@@ -190,7 +193,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="update-woob"
                 label={$t('client.settings.update_woob')}
-                help={$t('client.settings.update_woob_help')}>
+                help={$t('client.settings.update_woob_help')}
+            >
                 <UpdateButton />
             </Form.Input>
 
@@ -198,7 +202,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="enable-woob-debug"
                 label={$t('client.settings.woob_enable_debug')}
-                help={$t('client.settings.woob_enable_debug_desc')}>
+                help={$t('client.settings.woob_enable_debug_desc')}
+            >
                 <Switch
                     onChange={setDebug}
                     ariaLabel={$t('client.settings.woob_enable_debug')}
@@ -217,7 +222,8 @@ const WoobParameters = () => {
                             {$t('client.settings.read_more')}
                         </ExternalLink>
                     </>
-                }>
+                }
+            >
                 <Switch
                     onChange={onChangeFetchThreshold}
                     ariaLabel={$t('client.settings.woob_fetch_threshold')}

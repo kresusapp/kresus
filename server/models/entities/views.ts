@@ -50,9 +50,13 @@ export default class View {
     @Column('boolean', { default: false })
     createdByUser = false;
 
-    @OneToMany(() => ViewAccount, viewAccount => viewAccount.view, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => ViewAccount,
+        viewAccount => viewAccount.view,
+        {
+            cascade: ['insert'],
+        }
+    )
     accounts!: ViewAccount[];
 
     // Static methods.

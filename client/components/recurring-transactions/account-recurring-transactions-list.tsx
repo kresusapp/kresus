@@ -85,7 +85,8 @@ const RecurringTransactionsList = () => {
                         className="tooltipped tooltipped-s multiline"
                         aria-label={$t('client.recurring_transactions.explanation')
                             .split('. ')
-                            .join('\n')}>
+                            .join('\n')}
+                    >
                         <span className="fa fa-question-circle clickable" />
                     </span>
                 </p>

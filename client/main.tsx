@@ -434,7 +434,8 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                     href="https://liberapay.com/Kresus"
                     target="_blank"
                     onClick={handleFunLinkClick}
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                >
                     {$t('client.fun.cancel')}
                 </a>
 
@@ -443,7 +444,8 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                     href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUIcmlja3JvbGw%3D"
                     target="_blank"
                     onClick={handleFunLinkClick}
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                >
                     {$t('client.fun.confirm')}
                 </a>
             </Form.Toolbar>

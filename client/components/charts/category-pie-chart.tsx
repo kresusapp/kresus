@@ -158,7 +158,8 @@ export const PieChartWithHelp = forwardRef<Hideable, PieChartWithHelpProps>((pro
             <h3>
                 <span
                     className="tooltipped tooltipped-ne tooltipped-multiline"
-                    aria-label={$t(props.helpKey)}>
+                    aria-label={$t(props.helpKey)}
+                >
                     <span className="fa fa-question-circle clickable" />
                 </span>
                 {$t(props.titleKey)}

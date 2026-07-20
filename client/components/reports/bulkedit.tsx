@@ -193,7 +193,8 @@ const BulkEditComponent = (props: {
                             className="btn warning"
                             type="button"
                             disabled={!isApplyEnabled}
-                            onClick={isApplyEnabled ? handleApplyBulkEdit : undefined}>
+                            onClick={isApplyEnabled ? handleApplyBulkEdit : undefined}
+                        >
                             {buttonLabel}
                         </button>
                     </td>

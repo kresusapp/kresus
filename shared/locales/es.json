@@ -255,7 +255,7 @@
             "category": "Categoría",
             "last_sync_full": "Última sincronización :",
             "sync_now": "Sincronizar",
-                  "type": "Tipo",
+            "type": "Tipo",
             "date": "Fecha real",
             "custom_label": "Redacción personalizada",
             "delete_transaction_button": "Suprimir la operación",

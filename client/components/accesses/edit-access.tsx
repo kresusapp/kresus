@@ -87,7 +87,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         inline={true}
                         id="reload-accounts"
                         label={$t('client.settings.reload_accounts')}
-                        help={$t('client.settings.reload_accounts_help')}>
+                        help={$t('client.settings.reload_accounts_help')}
+                    >
                         <button type="button" className="btn primary" onClick={onSyncAccounts}>
                             {$t('client.settings.reload_accounts_go')}
                         </button>
@@ -97,7 +98,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         inline={true}
                         id="exclude-from-poll"
                         label={$t('client.editaccess.include_in_polls')}
-                        help={$t('client.editaccess.include_in_polls_details')}>
+                        help={$t('client.editaccess.include_in_polls_details')}
+                    >
                         <Switch
                             onChange={onToggleExcludeFromPoll}
                             ariaLabel={$t('client.editaccess.include_in_polls')}
@@ -145,7 +147,8 @@ const CustomLabelForm = (props: { access: Access }) => {
         <Form.Input
             id="custom-label-text"
             label={$t('client.settings.custom_label')}
-            optional={true}>
+            optional={true}
+        >
             <UncontrolledTextInput onSubmit={saveCustomLabel} value={access.customLabel} />
         </Form.Input>
     );
@@ -191,7 +194,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.editaccess.disable_access')}
                             </button>
                         }
-                        onConfirm={onDisableAccess}>
+                        onConfirm={onDisableAccess}
+                    >
                         <p>{$t('client.editaccess.disable_access_body')}</p>
                     </Popconfirm>
 
@@ -201,7 +205,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.editaccess.delete_session')}
                             </button>
                         }
-                        onConfirm={onDeleteSession}>
+                        onConfirm={onDeleteSession}
+                    >
                         <p>{$t('client.editaccess.delete_session_help')}</p>
                     </Popconfirm>
                 </DisplayIf>
@@ -213,7 +218,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.settings.delete_access_button')}
                             </button>
                         }
-                        onConfirm={onDeleteAccess}>
+                        onConfirm={onDeleteAccess}
+                    >
                         <p>
                             {$t('client.settings.delete_access', {
                                 name: displayLabel(props.access),

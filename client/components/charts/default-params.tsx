@@ -81,7 +81,8 @@ const DefaultParams = () => {
                 </button>
             }
             confirmClass="success"
-            onConfirm={handleSubmit}>
+            onConfirm={handleSubmit}
+        >
             <Form.Input id="default-display-type" label={$t('client.charts.default_display')}>
                 <select onChange={handleDisplayTypeChange} defaultValue={displayType}>
                     <option value="all">{$t('client.charts.by_category')}</option>

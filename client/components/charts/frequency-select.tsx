@@ -25,7 +25,8 @@ const FrequencySelect = (props: {
             className="form-element-block"
             value={props.value}
             onChange={onChange}
-            id={props.id}>
+            id={props.id}
+        >
             <option key="monthly" value="monthly">
                 {$t('client.charts.monthly')}
             </option>

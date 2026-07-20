@@ -266,7 +266,8 @@ const ImportForm = (props: {
                     className="btn primary"
                     tabIndex={0}
                     disabled={disableSubmit}
-                    onClick={handleSubmit}>
+                    onClick={handleSubmit}
+                >
                     {$t('client.settings.go_import_instance')}
                 </button>
             </Form.Toolbar>

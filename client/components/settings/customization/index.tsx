@@ -70,7 +70,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 label={$t('client.accesses.default_account')}
                 id="default-account-selector"
-                help={$t('client.accesses.default_account_helper')}>
+                help={$t('client.accesses.default_account_helper')}
+            >
                 <AnyAccountSelector
                     includeNone={true}
                     onChange={setDefaultAccount}
@@ -85,7 +86,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.dark_mode')}
-                id="dark-mode">
+                id="dark-mode"
+            >
                 <Switch
                     onChange={toggleDarkMode}
                     checked={isDarkMode}
@@ -97,7 +99,8 @@ const CustomizationOptions = () => {
                 inline={true}
                 label={$t('client.settings.customization.fluid_layout')}
                 help={$t('client.settings.customization.fluid_layout_help')}
-                id="fluid-layout">
+                id="fluid-layout"
+            >
                 <Switch
                     onChange={toggleFluidLayout}
                     checked={isFluidLayout}
@@ -108,7 +111,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.discovery_label')}
-                id="discovery-mode">
+                id="discovery-mode"
+            >
                 <Switch
                     onChange={toggleDiscoveryMode}
                     checked={isDiscoveryModeEnabled}
@@ -119,7 +123,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.limit_ongoing_to_current_month')}
-                id="discovery-mode">
+                id="discovery-mode"
+            >
                 <Switch
                     onChange={setIsOngoingLimitedToCurrentMonth}
                     checked={isOngoingLimitedToCurrentMonth}

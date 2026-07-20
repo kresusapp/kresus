@@ -33,7 +33,8 @@ const DeleteButton = (props: {
                     title={$t(`client.settings.emails.delete_${props.type}`)}
                 />
             }
-            onConfirm={onConfirm}>
+            onConfirm={onConfirm}
+        >
             <p>{$t(`client.settings.emails.delete_${props.type}_full_text`)}</p>
         </Popconfirm>
     );

@@ -100,7 +100,8 @@ const CredentialsForm = (props: CredentialsFormProps) => {
                     inline={true}
                     id="store-credentials"
                     label={$t('client.accountwizard.store_credentials')}
-                    help={$t('client.accountwizard.store_credentials_desc')}>
+                    help={$t('client.accountwizard.store_credentials_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.store_credentials')}
                         checked={storeCredentials}

@@ -34,7 +34,8 @@ const ViewItem = (props: { view: View }) => {
                         <button className="btn danger" aria-label="delete view">
                             <span className={'fa fa-trash'} />
                         </button>
-                    }>
+                    }
+                >
                     <p>
                         {$t('client.settings.views.delete_confirmation', {
                             label: view.label,

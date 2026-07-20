@@ -249,7 +249,8 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 disabled={!togglable}
                 onClick={clickToggleSign}
                 id={props.signId}
-                title={maybeTitle}>
+                title={maybeTitle}
+            >
                 <span className="screen-reader-text">{$t(`client.general.${signLabel}`)}</span>
                 <i className={`fa fa-${signLabel}`} aria-hidden="true" />
             </button>

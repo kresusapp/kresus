@@ -190,7 +190,8 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
                 onChange={handleChange}
                 value={value}
                 className={className}
-                required={required}>
+                required={required}
+            >
                 {emptyOption}
                 {nativeOptions}
             </select>
