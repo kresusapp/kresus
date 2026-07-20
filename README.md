@@ -20,13 +20,13 @@ to improve installation instructions.
 
 ## Contributing
 
-See the [contributing file](CONTRIBUTING.md).
+See the [contributing file](https://codeberg.org/kresus/kresus/src/branch/main/CONTRIBUTING.md).
 
-A big thank you to all of our [contributors](https://framagit.org/kresusapp/kresus/graphs/main)!
+A big thank you to all of our [contributors](https://codeberg.org/kresus/kresus/activity/contributors)!
 
 ## Code of conduct
 
-Kresus project adopted a [code of conduct](CodeOfConduct.md) that everybody is
+Kresus project adopted a [code of conduct](https://codeberg.org/kresus/kresus/src/branch/main/CodeOfConduct.md) that everybody is
 expected to follow. Read it for further information about how to behave, how
 to report abuses, etc.
 

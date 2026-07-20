@@ -84,6 +84,28 @@ When bumping the node.js version, make sure to update it in all the following pl
 - in the `Dockerfile`s, in the `FROM` lines,
 - in the CI configuration, in the `.gitlab-ci.yml` file, in the `default` `image` field.
 
+## Testing email support
+
+You can use a `mailcatcher` Docker instance to test the email support. The service spawns a small
+SMTP server that will catch and show emails in a neat Web interface accessible on localhost:1080.
+
+```bash
+docker run -ti --rm -p 1080:1080 -p 1025:1025 dockage/mailcatcher
+```
+
+In Kresus' `config.ini` file, you can set the following configuration options:
+
+```ini
+[email]
+transport=smtp
+from=kresus@localhost.tld
+host=localhost
+port=1025
+```
+
+And finally, after starting the Kresus server locally, you can set any recipient email address in
+the email settings.
+
 # Misc
 
 ## About branches/tags

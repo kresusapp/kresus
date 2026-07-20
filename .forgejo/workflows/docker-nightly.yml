@@ -1,0 +1,45 @@
+name: Nightly Docker build
+
+on:
+  schedule:
+    # Once a day, at 02:00 UTC.
+    # Scheduled triggers must be enabled on the runner/instance, and they only
+    # fire on the repository's default branch.
+    - cron: '0 2 * * *'
+  # Allow manual runs from the Forgejo UI.
+  workflow_dispatch:
+
+jobs:
+  build-docker-main:
+    # Only build on the canonical repository, never on forks.
+    if: github.repository_owner == 'kresus'
+
+    runs-on: node-lts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Docker registry authentication
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/.docker"
+          echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"${DOCKER_AUTH}\"}}}" > "${GITHUB_WORKSPACE}/.docker/config.json"
+        env:
+          DOCKER_AUTH: ${{ secrets.DOCKER_AUTH }}
+
+      - name: Build and push image
+        uses: docker://martizih/kaniko:debug
+        env:
+          DOCKER_CONFIG: ${{ github.workspace }}/.docker
+        with:
+          entrypoint: /kaniko/executor
+          args: >-
+            --context=${{ github.workspace }}/support/docker
+            --dockerfile=${{ github.workspace }}/support/docker/Dockerfile-nightly
+            --destination=bnjbvr/kresus-nightly:prod
+            --build-arg=VCS_REF=${{ github.sha }}
+            --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+      - name: Manually cleanup docker token
+        run: |
+          rm -rf "${GITHUB_WORKSPACE}/.docker"
