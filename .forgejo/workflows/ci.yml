@@ -21,8 +21,8 @@ env:
   APT_CACHE_DIR: '${{ github.workspace }}/apt-cache'
 
 jobs:
-  build:
-    name: Build and lint
+  jslint:
+    name: JS code lint
     runs-on: node-lts
     container:
       image: node:24.15
@@ -46,6 +46,30 @@ jobs:
 
       - name: JS code lint
         run: yarn run --silent ci:lint-full
+
+
+  build:
+    name: Build and lint
+    runs-on: node-lts
+    container:
+      image: node:24.15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn-cache
+            node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-
+
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Client TS code check
         run: yarn run ci:ts-client
