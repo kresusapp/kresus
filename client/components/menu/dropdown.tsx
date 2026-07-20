@@ -59,7 +59,8 @@ const DropdownMenu = () => {
                 <DropdownContent
                     id="dropdown-overlay"
                     onKeydown={handleKeydown}
-                    onClick={handleHide}>
+                    onClick={handleHide}
+                >
                     <nav className="settings-dropdown-menu">
                         <ul>
                             <li>

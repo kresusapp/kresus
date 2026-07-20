@@ -45,7 +45,8 @@ const MergeAll = ({ pairs }: MergeAllProps) => {
                 </button>
             }
             confirmClass="warning"
-            onConfirm={handleSubmit}>
+            onConfirm={handleSubmit}
+        >
             <h4>{$t('client.transactions.warning_merge_all')}</h4>
             <p>
                 <strong>{$t('client.transactions.warning_irrevocable')}</strong>

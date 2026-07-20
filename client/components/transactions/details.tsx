@@ -111,7 +111,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                             label={$t('client.transactions.create_categorization_rule')}
                             icon="magic"
                         />
-                    }>
+                    }
+                >
                     <CategorySelect transactionId={transaction.id} value={transaction.categoryId} />
                 </Form.Input>
 
@@ -125,7 +126,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 <Form.Input
                     id="budget-date"
                     label={$t('client.transactions.budget')}
-                    help={$t('client.transactions.budget_help')}>
+                    help={$t('client.transactions.budget_help')}
+                >
                     <BudgetDateComponent transaction={transaction} />
                 </Form.Input>
             </Form>
@@ -134,7 +136,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 <Form.Input
                     id="recurring-transaction-shortcut"
                     label={$t('client.recurring_transactions.new')}
-                    help={`${$t('client.addtransaction.recurring_transaction')}.`}>
+                    help={`${$t('client.addtransaction.recurring_transaction')}.`}
+                >
                     <ButtonLink
                         className="btn"
                         to={MainURLs.newAccountRecurringTransaction.url(account.id, {
@@ -161,7 +164,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                                 &nbsp;
                                 {$t('client.transactions.delete_transaction_button')}
                             </button>
-                        }>
+                        }
+                    >
                         <p>
                             {$t('client.transactions.warning_delete')}{' '}
                             <Link to={MainURLs.duplicates.url(driver)}>

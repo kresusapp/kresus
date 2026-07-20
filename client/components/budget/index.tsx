@@ -51,7 +51,8 @@ function PrefsPopover(props: BudgetsPopoverProps) {
                         inline={true}
                         label={$t('client.budget.show_empty_budgets')}
                         help={$t('client.budget.show_empty_budgets_desc')}
-                        id="show-without-threshold">
+                        id="show-without-threshold"
+                    >
                         <Switch
                             ariaLabel={$t('client.budget.show_empty_budgets')}
                             onChange={props.toggleWithoutThreshold}
@@ -62,7 +63,8 @@ function PrefsPopover(props: BudgetsPopoverProps) {
                     <Form.Input
                         inline={true}
                         label={$t('client.budget.display_in_percent')}
-                        id="display-in-percent">
+                        id="display-in-percent"
+                    >
                         <Switch
                             ariaLabel={$t('client.budget.display_in_percent')}
                             onChange={props.toggleDisplayPercent}
@@ -368,7 +370,8 @@ const BudgetsList = (): ReactElement => {
                     <select
                         id="budget-period"
                         onChange={onChange}
-                        defaultValue={`${year}-${month}`}>
+                        defaultValue={`${year}-${month}`}
+                    >
                         {months}
                     </select>
                 </label>
@@ -394,7 +397,8 @@ const BudgetsList = (): ReactElement => {
                             {$t('client.budget.threshold')}
                             <span
                                 className="tooltipped tooltipped-s"
-                                aria-label={$t('client.budget.threshold_help')}>
+                                aria-label={$t('client.budget.threshold_help')}
+                            >
                                 <span className="fa fa-question-circle clickable" />
                             </span>
                         </th>

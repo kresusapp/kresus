@@ -335,7 +335,8 @@ const NewAccessForm = (props: {
             <Form.Input
                 id="custom-label-text"
                 label={$t('client.settings.custom_label')}
-                optional={true}>
+                optional={true}
+            >
                 <TextInput onChange={setCustomLabel} initialValue={props.customBankTitle || ''} />
             </Form.Input>
 
@@ -346,7 +347,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="default-categories-switch"
                     label={$t('client.accountwizard.default_categories')}
-                    help={$t('client.accountwizard.default_categories_desc')}>
+                    help={$t('client.accountwizard.default_categories_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.default_categories')}
                         checked={mustCreateDefaultCategories}
@@ -360,7 +362,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="default-alerts"
                     label={$t('client.accountwizard.default_alerts')}
-                    help={$t('client.accountwizard.default_alerts_desc')}>
+                    help={$t('client.accountwizard.default_alerts_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.default_alerts')}
                         checked={mustCreateDefaultAlerts}
@@ -388,7 +391,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="store-credentials"
                     label={$t('client.accountwizard.store_credentials')}
-                    help={$t('client.accountwizard.store_credentials_desc')}>
+                    help={$t('client.accountwizard.store_credentials_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.store_credentials')}
                         checked={storeCredentials}

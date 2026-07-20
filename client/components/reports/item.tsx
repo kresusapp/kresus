@@ -150,7 +150,8 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                         <DisplayIf condition={!props.inBulkEditMode}>
                             <Link
                                 to={TransactionUrls.details.url(driver, transaction.id)}
-                                title={$t('client.transactions.show_details')}>
+                                title={$t('client.transactions.show_details')}
+                            >
                                 <span className="fa fa-plus-square" />
                             </Link>
                         </DisplayIf>

@@ -43,7 +43,8 @@ const Access = (props: { accessId: number }) => {
             <DisplayIf
                 condition={
                     !isBankVendorDeprecated && enabled && fetchStatus !== FETCH_STATUS_SUCCESS
-                }>
+                }
+            >
                 <p className="alerts warning">
                     <span className="fa fa-exclamation-triangle status fail" />
                     {statusLabel}

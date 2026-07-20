@@ -20,7 +20,8 @@ function toggleButton(label: string, toggled: boolean, icon: string, onclick: ()
         <button
             type="button"
             onClick={onclick}
-            className={`${toggleButtonClass} budget-assignment`}>
+            className={`${toggleButtonClass} budget-assignment`}
+        >
             <i className={`fa ${icon}`} />
             <span>{label}</span>
         </button>

@@ -69,7 +69,8 @@ const AlertForm = () => {
             <Form.Input
                 id="order-select"
                 dontPropagateId={true}
-                label={$t(`client.settings.emails.send_if_${type}_is`)}>
+                label={$t(`client.settings.emails.send_if_${type}_is`)}
+            >
                 <div className="balance-inputs">
                     <select id="order-select" ref={refSelectOrder}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>

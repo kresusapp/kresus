@@ -54,9 +54,13 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(() => AccessField, accessField => accessField.access, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => AccessField,
+        accessField => accessField.access,
+        {
+            cascade: ['insert'],
+        }
+    )
     fields!: AccessField[];
 
     // A JSON-serialized session's content.

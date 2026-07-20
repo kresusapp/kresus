@@ -51,7 +51,8 @@ const SearchButton = () => {
             className="btn"
             aria-label={$t('client.search.title')}
             onClick={handleClick}
-            title={$t('client.search.title')}>
+            title={$t('client.search.title')}
+        >
             <span className="fa fa-search" />
             <span className="label">{$t('client.search.title')}</span>
         </button>
@@ -69,7 +70,8 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
             className={toggleButtonClass}
             aria-label={$t('client.bulkedit.title')}
             onClick={props.handleClick}
-            title={$t('client.bulkedit.title')}>
+            title={$t('client.bulkedit.title')}
+        >
             <span className="fa fa-list-alt" />
             <span className="label">{$t('client.bulkedit.title')}</span>
         </button>
@@ -382,7 +384,8 @@ const Reports = () => {
                             <span className="date">{formatDate.fromNow(lastCheckDate)}</span>
                             <span
                                 className="tooltipped tooltipped-sw tooltipped-multiline"
-                                aria-label={lastCheckDateTooltip}>
+                                aria-label={lastCheckDateTooltip}
+                            >
                                 <span className="fa fa-question-circle clickable" />
                             </span>
                         </span>
@@ -469,7 +472,8 @@ const Reports = () => {
                 <div className="swipeable-table-wrapper">
                     <table
                         className="swipeable-table no-vertical-border transaction-table"
-                        ref={refTransactionTable}>
+                        ref={refTransactionTable}
+                    >
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>

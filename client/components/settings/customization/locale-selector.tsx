@@ -28,7 +28,8 @@ const LocaleSelector = (props: { id?: string; className?: string }) => {
             id={props.id}
             className={className}
             onChange={onChange}
-            defaultValue={currentLocale}>
+            defaultValue={currentLocale}
+        >
             <option value="fr">Français</option>
             <option value="en">English</option>
             <option value="es">Español</option>

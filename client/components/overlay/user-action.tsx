@@ -47,7 +47,8 @@ const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
             <Form.Input
                 key={key}
                 label={field.label || $t('client.user-action.code')}
-                id={`field-${field.id}`}>
+                id={`field-${field.id}`}
+            >
                 <ValidatedTextInput {...extraRef} onChange={makeUpdateField(field.id)} />
             </Form.Input>
         );

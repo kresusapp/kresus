@@ -26,7 +26,8 @@ const TransactionLine = (props: {
                 <h3>
                     <span
                         className="tooltipped tooltipped-ne tooltipped-multiline"
-                        aria-label={more}>
+                        aria-label={more}
+                    >
                         <span className="fa fa-question-circle clickable" />
                     </span>
                     <span>{label}</span>
@@ -123,7 +124,8 @@ const DuplicatePair = (props: {
                     }
                     onConfirm={mergeTransactionsCb}
                     confirmText={$t('client.similarity.merge')}
-                    confirmClass="warning">
+                    confirmClass="warning"
+                >
                     <p>{$t('client.similarity.confirm')}</p>
                 </Popconfirm>
             </div>

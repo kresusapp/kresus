@@ -87,7 +87,8 @@ const RecurringTransactionItem = React.forwardRef<
                     className="tooltipped"
                     aria-label={listOfMonths
                         .map(m => moment.months(parseInt(m, 10) - 1))
-                        .join(', ')}>
+                        .join(', ')}
+                >
                     {$t('client.recurring_transactions.several')}
                 </span>
             );
@@ -119,11 +120,13 @@ const RecurringTransactionItem = React.forwardRef<
                             <button
                                 className="btn danger"
                                 aria-label={$t('client.recurring_transactions.delete')}
-                                title={$t('client.recurring_transactions.delete')}>
+                                title={$t('client.recurring_transactions.delete')}
+                            >
                                 <span className="fa fa-trash" />
                             </button>
                         }
-                        onConfirm={handleDelete}>
+                        onConfirm={handleDelete}
+                    >
                         <p>{$t('client.recurring_transactions.delete_confirm')}</p>
                     </Popconfirm>
                 </td>

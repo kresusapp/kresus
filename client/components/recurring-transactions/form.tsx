@@ -150,7 +150,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-amount"
-                label={$t('client.addtransaction.amount')}>
+                label={$t('client.addtransaction.amount')}
+            >
                 <AmountInput
                     signId="recurring-transaction-amount-sign"
                     onInput={handleAmountChange}
@@ -162,7 +163,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-dayofmonth"
-                label={$t('client.recurring_transactions.day')}>
+                label={$t('client.recurring_transactions.day')}
+            >
                 <Select
                     onChange={handleDayOfMonthChange}
                     value={dayOfMonth}
@@ -173,7 +175,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-listofmonths"
-                label={$t('client.recurring_transactions.every')}>
+                label={$t('client.recurring_transactions.every')}
+            >
                 <MultipleSelect
                     onChange={handleListOfMonthsChange}
                     values={listOfMonths.map(v => v.value)}

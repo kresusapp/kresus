@@ -25,7 +25,8 @@ const PeriodSelect = (props: {
             className="form-element-block"
             defaultValue={props.defaultValue}
             onChange={onChange}
-            id={props.id}>
+            id={props.id}
+        >
             <option key="value" value="all">
                 {$t('client.charts.all_periods')}
             </option>

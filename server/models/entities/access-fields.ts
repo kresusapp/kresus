@@ -33,11 +33,15 @@ export default class AccessField {
     userId!: number;
 
     // The access unique identifier of the access the field is attached to.
-    @ManyToOne(() => Access, access => access.fields, {
-        cascade: true,
-        onDelete: 'CASCADE',
-        nullable: false,
-    })
+    @ManyToOne(
+        () => Access,
+        access => access.fields,
+        {
+            cascade: true,
+            onDelete: 'CASCADE',
+            nullable: false,
+        }
+    )
     @JoinColumn()
     access!: Access;
 

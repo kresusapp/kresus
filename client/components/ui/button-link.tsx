@@ -34,7 +34,8 @@ const ButtonLink = (props: {
             type="button"
             className={`btn ${additionalClass}`}
             aria-label={aria}
-            onClick={handleClick}>
+            onClick={handleClick}
+        >
             {iconComponent}
             {labelContainer}
         </button>

@@ -334,14 +334,16 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
                             includeMonths={true}
                             includeYears={true}
                         />
-                    }>
+                    }
+                >
                     <DateRange onSelect={onChangePeriod} value={dateRange} />
                 </Form.Input>
 
                 <Form.Input
                     id="categories"
                     dontPropagateId={true}
-                    label={$t('client.menu.categories')}>
+                    label={$t('client.menu.categories')}
+                >
                     <p className="buttons-group" role="group" aria-label="Show/Hide categories">
                         <button type="button" className="btn" onClick={handleHideAll}>
                             {$t('client.general.unselect_all')}

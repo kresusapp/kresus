@@ -98,7 +98,8 @@ export const AccountSelector = React.forwardRef<{ value: number }, AccountSelect
                 id={props.id}
                 className="form-element-block"
                 defaultValue={props.initial}
-                onChange={onChange}>
+                onChange={onChange}
+            >
                 {options}
             </select>
         );

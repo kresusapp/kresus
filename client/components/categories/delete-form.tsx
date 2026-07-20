@@ -70,7 +70,8 @@ const DeleteForm = () => {
                 inline={true}
                 label={$t('client.category.replace_with')}
                 id="replace-selector"
-                help={$t('client.category.replace_with_info')}>
+                help={$t('client.category.replace_with_info')}
+            >
                 <select ref={refReplace}>
                     <option key="none" value={NONE_CATEGORY_ID}>
                         {$t('client.category.dont_replace')}

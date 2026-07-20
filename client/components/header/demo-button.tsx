@@ -56,7 +56,8 @@ export default () => {
                 </button>
             }
             onConfirm={handleDisable}
-            confirmClass="warning">
+            confirmClass="warning"
+        >
             <p>{$t('client.demo.disable_warning')}</p>
         </Popconfirm>
     );

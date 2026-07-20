@@ -89,7 +89,8 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
                 type="button"
                 className="btn"
                 onClick={handleClear}
-                title={$t('client.search.clear')}>
+                title={$t('client.search.clear')}
+            >
                 <span className="screen-reader-text">X</span>
                 <i className="fa fa-times" aria-hidden="true" />
             </button>

@@ -24,7 +24,8 @@ const AmountKindSelect = (props: {
             id={props.id}
             className="form-element-block"
             defaultValue={props.defaultValue}
-            onChange={onChange}>
+            onChange={onChange}
+        >
             <option key="all" value="all">
                 {$t('client.charts.incomes_and_expenses')}
             </option>

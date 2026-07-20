@@ -342,7 +342,8 @@ const ListItem = (props: {
                     aria-label={$t('client.rules.move_up')}
                     title={$t('client.rules.move_up')}
                     onClick={onSwapPrev}
-                    disabled={index === 0}>
+                    disabled={index === 0}
+                >
                     <span className="fa fa-arrow-up" />
                 </button>
 
@@ -351,7 +352,8 @@ const ListItem = (props: {
                     aria-label={$t('client.rules.move_down')}
                     title={$t('client.rules.move_down')}
                     onClick={onSwapNext}
-                    disabled={index === numRules - 1}>
+                    disabled={index === numRules - 1}
+                >
                     <span className="fa fa-arrow-down" />
                 </button>
 
@@ -360,11 +362,13 @@ const ListItem = (props: {
                         <button
                             className="btn danger"
                             aria-label={$t('client.rules.delete')}
-                            title={$t('client.rules.delete')}>
+                            title={$t('client.rules.delete')}
+                        >
                             <span className="fa fa-trash" />
                         </button>
                     }
-                    onConfirm={onDelete}>
+                    onConfirm={onDelete}
+                >
                     <p>{$t('client.rules.delete_confirm')}</p>
                 </Popconfirm>
             </div>

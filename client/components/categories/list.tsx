@@ -74,11 +74,13 @@ export default () => {
                         <button
                             className="btn danger"
                             aria-label="delete unused"
-                            disabled={numUnused === 0}>
+                            disabled={numUnused === 0}
+                        >
                             <span className={'fa fa-trash'} />
                             <span>{deleteUnusedButtonLabel}</span>
                         </button>
-                    }>
+                    }
+                >
                     <p>{$t('client.deleteunusedcategories.explanation')}</p>
                     <ul>
                         {unusedCategories.map(c => (

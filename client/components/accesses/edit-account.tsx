@@ -63,7 +63,8 @@ const GracePeriodForm = (props: { account: Account }) => {
         <Form.Input
             id="grace-period"
             inline={true}
-            label={$t('client.editaccess.grace_period_label')}>
+            label={$t('client.editaccess.grace_period_label')}
+        >
             <div style={{ display: 'flex', gap: '1em' }}>
                 <UncontrolledTextInput
                     onSubmit={updateTemporaryGracePeriod}
@@ -110,7 +111,8 @@ const CustomLabelForm = (props: { account: Account }) => {
         <Form.Input
             id="custom-label-text"
             label={$t('client.settings.custom_label')}
-            optional={true}>
+            optional={true}
+        >
             <UncontrolledTextInput onSubmit={saveCustomLabel} value={account.customLabel} />
         </Form.Input>
     );
@@ -135,7 +137,8 @@ export const SyncAccount = (props: { accountId: number; fields?: AccessCustomFie
             }
             onConfirm={handleConfirm}
             confirmClass="warning"
-            confirmText={$t('client.settings.resync_account.submit')}>
+            confirmText={$t('client.settings.resync_account.submit')}
+        >
             <p>{$t('client.settings.resync_account.make_sure')}</p>
             <ul className="bullet">
                 <li>{$t('client.settings.resync_account.sync_transactions')}</li>
@@ -175,7 +178,8 @@ const SetBalanceForm = (props: {
                 <button onClick={onSubmit} className="btn small primary">
                     {$t('client.settings.set_balance_submit')}
                 </button>
-            }>
+            }
+        >
             <AmountInput onChange={setBalance} defaultValue={balance} signId="balance-sign" />
         </Form.Input>
     );
@@ -315,7 +319,8 @@ export default () => {
                     <Form.Input
                         id="last-sync"
                         label={$t('client.transactions.last_sync_full')}
-                        help={account.isOrphan ? $t('client.accesses.orphan_account') : undefined}>
+                        help={account.isOrphan ? $t('client.accesses.orphan_account') : undefined}
+                    >
                         <div>{formatDate.toLongString(account.lastCheckDate)}</div>
                     </Form.Input>
                 </DisplayIf>
@@ -327,7 +332,8 @@ export default () => {
                 <Form.Input
                     inline={true}
                     id="exclude-from-balance"
-                    label={$t('client.settings.include_in_balance')}>
+                    label={$t('client.settings.include_in_balance')}
+                >
                     <Switch
                         onChange={onToggleExcludeFromBalance}
                         ariaLabel={$t('client.settings.include_in_balance')}
@@ -346,7 +352,8 @@ export default () => {
                 <Form.Input
                     inline={true}
                     id="merge-into-account"
-                    label={$t('client.editaccess.merge_accounts_label')}>
+                    label={$t('client.editaccess.merge_accounts_label')}
+                >
                     <div>
                         <AnyAccountSelector
                             accessId={account.accessId}
@@ -365,7 +372,8 @@ export default () => {
                                     label={$t('client.general.save')}
                                 />
                             }
-                            onConfirm={handleMergeValidate}>
+                            onConfirm={handleMergeValidate}
+                        >
                             <p>{$t('client.editaccess.merge_accounts_confirm')}</p>
                         </Popconfirm>
                     </div>
@@ -381,14 +389,16 @@ export default () => {
 
                 <Form.Toolbar align="left">
                     <DisplayIf
-                        condition={!isManualAccess(access) && !access.isBankVendorDeprecated}>
+                        condition={!isManualAccess(access) && !access.isBankVendorDeprecated}
+                    >
                         {access.enabled ? (
                             <SyncAccount accountId={account.id} />
                         ) : (
                             <Link
                                 to={URL.manualResyncAccount(account.id)}
                                 state={{ backLink: URL.editAccount(account.id) }}
-                                className="btn warning">
+                                className="btn warning"
+                            >
                                 {$t('client.settings.resync_account_button')}
                             </Link>
                         )}
@@ -401,7 +411,8 @@ export default () => {
                                     {$t('client.settings.delete_account_button')}
                                 </button>
                             }
-                            onConfirm={onDeleteAccount}>
+                            onConfirm={onDeleteAccount}
+                        >
                             <p>{$t('client.settings.erase_account', { label: account.label })}</p>
                         </Popconfirm>
                     </DisplayIf>

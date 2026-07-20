@@ -119,7 +119,8 @@ const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
             visible={isOpen}
             onClickOutside={close}
             interactive={true}
-            render={render}>
+            render={render}
+        >
             {trigger}
         </Tippy>
     );

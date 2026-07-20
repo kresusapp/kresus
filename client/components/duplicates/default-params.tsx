@@ -47,14 +47,16 @@ const DefaultParameters = () => {
                 </button>
             }
             confirmClass="success"
-            onConfirm={handleSubmit}>
+            onConfirm={handleSubmit}
+        >
             <h3>{$t('client.general.default_parameters')}</h3>
 
             <Form.Input
                 inline={true}
                 id="ignore_different_custom_fields"
                 label={$t('client.similarity.ignore_different_custom_fields')}
-                help={$t('client.similarity.ignore_different_custom_fields_desc')}>
+                help={$t('client.similarity.ignore_different_custom_fields_desc')}
+            >
                 <Switch
                     id="ignoreDifferentCustomFields"
                     checked={ignore}
@@ -67,7 +69,8 @@ const DefaultParameters = () => {
                 inline={true}
                 id="lax_level"
                 label={$t('client.similarity.lax_level')}
-                help={$t('client.similarity.lax_level_desc')}>
+                help={$t('client.similarity.lax_level_desc')}
+            >
                 <Switch
                     id="laxMatching"
                     checked={laxMode}

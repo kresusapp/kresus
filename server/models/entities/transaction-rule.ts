@@ -42,14 +42,22 @@ export default class TransactionRule {
     @Column('integer')
     position!: number;
 
-    @OneToMany(() => TransactionRuleCondition, condition => condition.rule, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => TransactionRuleCondition,
+        condition => condition.rule,
+        {
+            cascade: ['insert'],
+        }
+    )
     conditions!: TransactionRuleCondition[];
 
-    @OneToMany(() => TransactionRuleAction, action => action.rule, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => TransactionRuleAction,
+        action => action.rule,
+        {
+            cascade: ['insert'],
+        }
+    )
     actions!: TransactionRuleAction[];
 
     // Static methods.

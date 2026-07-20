@@ -60,7 +60,8 @@ const TabsContainer = (props: {
                 <select
                     className="form-element-block"
                     value={props.selectedTab}
-                    onChange={onChange}>
+                    onChange={onChange}
+                >
                     {tabsOptions}
                 </select>
             </div>

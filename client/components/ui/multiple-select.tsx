@@ -74,7 +74,8 @@ const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
                     )}
                     {...innerProps}
                     onClick={toggleAll}
-                    onTouchEnd={toggleAll}>
+                    onTouchEnd={toggleAll}
+                >
                     <input type="checkbox" checked={isAllSelected} readOnly={true} />
                     <label>{$t('client.general.select_all')}</label>
                 </div>
@@ -113,7 +114,8 @@ const Option = (props: OptionProps<MultiSelectOptionProps, IsMulti>) => {
                         'multiple-select-menu': true,
                     },
                     className
-                )}>
+                )}
+            >
                 <input type="checkbox" checked={props.isSelected} readOnly={true} />
                 <label>{props.label}</label>
             </div>

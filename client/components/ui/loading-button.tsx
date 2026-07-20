@@ -28,7 +28,8 @@ const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
                 className={`btn loading-button ${className}`}
                 disabled={isLoading || disabled}
                 onClick={onClick}
-                ref={ref}>
+                ref={ref}
+            >
                 <span>{label}</span>
                 <DisplayIf condition={isLoading}>
                     <span className="fa fa-spinner" />
