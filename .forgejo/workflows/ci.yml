@@ -19,7 +19,7 @@ jobs:
     runs-on: node-lts
 
     container:
-      image: node:24.12
+      image: node:24.15
 
     steps:
       - name: Checkout
