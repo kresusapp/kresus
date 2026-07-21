@@ -8,6 +8,8 @@ import {
     Link,
     Navigate,
     useMatch,
+    useLocation,
+    matchPath,
     type NavigateOptions,
     type To,
 } from 'react-router';
@@ -134,56 +136,64 @@ export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.
     return <>{props.children}</>;
 };
 
+// Derives the current driver from the location and provides it through
+// DriverContext. This is rendered above both the menu and the content route
+// trees so that persistent components (e.g. the menu) which live outside the
+// `:driver/:value` route can still read the current driver. As it sits outside
+// that route, the params are matched manually with `matchPath` rather than
+// `useParams`.
+const DriverProvider = (props: { children: React.ReactNode }) => {
+    const { pathname } = useLocation();
+
+    const driver = useMemo(() => {
+        const viewMatch = matchPath('/view/:driver/:value/*', pathname);
+        const driverType = viewMatch?.params.driver ?? DriverType.None;
+        const value = viewMatch?.params.value ?? null;
+        return getDriver(driverType, value);
+    }, [pathname]);
+
+    return <DriverContext.Provider value={driver}>{props.children}</DriverContext.Provider>;
+};
+
 const View = () => {
-    const params = useRequiredParams<{
-        driver: string;
-        value: string;
-    }>();
-
-    const currentDriver = useMemo(() => {
-        return getDriver(params.driver, params.value);
-    }, [params.driver, params.value]);
-
     return (
-        <DriverContext.Provider value={currentDriver}>
-            <Routes>
-                <Route
-                    path="reports"
-                    element={
+        <Routes>
+            <Route
+                path="reports"
+                element={
+                    <RedirectIfUnknownAccount>
+                        <Reports />
+                    </RedirectIfUnknownAccount>
+                }
+            />
+            <Route
+                path="budget"
+                element={
+                    <RedirectIfCurrencyView>
                         <RedirectIfUnknownAccount>
-                            <Reports />
+                            <Budget />
                         </RedirectIfUnknownAccount>
-                    }
-                />
-                <Route
-                    path="budget"
-                    element={
-                        <RedirectIfCurrencyView>
-                            <RedirectIfUnknownAccount>
-                                <Budget />
-                            </RedirectIfUnknownAccount>
-                        </RedirectIfCurrencyView>
-                    }
-                />
-                <Route
-                    path="charts/:subsection?/"
-                    element={
-                        <RedirectIfUnknownAccount>
-                            <Charts />
-                        </RedirectIfUnknownAccount>
-                    }
-                />
-                <Route
-                    path="duplicates"
-                    element={
-                        <RedirectIfUnknownAccount>
-                            <DuplicatesList />
-                        </RedirectIfUnknownAccount>
-                    }
-                />
-                <Route path="transactions/*" element={<Transactions />} />
-            </Routes>
-        </DriverContext.Provider>
+                    </RedirectIfCurrencyView>
+                }
+            />
+            <Route
+                path="charts/:subsection?/"
+                element={
+                    <RedirectIfUnknownAccount>
+                        <Charts />
+                    </RedirectIfUnknownAccount>
+                }
+            />
+            <Route
+                path="duplicates"
+                element={
+                    <RedirectIfUnknownAccount>
+                        <DuplicatesList />
+                    </RedirectIfUnknownAccount>
+                }
+            />
+            <Route path="transactions/*" element={<Transactions />} />
+        </Routes>
     );
 };
 
@@ -317,57 +327,62 @@ const Kresus = () => {
                                     <DropdownMenu />
                                 </header>
 
-                                <main onClick={handleAutoCloseMenu}>
-                                    <Routes>
-                                        <Route path="/*" element={<Menu />} />
-                                    </Routes>
-                                    <div id="content-container">
-                                        <div className="content">
-                                            <Routes>
-                                                <Route
-                                                    path={`${URL.view.pattern}/*`}
-                                                    element={<View />}
-                                                />
-                                                <Route path="/settings/*" element={<Settings />} />
-                                                <Route
-                                                    path={`${URL.categories.pattern}/*`}
-                                                    element={<Categories />}
-                                                />
-                                                <Route
-                                                    path={URL.about.pattern}
-                                                    element={<About />}
-                                                />
-                                                <Route
-                                                    path={`${URL.accesses.pattern}/*`}
-                                                    element={<Accesses />}
-                                                />
-                                                <Route
-                                                    path={URL.dashboard.pattern}
-                                                    element={<Dashboard />}
-                                                />
-                                                <Route
-                                                    path={`${URL.rules.pattern}/*`}
-                                                    element={<TransactionRules />}
-                                                />
-                                                <Route
-                                                    path={`${URL.recurringTransactions.pattern}/*`}
-                                                    element={<RecurringTransactions />}
-                                                />
-                                                <Route
-                                                    path="*"
-                                                    element={
-                                                        <Navigate
-                                                            to={URL.reports.url(
-                                                                new DriverAccount(initialViewId)
-                                                            )}
-                                                            replace={true}
-                                                        />
-                                                    }
-                                                />
-                                            </Routes>
+                                <DriverProvider>
+                                    <main onClick={handleAutoCloseMenu}>
+                                        <Routes>
+                                            <Route path="/*" element={<Menu />} />
+                                        </Routes>
+                                        <div id="content-container">
+                                            <div className="content">
+                                                <Routes>
+                                                    <Route
+                                                        path={`${URL.view.pattern}/*`}
+                                                        element={<View />}
+                                                    />
+                                                    <Route
+                                                        path="/settings/*"
+                                                        element={<Settings />}
+                                                    />
+                                                    <Route
+                                                        path={`${URL.categories.pattern}/*`}
+                                                        element={<Categories />}
+                                                    />
+                                                    <Route
+                                                        path={URL.about.pattern}
+                                                        element={<About />}
+                                                    />
+                                                    <Route
+                                                        path={`${URL.accesses.pattern}/*`}
+                                                        element={<Accesses />}
+                                                    />
+                                                    <Route
+                                                        path={URL.dashboard.pattern}
+                                                        element={<Dashboard />}
+                                                    />
+                                                    <Route
+                                                        path={`${URL.rules.pattern}/*`}
+                                                        element={<TransactionRules />}
+                                                    />
+                                                    <Route
+                                                        path={`${URL.recurringTransactions.pattern}/*`}
+                                                        element={<RecurringTransactions />}
+                                                    />
+                                                    <Route
+                                                        path="*"
+                                                        element={
+                                                            <Navigate
+                                                                to={URL.reports.url(
+                                                                    new DriverAccount(initialViewId)
+                                                                )}
+                                                                replace={true}
+                                                            />
+                                                        }
+                                                    />
+                                                </Routes>
+                                            </div>
                                         </div>
-                                    </div>
-                                </main>
+                                    </main>
+                                </DriverProvider>
                             </DisplayOrRedirectToInitialScreen>
                         }
                     />

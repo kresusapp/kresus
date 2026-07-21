@@ -1,16 +1,16 @@
+import { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
 import { displayLabel, translate as $t, currency } from '../../helpers';
-import { useRequiredParams } from '../../hooks';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
-import { DriverType } from '../drivers';
+import { DriverType, DriverContext } from '../drivers';
 
 interface AccountItemProps {
     // The account unique id.
@@ -37,7 +37,7 @@ const AccountItem = (props: AccountItemProps) => {
     });
 
     const { pathname } = useLocation();
-    const { driver = null, value } = useRequiredParams<{ driver?: string; value?: string }>();
+    const currentDriver = useContext(DriverContext);
 
     if (account === null || view === null) {
         // Zombie child: return nothing.
@@ -47,9 +47,13 @@ const AccountItem = (props: AccountItemProps) => {
     const { balance, outstandingSum } = account;
     const formatCurrency = currency.makeFormat(account.currency);
 
+    // Keep the user on the same sub-page (reports/charts/…) when switching
+    // accounts, by rewriting the current pathname to point at this account.
     const newPathname =
-        driver !== null
-            ? pathname.replace(driver, DriverType.Account).replace(value!, view.id.toString())
+        currentDriver.type !== DriverType.None
+            ? pathname
+                  .replace(currentDriver.type, DriverType.Account)
+                  .replace(currentDriver.value!, view.id.toString())
             : URL.reports.url(new DriverAccount(view.id));
 
     return (

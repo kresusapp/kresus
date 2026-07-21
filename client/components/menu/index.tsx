@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import * as React from 'react';
-import { NavLink, useLocation, matchPath } from 'react-router';
+import { NavLink } from 'react-router';
 
 import URL from '../../urls';
-import { getDriver, Driver, DriverType } from '../drivers';
+import { Driver, DriverType, DriverContext } from '../drivers';
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
@@ -100,15 +100,7 @@ AccountSubMenu.displayName = 'AccountSubMenu';
 const Menu = () => {
     const isHidden = useKresusState(state => UiStore.isMenuHidden(state.ui));
 
-    const { pathname } = useLocation();
-
-    // This component is rendered outside the route tree defining
-    // :driver and :value params as it is persistent, so we cannot use useParams here.
-    const viewMatch = matchPath('/view/:driver/:value/*', pathname);
-    const driverType = viewMatch?.params.driver ?? DriverType.None;
-    const value = viewMatch?.params.value ?? null;
-
-    const driver = getDriver(driverType, value);
+    const driver = useContext(DriverContext);
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
