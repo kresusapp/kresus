@@ -198,7 +198,7 @@ export async function createAndRetrieveData(
             access,
             accountInfoMap,
             /* isInteractive */ true,
-            userActionFields
+            /* userActionFields */ null
         );
 
         assert(
@@ -328,7 +328,7 @@ const _fetchAccountsAndTransactions = async (
         access,
         accountInfoMap,
         /* isInteractive */ true,
-        userActionFields
+        /* userActionFields */ null
     );
 
     assert(
