@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
 
 import { useKresusState } from '../../store';
 import * as ViewsStore from '../../store/views';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
-import { DriverType } from '../drivers';
+import { DriverType, DriverContext } from '../drivers';
 import { translate as $t } from '../../helpers';
-import { useRequiredParams } from '../../hooks';
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 
 const UserViewList = () => {
     const { pathname } = useLocation();
-    const { driver = null, value } = useRequiredParams<{ driver?: string; value: string }>();
+    const currentDriver = useContext(DriverContext);
 
     const viewsItems = useKresusState(state => {
         return ViewsStore.allUserViews(state.views).map(view => {
@@ -22,10 +21,10 @@ const UserViewList = () => {
             const outstandingSum = accountDriver.getOutstandingSum(state);
 
             const newPathname =
-                driver !== null
+                currentDriver.type !== DriverType.None
                     ? pathname
-                          .replace(driver, DriverType.Account)
-                          .replace(value, view.id.toString())
+                        .replace(currentDriver.type, DriverType.Account)
+                        .replace(currentDriver.value!, view.id.toString())
                     : URL.reports.url(accountDriver);
 
             return (
