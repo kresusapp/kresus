@@ -143,8 +143,7 @@ export async function fullPoll(userId: number) {
                     userId,
                     access,
                     accountInfoMap,
-                    /* isInteractive */ false,
-                    null
+                    /* isInteractive */ false
                 );
                 assert(
                     transactionResponse.kind !== 'user_action',

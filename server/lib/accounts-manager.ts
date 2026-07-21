@@ -319,8 +319,6 @@ interface PollTransactionsConfig {
     // Is this an interactive update (i.e. requested by a user if true,
     // automatic polling if false)?
     isInteractive: boolean;
-    // Fields completed by the user after an action was required of them.
-    userActionFields: Record<string, string> | null;
     // Transactions older than this date will be filtered out.
     fromDate: Date | null;
 }
@@ -426,7 +424,7 @@ async function pollTransactions(
                     debug,
                     fromDate: config.fromDate,
                     isInteractive: config.isInteractive,
-                    userActionFields: config.userActionFields,
+                    userActionFields: null,
                 },
                 sessionManager
             );
@@ -480,8 +478,7 @@ class AccountManager {
     async getActualAccountBalances(
         userId: number,
         access: Access,
-        oldAccounts: Account[],
-        userActionFields: Record<string, string> | null
+        oldAccounts: Account[]
     ): Promise<
         {
             accountId: number;
@@ -491,7 +488,7 @@ class AccountManager {
         const result = await pollAccounts(GLOBAL_CONTEXT, userId, access, {
             updateProvider: false,
             isInteractive: false,
-            userActionFields,
+            userActionFields: null,
         });
         if (result.kind === 'user_action') {
             return [];
@@ -602,16 +599,11 @@ merging as per request`);
     }
 
     // Sync transactions.
-    //
-    // Note: when this is happening after a call to `syncAccounts`, it's important to NOT pass the
-    // userActionFields again, otherwise some modules may end up in a weird state where they think
-    // they should resume a 2FA again.
     async syncTransactions(
         userId: number,
         access: Access,
         pAccountInfoMap: AccountInfoMap | null,
-        isInteractive: boolean,
-        userActionFields: Record<string, string> | null
+        isInteractive: boolean
     ): Promise<UserActionOrValue<AccountsAndTransactions>> {
         if (!access.isEnabled()) {
             // If the access has no password, check if it's an access that doesn't require
@@ -640,7 +632,7 @@ merging as per request`);
             startOfPoll,
             vendorToOwnAccountIdMap,
             access,
-            { fromDate, isInteractive, userActionFields }
+            { fromDate, isInteractive }
         );
         if (result.kind === 'user_action') {
             return result;
@@ -665,7 +657,7 @@ merging as per request`);
             if (
                 gracePeriod <= 0 ||
                 (transaction.date?.getTime() ?? 0) <
-                currentMoment - gracePeriod * 24 * 60 * 60 * 1000
+                    currentMoment - gracePeriod * 24 * 60 * 60 * 1000
             ) {
                 filteredTransactions.push(transaction);
             }
@@ -869,8 +861,7 @@ merging as per request`);
             balanceFixups = await this.getActualAccountBalances(
                 userId,
                 access,
-                allAccounts.slice(),
-                userActionFields
+                allAccounts.slice()
             );
         }
 
