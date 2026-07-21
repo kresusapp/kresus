@@ -43,7 +43,7 @@ RUN cd /home/user && \
     wget https://codeberg.org/kresus/kresus/archive/main.zip && \
     unzip main.zip && \
     rm main.zip && \
-    mv kresus-main app && \
+    mv kresus app && \
     cd /home/user/app && \
     yarn && \
     yarn build:prod && \
