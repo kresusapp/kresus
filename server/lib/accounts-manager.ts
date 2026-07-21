@@ -601,6 +601,11 @@ merging as per request`);
         return { kind: 'value', value: accountInfoMap };
     }
 
+    // Sync transactions.
+    //
+    // Note: when this is happening after a call to `syncAccounts`, it's important to NOT pass the
+    // userActionFields again, otherwise some modules may end up in a weird state where they think
+    // they should resume a 2FA again.
     async syncTransactions(
         userId: number,
         access: Access,
@@ -660,7 +665,7 @@ merging as per request`);
             if (
                 gracePeriod <= 0 ||
                 (transaction.date?.getTime() ?? 0) <
-                    currentMoment - gracePeriod * 24 * 60 * 60 * 1000
+                currentMoment - gracePeriod * 24 * 60 * 60 * 1000
             ) {
                 filteredTransactions.push(transaction);
             }
