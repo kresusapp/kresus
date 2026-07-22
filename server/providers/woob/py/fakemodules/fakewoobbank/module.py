@@ -6,6 +6,7 @@ Fake Woob module with capability CapBank.
 from __future__ import unicode_literals
 
 import datetime
+import logging
 import random
 import time
 from decimal import Decimal
@@ -27,9 +28,12 @@ try:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
+        BrowserUnavailable,
         ModuleInstallError,
         ModuleLoadError,
     )
+    from woob.browser.exceptions import ClientError
+    from woob.browser.pages import FormNotFound
     from woob.tools.backend import Module, BackendConfig
     from woob.tools.value import ValueBackendPassword, Value, ValueTransient
     from woob.browser.browsers import LoginBrowser, need_login
@@ -50,9 +54,12 @@ except ImportError:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
+        BrowserUnavailable,
         ModuleInstallError,
         ModuleLoadError,
     )
+    from weboob.browser.exceptions import ClientError
+    from weboob.browser.pages import FormNotFound
     from weboob.tools.backend import Module, BackendConfig
     from weboob.tools.value import ValueBackendPassword, Value, ValueTransient
     from weboob.browser.browsers import LoginBrowser, need_login
@@ -178,11 +185,11 @@ class FakeBankModule(Module, CapBank):
         """
         Generate an error according to login and random rate.
 
-        If login is a specific login matching an error type
-        (``invalidpassword``, ``actionneeded``, ``expiredpassword``),
-        systematically trigger the matching error. If login is ``noerror``,
-        never throw any error. In all other cases, throw a random error
-        according to given rate.
+        - If login is a specific login matching an error type (``invalidpassword``,
+          ``actionneeded``, ``expiredpassword``), systematically trigger the matching error.
+        - If login is ``noerror`` or ``onlytransactionerror``, never throw any error.
+
+        In all other cases, throw a random error according to given rate.
 
         :param rate: Rate at which the errors should be generated.
         """
@@ -205,7 +212,13 @@ class FakeBankModule(Module, CapBank):
             raise BrowserQuestion(
                 Value("code", label="Please enter some fake 2fa code!")
             )
-        if login not in ["noerror", "session", "appvalidation", "2fa"]:
+        if login not in [
+            "noerror",
+            "onlytransactionerror",
+            "session",
+            "appvalidation",
+            "2fa",
+        ]:
             self.random_errors(rate)
 
     def do_login(self):
@@ -361,6 +374,9 @@ class FakeBankModule(Module, CapBank):
     def generate_single_transaction(self):
         """
         Generate a fake transaction.
+
+        May cause an error if the login isn't a special one. If the login is
+        `onlytransactionerror`, it may generate errors here (but not elsewhere).
         """
         now = datetime.datetime.now()
 
@@ -368,6 +384,17 @@ class FakeBankModule(Module, CapBank):
         transaction.type = self.generate_type()
 
         n = random.randrange(100)
+
+        login = self.config["login"].get()
+        if n < 2 and login not in ["noerror", "session", "appvalidation", "2fa"]:
+            possible_errors = [
+                BrowserUnavailable,
+                ClientError,
+                AttributeError,
+                FormNotFound,
+            ]
+            raise possible_errors[random.randrange(len(possible_errors))]
+
         if n < 2:
             # with a 2% rate, generate a special transaction to test duplicates
             # (happening on 4th of current month).
@@ -416,16 +443,33 @@ class FakeBankModule(Module, CapBank):
         """
         Returns transactions with a debit date in the past.
         """
-        # Throw error from password value or random error
-        self.maybe_generate_error(5)
 
-        transactions = []
+        class IterHistory:
+            def __iter__(self):
+                return self
 
-        # Generate some transactions
-        for _ in range(random.randrange(15)):
-            transactions.append(self.generate_single_transaction())
+            def __init__(self, module):
+                # Throw error from password value or random error
+                module.maybe_generate_error(5)
 
-        return iter(transactions)
+                self.module = module
+                self.num_transactions = random.randrange(15)
+
+                self.logger = logging.getLogger()
+                self.logger.debug("total will generate: " + str(self.num_transactions))
+
+            def __next__(self):
+                self.logger.debug(
+                    "generating transaction " + str(self.num_transactions)
+                )
+
+                if self.num_transactions <= 0:
+                    raise StopIteration()
+
+                self.num_transactions -= 1
+                return self.module.generate_single_transaction()
+
+        return IterHistory(self)
 
     def iter_coming(self, account):
         """
