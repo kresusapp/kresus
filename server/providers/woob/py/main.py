@@ -559,7 +559,13 @@ class Connector:
         errors = []
 
         with self.backend:
-            accounts_iter = iter(self.backend.iter_accounts())
+            accounts_iter = self.backend.iter_accounts()
+            if accounts_iter is None:
+                logging.warning(
+                    "iter_accounts() returned None, returning early with an empty list"
+                )
+                return results, errors
+
             while True:
                 try:
                     account = next(accounts_iter)
@@ -618,7 +624,16 @@ class Connector:
         errors = []
 
         with self.backend:
-            accounts_iter = iter(self.backend.iter_accounts())
+            accounts_iter = self.backend.iter_accounts()
+            if accounts_iter is None:
+                logging.warning(
+                    "iter_accounts() returned None, returning early with an empty list"
+                )
+                return results, errors
+
+            # Force an iterator, as some woob modules don't return one.
+            accounts_iter = iter(accounts_iter)
+
             while True:
                 try:
                     account = next(accounts_iter)
@@ -631,10 +646,7 @@ class Connector:
                     AttributeError,
                     FormNotFound,
                 ) as exc:
-                    logging.error(
-                        "Skipping account (iter_history) due to unexpected error: %s",
-                        exc,
-                    )
+                    logging.error("Skipping account due to unexpected error: %s", exc)
                     errors.append(exc)
                     continue
 
@@ -643,9 +655,17 @@ class Connector:
                 transactions = []
 
                 try:
-                    # Manual iteration, to catch errors by hand.
-                    transaction_iter = iter(self.backend.iter_history(account))
+                    transaction_iter = self.backend.iter_history(account)
+                    if transaction_iter is None:
+                        logging.warning(
+                            "iter_history returned None for %s, treating as an empty list",
+                            account.id,
+                        )
+                        transaction_iter = []
 
+                    transaction_iter = iter(transaction_iter)
+
+                    # Manual iteration, to catch errors by hand.
                     while True:
                         try:
                             hist_tr = next(transaction_iter)
@@ -694,9 +714,17 @@ class Connector:
 
                 # Now, fetch incoming transactions.
                 try:
-                    # Manual iteration, to catch errors by hand.
-                    coming_transaction_iter = iter(self.backend.iter_coming(account))
+                    coming_transaction_iter = self.backend.iter_coming(account)
+                    if coming_transaction_iter is None:
+                        logging.warning(
+                            "iter_coming is None for %s, treating as an empty list",
+                            account.id,
+                        )
+                        coming_transaction_iter = []
 
+                    coming_transaction_iter = iter(coming_transaction_iter)
+
+                    # Manual iteration, to catch errors by hand.
                     while True:
                         try:
                             coming_tr = next(coming_transaction_iter)
@@ -779,7 +807,14 @@ class Connector:
         if len(results) == 0 and len(errors) > 0:
             raise errors[0]
 
-        errors = ["Error while fetching transactions: " + str(exc) for exc in errors]
+        if len(errors) > 0:
+            new_errors = []
+            for exc in errors:
+                as_unicode = unicode(exc).strip()
+                if len(as_unicode) == 0:
+                    as_unicode = unicode(repr(exc))
+                new_errors.append("Error while fetching transactions: %s" % as_unicode)
+            errors = new_errors
 
         return results, errors
 
