@@ -274,7 +274,7 @@ async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, ac
                 debug,
                 fromDate: config.fromDate,
                 isInteractive: config.isInteractive,
-                userActionFields: config.userActionFields,
+                userActionFields: null,
             }, sessionManager));
         });
         if (!providerResponse) {
@@ -315,12 +315,12 @@ class AccountManager {
         this.syncTransactions = this.q.wrap(this.syncTransactions.bind(this));
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
-    async getActualAccountBalances(userId, access, oldAccounts, userActionFields) {
+    async getActualAccountBalances(userId, access, oldAccounts) {
         var _a, _b;
         const result = await pollAccounts(exports.GLOBAL_CONTEXT, userId, access, {
             updateProvider: false,
             isInteractive: false,
-            userActionFields,
+            userActionFields: null,
         });
         if (result.kind === 'user_action') {
             return [];
@@ -401,7 +401,8 @@ merging as per request`);
         }
         return { kind: 'value', value: accountInfoMap };
     }
-    async syncTransactions(userId, access, pAccountInfoMap, isInteractive, userActionFields) {
+    // Sync transactions.
+    async syncTransactions(userId, access, pAccountInfoMap, isInteractive) {
         var _a, _b, _c;
         if (!access.isEnabled()) {
             // If the access has no password, check if it's an access that doesn't require
@@ -417,7 +418,7 @@ merging as per request`);
         const allAccounts = await models_1.Account.byAccess(userId, access);
         const accountInfoMap = pAccountInfoMap !== null && pAccountInfoMap !== void 0 ? pAccountInfoMap : new Map();
         const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(userId, allAccounts, accountInfoMap);
-        const result = await pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, { fromDate, isInteractive, userActionFields });
+        const result = await pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, { fromDate, isInteractive });
         if (result.kind === 'user_action') {
             return result;
         }
@@ -573,7 +574,7 @@ merging as per request`);
             // transactions; otherwise we've polled the accounts too and
             // could perform a better balance merge.
             log.info('Adjusting account balances...');
-            balanceFixups = await this.getActualAccountBalances(userId, access, allAccounts.slice(), userActionFields);
+            balanceFixups = await this.getActualAccountBalances(userId, access, allAccounts.slice());
         }
         const accounts = [];
         for (const { account, balanceOffset } of accountInfoMap.values()) {

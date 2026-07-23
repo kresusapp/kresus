@@ -184,7 +184,7 @@ async function createAndRetrieveData(userId, params, storeCredentials = true) {
             providerErrors = providerErrors.concat(accountResponse.errors);
         }
         const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-        /* isInteractive */ true, userActionFields);
+        /* isInteractive */ true);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         if (transactionResponse.errors) {
             providerErrors = providerErrors.concat(transactionResponse.errors);
@@ -279,7 +279,7 @@ const _fetchAccountsAndTransactions = async (req, params) => {
         providerErrors = providerErrors.concat(accountResponse.errors);
     }
     const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-    /* isInteractive */ true, userActionFields);
+    /* isInteractive */ true);
     (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
     if (transactionResponse.errors) {
         providerErrors = providerErrors.concat(transactionResponse.errors);
