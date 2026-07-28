@@ -10,6 +10,7 @@ import URLs from '../../urls';
 import * as UiStore from '../../store/ui';
 import { useDispatch } from 'react-redux';
 import { DriverContext } from '../drivers';
+import { AmountKindType } from './amount-select';
 
 function datekey(op: Transaction) {
     const d = op.budgetDate || op.date;
@@ -47,7 +48,7 @@ interface BarchartProps extends TransactionsChartProps {
     dateRange?: [Date] | [Date, Date];
 
     // What's the selected type (only positive, only negative, or both)?
-    amountKind: String; // TODO: use an enum
+    amountKind: AmountKindType;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
@@ -187,14 +188,16 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                             );
                         }
 
+                        // Extend the date boundaries as much as possible to avoid bad surprises.
                         newLeftBound.hours(0).minutes(0).seconds(0);
                         newRightBound.hours(23).minutes(59).seconds(59);
+
+                        // Make sure the search panel is open, in the reports view.
+                        dispatch(UiStore.toggleSearchDetails(true));
 
                         const amountLow = props.amountKind === 'positive' ? 0 : undefined;
                         const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
 
-                        // Make sure the search panel is open, in the reports view.
-                        dispatch(UiStore.toggleSearchDetails(true));
                         // Set the date, category, and amount fields if needs be.
                         dispatch(
                             UiStore.setSearchFields({
@@ -205,6 +208,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                                 amountHigh,
                             })
                         );
+
                         // Move to the reports view.
                         navigate(URLs.reports.url(driver));
                         break;

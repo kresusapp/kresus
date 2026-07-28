@@ -15,12 +15,12 @@ import {
 import FrequencySelect from './frequency-select';
 import { Form, Popform } from '../ui';
 import PeriodSelect from './period-select';
-import AmountKindSelect from './amount-select';
+import AmountKindSelect, { AmountKindType } from './amount-select';
 
 const DefaultParams = () => {
     const initialAmountKind = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
-    );
+    ) as AmountKindType;
     const initialDisplayType = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
     );

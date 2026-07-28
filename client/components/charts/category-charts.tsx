@@ -20,7 +20,7 @@ import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settin
 import DiscoveryMessage from '../ui/discovery-message';
 import BarChart, { BaseChartProps } from './category-barchart';
 import PieChart, { PieChartWithHelp } from './category-pie-chart';
-import AmountKindSelect from './amount-select';
+import AmountKindSelect, { AmountKindType } from './amount-select';
 import { Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
@@ -117,7 +117,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
 
     const defaultAmountKind = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
-    );
+    ) as AmountKindType;
     const defaultPeriod = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_PERIOD)
     );
