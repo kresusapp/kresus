@@ -112,6 +112,7 @@
         "ci:config": "./scripts/ci/config.sh",
         "ci": "./scripts/ci/index.sh",
         "dev": "./scripts/dev.sh",
+        "dev:githooks": "./scripts/dev/githooks.sh",
         "pretty": "./scripts/ci/lint.sh --fix",
         "fix:config": "./scripts/fix/config.sh",
         "fix:licenses": "node ./scripts/js/dependencies.js",
