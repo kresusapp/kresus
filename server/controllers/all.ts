@@ -1250,7 +1250,7 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {
             // Make sure the access exists.
-            if (!Access.exists(userId, userData.accessId)) {
+            if (!(await Access.exists(userId, userData.accessId))) {
                 throw new KError('No existing access for this access id', 400);
             }
 
