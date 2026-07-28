@@ -145,6 +145,11 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             options: {
                 aspectRatio: props.aspectRatio || 2,
 
+                // Make it clear that the elements can be clicked.
+                onHover: (_evt, elements, thisChart) => {
+                    thisChart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                },
+
                 // On click, open the reports view corresponding to the current category.
                 onClick(_event, elements) {
                     for (const e of elements) {
