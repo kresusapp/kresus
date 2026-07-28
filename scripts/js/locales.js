@@ -4,6 +4,8 @@ let fs = require('fs');
 
 import { makeLogger } from '../../server/helpers';
 
+const { buildKeys } = require('./locales-keys');
+
 const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..');
 
 let log = makeLogger('compare-locales');
@@ -20,28 +22,6 @@ fs.readdirSync(localesDir).forEach(child => {
     localesMap.set(format, require(file));
     log.info(`Found ${format} locale...`);
 });
-
-let cache = new Map();
-function buildKeys(localeObject) {
-    function _(obj, prefix) {
-        let keys = [];
-        for (let k in obj) {
-            if (!obj.hasOwnProperty(k)) continue;
-
-            let val = obj[k];
-            let newPrefix = `${prefix}.${k}`;
-            if (typeof val === 'object') {
-                let subkeys = _(val, newPrefix);
-                keys = keys.concat(subkeys);
-            } else {
-                keys.push(newPrefix);
-            }
-        }
-        return keys;
-    }
-    if (!cache.has(localeObject)) cache.set(localeObject, _(localeObject, ''));
-    return cache.get(localeObject);
-}
 
 let allKeys = new Map();
 for (let [format, locale] of localesMap) {

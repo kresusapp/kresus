@@ -109,6 +109,7 @@
         "ci:python": "./scripts/ci/python.sh",
         "ci:banks": "./scripts/ci/banks.sh",
         "ci:locales": "./scripts/ci/locales.sh",
+        "ci:locales:unused": "./scripts/ci/locales-unused.sh",
         "ci:test": "./scripts/ci/test.sh",
         "test": "yarn ci:test",
         "ci:config": "./scripts/ci/config.sh",
