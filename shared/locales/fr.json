@@ -25,9 +25,7 @@
             "welcome": "Bienvenue dans votre nouveau Kresus !",
             "description": "Voici votre gestionnaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",
             "letsgo": "Commençons par ajouter votre premier accès !",
-            "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez l'importer en sélectionnant le fichier JSON créé lors de l'import.",
-            "import_others": "Importer un autre format (OFX)",
             "return_onboarding": "Retourner à l'écran d'accueil",
             "menu": {
                 "add_first_access_title": "Première installation ?",
@@ -77,7 +75,6 @@
             "attached_transactions": "%{smart_count} opération est associée à cette catégorie. Elle ne sera pas supprimée. |||| %{smart_count} opérations sont associées à cette catégorie. Elles ne seront pas supprimées.",
             "replace_with_info": "Les transactions associées peuvent être réaffectées à une autre catégorie (par défault, elles ne seront plus catégorisées). Les budgets attachés seront également migrés vers cette catégorie, à moins que des budgets y soient déjà attachés.",
             "replace_with": "Remplacer par",
-            "label": "Libellé",
             "creation": "Création d'une catégorie",
             "edition": "Édition d'une catégorie",
             "deletion": "Suppression d'une catégorie",
@@ -124,12 +121,7 @@
             "orphan_account": "Ce compte n'a pas été trouvé sur le site de votre banque lors de la dernière synchronisation."
         },
         "editaccess": {
-            "not_empty": "Le mot de passe est obligatoire !",
-            "customFields_not_empty": "Veuillez renseigner tous les champs personnalisés",
-            "title": "Changer les informations de connexion du compte",
-            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
             "success": "Votre accès bancaire a bien été mis à jour.",
-            "error": "Votre accès bancaire n'a pas pu être mis à jour.",
             "disable_access": "Désactiver l'accès",
             "this_access": "Cet accès est actuellement",
             "enabled": "activé",
@@ -154,17 +146,12 @@
             "include_in_polls": "Synchroniser automatiquement",
             "include_in_polls_details": "Désactivez cette option si cet accès ne devrait pas être synchronisé lors des récupérations automatiques, par exemple parce qu'il nécessite une authentification multi-facteurs de manière systématique."
         },
-        "confirmdelete": {
-            "confirm": "Confirmer la suppression"
-        },
         "deleteunusedcategories": {
             "explanation": "Cela va supprimer les catégories suivantes qui sont inutilisées :",
             "question": "Êtes-vous certain⋅e de vouloir supprimer toutes ces catégories ? Les budgets associés, s'ils existent, seront également perdus."
         },
         "charts": {
-            "currency_filter": "Filtrer par devise",
             "currency_no_conversion": "(aucune conversion effectuée)",
-            "amount": "Montant",
             "balance": "solde",
             "balance_desc": "Ce graphique vous montre quelle était la balance de votre compte à un moment donné. C'est utile par exemple pour voir si vous atteignez un niveau critique toujours à une même période.",
             "by_category": "par catégorie",
@@ -174,11 +161,7 @@
             "spent": "Dépensé",
             "received": "Reçu",
             "saved": "Économisé",
-            "type": "Type d'affichage",
             "amount_type": "Type d'opérations",
-            "all_types": "Les deux",
-            "positive": "Revenus",
-            "negative": "Dépenses",
             "frequency": "Fréquence",
             "monthly": "Mensuelle",
             "yearly": "Annuelle",
@@ -206,7 +189,6 @@
             "net_income": "Revenus nets",
             "raw_spendings": "Dépenses brutes",
             "net_spendings": "Dépenses nettes",
-            "help": "Qu'est-ce que c'est ?",
             "help_raw_income": "Ce camembert vous montre toutes les transactions qui ont contribué à des revenus, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les revenus apparaîtront ici et les dépenses sur le camembert des dépenses brutes.",
             "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
             "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
@@ -340,7 +322,6 @@
             "uncategorized": "Non catégorisé"
         },
         "search": {
-            "any_category": "N'importe quelle catégorie",
             "any_type": "N'importe quel type",
             "keywords": "Mots-clés :",
             "category": "Catégorie :",
@@ -570,8 +551,6 @@
         "similarity": {
             "nothing_found": "Aucune paire d'opérations similaires n'a été trouvée.",
             "help": "Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
-            "date": "Date",
-            "label": "Libellé de l'opération",
             "amount": "Montant :",
             "category": "Catégorie :",
             "imported_on": "Importée le",
@@ -591,7 +570,6 @@
             "will_be_removed": "Cette opération sera supprimée."
         },
         "about": {
-            "title": "À propos",
             "thanks": "Remerciements",
             "thanks_description": "Parce que le monde du logiciel libre est un écosystème à part entière, et que tout logiciel repose sur de nombreuses dépendances, nous listons ci-dessous toutes les dépendances utilisées par Kresus et sans lesquelles ce logiciel ne pourrait exister.",
             "kresus_license": "Licence de Kresus",
@@ -623,7 +601,6 @@
             "partial_errors": "La synchronisation a fonctionné partiellement, des erreurs ont été rencontrées : %{errors}"
         },
         "type": {
-            "none": "Aucun",
             "unknown": "Type inconnu",
             "transfer": "Virement",
             "order": "Prélèvement",
@@ -667,9 +644,7 @@
         "spinner": {
             "loading": "Chargement en cours",
             "title": "Veuillez patienter…",
-            "balance_resync": "Resynchronisation de votre balance en cours…",
             "fetch_account": "Connexion au site de votre banque et import des comptes et opérations en cours…",
-            "delete_account": "Suppression de votre compte et des données associées en cours…",
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
             "sync": "Récupération de vos dernières opérations en cours…",

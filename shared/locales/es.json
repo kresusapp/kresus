@@ -25,9 +25,7 @@
             "welcome": "Hola, bienvenido a tu propio Kresus",
             "description": "Este es su gestor de finanzas personal, su propio compañero diario para darle información sobre sus cuentas bancarias y ayudarle a analizar sus gastos.",
             "letsgo": "¡Empecemos añadiendo su primer acceso bancario !",
-            "import_title": "Importar",
             "import": "Si ha exportado su anterior instancia de Kresus, podrá importarlo seleccionando el archivo JSON creado al importar.",
-            "import_others": "Importar otro formato (OFX)",
             "return_onboarding": "Volver a la pantalla de inicio",
             "menu": {
                 "add_first_access_title": "Primera instalación ?",
@@ -72,7 +70,6 @@
             "attached_transactions": "hay %{smart_count} operación está asociada a esta categoría. No se suprimirá. |||| hay %{smart_count} operaciones asociadas a esta categoría. Ellas no so suprimirá.",
             "replace_with_info": "las transacciones asociadas reasignarán a diferentes categorías (por defecto, ellas no son categorizadas). Los presupuestos adjuntos también se transferirán a la categoría elegida, a menos que la categoría de sustitución ya haya definido ningún presupuesto.",
             "replace_with": "Reemplazar por",
-            "label": "Redacción",
             "creation": "Creación de una categoría",
             "edition": "Actualización categoría",
             "deletion": "Supresión de una categoría",
@@ -112,12 +109,7 @@
             "creation_success": "El acceso bancario se ha creado con éxito."
         },
         "editaccess": {
-            "not_empty": "La contraseña es obligatoria !",
-            "customFields_not_empty": "Por favor rellene todos los campos personalizados",
-            "title": "Cambiar los detalles de inicio de sesión de la cuenta",
-            "body": "Si su contraseña bancaria ha cambiado, puedes cambiarlo aquí para que el enlace de Kresus siga funcionando.",
             "success": "Su acceso al banco ha sido actualizado.",
-            "error": "No se ha podido actualizar su acceso al banco.",
             "disable_access": "Desactivar el acceso",
             "this_access": "Este acceso es actualmente",
             "enabled": "activado",
@@ -134,15 +126,11 @@
             "grace_period_success": "Retraso registrado",
             "grace_period_label": "Retraso (en días)"
         },
-        "confirmdelete": {
-            "confirm": "Confirmar la supresión"
-        },
         "deleteunusedcategories": {
             "explanation": "Esto eliminará las siguientes categorías no utilizadas :",
             "question": "¿Estás seguro de que quieres eliminar todas estas categorías ? Los presupuestos asociados, si existen, también se perderán."
         },
         "charts": {
-            "amount": "Monto",
             "balance": "saldo",
             "balance_desc": "Este gráfico le muestra el saldo de su cuenta en un momento dado. Esto es útil, por ejemplo, para ver si se alcanza un nivel crítico siempre en el mismo periodo.",
             "by_category": "por categoría",
@@ -151,11 +139,7 @@
             "spent": "Gastado",
             "received": "Recibido",
             "saved": "Ahorrado",
-            "type": "Tipo de visualización",
             "amount_type": "Tipo de operación",
-            "all_types": "Los dos",
-            "positive": "Ingresos",
-            "negative": "Gastos",
             "frequency": "Frecuencia",
             "monthly": "Mensual",
             "yearly": "Anual",
@@ -181,7 +165,6 @@
             "net_income": "Salario neto",
             "raw_spendings": "Gastos brutos",
             "net_spendings": "Gastos netos",
-            "help": "¿Qué es??",
             "help_raw_income": "Este gráfico circular muestra todas las transacciones que contribuyeron a los ingresos, para cada categoría. Si una categoría contiene tanto ingresos como gastos, los ingresos aparecerán aquí y los gastos en el gráfico circular de gastos brutos.",
             "help_raw_spendings": "Este gráfico circular le muestra todas las transacciones que contribuyeron a los gastos, para cada categoría. Si una categoría contiene tanto ingresos como gastos, los gastos aparecerán aquí y los ingresos en el gráfico circular de ingresos brutos.",
             "help_net_income": "Este gráfico circular muestra todas las categorías en las que la suma de los gastos y los ingresos da lugar a un ingreso neto. Si una categoría contiene tanto ingresos como gastos, pero los ingresos son mayores que los gastos, entonces la categoría sólo aparecerá aquí.",
@@ -255,7 +238,7 @@
             "category": "Categoría",
             "last_sync_full": "Última sincronización :",
             "sync_now": "Sincronizar",
-                  "type": "Tipo",
+            "type": "Tipo",
             "date": "Fecha real",
             "custom_label": "Redacción personalizada",
             "delete_transaction_button": "Suprimir la operación",
@@ -295,7 +278,6 @@
             "uncategorized": "no categorizado"
         },
         "search": {
-            "any_category": "Cualquier categoría",
             "any_type": "Cualquier tipo",
             "keywords": "Palabras clave :",
             "category": "Categoría :",
@@ -482,8 +464,6 @@
         "similarity": {
             "nothing_found": "No se encontró ningún par de transacciones similares.",
             "help": "¿Qué es? Al importar las transacciones bancarias ocurre que algunas de ellas se importan por duplicado, por ejemplo cuando el banco añade información sobre una transacción bancaria unos días después de que se haya producido. Esta pantalla le muestra los posibles duplicados (transacciones que tienen el mismo importe durante un periodo de tiempo determinado). Nota: las categorías se transfieren al borrar: si en un par A / B duplicado donde A tiene una categoría y B no, al borrar A se reasignará automáticamente su categoría a B.",
-            "date": "Fecha",
-            "label": "Redacción de la operación",
             "amount": "Monto:",
             "category": "categoría:",
             "imported_on": "Importado en",
@@ -500,7 +480,6 @@
             "will_be_removed": "Esta operación será suprimida."
         },
         "about": {
-            "title": "A proposito",
             "thanks": "Gracias",
             "thanks_description": "Dado que el mundo del software libre es un ecosistema en sí mismo, y que todo el software depende de muchas dependencias, a continuación enumeramos todas las dependencias que utiliza Kresus y sin las cuales este software no podría existir.",
             "kresus_license": "Licencia de Kresus",
@@ -530,7 +509,6 @@
             "woob_not_installed": "Woob no está instalado. Ahora será redirigido a la página de ayuda asociada."
         },
         "type": {
-            "none": "Ninguno",
             "unknown": "Tipo desconocido.",
             "transfer": "Transferencia",
             "order": "Levy",
@@ -570,9 +548,7 @@
         "spinner": {
             "loading": "Carga en curso",
             "title": "Espere, por favor…",
-            "balance_resync": "Resincronización de su saldo actual…",
             "fetch_account": "Conexión con el sitio web de su banco e importación de cuentas y transacciones…",
-            "delete_account": "Suprimir su cuenta y los datos asociados en curso…",
             "generic": "Kresus está cumpliendo sus deseos, nos vemos pronto !",
             "import": "Importar su instancia guardada actual…",
             "sync": "Recuperar sus últimas transacciones…",

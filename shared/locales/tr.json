@@ -25,9 +25,7 @@
             "welcome": "Yeni Kresus’unuza hos geldiniz!",
             "description": "Işte kişisel finans yöneticiniz, günlük arkadaşınız size banka hesaplarınızın durumu hakkında genel bir bakış sunmak ve harcamalarınızı analiz etmenize yardımcı olur.",
             "letsgo": "Ilk erişiminizi ekleyerek başlayalım!",
-            "import_title": "Iç aktar",
             "import": "Önceki Kresus örneğinizi dışa aktardıysanız, içe aktarma sırasında oluşturulan JSON dosyasını seçerek bunu içe aktarabilirsiniz.",
-            "import_others": "Baska bir format içe aktar (OFX)",
             "return_onboarding": "Ana sayfa geri dön",
             "menu": {
                 "add_first_access_title": "Ilk kurulum?",
@@ -72,7 +70,6 @@
             "attached_transactions": "%{smart_count} işlemi bu kategori ile ilişkilendirilir. Silinmeyecek.|||| %{smart_count} işlemleri bu kategori ile ilişkilendirilir. Silinmeyecekler.",
             "replace_with_info": "Ilişkili işlemler başka bir kategoriye yeniden atanabilirler (varsayılan olarak artık kategorize edilmeyecektir). Bütçeler zaten eklenmemişse, ekteki bütçeler de bu kategoriye geçirilecektir.",
             "replace_with": "Bununla değiştir",
-            "label": "Etiket",
             "creation": "Kategori oluşturma",
             "edition": "Kategori düzenleme",
             "deletion": "Kategori silme",
@@ -112,12 +109,7 @@
             "creation_success": "Banka erişimi başarıyla oluşturuldu."
         },
         "editaccess": {
-            "not_empty": "Şifre zorunludur!",
-            "customFields_not_empty": "Lütfen tüm özel alanları doldurun",
-            "title": "Hesap giriş bilgilerini değiştir",
-            "body": "Banka şifreniz değiştiyse, kresus bağlantısının çalışmaya devam etmesi için buradan değiştirebilirsiniz.",
             "success": "Banka erişiminiz başarıyla güncellendi",
-            "error": "Banka erişiminiz güncellenemedi.",
             "disable_access": "Erişimi devre dışı bırak",
             "this_access": "Bu erişim şu anda",
             "enabled": "aktif",
@@ -134,15 +126,11 @@
             "grace_period_success": "Gecikme kaydedildi",
             "grace_period_label": "Son işlemleri yoksay (gün olarak)"
         },
-        "confirmdelete": {
-            "confirm": "Silmeyi onayla"
-        },
         "deleteunusedcategories": {
             "explanation": "Bu işlem aşağıdaki kategorileri silecektir:",
             "question": "Tüm bu kategorileri silmek istediğinizden emin misiniz? Varsa, bağlantılı bütçeler de kaybolacaktır."
         },
         "charts": {
-            "amount": "Miktar",
             "balance": "bakiye",
             "balance_desc": "Bu grafik, belirli bir zamanda hesabınızın bakiyesini ne olduğunu gösterir. Bu, örneğin her zaman aynı dönemde kritik bir seviyeye ulaşıp ulaşmadığınızı görmek için kullanışlıdır",
             "by_category": "kategoriye göre",
@@ -151,11 +139,7 @@
             "spent": "Harcanan",
             "received": "Gelen",
             "saved": "Biriken",
-            "type": "Görüntü türü",
             "amount_type": "Işlem türü",
-            "all_types": "kisi",
-            "positive": "Gelirler",
-            "negative": "Giderler",
             "frequency": "Sıklık",
             "monthly": "Aylık",
             "yearly": "Yıllık",
@@ -181,7 +165,6 @@
             "net_income": "Net gelirler",
             "raw_spendings": "Brüt giderler",
             "net_spendings": "Net giderler",
-            "help": "Bu nedir?",
             "help_raw_income": "Bu pasta grafiği size her kategori için gelire katkıda bulunan tüm işlemleri gösterir. Bir kategori hem gelirleri hem de giderleri içeriyorsa, gelirler burada görünecek ve giderler brüt giderler pasta grafiğinde görünecektir.",
             "help_raw_spendings": "Bu pasta grafiği size her kategori için gidere katkıda bulunan tüm işlemleri gösterir. Bir kategori hem gelirleri hem de giderleri içeriyorsa, gelirler burada görünecek ve giderler brüt giderler pasta grafiğinde görünecektir.",
             "help_net_income": "Bu pasta grafiği size toplam giderleri ve gelirleri net gelirle sonuçlanan tüm kategorileri gösterir. Bir kategori hem gelirleri hem de gider içeriyorsa, ancak gelir giderden büyükse, kategori yalnızca burada görünecektir.",
@@ -291,7 +274,6 @@
             "uncategorized": "Kategorize edilmemiş"
         },
         "search": {
-            "any_category": "Herhangi bir kategori",
             "any_type": "Herhangi bir tür",
             "keywords": "Anahtar kelimeler:",
             "category": "Kategori:",
@@ -478,8 +460,6 @@
         "similarity": {
             "nothing_found": "Benzer bir çift işlem bulunamadı.",
             "help": "Bu nedir? Bankacılık işlemlerini içe aktarırken, bazıları kopya olarak içe aktarılır, örneğin banka, gerçekleştikten birkaç gün sonra bir bankacılık işlemi hakkında bilgi eklediğinde olur. Bu ekran size olası kopyaları gösterir (belirli bir süre boyunca aynı miktarda olan işlemler). Not: kategoriler silme sırasında aktarılır: A'nın bir kategoriye sahip olduğu ve B'nin olmadığı yinelenen bir A / B çiftinde, A silindiğinde kategori otomatik olarak B'ye yeniden atanır.",
-            "date": "Tarih",
-            "label": "Işlemin etiketi",
             "amount": "Miktar:",
             "category": "Kategori:",
             "imported_on": "Bu tarihte içe aktarıldı",
@@ -496,7 +476,6 @@
             "will_be_removed": "Bu işlem silinecektir."
         },
         "about": {
-            "title": "Hakkımızda",
             "thanks": "Teşekkürler",
             "thanks_description": "Özgür yazılım dünyası kendi başına bir ekosistem olduğundan ve tüm yazılımlar birçok bağımlılığa dayandığından, Kresus tarafından kullanılan ve olmadan bu yazılımın var olamayacağı tüm bağımlılıkları aşağıda listeliyoruz.",
             "kresus_license": "Kresus lisansı",
@@ -526,7 +505,6 @@
             "woob_not_installed": "Woob yüklü değil. Şimdi ilgili yardım sayfasına yönlendirileceksiniz."
         },
         "type": {
-            "none": "Hiçbiri",
             "unknown": "Bilinmeyen tür",
             "transfer": "Havale",
             "order": "Otomatik ödeme",
@@ -564,9 +542,7 @@
         "spinner": {
             "loading": "Yükleniyor",
             "title": "Lütfen bekleyin...",
-            "balance_resync": "Bakiyenizin senkronizasyonu devam ediliyor...",
             "fetch_account": "Bankanızın web sitesine bağlanıyor ve hesapların ve işlemlerin içe aktarılıyor...",
-            "delete_account": "Hesabınız ve ilişkili veriler siliniyor...",
             "generic": "Kresus dileklerinizi yerine getiriyor, yakında görüşürüz!",
             "import": "Kaydedilen örneğiniz içe aktarılıyor...",
             "sync": "Son mevcut işlemlerinizin kurtarılıyor...",

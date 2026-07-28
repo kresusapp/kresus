@@ -25,9 +25,7 @@
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
             "letsgo": "Let's set up your first bank access!",
-            "import_title": "Import",
             "import": "If you have exported your previous Kresus instance, you can import it back by selecting the JSON file created on export.",
-            "import_others": "Import another format (OFX)",
             "return_onboarding": "Go back to onboarding",
             "menu": {
                 "add_first_access_title": "First install?",
@@ -81,7 +79,6 @@
             "attached_transactions": "There is %{smart_count} transaction attached. It will not be deleted. |||| There are %{smart_count} transactions attached. They will not be deleted.",
             "replace_with_info": "Associated transactions may be reaffected to a different category (by default, they won't be otherwise categorized). Attached budgets will also be migrated to the chosen category, unless the replacement category already had defined any budgets.",
             "replace_with": "Replace with",
-            "label": "Label",
             "creation": "Create category",
             "edition": "Update category",
             "deletion": "Delete category",
@@ -128,12 +125,7 @@
             "orphan_account": "This account wasn't found in your bank's website last time we synchronized it."
         },
         "editaccess": {
-            "not_empty": "Please fill the password field",
-            "customFields_not_empty": "Please fill all the custom fields",
-            "title": "Edit bank access",
-            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing transactions from your bank account.",
             "success": "Your bank access was correctly updated.",
-            "error": "Your bank access could not correctly be updated.",
             "disable_access": "Disable the access",
             "this_access": "This access is currently",
             "enabled": "enabled",
@@ -158,17 +150,12 @@
             "include_in_polls": "Automatically sync",
             "include_in_polls_details": "Disable this option if this access shouldn't be synchronized during automated polls, for instance because it always requires an interactive multi-factor authentication."
         },
-        "confirmdelete": {
-            "confirm": "Confirm deletion"
-        },
         "deleteunusedcategories": {
             "explanation": "This will delete the following unused categories:",
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
         "charts": {
-            "currency_filter": "Filter by currency",
             "currency_no_conversion": "(no conversion done)",
-            "amount": "Amounts",
             "balance": "balance",
             "balance_desc": "This chart shows you what was the balance at a given moment. This is useful for example to see if you always hit a critical level around the same period.",
             "by_category": "by category",
@@ -178,11 +165,7 @@
             "spent": "Spent",
             "received": "Received",
             "saved": "Saved",
-            "type": "Display type",
             "amount_type": "Amount type",
-            "all_types": "All types",
-            "positive": "Income",
-            "negative": "Expenses",
             "frequency": "Frequency",
             "monthly": "Monthly",
             "yearly": "Yearly",
@@ -210,7 +193,6 @@
             "net_income": "Net income",
             "raw_spendings": "Raw spendings",
             "net_spendings": "Net spendings",
-            "help": "What am I looking at?",
             "help_raw_income": "This shows all the transactions which contributed to income for each category. Note that if a category has transactions which are both income and spendings, income will appear here and spendings on the raw spendings chart.",
             "help_raw_spendings": "This shows all the transactions which contributed to spendings for each category. Note that if a category has transactions which are both income and spendings, spendings will appear here and income on the raw spendings chart.",
             "help_net_income": "This shows all the categories which contributed to income, that is, categories for which the overall sum resulted in gains. If a category has both incoming and outcoming transactions, but income was overall bigger for this category, then it will appear only here.",
@@ -344,7 +326,6 @@
             "uncategorized": "Uncategorized"
         },
         "search": {
-            "any_category": "Any category",
             "any_type": "Any type",
             "keywords": "Keywords:",
             "category": "Category:",
@@ -574,8 +555,6 @@
         "similarity": {
             "nothing_found": "No similar transactions found.",
             "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
-            "date": "Date",
-            "label": "Label",
             "amount": "Amount:",
             "category": "Category:",
             "imported_on": "Imported on",
@@ -595,7 +574,6 @@
             "will_be_removed": "This transaction will be removed."
         },
         "about": {
-            "title": "About",
             "thanks": "Thanks",
             "thanks_description": "Free software is a whole ecosystem and any software relies on a huge number of dependencies. That is why we are listing here the dependencies used by Kresus and without which this software could not exist.",
             "kresus_license": "Kresus' license",
@@ -627,7 +605,6 @@
             "partial_errors": "The synchronization worked partially, some errors were met: %{errors}"
         },
         "type": {
-            "none": "None",
             "unknown": "Unknown type",
             "transfer": "Transfer",
             "order": "Order",
@@ -671,9 +648,7 @@
         "spinner": {
             "loading": "Loading",
             "title": "Please wait…",
-            "balance_resync": "Resynchronizing your account's balance…",
             "fetch_account": "Connecting to your bank's website and fetching all the accounts and transactions…",
-            "delete_account": "Deleting your account and associated data from Kresus…",
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
             "sync": "Fetching your latest bank transactions…",
