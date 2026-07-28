@@ -36,8 +36,9 @@ export interface MinMaxInputRef {
 }
 
 const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
-    const currentLow = props.low || props.min;
-    const currentMax = props.high || props.max;
+    const currentLow = props.low ?? props.min;
+    const currentMax = props.high ?? props.max; // TODO: rename to currentHigh
+
     const [lowText, setLowText] = useState<string>(`${currentLow}`);
     const [lowNumber, setLowNumber] = useState<number>(currentLow);
     const [highText, setHighText] = useState<string>(`${currentMax}`);
