@@ -359,6 +359,8 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
 
             <BarChart
                 transactions={transactionsInPeriod}
+                amountKind={amountKind}
+                dateRange={dateRange}
                 getCategoryById={getCatById}
                 invertSign={onlyNegative}
                 chartId="barchart"

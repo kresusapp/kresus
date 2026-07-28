@@ -1,9 +1,15 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { Chart, type LegendItem } from 'chart.js';
 
 import { assert, round2, localeComparator } from '../../helpers';
 import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
+import moment, { Moment } from 'moment';
+import { useNavigate } from 'react-router';
+import URLs from '../../urls';
+import * as UiStore from '../../store/ui';
+import { useDispatch } from 'react-redux';
+import { DriverContext } from '../drivers';
 
 function datekey(op: Transaction) {
     const d = op.budgetDate || op.date;
@@ -36,14 +42,25 @@ interface BarchartProps extends TransactionsChartProps {
     // Aspect ratio (width/height). 2 by default. If the width is too small, height will be too and
     // barchart legends can be cropped (and some legend items might be missing).
     aspectRatio?: number;
+
+    // What's the selected date range?
+    dateRange?: [Date] | [Date, Date];
+
+    // What's the selected type (only positive, only negative, or both)?
+    amountKind: String; // TODO: use an enum
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
     const container = useRef<Chart | null>(null);
 
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const driver = useContext(DriverContext);
+
     const redraw = useCallback(() => {
         // Category name -> {date key string -> [amounts]}.
         const map = new Map<string, Record<string, number[]>>();
+        const categoryNameToId = new Map<string, number>();
 
         // Category name -> color string.
         const colorMap: Record<string, string> = {};
@@ -55,6 +72,8 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             const cat = props.getCategoryById(op.categoryId);
 
             map.set(cat.label, map.get(cat.label) || {});
+            categoryNameToId.set(cat.label, cat.id);
+
             const categoryDates = map.get(cat.label);
             assert(typeof categoryDates !== 'undefined', 'defensively created above');
 
@@ -77,6 +96,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             data: number[];
             backgroundColor: string;
             hidden?: boolean;
+            categoryId: number;
         }[] = [];
         for (const categoryName of map.keys()) {
             const data: number[] = [];
@@ -89,6 +109,8 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 data.push(round2(values.reduce((a, b) => a + b, 0)));
             }
 
+            const categoryId = categoryNameToId.get(categoryName)!;
+
             datasets.push({
                 label: categoryName,
                 data,
@@ -96,6 +118,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 hidden:
                     props.hiddenCategories instanceof Array &&
                     props.hiddenCategories.includes(categoryName),
+                categoryId,
             });
         }
 
@@ -121,6 +144,73 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             options: {
                 aspectRatio: props.aspectRatio || 2,
 
+                // On click, open the reports view corresponding to the current category.
+                onClick(_event, elements) {
+                    for (const e of elements) {
+                        // e.datasetIndex is the dataset for a given category; we can retrieve the
+                        // categoryId quite easily.
+                        const categoryId = datasets[e.datasetIndex].categoryId;
+
+                        // e.index refers to the selected date.
+                        const clickedDate = moment(dates[e.index][1]);
+                        const firstDayOfClickedMonth = clickedDate.date(1);
+                        const lastDayOfClickedMonth = moment(clickedDate).date(
+                            clickedDate.daysInMonth()
+                        );
+
+                        // We want to compute a min and a max bound according to the following:
+                        // min := max(first day of clicked month, dateRange[0])
+                        // max := min(last day of clicked month, dateRange[1])
+                        let newLeftBound: Moment, newRightBound: Moment;
+                        if (typeof props.dateRange === 'undefined') {
+                            // The bounds are the full month.
+                            newLeftBound = firstDayOfClickedMonth;
+                            newRightBound = lastDayOfClickedMonth;
+                        } else if (typeof props.dateRange[1] === 'undefined') {
+                            // Only a left bound is set; take the later date (max) among the first
+                            // day, or the left bound.
+                            newLeftBound = moment.max(
+                                firstDayOfClickedMonth,
+                                moment(props.dateRange[0])
+                            );
+                            newRightBound = lastDayOfClickedMonth;
+                        } else {
+                            // Both bounds are set; take the later date for the left bound, and the
+                            // sooner date for the right bound.
+                            newLeftBound = moment.max(
+                                firstDayOfClickedMonth,
+                                moment(props.dateRange[0])
+                            );
+                            newRightBound = moment.min(
+                                lastDayOfClickedMonth,
+                                moment(props.dateRange[1])
+                            );
+                        }
+
+                        newLeftBound.hours(0).minutes(0).seconds(0);
+                        newRightBound.hours(23).minutes(59).seconds(59);
+
+                        const amountLow = props.amountKind === 'positive' ? 0 : undefined;
+                        const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
+
+                        // Make sure the search panel is open, in the reports view.
+                        dispatch(UiStore.toggleSearchDetails(true));
+                        // Set the date, category, and amount fields if needs be.
+                        dispatch(
+                            UiStore.setSearchFields({
+                                dateLow: newLeftBound.toDate(),
+                                dateHigh: newRightBound.toDate(),
+                                categoryIds: [categoryId],
+                                amountLow,
+                                amountHigh,
+                            })
+                        );
+                        // Move to the reports view.
+                        navigate(URLs.reports.url(driver));
+                        break;
+                    }
+                },
+
                 plugins: {
                     legend: {
                         labels: {
@@ -143,7 +233,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         });
 
         container.current = chart;
-    }, [props]);
+    }, [props, navigate, dispatch, driver]);
 
     useEffect(() => {
         // Redraw on mount and update.
