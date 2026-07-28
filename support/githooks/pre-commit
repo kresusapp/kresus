@@ -1,0 +1,30 @@
+#!/bin/sh
+# Format staged files with Biome, then re-stage them, so that what gets
+# committed is what Biome produced.
+#
+# Install with one of:
+#     yarn dev:githooks
+# or:
+#     git config core.hooksPath support/githooks
+set -e
+
+root=$(git rev-parse --show-toplevel)
+biome="$root/node_modules/.bin/biome"
+
+if [ ! -x "$biome" ]; then
+    echo "pre-commit: $biome not found — run 'yarn install' first." >&2
+    exit 1
+fi
+
+# Added / Copied / Modified / Renamed staged paths, NUL-separated so that
+# spaces and other odd characters in filenames survive. Kept in a file because
+# command substitution would strip the NULs.
+list=$(mktemp)
+trap 'rm -f "$list"' EXIT
+git diff --cached --name-only --diff-filter=ACMR -z > "$list"
+[ -s "$list" ] || exit 0
+
+# --files-ignore-unknown overrides biome.json's "ignoreUnknown": false, so that
+# committing a file type Biome doesn't handle (.ini, .sh, …) is not an error.
+xargs -0 "$biome" format --write --no-errors-on-unmatched --files-ignore-unknown=true < "$list"
+xargs -0 git add -- < "$list"
