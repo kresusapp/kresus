@@ -32,7 +32,6 @@ const chartsPlaceholderPlugin = {
                 bottom: number;
                 width: number;
             };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data: any;
         },
         _args: never,

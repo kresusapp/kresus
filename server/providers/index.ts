@@ -16,7 +16,6 @@ export interface ProviderTransaction {
     label: string;
     rawLabel: string;
     type?: number;
-    // eslint-disable-next-line camelcase
     debit_date?: Date;
 }
 
@@ -110,7 +109,7 @@ function init() {
             continue;
         }
 
-        // eslint-disable-next-line import/no-dynamic-require, @typescript-eslint/no-var-requires
+        // eslint-disable-next-line import/no-dynamic-require
         const handler: Provider = require(`./${fileOrDirName}`);
 
         addBackend(handler);

@@ -128,7 +128,6 @@ export function isSqlite(connection: DataSource): boolean {
 // Note: doesn't return the inserted entities.
 export async function bulkInsert<T extends ObjectLiteral>(
     repository: Repository<T>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     entities: Extract<Parameters<Repository<T>['insert']>[0], Array<any>>
 ): Promise<void> {
     // Do not call `repository.insert` without actual entities, that will generate an empty insert

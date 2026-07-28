@@ -93,18 +93,14 @@ interface PythonResponse {
 // An error returned by Woob.
 interface WoobErrorResponse extends PythonResponse {
     kind: 'error';
-    // eslint-disable-next-line camelcase
     error_code: string;
-    // eslint-disable-next-line camelcase
     error_message: string;
-    // eslint-disable-next-line camelcase
     error_short: string;
 }
 
 // The woob connection requires a user action.
 interface WoobUserActionResponse extends PythonResponse {
     kind: 'user_action';
-    // eslint-disable-next-line camelcase
     action_kind: UserActionKind;
     message?: string;
     fields: UserActionField[];
@@ -210,8 +206,6 @@ function defaultOptions(): WoobOptions {
     };
 }
 
-// bug in eslint which thinks this is declared twice??
-// eslint-disable-next-line
 enum CallWoobCommand {
     Test,
     Version,

@@ -188,7 +188,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
     let swipeDelta = 0;
 
     const onSwipeStart = (element: HTMLElement) => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = 0;
 
         element.classList.add('swiped');
@@ -196,7 +195,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
 
     const onSwipeChange = (element: HTMLElement, delta: number) => {
         // The swipeable action is 100px wide so we set a maximum range of -100/100.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = Math.min(SwipeableActionWidth, Math.max(-SwipeableActionWidth, delta));
 
         // Whether the swipe will be effective or discarded because not meaningful enough.
@@ -230,7 +228,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
             }
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = 0;
     };
 

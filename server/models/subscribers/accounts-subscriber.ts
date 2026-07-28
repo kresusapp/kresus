@@ -3,8 +3,6 @@ import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } 
 import Account from '../entities/accounts';
 import View from '../entities/views';
 
-// eslint new-cap rule does not like decorators. See https://github.com/eslint/typescript-eslint-parser/issues/569
-// eslint-disable-next-line new-cap
 @EventSubscriber()
 export class AccountsSubscriber implements EntitySubscriberInterface<Account> {
     listenTo() {

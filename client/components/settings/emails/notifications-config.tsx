@@ -74,7 +74,6 @@ const NotificationsConfig = () => {
                 <span className="fa fa-question-circle" />
                 {$t('client.settings.notifications.apprise_description')}
                 &nbsp;
-                {/* eslint-disable-next-line max-len */}
                 <ExternalLink href="https://github.com/caronc/apprise/wiki#notification-services">
                     {$t('client.settings.notifications.apprise_description_link')}
                 </ExternalLink>

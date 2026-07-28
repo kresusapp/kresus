@@ -57,7 +57,6 @@ export function assert(x: boolean, wat: string): asserts x {
         }
         if (ASSERTS) {
             window.alert(shortText);
-            /* eslint-disable-next-line no-console */
             console.error(text);
         }
     }

@@ -10,7 +10,6 @@ const SCROLL_THROTTLING = 150;
 interface Props {
     // Number of transactions before / after the ones to render, for fast scroll.
     // As the prop is used in a static function, the linter does not detect it is used.
-    // eslint-disable-next-line react/no-unused-prop-types
     ballast: number;
 
     // The list of items to be rendered.
@@ -21,7 +20,6 @@ interface Props {
 
     // The space between the component and window's top.
     // As the prop is used in a static function, the linter does not detect it is used.
-    // eslint-disable-next-line react/no-unused-prop-types
     heightAbove: number;
 
     // Function to be called for rendering all the items, with the signature:
