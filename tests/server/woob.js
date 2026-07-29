@@ -262,30 +262,39 @@ async function makeDefectSituation(command) {
 
             assert.ok('success' in result);
             assert.ok('kind' in result.success);
-            assert.strictEqual(result.success.kind, 'user_action');
-            assert.ok('fields' in result.success);
-            assert.ok(result.success.fields instanceof Array);
 
-            // And re-calling with the same session and fields should be
-            // sufficient to launch the sync.
-            let woobOptions = {
-                ...defaultOptions(),
-                userActionFields: {
-                    code: '1337',
-                },
-            };
+            if (command === 'accounts') {
+                // In the fakewoobbank module, only the accounts command requires a 2fa. Even when
+                // fetching transactions we start with fetching the accounts anyways, which causes
+                // a 2fa that overlives the transactions fetch.
+                assert.strictEqual(result.success.kind, 'user_action');
+                assert.ok('fields' in result.success);
+                assert.ok(result.success.fields instanceof Array);
 
-            let woobResponse = await callWoob(
-                command,
-                woobOptions,
-                sessionManager,
-                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
-            );
+                // And re-calling with the same session and fields should be
+                // sufficient to launch the sync.
+                let woobOptions = {
+                    ...defaultOptions(),
+                    userActionFields: {
+                        code: '1337',
+                    },
+                };
 
-            assert.ok(woobResponse);
-            assert.ok('kind' in woobResponse);
-            assert.strictEqual(woobResponse.kind, 'values');
-            assert.ok('values' in woobResponse);
+                result = await callWoob(
+                    command,
+                    woobOptions,
+                    sessionManager,
+                    setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
+                );
+
+                assert.ok(result);
+                assert.ok('kind' in result);
+
+                result = { success: result };
+            }
+
+            assert.strictEqual(result.success.kind, 'values');
+            assert.ok('values' in result.success);
         });
     });
 }
