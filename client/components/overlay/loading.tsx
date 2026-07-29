@@ -3,7 +3,7 @@ import { translate as $t } from '../../helpers';
 const LoadingMessage = (props: {
     // Message indicating why we're doing background loading (and the UI is
     // frozen).
-    message?: string;
+    message?: string | React.JSX.Element;
 }) => {
     const message = props.message || $t('client.spinner.generic');
 

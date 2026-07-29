@@ -14,7 +14,8 @@
         "user-action": {
             "title": "On y est presque !",
             "help": "Cette connexion bancaire nécessite une validation supplémentaire ou une information supplémentaire envoyée par SMS ou via une application mobile. Rentrez toutes les informations nécessaires ou validez la connexion, puis cliquez sur continuer.",
-            "code": "Code"
+            "code": "Code",
+            "after-validation": "Après la validation, l'opération continuera automatiquement."
         },
 
         "account-select": {

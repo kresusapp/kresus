@@ -605,6 +605,7 @@ function maybeGetUserAction(dispatch: Dispatch, results: UserActionResponse | { 
                     })
                 );
             });
+
         case 'browser_question':
             assertDefined(results.fields);
 
@@ -620,6 +621,7 @@ function maybeGetUserAction(dispatch: Dispatch, results: UserActionResponse | { 
                     })
                 );
             });
+
         default:
             assert(false, `unknown user action ${results.actionKind}`);
     }
