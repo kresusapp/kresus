@@ -152,72 +152,76 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
 
                 // On click, open the reports view corresponding to the current category.
                 onClick(_event, elements) {
-                    for (const e of elements) {
-                        // e.datasetIndex is the dataset for a given category; we can retrieve the
-                        // categoryId quite easily.
-                        const categoryId = datasets[e.datasetIndex].categoryId;
-
-                        // e.index refers to the selected date.
-                        const clickedDate = moment(dates[e.index][1]);
-                        const firstDayOfClickedMonth = clickedDate.date(1);
-                        const lastDayOfClickedMonth = moment(clickedDate).date(
-                            clickedDate.daysInMonth()
-                        );
-
-                        // We want to compute a min and a max bound according to the following:
-                        // min := max(first day of clicked month, dateRange[0])
-                        // max := min(last day of clicked month, dateRange[1])
-                        let newLeftBound: Moment, newRightBound: Moment;
-                        if (typeof props.dateRange === 'undefined') {
-                            // The bounds are the full month.
-                            newLeftBound = firstDayOfClickedMonth;
-                            newRightBound = lastDayOfClickedMonth;
-                        } else if (typeof props.dateRange[1] === 'undefined') {
-                            // Only a left bound is set; take the later date (max) among the first
-                            // day, or the left bound.
-                            newLeftBound = moment.max(
-                                firstDayOfClickedMonth,
-                                moment(props.dateRange[0])
-                            );
-                            newRightBound = lastDayOfClickedMonth;
-                        } else {
-                            // Both bounds are set; take the later date for the left bound, and the
-                            // sooner date for the right bound.
-                            newLeftBound = moment.max(
-                                firstDayOfClickedMonth,
-                                moment(props.dateRange[0])
-                            );
-                            newRightBound = moment.min(
-                                lastDayOfClickedMonth,
-                                moment(props.dateRange[1])
-                            );
-                        }
-
-                        // Extend the date boundaries as much as possible to avoid bad surprises.
-                        newLeftBound.hours(0).minutes(0).seconds(0);
-                        newRightBound.hours(23).minutes(59).seconds(59);
-
-                        // Make sure the search panel is open, in the reports view.
-                        dispatch(UiStore.toggleSearchDetails(true));
-
-                        const amountLow = props.amountKind === 'positive' ? 0 : undefined;
-                        const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
-
-                        // Set the date, category, and amount fields if needs be.
-                        dispatch(
-                            UiStore.setSearchFields({
-                                dateLow: newLeftBound.toDate(),
-                                dateHigh: newRightBound.toDate(),
-                                categoryIds: [categoryId],
-                                amountLow,
-                                amountHigh,
-                            })
-                        );
-
-                        // Move to the reports view.
-                        navigate(URLs.reports.url(driver));
-                        break;
+                    if (elements.length === 0) {
+                        return;
                     }
+
+                    // Can only click one element at a time.
+                    const e = elements[0];
+
+                    // e.datasetIndex is the dataset for a given category; we can retrieve the
+                    // categoryId quite easily.
+                    const categoryId = datasets[e.datasetIndex].categoryId;
+
+                    // e.index refers to the selected date.
+                    const clickedDate = moment(dates[e.index][1]);
+                    const firstDayOfClickedMonth = clickedDate.date(1);
+                    const lastDayOfClickedMonth = moment(clickedDate).date(
+                        clickedDate.daysInMonth()
+                    );
+
+                    // We want to compute a min and a max bound according to the following:
+                    // min := max(first day of clicked month, dateRange[0])
+                    // max := min(last day of clicked month, dateRange[1])
+                    let newLeftBound: Moment, newRightBound: Moment;
+                    if (typeof props.dateRange === 'undefined') {
+                        // The bounds are the full month.
+                        newLeftBound = firstDayOfClickedMonth;
+                        newRightBound = lastDayOfClickedMonth;
+                    } else if (typeof props.dateRange[1] === 'undefined') {
+                        // Only a left bound is set; take the later date (max) among the first
+                        // day, or the left bound.
+                        newLeftBound = moment.max(
+                            firstDayOfClickedMonth,
+                            moment(props.dateRange[0])
+                        );
+                        newRightBound = lastDayOfClickedMonth;
+                    } else {
+                        // Both bounds are set; take the later date for the left bound, and the
+                        // sooner date for the right bound.
+                        newLeftBound = moment.max(
+                            firstDayOfClickedMonth,
+                            moment(props.dateRange[0])
+                        );
+                        newRightBound = moment.min(
+                            lastDayOfClickedMonth,
+                            moment(props.dateRange[1])
+                        );
+                    }
+
+                    // Extend the date boundaries as much as possible to avoid bad surprises.
+                    newLeftBound.hours(0).minutes(0).seconds(0);
+                    newRightBound.hours(23).minutes(59).seconds(59);
+
+                    // Make sure the search panel is open, in the reports view.
+                    dispatch(UiStore.toggleSearchDetails(true));
+
+                    const amountLow = props.amountKind === 'positive' ? 0 : undefined;
+                    const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
+
+                    // Set the date, category, and amount fields if needs be.
+                    dispatch(
+                        UiStore.setSearchFields({
+                            dateLow: newLeftBound.toDate(),
+                            dateHigh: newRightBound.toDate(),
+                            categoryIds: [categoryId],
+                            amountLow,
+                            amountHigh,
+                        })
+                    );
+
+                    // Move to the reports view.
+                    navigate(URLs.reports.url(driver));
                 },
 
                 plugins: {
