@@ -1,8 +1,9 @@
 import { translate as $t } from '../../helpers';
 
 export const LoadingMessage = (props: {
-    // Message indicating why we're doing background loading.
-    message?: string;
+    // Message indicating why we're doing background loading (and the UI is
+    // frozen).
+    message?: string | React.JSX.Element;
 
     inline?: boolean;
 }) => {
@@ -35,8 +36,9 @@ export const LoadingMessage = (props: {
 LoadingMessage.displayName = 'LoadingMessage';
 
 const LoadingMessageWithTitle = (props: {
-    // Message indicating why we're doing background loading.
-    message?: string;
+    // Message indicating why we're doing background loading (and the UI is
+    // frozen).
+    message?: string | React.JSX.Element;
 }) => {
     const message = props.message || $t('client.spinner.generic');
 

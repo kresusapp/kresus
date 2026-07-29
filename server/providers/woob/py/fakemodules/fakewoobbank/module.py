@@ -253,6 +253,10 @@ class FakeBankModule(Module, CapBank):
         # Throw error from password value or random error
         self.maybe_generate_error(8)
 
+        if self.config.get("resume", Value()).get() is not None:
+            # wait a bit to simulate the user validating the request.
+            time.sleep(3)
+
         accounts = []
 
         first_account = Account()
