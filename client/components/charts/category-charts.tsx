@@ -32,6 +32,7 @@ interface AllPieChartsProps extends BaseChartProps {
     rawSpendingOps: Transaction[];
     netIncomeOps: Transaction[];
     netSpendingOps: Transaction[];
+    dateRange?: [Date] | [Date, Date];
 }
 
 const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
@@ -74,6 +75,8 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 ref={refRawIncome}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
+                dateRange={props.dateRange}
+                amountKind={'positive'}
             />
 
             <PieChartWithHelp
@@ -85,6 +88,8 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 ref={refRawSpendings}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
+                dateRange={props.dateRange}
+                amountKind={'negative'}
             />
 
             <PieChartWithHelp
@@ -96,6 +101,8 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 ref={refNetIncome}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
+                dateRange={props.dateRange}
+                amountKind={'all'}
             />
 
             <PieChartWithHelp
@@ -107,6 +114,8 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 ref={refNetSpendings}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
+                dateRange={props.dateRange}
+                amountKind={'all'}
             />
         </div>
     );
@@ -273,6 +282,8 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
                 ref={refPiecharts}
                 handleLegendClick={handleLegendClick}
                 hiddenCategories={hiddenCategories}
+                dateRange={dateRange}
+                amountKind={amountKind}
             />
         );
     } else {
@@ -311,6 +322,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
                 ref={refPiecharts}
                 handleLegendClick={handleLegendClick}
                 hiddenCategories={hiddenCategories}
+                dateRange={dateRange}
             />
         );
     }

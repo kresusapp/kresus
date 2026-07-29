@@ -34,6 +34,12 @@ export interface TransactionsChartProps extends BaseChartProps {
 
     // A unique chart id that will serve as the container's id.
     chartId: string;
+
+    // What's the selected date range?
+    dateRange?: [Date] | [Date, Date];
+
+    // What's the selected type (only positive, only negative, or both)?
+    amountKind: AmountKindType;
 }
 
 interface BarchartProps extends TransactionsChartProps {
@@ -43,12 +49,6 @@ interface BarchartProps extends TransactionsChartProps {
     // Aspect ratio (width/height). 2 by default. If the width is too small, height will be too and
     // barchart legends can be cropped (and some legend items might be missing).
     aspectRatio?: number;
-
-    // What's the selected date range?
-    dateRange?: [Date] | [Date, Date];
-
-    // What's the selected type (only positive, only negative, or both)?
-    amountKind: AmountKindType;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
