@@ -131,6 +131,9 @@ class FakeBankModule(Module, CapBank):
         Value("secret", label="Valeur top sikrète", required=True, masked=True),
         ValueTransient("code", label="Secret code 2fa"),
         ValueTransient("resume", label="App validation 2fa"),
+        ValueTransient(
+            "fetching_transactions", label="Are we running the transactions command?"
+        ),
     )
     BROWSER = None
 
@@ -181,7 +184,7 @@ class FakeBankModule(Module, CapBank):
 
         raise possible_errors[random.randrange(len(possible_errors))]
 
-    def maybe_generate_error(self, rate):
+    def maybe_generate_error(self, rate, twofa_allowed=True):
         """
         Generate an error according to login and random rate.
 
@@ -195,23 +198,38 @@ class FakeBankModule(Module, CapBank):
         """
         login = self.config["login"].get()
 
+        if twofa_allowed:
+            fetching_transactions = self.config.get(
+                "fetching_transactions", Value()
+            ).get()
+            if fetching_transactions:
+                logger = logging.getLogger()
+                logger.debug("fetching transactions; inhibiting 2fa")
+                twofa_allowed = False
+
         if login == "invalidpassword":
             raise BrowserIncorrectPassword
+
         if login == "actionneeded":
             raise ActionNeeded
+
         if login == "expiredpassword":
             raise BrowserPasswordExpired
+
         if login == "authmethodnotimplemented":
             raise AuthMethodNotImplemented
-        if (
-            login == "appvalidation"
-            and self.config.get("resume", Value()).get() is None
-        ):
-            raise AppValidation("Please confirm login!")
-        if login == "2fa" and self.config.get("code", Value()).get() is None:
-            raise BrowserQuestion(
-                Value("code", label="Please enter some fake 2fa code!")
-            )
+
+        if twofa_allowed:
+            if (
+                login == "appvalidation"
+                and self.config.get("resume", Value()).get() is None
+            ):
+                raise AppValidation("Please confirm login!")
+            if login == "2fa" and self.config.get("code", Value()).get() is None:
+                raise BrowserQuestion(
+                    Value("code", label="Please enter some fake 2fa code!")
+                )
+
         if login not in [
             "noerror",
             "onlytransactionerror",
@@ -450,7 +468,7 @@ class FakeBankModule(Module, CapBank):
 
             def __init__(self, module):
                 # Throw error from password value or random error
-                module.maybe_generate_error(5)
+                module.maybe_generate_error(5, twofa_allowed=False)
 
                 self.module = module
                 self.num_transactions = random.randrange(15)

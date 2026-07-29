@@ -1056,6 +1056,9 @@ def main():
         if options.fromDate:
             params["from_date"] = datetime.fromtimestamp(float(options.fromDate))
 
+        if command == "transactions":
+            params["fetching_transactions"] = True
+
         if options.field is not None:
             for name, value in options.field:
                 if not name:
