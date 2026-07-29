@@ -22,7 +22,13 @@ import CurrencySelect from './currency-select';
 import { Transaction } from '../../models';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import { initializeCharts } from '.';
-import { DriverContext } from '../drivers';
+import { Driver, DriverContext } from '../drivers';
+import moment from 'moment';
+import { useDispatch } from 'react-redux';
+import { NavigateFunction, useNavigate } from 'react-router';
+import { Dispatch } from '@reduxjs/toolkit';
+import * as UiStore from '../../store/ui';
+import URLs from '../../urls';
 
 initializeCharts();
 
@@ -46,6 +52,9 @@ function formatLabelYearly(date: Date) {
 }
 
 function createChartPositiveNegative(
+    dispatch: Dispatch<any>,
+    navigate: NavigateFunction,
+    driver: Driver,
     chartId: string,
     frequency: string,
     transactions: Transaction[],
@@ -185,6 +194,57 @@ function createChartPositiveNegative(
         options: {
             responsive: true,
             maintainAspectRatio: false,
+
+            // Make it clear that the elements can be clicked.
+            onHover: (_evt, elements, thisChart) => {
+                thisChart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            },
+
+            // On click, open the reports view corresponding to the current category.
+            onClick(_e, elements) {
+                if (elements.length === 0) {
+                    return;
+                }
+
+                // Can click only one element at a time.
+                const e = elements[0];
+
+                const amountLow = e.datasetIndex === POS ? 0 : undefined;
+                const amountHigh = e.datasetIndex === NEG ? 0 : undefined;
+
+                // e.index is the index in the date set. Reconstruct a date from it.
+                const dateLow = moment(ascTicks[e.index]);
+                let dateHigh;
+                if (frequency === 'monthly') {
+                    dateLow.date(1);
+                    dateHigh = moment(dateLow).date(dateLow.daysInMonth());
+                } else if (frequency === 'yearly') {
+                    dateLow.month(0).date(1);
+                    dateHigh = moment(dateLow).month(11).date(31);
+                } else {
+                    assert(false, 'unexpected frequency');
+                }
+
+                // Extend the date boundaries as much as possible to avoid bad surprises.
+                dateLow.hours(0).minutes(0).seconds(0);
+                dateHigh.hours(23).minutes(59).seconds(59);
+
+                // Make sure the search panel is open, in the reports view.
+                dispatch(UiStore.toggleSearchDetails(true));
+
+                // Set the date and amount fields if needs be.
+                dispatch(
+                    UiStore.setSearchFields({
+                        dateLow: dateLow.toDate(),
+                        dateHigh: dateHigh.toDate(),
+                        amountLow,
+                        amountHigh,
+                    })
+                );
+
+                // Move to the reports view.
+                navigate(URLs.reports.url(driver));
+            },
         },
     });
 }
@@ -204,15 +264,22 @@ const BarChart = (
 ) => {
     const container = useRef<Chart | null>(null);
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const driver = useContext(DriverContext);
+
     const redraw = useCallback(() => {
         container.current = createChartPositiveNegative(
+            dispatch,
+            navigate,
+            driver,
             props.chartId,
             props.frequency,
             props.transactions,
             props.fromDate,
             props.toDate
         );
-    }, [props]);
+    }, [props, dispatch, navigate, driver]);
 
     useEffect(() => {
         redraw();
