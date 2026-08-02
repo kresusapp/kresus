@@ -1,20 +1,7 @@
 import { useCallback, useRef } from 'react';
 
-import RcColorPicker from 'rc-color-picker';
-
-import 'rc-color-picker/assets/index.css';
 import './color-picker.css';
 import { assert } from '../../helpers';
-
-const supportsColorInput = (() => {
-    if (typeof document === 'undefined') {
-        // Testing support!
-        return false;
-    }
-    const input = document.createElement('input');
-    input.setAttribute('type', 'color');
-    return input.type === 'color';
-})();
 
 const ColorPicker = (props: {
     // Callback getting the new color whenever the selected one changes.
@@ -32,6 +19,7 @@ const ColorPicker = (props: {
         if (timer.current) {
             window.clearTimeout(timer.current);
         }
+        // Debounce (250ms).
         timer.current = window.setTimeout(() => {
             timer.current = null;
             assert(ref.current !== null, 'ref input must be mounted');
@@ -41,47 +29,14 @@ const ColorPicker = (props: {
         }, 250);
     }, [propsOnChange]);
 
-    const rcColorPickerOnChange = useCallback(
-        (rcColorPickerValue: { color: string }) => {
-            if (timer.current) {
-                window.clearTimeout(timer.current);
-            }
-            timer.current = window.setTimeout(() => {
-                timer.current = null;
-                if (propsOnChange) {
-                    propsOnChange(rcColorPickerValue.color);
-                }
-            }, 250);
-        },
-        [propsOnChange]
-    );
-
-    const childProps = {
-        className: 'color-picker',
-        ref,
-    };
-
-    if (supportsColorInput) {
-        // Input color field.
-        return (
-            <input
-                onChange={inputOnChange}
-                type="color"
-                defaultValue={props.defaultValue}
-                {...childProps}
-            />
-        );
-    }
-
-    // Fallback on react color picker.
-    childProps.className += ' form-element-block';
+    // Native input color field.
     return (
-        <RcColorPicker
-            onChange={rcColorPickerOnChange}
-            defaultColor={props.defaultValue}
-            placement="topLeft"
-            animation="slide-up"
-            {...childProps}
+        <input
+            onChange={inputOnChange}
+            type="color"
+            defaultValue={props.defaultValue}
+            className="color-picker"
+            ref={ref}
         />
     );
 };
