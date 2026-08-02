@@ -6,12 +6,3 @@ input.color-picker {
 .color-picker {
     height: 34px;
 }
-
-.color-picker .rc-color-picker-trigger {
-    width: 100%;
-    height: 100%;
-}
-
-.color-picker .rc-color-picker-panel-inner {
-    background-color: #FFF;
-}
