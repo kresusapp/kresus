@@ -565,6 +565,9 @@ class Connector:
                 )
                 return results, errors
 
+            # Force an iterator, as some woob modules don't return one.
+            accounts_iter = iter(accounts_iter)
+
             while True:
                 try:
                     account = next(accounts_iter)
