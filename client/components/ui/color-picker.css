@@ -3,6 +3,17 @@ input.color-picker {
     padding: 0;
 }
 
-.color-picker {
-    height: 34px;
+/* Chrome adds a padding inside the color input. Remove it to match Firefox cleaner UI */
+input.color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input.color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
+input.color-picker::-moz-color-swatch {
+    border: none;
+    border-radius: 3px;
 }
