@@ -12,7 +12,7 @@ import * as RulesStore from '../../store/rules';
 import { Category, Rule } from '../../models';
 
 import './rules.css';
-import { LoadingMessage } from '../overlay';
+import { LoadingMessage } from '../overlay/loading';
 
 const SharedForm = (props: {
     formTitle: string;
@@ -428,7 +428,7 @@ export default () => {
     );
 
     if (firstLoad) {
-        return <LoadingMessage message={$t('client.rules.loading_rules')} />;
+        return <LoadingMessage message={$t('client.rules.loading_rules')} inline={true} />;
     }
 
     return (
