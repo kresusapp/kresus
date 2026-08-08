@@ -5,9 +5,7 @@ import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
-import URL from '../../urls';
-import { type Driver, DriverContext, DriverType } from '../drivers';
-import { findRedundantPairs } from '../duplicates';
+import { findRedundantPairs } from '../duplicates/pairs';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
 

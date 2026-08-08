@@ -3,8 +3,11 @@ import { translate as $t, displayLabel, formatDate } from '../../helpers';
 import type { Transaction } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import * as CategoriesStore from '../../store/categories';
+import * as DuplicatesStore from '../../store/duplicates';
+import { translate as $t, formatDate, displayLabel } from '../../helpers';
 import { Popconfirm } from '../ui';
+import { useGenericError } from '../../hooks';
+import { Transaction } from '../../models';
 
 const TransactionLine = (props: {
     label: string;
@@ -56,8 +59,11 @@ const DuplicatePair = (props: {
     formatCurrency: (val: number) => string;
     toKeep: Transaction;
     toRemove: Transaction;
+    // When set, the pair is one the user chose to ignore: it can only be un-ignored.
+    ignored?: boolean;
 }) => {
     let { toKeep, toRemove } = props;
+    const { ignored = false } = props;
 
     // The transaction to keep should usually be the one that's the most
     // recent.
@@ -82,6 +88,30 @@ const DuplicatePair = (props: {
         }
     }, [dispatch, toKeep, toRemove]);
 
+    const ignoreCb = useGenericError(
+        useCallback(async () => {
+            await dispatch(
+                DuplicatesStore.ignoreDuplicate({
+                    accountId: toKeep.accountId,
+                    transactionId: toKeep.id,
+                    otherTransactionId: toRemove.id,
+                })
+            ).unwrap();
+        }, [dispatch, toKeep, toRemove])
+    );
+
+    const unignoreCb = useGenericError(
+        useCallback(async () => {
+            await dispatch(
+                DuplicatesStore.unignoreDuplicate({
+                    accountId: toKeep.accountId,
+                    transactionId: toKeep.id,
+                    otherTransactionId: toRemove.id,
+                })
+            ).unwrap();
+        }, [dispatch, toKeep, toRemove])
+    );
+
     const key = `dpair-${toKeep.id}-${toRemove.id}`;
 
     return (
@@ -94,7 +124,7 @@ const DuplicatePair = (props: {
                 importDate={toKeep.importDate}
                 categoryLabel={toKeepCategory.label}
                 type={toKeep.type}
-                deletionInfo={$t('client.similarity.will_be_kept')}
+                deletionInfo={ignored ? '' : $t('client.similarity.will_be_kept')}
             />
 
             <TransactionLine
@@ -105,7 +135,7 @@ const DuplicatePair = (props: {
                 importDate={toRemove.importDate}
                 categoryLabel={toRemoveCategory.label}
                 type={toRemove.type}
-                deletionInfo={$t('client.similarity.will_be_removed')}
+                deletionInfo={ignored ? '' : $t('client.similarity.will_be_removed')}
             />
 
             <div className="toolbar">
@@ -114,19 +144,35 @@ const DuplicatePair = (props: {
                     {props.formatCurrency(toKeep.amount)}
                 </span>
 
-                <Popconfirm
-                    trigger={
-                        <button className="btn primary">
-                            <span className="fa fa-compress" aria-hidden="true" />
-                            <span className="merge-title">{$t('client.similarity.merge')}</span>
+                {ignored ? (
+                    <button className="btn primary" onClick={unignoreCb}>
+                        <span className="fa fa-eye" aria-hidden="true" />
+                        <span>{$t('client.similarity.unignore')}</span>
+                    </button>
+                ) : (
+                    <>
+                        <button className="btn" onClick={ignoreCb}>
+                            <span className="fa fa-eye-slash" aria-hidden="true" />
+                            <span>{$t('client.similarity.ignore')}</span>
                         </button>
-                    }
-                    onConfirm={mergeTransactionsCb}
-                    confirmText={$t('client.similarity.merge')}
-                    confirmClass="warning"
-                >
-                    <p>{$t('client.similarity.confirm')}</p>
-                </Popconfirm>
+
+                        <Popconfirm
+                            trigger={
+                                <button className="btn primary">
+                                    <span className="fa fa-compress" aria-hidden="true" />
+                                    <span className="merge-title">
+                                        {$t('client.similarity.merge')}
+                                    </span>
+                                </button>
+                            }
+                            onConfirm={mergeTransactionsCb}
+                            confirmText={$t('client.similarity.merge')}
+                            confirmClass="warning"
+                        >
+                            <p>{$t('client.similarity.confirm')}</p>
+                        </Popconfirm>
+                    </>
+                )}
             </div>
         </div>
     );

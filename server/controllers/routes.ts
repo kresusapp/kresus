@@ -236,6 +236,11 @@ const routes: RoutesDescriptor = {
     duplicates: {
         get: duplicates.getDuplicates,
     },
+    'duplicates/ignored': {
+        get: duplicates.getIgnoredDuplicates,
+        post: duplicates.ignoreDuplicate,
+        delete: duplicates.unignoreDuplicate,
+    },
 };
 
 const exportedRoutes: { [endpoint: string]: RouteObject<any> } = {};

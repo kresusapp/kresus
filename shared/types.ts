@@ -47,11 +47,16 @@ export type TransactionRuleConditionType =
     | 'amount_equals';
 export type TransactionRuleActionType = 'categorize';
 
+export type DuplicatesByAccount = Array<{
+    accountId: number;
+    duplicates: Array<[number, number]>;
+}>;
+
 export type Duplicates = {
-    new: Array<{
-        accountId: number;
-        duplicates: Array<[number, number]>;
-    }>;
+    // Pairs detected by the duplicates algorithm, minus the ones the user chose to ignore.
+    new: DuplicatesByAccount;
+    // Pairs the user explicitly marked as not being duplicates.
+    ignored: DuplicatesByAccount;
 };
 
 export type BankVendor = {

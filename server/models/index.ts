@@ -24,6 +24,7 @@ import TransactionRuleCondition from './entities/transaction-rule-condition';
 import Transaction from './entities/transactions';
 import User from './entities/users';
 import View from './entities/views';
+import DuplicatesIgnored from './entities/duplicates-ignored';
 
 type MinimalTransaction = Partial<Transaction> &
     Pick<Transaction, 'date' | 'importDate' | 'amount' | 'rawLabel'>;
@@ -45,6 +46,7 @@ export {
     TransactionRuleCondition,
     User,
     View,
+    DuplicatesIgnored,
 };
 
 const log = makeLogger('models/index');
