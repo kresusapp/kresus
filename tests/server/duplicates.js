@@ -193,4 +193,23 @@ describe('findRedundantPairs', () => {
         assert.deepStrictEqual(pairs[1].sort(), [3, 4]);
         assert.deepStrictEqual(pairs[2].sort(), [1, 2]);
     });
+
+    it('should discard the pairs to ignore, whatever the order of the two ids', () => {
+        // Same date, distinct import dates: the three transactions are duplicates of each other.
+        const transactions = [
+            { ...BaseTransaction, id: 1 },
+            { ...BaseTransaction, id: 2, importDate: new Date('2026-06-01') },
+            { ...BaseTransaction, id: 3, importDate: new Date('2026-06-05') },
+        ];
+
+        assert.strictEqual(findRedundantPairs(transactions, 24, false).length, 3);
+
+        const pairs = findRedundantPairs(transactions, 24, false, [
+            [1, 2],
+            [3, 1],
+        ]);
+
+        assert.strictEqual(pairs.length, 1);
+        assert.deepStrictEqual(pairs[0].sort(), [2, 3]);
+    });
 });

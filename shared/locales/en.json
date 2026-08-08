@@ -593,7 +593,13 @@
             "lax_level_desc": "When enabled, the automatic duplicate detection algorithm will be more permissive. In particular it will reuse the user's duplicate time threshold instead of forbidding any date gap.",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
-            "will_be_removed": "This transaction will be removed."
+            "will_be_removed": "This transaction will be removed.",
+            "ignore": "Ignore",
+            "unignore": "Stop ignoring",
+            "show_ignored_duplicates": "Show the ignored pairs",
+            "back_to_duplicates": "Back to the detected duplicates",
+            "ignored_duplicates_desc": "These pairs of transactions have been marked as not being duplicates, so they are not listed with the detected duplicates anymore. You can stop ignoring them at any time.",
+            "no_ignored_duplicates": "No ignored pairs of transactions."
         },
         "about": {
             "title": "About",

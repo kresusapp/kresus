@@ -484,3 +484,20 @@ export function deleteView(viewId: number) {
 export function fetchDuplicates() {
     return new Request('api/duplicates').run();
 }
+
+export function ignoreDuplicate(transactionId: number, otherTransactionId: number) {
+    return new Request('api/duplicates/ignored')
+        .post()
+        .json({ transactionId, otherTransactionId })
+        .run();
+}
+
+export function unignoreDuplicate(
+    transactionId: number,
+    otherTransactionId: number
+): Promise<{ isDuplicate: boolean }> {
+    return new Request('api/duplicates/ignored')
+        .delete()
+        .json({ transactionId, otherTransactionId })
+        .run();
+}

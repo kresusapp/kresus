@@ -147,13 +147,16 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
             now.getMonth(),
             now.getFullYear()
         );
+
+        // Ignored duplicates should be returned too but we remove the transactions ids
+        // on export so we have no way on import to re-import them…
     } else {
         ret.bankVendors = getBankVendors();
 
         ret.instance = await getAllInstanceProperties();
 
-        // Note: the duplicates are lazy-loaded (through the /duplicates endpoint) on therefore not
-        // part of this payload.
+        // Note: the duplicates (detected and ignored ones) are lazy-loaded through the
+        // /duplicates endpoint and therefore not part of this payload.
 
         const user = await User.find(userId);
         if (user) {

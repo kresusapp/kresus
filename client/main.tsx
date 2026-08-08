@@ -185,7 +185,7 @@ const View = () => {
                 }
             />
             <Route
-                path="duplicates"
+                path="duplicates/*"
                 element={
                     <RedirectIfUnknownAccount>
                         <DuplicatesList />

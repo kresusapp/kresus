@@ -29,6 +29,13 @@ const URLs = {
         },
     },
 
+    duplicatesIgnored: {
+        pattern: '/view/:driver/:value/duplicates/ignored',
+        url(driver: Driver) {
+            return `/view/${driver.type}/${driver.value}/duplicates/ignored`;
+        },
+    },
+
     reports: {
         pattern: '/view/:driver/:value/reports',
         url(driver: Driver) {

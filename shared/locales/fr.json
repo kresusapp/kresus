@@ -589,7 +589,13 @@
             "lax_level_desc": "Lorsque cette option est activée, l'algorithme de détection automatique des doublons sera plus permissif. En particulier il réutilisera le seuil utilisateur temporel au lieu de ne permettre aucun écart de date.",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
-            "will_be_removed": "Cette opération sera supprimée."
+            "will_be_removed": "Cette opération sera supprimée.",
+            "ignore": "Ignorer",
+            "unignore": "Ne plus ignorer",
+            "show_ignored_duplicates": "Afficher les paires ignorées",
+            "back_to_duplicates": "Retour aux doublons détectés",
+            "ignored_duplicates_desc": "Ces paires d'opérations ont été marquées comme n'étant pas des doublons, elles n'apparaissent donc plus parmi les doublons détectés. Vous pouvez à tout moment ne plus les ignorer.",
+            "no_ignored_duplicates": "Aucune paire d'opérations ignorée."
         },
         "about": {
             "title": "À propos",
