@@ -18,7 +18,7 @@ import { useGenericError } from '../../hooks';
 
 import DiscoveryMessage from '../ui/discovery-message';
 import MergeAll from './merge-all';
-import { LoadingMessage } from '../overlay';
+import { LoadingMessage } from '../overlay/loading';
 
 export function findRedundantPairs(state: GlobalState, accountId: number) {
     const accountDuplicates = DuplicatesStore.byAccountId(state.duplicates, accountId);
@@ -98,7 +98,9 @@ const Duplicates = () => {
     let sim;
     if (!isLoaded) {
         // Duplicates are lazy-loaded to speed-up the initial /all request.
-        sim = <LoadingMessage message={$t('client.similarity.loading_duplicates')} />;
+        sim = (
+            <LoadingMessage message={$t('client.similarity.loading_duplicates')} inline={true} />
+        );
     } else if (pairsByAccount.size === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
     } else {
