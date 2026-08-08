@@ -1,3 +1,17 @@
+.loading-message-base.inline {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1em;
+  margin: 1em 0;
+  align-items: center;
+}
+
+.loading-message-base.inline svg {
+    width: 2em;
+    height: 2em;
+    margin: 0;
+}
+
 #content-overlay {
     z-index: 2000;
     position: fixed;

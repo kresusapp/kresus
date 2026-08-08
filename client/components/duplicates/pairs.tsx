@@ -8,7 +8,7 @@ import * as DuplicatesStore from '../../store/duplicates';
 
 import { Driver, DriverContext } from '../drivers';
 import { Transaction } from '../../models';
-import { LoadingMessage } from '../overlay';
+import { LoadingMessage } from '../overlay/loading';
 
 import Pair from './item';
 
@@ -65,7 +65,9 @@ const PairsList = (props: {
 
     if (!isLoaded) {
         // Duplicates are lazy-loaded to speed-up the initial /all request.
-        return <LoadingMessage message={$t('client.similarity.loading_duplicates')} />;
+        return (
+            <LoadingMessage message={$t('client.similarity.loading_duplicates')} inline={true} />
+        );
     }
 
     if (pairsByAccount.size === 0) {
