@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import * as backend from './backend';
 import { mergeTransactions, deleteTransaction, deleteAccount } from './banks';
+import { enableDemo, importInstance } from './global';
 
 import { assertDefined } from '../helpers';
 
@@ -9,6 +10,10 @@ import type { Duplicates } from '../../shared/types';
 
 export interface DuplicatesState {
     items: Duplicates['new'];
+
+    // Duplicates are lazy-loaded to speed-up the initial /all request: we need to track whether
+    // they are loaded yet.
+    isLoaded: boolean;
 }
 
 export const updateDuplicatesList = createAsyncThunk('duplicates/list', async () => {
@@ -24,29 +29,26 @@ function removePairsWithTransaction(state: DuplicatesState, transactionId: numbe
     }
 }
 
-// Initial state for the duplicates store.
-function makeInitialState(duplicates: Duplicates): DuplicatesState {
-    return {
-        items: duplicates.new,
-    };
-}
+const initialState: DuplicatesState = {
+    items: [],
+    isLoaded: false,
+};
 
 const duplicatesSlice = createSlice({
     name: 'duplicates',
-    initialState: makeInitialState({ new: [] }),
-    reducers: {
-        reset(_state, action) {
-            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
-            // Returning a value here will overwrite the state.
-            return makeInitialState(action.payload);
-        },
-    },
+    initialState,
+    reducers: {},
     extraReducers: builder => {
         builder
             .addCase(updateDuplicatesList.fulfilled, (state, action) => {
-                const newDuplicates = action.payload.new;
-                state.items = newDuplicates;
+                state.items = action.payload.new;
+                state.isLoaded = true;
             })
+            // After an import or a demo mode toggle, the known pairs refer to transactions which
+            // don't exist anymore: forget them and wait for the new ones, which the duplicates
+            // middleware is fetching.
+            .addCase(importInstance.fulfilled, () => initialState)
+            .addCase(enableDemo.fulfilled, () => initialState)
             .addCase(deleteTransaction.fulfilled, (state, action) => {
                 const deleted = action.payload;
                 assertDefined(deleted);
@@ -76,4 +78,8 @@ export const reducer = duplicatesSlice.reducer;
 export function byAccountId(state: DuplicatesState, accountId: number): Duplicates['new'] {
     const accountDuplicates = state.items.filter(itm => itm.accountId === accountId);
     return accountDuplicates ? accountDuplicates : [];
+}
+
+export function isLoaded(state: DuplicatesState): boolean {
+    return state.isLoaded;
 }

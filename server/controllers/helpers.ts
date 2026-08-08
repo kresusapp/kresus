@@ -23,7 +23,7 @@ import {
 
 import { conditionTypesList } from './rules';
 
-import type { BankVendor, Duplicates } from '../../shared/types';
+import type { BankVendor } from '../../shared/types';
 
 const log = makeLogger('controllers/helpers');
 
@@ -58,7 +58,6 @@ export type AllData = {
     views: View[];
     // For non exports only.
     user?: User;
-    duplicates?: Duplicates;
     bankVendors: BankVendor[];
 };
 

@@ -24,6 +24,8 @@ import * as GlobalStore from './global';
 // Any store that is subject to reset after these actions should be added to the list below or
 // implement a reducer for these actions directly.
 // This is meant for "stores" created as redux-toolkit slices. For legacy reducers see augmentReducer.
+// Note: since duplicates are lazy-loaded (not part of the global state), they are not reset on
+// import: they will be fetched on reset below.
 const storesToReset = [
     CategoryStore,
     BudgetStore,
@@ -33,7 +35,6 @@ const storesToReset = [
     RulesStore,
     InstanceStore,
     ViewStore,
-    DuplicatesStore,
 ];
 
 export const resetGlobalState = createAction<any>('global/reset');
@@ -57,9 +58,13 @@ resetStateMiddleware.startListening({
 
 // Duplicates are affected by transaction creation/deletion/update, as well as settings update, as
 // well as transactions sync, so we listen to these actions to update the duplicates list.
+// Also, since they are lazy-loaded, a reset/import/demo enablement triggers a new fetch.
 const duplicatesMiddleware = createListenerMiddleware();
 duplicatesMiddleware.startListening({
     matcher: isAnyOf(
+        resetGlobalState,
+        GlobalStore.importInstance.fulfilled,
+        GlobalStore.enableDemo.fulfilled,
         BankStore.createTransaction.fulfilled,
         BankStore.setTransactionCategory.fulfilled,
         BankStore.setTransactionType.fulfilled,

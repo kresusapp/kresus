@@ -18,6 +18,7 @@ import { useGenericError } from '../../hooks';
 
 import DiscoveryMessage from '../ui/discovery-message';
 import MergeAll from './merge-all';
+import { LoadingMessage } from '../overlay';
 
 export function findRedundantPairs(state: GlobalState, accountId: number) {
     const accountDuplicates = DuplicatesStore.byAccountId(state.duplicates, accountId);
@@ -58,6 +59,8 @@ const Duplicates = () => {
     const allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
     const allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
+    const isLoaded = useKresusState(state => DuplicatesStore.isLoaded(state.duplicates));
+
     const pairsByAccount = useKresusState(state => {
         const mapping = new Map<string, ReturnType<typeof findRedundantPairs>>();
         const accounts = driver.getAccounts(state);
@@ -93,7 +96,10 @@ const Duplicates = () => {
     const duplicateThresholdInDays = duplicateThreshold / 24;
 
     let sim;
-    if (pairsByAccount.size === 0) {
+    if (!isLoaded) {
+        // Duplicates are lazy-loaded to speed-up the initial /all request.
+        sim = <LoadingMessage message={$t('client.similarity.loading_duplicates')} />;
+    } else if (pairsByAccount.size === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
     } else {
         sim = [];

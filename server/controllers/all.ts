@@ -38,7 +38,6 @@ import DefaultSettings from '../shared/default-settings';
 import {
     DEFAULT_ACCOUNT_ID,
     DEMO_MODE,
-    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_LAX_MODE,
     DUPLICATE_THRESHOLD,
 } from '../../shared/settings';
@@ -49,7 +48,6 @@ import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
 import diffAccount from '../lib/diff-accounts';
 import diffTransactions from '../lib/diff-transactions';
-import { findRedundantPairs } from '../lib/duplicates-manager';
 
 const log = makeLogger('controllers/all');
 
@@ -154,56 +152,8 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
 
         ret.instance = await getAllInstanceProperties();
 
-        // Find duplicates.
-        // First, map transactions to accounts
-        const accountTransactionsMap = new Map<number, Transaction[]>();
-        for (const tr of ret.transactions) {
-            if (!accountTransactionsMap.has(tr.accountId)) {
-                accountTransactionsMap.set(tr.accountId, [tr]);
-            } else {
-                accountTransactionsMap.get(tr.accountId)?.push(tr);
-            }
-        }
-
-        const duplicateThresholdSetting = ret.settings.find(s => s.key === DUPLICATE_THRESHOLD);
-        const ignoreDuplicatesWithDifferentCustomFieldsSetting = ret.settings.find(
-            s => s.key === DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
-        );
-
-        const ignoreDuplicatesWithDifferentCustomFieldsSettingValue =
-            ignoreDuplicatesWithDifferentCustomFieldsSetting
-                ? ignoreDuplicatesWithDifferentCustomFieldsSetting.value
-                : unwrap(DefaultSettings.get(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS));
-
-        const threshold = Number.parseInt(
-            duplicateThresholdSetting
-                ? duplicateThresholdSetting.value
-                : unwrap(DefaultSettings.get(DUPLICATE_THRESHOLD)),
-            10
-        );
-        const ignoreDuplicatesWithDifferentCustomFields =
-            ignoreDuplicatesWithDifferentCustomFieldsSettingValue === 'true';
-
-        const newDuplicates: NonNullable<AllData['duplicates']>['new'] = [];
-
-        for (const [accountId, transactions] of accountTransactionsMap.entries()) {
-            const duplicates = findRedundantPairs(
-                transactions,
-                threshold,
-                ignoreDuplicatesWithDifferentCustomFields
-            );
-
-            if (duplicates.length > 0) {
-                newDuplicates.push({
-                    accountId,
-                    duplicates,
-                });
-            }
-        }
-
-        ret.duplicates = {
-            new: newDuplicates,
-        };
+        // Note: the duplicates are lazy-loaded (through the /duplicates endpoint) on therefore not
+        // part of this payload.
 
         const user = await User.find(userId);
         if (user) {
