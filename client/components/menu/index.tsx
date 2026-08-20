@@ -6,6 +6,7 @@ import URL from '../../urls';
 import { Driver, DriverType, DriverContext } from '../drivers';
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
+import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
@@ -56,6 +57,8 @@ Entry.displayName = 'Entry';
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
 
+    const areDuplicatesLoaded = useKresusState(state => DuplicatesStore.isLoaded(state.duplicates));
+
     const numDuplicates = useKresusState(state => {
         if (driver.type === DriverType.None) {
             return 0;
@@ -67,6 +70,13 @@ const AccountSubMenu = (props: { driver: Driver }) => {
 
     if (driver.type === DriverType.None) {
         return null;
+    }
+
+    let duplicatesBadge = null;
+    if (!areDuplicatesLoaded) {
+        duplicatesBadge = <span className="badge fa fa-hourglass" />;
+    } else if (numDuplicates > 0) {
+        duplicatesBadge = <span className="badge">{numDuplicates}</span>;
     }
 
     return (
@@ -87,9 +97,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
 
             <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
                 <span>{$t('client.menu.duplicates')}</span>
-                <DisplayIf condition={numDuplicates > 0}>
-                    <span className="badge">{numDuplicates}</span>
-                </DisplayIf>
+                {duplicatesBadge}
             </Entry>
         </ul>
     );

@@ -98,9 +98,7 @@ const Duplicates = () => {
     let sim;
     if (!isLoaded) {
         // Duplicates are lazy-loaded to speed-up the initial /all request.
-        sim = (
-            <LoadingMessage message={$t('client.similarity.loading_duplicates')} inline={true} />
-        );
+        sim = <LoadingMessage message={$t('client.similarity.loading_duplicates')} inline={true} />;
     } else if (pairsByAccount.size === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
     } else {
