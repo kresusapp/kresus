@@ -2,9 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import * as backend from './backend';
 import { mergeTransactions, deleteTransaction, deleteAccount } from './banks';
+import { setPair as setSetting } from './settings';
 import { enableDemo, importInstance } from './global';
 
 import { assertDefined } from '../helpers';
+
+import { DUPLICATE_THRESHOLD } from '../../shared/settings';
 
 import type { Duplicates } from '../../shared/types';
 
@@ -67,6 +70,14 @@ const duplicatesSlice = createSlice({
             .addCase(deleteAccount.fulfilled, (state, action) => {
                 const accountId = action.payload;
                 state.items = state.items.filter(item => item.accountId !== accountId);
+            })
+            .addCase(setSetting.pending, (state, action) => {
+                // When the threshold setting is modified, enable the loading state. If will
+                // automatically be reset to false within the duplicatesMiddleware listening on SettingsStore.setPair.fulfilled.
+                const settingKey = action?.meta.arg.key || '';
+                if (settingKey.startsWith('duplicate')) {
+                    state.isLoaded = false;
+                }
             });
     },
 });
