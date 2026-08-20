@@ -22,6 +22,8 @@ import type {
 import DefaultSettings from '../shared/default-settings';
 import { conditionTypesList } from './rules';
 
+import type { BankVendor, DuplicatesPairs } from '../../shared/types';
+
 const log = makeLogger('controllers/helpers');
 
 export type Remapping = { [key: number]: number };
@@ -56,6 +58,10 @@ export type AllData = {
     // For non exports only.
     user?: User;
     bankVendors: BankVendor[];
+
+    duplicates?: {
+        ignored: DuplicatesPairs;
+    };
 };
 
 // Sync function
@@ -153,8 +159,6 @@ export function cleanData(world: AllData) {
 
         o.accountId = accountMap[o.accountId];
 
-        // Strip away id.
-        delete (o as any).id;
         delete (o as any).userId;
     }
 

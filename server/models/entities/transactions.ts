@@ -158,8 +158,12 @@ export default class Transaction {
         return await Transaction.repo().save(entity);
     }
 
-    // Note: doesn't return the inserted entities.
-    static async bulkCreate(userId: number, transactions: Partial<Transaction>[]): Promise<void> {
+    // Note: doesn't return the inserted entities, only their ids, in the same order as the
+    // transactions which were passed as arguments.
+    static async bulkCreate(
+        userId: number,
+        transactions: Partial<Transaction>[]
+    ): Promise<Transaction['id'][]> {
         const fullTransactions = transactions.map(tr => {
             return { ...tr, userId };
         });

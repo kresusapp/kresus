@@ -124,17 +124,20 @@ export function isSqlite(connection: DataSource): boolean {
     return dbType === 'better-sqlite3';
 }
 
-// Note: doesn't return the inserted entities.
+// Note: doesn't return the inserted entities, only their ids, in the same order as the entities
+// which were passed as arguments.
 export async function bulkInsert<T extends ObjectLiteral>(
     repository: Repository<T>,
     entities: Extract<Parameters<Repository<T>['insert']>[0], Array<any>>
-): Promise<void> {
+): Promise<number[]> {
     // Do not call `repository.insert` without actual entities, that will generate an empty insert
     // query and throw an error.
     // See https://github.com/typeorm/typeorm/issues/3111
     if (entities.length === 0) {
-        return;
+        return [];
     }
+
+    const insertedIds: number[] = [];
 
     let remaining = entities;
     let batchSize = NUM_ENTITIES_IN_BATCH;
@@ -145,9 +148,12 @@ export async function bulkInsert<T extends ObjectLiteral>(
     log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
     while (remaining.length > 0) {
         const nextRemaining = remaining.splice(batchSize);
-        await repository.insert(remaining);
+        const result = await repository.insert(remaining);
+        insertedIds.push(...result.identifiers.map(identifier => identifier.id));
         remaining = nextRemaining;
     }
+
+    return insertedIds;
 }
 
 export async function bulkDelete<T extends ObjectLiteral>(

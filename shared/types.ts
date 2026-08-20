@@ -47,9 +47,11 @@ export type TransactionRuleConditionType =
     | 'amount_equals';
 export type TransactionRuleActionType = 'categorize';
 
+export type DuplicatesPairs = Array<[number, number]>;
+
 export type DuplicatesByAccount = Array<{
     accountId: number;
-    duplicates: Array<[number, number]>;
+    duplicates: DuplicatesPairs;
 }>;
 
 export type Duplicates = {

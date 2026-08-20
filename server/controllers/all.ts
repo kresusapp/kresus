@@ -1,5 +1,40 @@
 import crypto from 'crypto';
-import type express from 'express';
+
+import {
+    Access,
+    Account,
+    Alert,
+    Budget,
+    Category,
+    RecurringTransaction,
+    Setting,
+    MinimalTransaction,
+    Transaction,
+    TransactionRule,
+    AppliedRecurringTransaction,
+    View,
+    User,
+    DuplicatesIgnored,
+} from '../models';
+
+import runDataMigrations from '../models/data-migrations';
+
+import {
+    assert,
+    makeLogger,
+    isEmailEnabled,
+    KError,
+    asyncErr,
+    getErrorCode,
+    UNKNOWN_TRANSACTION_TYPE,
+    isAppriseApiEnabled,
+    unwrap,
+} from '../helpers';
+
+import { bankVendorByUuid, getBankVendors } from '../providers';
+import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
+import { validatePassword } from '../shared/helpers';
+import DefaultSettings from '../shared/default-settings';
 import {
     DEFAULT_ACCOUNT_ID,
     DEMO_MODE,
@@ -43,6 +78,8 @@ import { type AllData, type ClientAccess, cleanData, type Remapping } from './he
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import type { IdentifiedRequest } from './routes';
+
+import type { DuplicatesPairs } from '../shared/types';
 
 const log = makeLogger('controllers/all');
 
@@ -143,8 +180,14 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
             now.getFullYear()
         );
 
-        // Ignored duplicates should be returned too but we remove the transactions ids
-        // on export so we have no way on import to re-import them…
+        const ignoredDuplicatesPairs = (await DuplicatesIgnored.all(userId)).map(pair => [
+            pair.transactionId,
+            pair.otherTransactionId,
+        ]) satisfies DuplicatesPairs;
+
+        ret.duplicates = {
+            ignored: ignoredDuplicatesPairs,
+        };
     } else {
         ret.bankVendors = getBankVendors();
 
@@ -365,6 +408,9 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     // importing Kresus data in an older version of kresus.
     world.settings = world.settings.filter((s: any) => DefaultSettings.has(s.key)) || [];
 
+    // Exports made before the ignored duplicates were exported don't have a `duplicates` object.
+    world.ignoredDuplicates = world.duplicates?.ignored || [];
+
     log.info(`Importing:
         accesses:          ${world.accesses.length}
         accounts:          ${world.accounts.length}
@@ -377,7 +423,8 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
-        views:           ${world.views.length}
+        views:           ${world.views.length},
+        ignoredDuplicates ${world.ignoredDuplicates.length}
     `);
 
     log.info('Import accesses...');
@@ -794,6 +841,13 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     }
     const newByAccountId: Map<number, MinimalTransaction[]> = new Map();
 
+    // Maps the transaction ids as they were in the imported data to the ids they were given when
+    // inserted in database. Since the transactions are inserted per account, and only some of them
+    // are actually inserted, the previous id is kept on the transaction object itself rather than
+    // in a list, so it can't be mismatched.
+    const transactionIdsMap: Remapping = {};
+    const previousTransactionIds: Map<MinimalTransaction, number> = new Map();
+
     for (let i = 0; i < world.transactions.length; i++) {
         const tr = world.transactions[i];
 
@@ -872,9 +926,17 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             tr.isUserDefinedType = true;
         }
 
+        // Now that we are sure the transaction is to be imported (we are past all `continue`),
+        // store the id.
+        if (typeof tr.id === 'number') {
+            previousTransactionIds.set(tr, tr.id);
+        }
+
         // Remove contents of deprecated fields, if there were any.
         delete tr.attachments;
         delete tr.binary;
+
+        // Remove ids that differ depending on the instance (due to auto-increment mainly).
         delete tr.id;
         delete tr.userId;
 
@@ -897,9 +959,40 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
 
         if (transactions.length > 0) {
             log.info(`Importing ${transactions.length} transactions for account ${accountId}.`);
-            await Transaction.bulkCreate(userId, transactions);
+            const insertedIds = await Transaction.bulkCreate(userId, transactions);
+
+            // There should be the same number of inserted transactions as transactions to create…
+            // Otherwise we can't map new ids to old ids.
+            if (transactions.length === insertedIds.length) {
+                insertedIds.forEach((trId, index) => {
+                    const previousId = previousTransactionIds.get(transactions[index]);
+                    if (typeof previousId === 'number') {
+                        transactionIdsMap[previousId] = trId;
+                    }
+                });
+            } else {
+                log.warn(
+                    'Could not map the imported transaction ids to the inserted ones, the duplicates pairs to ignore will be lost.'
+                );
+            }
         } else {
             log.info(`No transactions to import for account ${accountId}.`);
+        }
+    }
+
+    log.info('Done.');
+
+    log.info('Import duplicates pairs to ignore...');
+    for (const pair of world.ignoredDuplicates) {
+        const newId = transactionIdsMap[pair[0]];
+        const newOtherId = transactionIdsMap[pair[1]];
+
+        if (typeof newId === 'number' && typeof newOtherId === 'number') {
+            await DuplicatesIgnored.create(userId, newId, newOtherId);
+        } else {
+            log.warn(
+                `Could not import pair of duplicates to ignore because the ids do not match the ids mapping: ${pair[0]}/${pair[1]}`
+            );
         }
     }
 
