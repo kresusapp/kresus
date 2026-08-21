@@ -53,7 +53,7 @@ interface OptionalEnvParams extends NodeJS.ProcessEnv {
     KRESUS_WOOB_SESSION?: string;
 }
 
-// Runs the subcommad `command`, with the given array of args, setting the
+// Runs the subcommand `command`, with the given array of args, setting the
 // environment to the given value.
 function subcommand(
     command: string,
