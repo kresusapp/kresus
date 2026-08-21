@@ -304,7 +304,16 @@ describe('Testing kresus/woob integration', function () {
     // These tests can be long
     this.slow(4000);
     this.timeout(10000);
+
     describe('with woob not installed.', () => {
+        beforeEach(function () {
+            // If the Python executable is explicitly set, assume it's pointing to a python in a
+            // virtual environment where Woob is globally installed, and thus skip this test.
+            if (typeof process.env.KRESUS_PYTHON_EXEC !== 'undefined') {
+                this.skip();
+            }
+        });
+
         it('call "test" should raise "WOOB_NOT_INSTALLED" error, if woob is not globally installed. WARNING: if this test fails, make sure Woob is not installed globally before opening an issue.', async () => {
             applyTestConfig();
             // Simulate the non installation of woob.
@@ -316,7 +325,9 @@ describe('Testing kresus/woob integration', function () {
 
     describe('with woob installed', () => {
         beforeEach(function () {
-            if (!process.env.KRESUS_WOOB_DIR) {
+            // Don't run these tests if the woob directory isn't set, and if the python exec isn't
+            // set (which could point to a virtual environment with woob installed).
+            if (!process.env.KRESUS_WOOB_DIR && !process.env.KRESUS_PYTHON_EXEC) {
                 this.skip();
             }
         });
