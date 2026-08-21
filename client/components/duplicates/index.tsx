@@ -77,16 +77,21 @@ const DetectedDuplicates = () => {
                 <p>{$t('client.similarity.threshold_desc')}</p>
 
                 <div className="duplicates-explanation">
-                    <label>{$t('client.similarity.threshold')}:</label>
+                    <span>{$t('client.similarity.threshold')}:</span>
                     <p className="buttons-group">
-                        <button className="btn" onClick={fewer} disabled={!allowFewer}>
+                        <button
+                            type="button"
+                            className="btn"
+                            onClick={fewer}
+                            disabled={!allowFewer}
+                        >
                             {$t('client.similarity.find_fewer')}
                         </button>
                         <span className="btn inner-text">
                             {duplicateThresholdInDays}
                             &nbsp;{$t('client.similarity.days')}
                         </span>
-                        <button className="btn" onClick={more} disabled={!allowMore}>
+                        <button type="button" className="btn" onClick={more} disabled={!allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
                     </p>

@@ -92,7 +92,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             // Don't test against typeof X === 'undefined' here! The event is
             // a proxy which doesn't reflect typeof. It does reflect "in"
             // though, so use this instead.
-            if (event && event.target && 'value' in event.target) {
+            if (event?.target && 'value' in event.target) {
                 // That's the native select.
                 newValue = event.target.value;
             } else if (event && 'value' in event) {

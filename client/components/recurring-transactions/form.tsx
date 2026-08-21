@@ -67,40 +67,28 @@ export default (props: {
     const [dayOfMonth, setDayOfMonth] = useState(initialValues.dayOfMonth || 1);
     const [listOfMonths, setListOfMonths] = useState(predefinedListOfMonths);
 
-    const handleLabelChange = useCallback(
-        (newValue: string | null) => {
-            if (typeof newValue === 'string') {
-                setLabel(newValue);
-            }
-        },
-        [setLabel]
-    );
+    const handleLabelChange = useCallback((newValue: string | null) => {
+        if (typeof newValue === 'string') {
+            setLabel(newValue);
+        }
+    }, []);
 
-    const handleAmountChange = useCallback(
-        (newValue: number | null) => {
-            if (typeof newValue === 'number') {
-                setAmount(newValue);
-            }
-        },
-        [setAmount]
-    );
+    const handleAmountChange = useCallback((newValue: number | null) => {
+        if (typeof newValue === 'number') {
+            setAmount(newValue);
+        }
+    }, []);
 
-    const handleDayOfMonthChange = useCallback(
-        (newValue: string | null) => {
-            const numVal = parseInt(newValue || '', 10);
-            if (!isNaN(numVal)) {
-                setDayOfMonth(numVal);
-            }
-        },
-        [setDayOfMonth]
-    );
+    const handleDayOfMonthChange = useCallback((newValue: string | null) => {
+        const numVal = parseInt(newValue || '', 10);
+        if (!Number.isNaN(numVal)) {
+            setDayOfMonth(numVal);
+        }
+    }, []);
 
-    const handleListOfMonthsChange = useCallback(
-        (newValue: Array<string | number>) => {
-            setListOfMonths(newValue.map(v => ({ value: v as number, label: '' })));
-        },
-        [setListOfMonths]
-    );
+    const handleListOfMonthsChange = useCallback((newValue: Array<string | number>) => {
+        setListOfMonths(newValue.map(v => ({ value: v as number, label: '' })));
+    }, []);
 
     const onSubmitCallback = props.onSubmit;
     const onSubmit = useCallback(async () => {

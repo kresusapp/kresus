@@ -37,13 +37,10 @@ const CreateTransaction = () => {
     const [type, setType] = useState<string>(UNKNOWN_TRANSACTION_TYPE);
     const [accountId, setAccountId] = useState<number>(accounts[0].id);
 
-    const handleSetCategoryId = useCallback(
-        (newVal: number | null) => {
-            // Normalize null into undefined.
-            setCategoryId(newVal === null ? undefined : newVal);
-        },
-        [setCategoryId]
-    );
+    const handleSetCategoryId = useCallback((newVal: number | null) => {
+        // Normalize null into undefined.
+        setCategoryId(newVal === null ? undefined : newVal);
+    }, []);
 
     const dispatch = useKresusDispatch();
     const onSubmit = useCallback(async () => {
@@ -67,7 +64,7 @@ const CreateTransaction = () => {
         }
     }, [driver, dispatch, navigate, date, label, amount, categoryId, type, accountId]);
 
-    const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
+    const allowSubmit = date && label?.trim().length && amount && !Number.isNaN(amount);
     const reportUrl = URL.reports.url(driver);
 
     const displayWarning = useKresusState(state => {

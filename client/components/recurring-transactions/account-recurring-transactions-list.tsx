@@ -47,7 +47,7 @@ const RecurringTransactionsList = () => {
         if (!account) {
             navigate(URL.recurringTransactions.pattern);
         }
-    }, [account, recurringTransactions, navigate]);
+    }, [account, navigate]);
 
     if (!account) {
         return null;
@@ -75,11 +75,10 @@ const RecurringTransactionsList = () => {
             <DisplayIf condition={!recurringTransactions.length}>
                 <p className="recurring-transactions-none">
                     <span>{$t('client.recurring_transactions.none')}</span>
+                    {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                     <span
                         className="tooltipped tooltipped-s multiline"
-                        aria-label={$t('client.recurring_transactions.explanation')
-                            .split('. ')
-                            .join('\n')}
+                        aria-label={$t('client.recurring_transactions.explanation')}
                     >
                         <span className="fa fa-question-circle clickable" />
                     </span>

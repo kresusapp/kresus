@@ -18,6 +18,7 @@ export const LoadingMessage = (props: {
                 viewBox="0 0 66 66"
                 xmlns="http://www.w3.org/2000/svg"
             >
+                <title>{message}</title>
                 <circle
                     className="path"
                     fill="none"

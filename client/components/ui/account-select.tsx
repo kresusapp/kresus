@@ -123,7 +123,7 @@ const AnyAccountSelector = React.forwardRef<{ value: number }, AnyAccountSelecto
 
             return accountsIds
                 .filter(accountId => {
-                    if (props.exclude && props.exclude.includes(accountId)) {
+                    if (props.exclude?.includes(accountId)) {
                         return false;
                     }
 

@@ -722,7 +722,7 @@ function setCurrentAccount(state: BankState): void {
     // 1. the current account id, if defined.
     // 2. the first account of the first access, if it exists.
     // 3. null otherwise
-    let current;
+    let current: number | null;
     if (defaultAccountId !== null) {
         current = defaultAccountId;
     } else if (state.accessIds.length > 0) {

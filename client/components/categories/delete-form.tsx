@@ -44,10 +44,10 @@ const DeleteForm = () => {
             notify.error($t('client.category.deletion_error', { error: error.message }));
             navigate(URL.delete(categoryId));
         }
-    }, [dispatch, navigate, refReplace, categoryId]);
+    }, [dispatch, navigate, categoryId]);
 
-    let explainer;
-    let replaceForm;
+    let explainer: string;
+    let replaceForm: React.JSX.Element | undefined;
     if (numTransactions > 0) {
         explainer = $t('client.category.attached_transactions', {
             // eslint-disable-next-line camelcase
@@ -94,7 +94,7 @@ const DeleteForm = () => {
 
             {replaceForm}
 
-            <button className="btn danger" onClick={deleteCategory}>
+            <button type="button" className="btn danger" onClick={deleteCategory}>
                 {$t('client.general.delete')}
             </button>
         </Form>

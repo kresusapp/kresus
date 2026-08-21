@@ -151,7 +151,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 propsOnInput(computeValue(newValue, newIsNegative));
             }
         },
-        [numberComponents.isNegative, setNumberComponents, togglable, propsOnInput]
+        [numberComponents.isNegative, togglable, propsOnInput]
     );
 
     const handleChange = useCallback(
@@ -172,7 +172,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 propsOnChange(computeValue(newValue, newIsNegative));
             }
         },
-        [numberComponents.isNegative, setNumberComponents, togglable, propsOnChange]
+        [numberComponents.isNegative, togglable, propsOnChange]
     );
 
     const clickToggleSign = useCallback(() => {
@@ -195,7 +195,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 propsOnChange(computedValue);
             }
         }
-    }, [numberComponents, setNumberComponents, propsOnInput, propsOnChange, togglable]);
+    }, [numberComponents, propsOnInput, propsOnChange, togglable]);
 
     useImperativeHandle(ref, () => ({
         clear() {
@@ -215,7 +215,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         },
     }));
 
-    let maybeTitle, clickableClass;
+    let maybeTitle: string | undefined, clickableClass: string;
     if (togglable) {
         maybeTitle = $t('client.ui.toggle_sign');
         clickableClass = 'clickable';
@@ -266,6 +266,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 onKeyUp={handleKeyUp}
                 id={props.id}
                 required={props.checkValidity}
+                // biome-ignore lint/a11y/noAutofocus: we use it sparingly
                 autoFocus={props.autoFocus || false}
             />
 

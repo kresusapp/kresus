@@ -34,7 +34,7 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
         value: string;
     }>();
 
-    let totalElement;
+    let totalElement: React.ReactNode | string;
     if (totalEntries.length) {
         totalElement = totalEntries
             .map(([key, value]): React.ReactNode => {

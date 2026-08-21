@@ -23,13 +23,13 @@ export const renderCustomFields = (
     customFieldValues: CustomFieldMap | null,
     handleChange: (name: string, value: string | null) => void
 ) => {
-    if (!bankDesc || !bankDesc.customFields.length) {
+    if (!bankDesc?.customFields.length) {
         return null;
     }
     assert(customFieldValues !== null, 'must have customFieldValues if bankDesc has custom fields');
-    return bankDesc.customFields.map((field, index) => (
+    return bankDesc.customFields.map(field => (
         <CustomBankField
-            key={index}
+            key={field.name}
             onChange={handleChange}
             field={field}
             value={customFieldValues[field.name]}
@@ -185,7 +185,7 @@ const NewAccessForm = (props: {
             setBankDescData(newBankDesc);
             setCustomFields(newFields);
         },
-        [banks, setBankDescData, setCustomFields]
+        [banks]
     );
 
     const isFormValid = useCallback(() => {
@@ -202,13 +202,10 @@ const NewAccessForm = (props: {
         );
     }, [bankDesc, mustCreateDefaultAlerts, isEmailValid, noCredentials, customFields]);
 
-    const handleChangeEmail = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            setEmailRecipient(event.target.value);
-            setIsEmailValid(event.target.validity.valid);
-        },
-        [setEmailRecipient, setIsEmailValid]
-    );
+    const handleChangeEmail = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmailRecipient(event.target.value);
+        setIsEmailValid(event.target.validity.valid);
+    }, []);
 
     const handleChangeCustomField = useCallback(
         (name: string, value: string | null) => {
@@ -223,7 +220,7 @@ const NewAccessForm = (props: {
                 [name]: value,
             });
         },
-        [setCustomFields, customFields]
+        [customFields]
     );
 
     const { onSubmitSuccess } = props;
@@ -259,7 +256,7 @@ const NewAccessForm = (props: {
 
             // Create access.
             const res = await createAccess(arrayCustomFields);
-            if (res && res.errors instanceof Array && res.errors.length) {
+            if (res && Array.isArray(res.errors) && res.errors.length) {
                 notify.error(
                     $t('client.sync.partial_errors', {
                         errors: res.errors.map((err: string) => `”${err}”`).join(', '),

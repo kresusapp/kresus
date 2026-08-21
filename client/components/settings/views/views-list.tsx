@@ -29,7 +29,7 @@ const ViewItem = (props: { view: View }) => {
                 <Popconfirm
                     onConfirm={deleteView}
                     trigger={
-                        <button className="btn danger" aria-label="delete view">
+                        <button type="button" className="btn danger" aria-label="delete view">
                             <span className={'fa fa-trash'} />
                         </button>
                     }

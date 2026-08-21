@@ -18,7 +18,7 @@ const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     if (props.budgetDate === null || +props.budgetDate === +props.date) {
         return null;
     }
-    let budgetIcon, budgetTitle;
+    let budgetIcon: string, budgetTitle: string;
     if (+props.budgetDate < +props.date) {
         budgetIcon = 'fa-calendar-minus-o';
         budgetTitle = $t('client.transactions.previous_month_budget');

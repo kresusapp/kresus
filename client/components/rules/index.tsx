@@ -85,7 +85,7 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     let predefinedAmount = null;
     if (rawPredefinedAmount) {
         predefinedAmount = parseFloat(rawPredefinedAmount);
-        if (isNaN(predefinedAmount)) {
+        if (Number.isNaN(predefinedAmount)) {
             predefinedAmount = null;
         }
     }
@@ -337,6 +337,7 @@ const ListItem = (props: {
                 />
 
                 <button
+                    type="button"
                     className="btn primary"
                     aria-label={$t('client.rules.move_up')}
                     title={$t('client.rules.move_up')}
@@ -347,6 +348,7 @@ const ListItem = (props: {
                 </button>
 
                 <button
+                    type="button"
                     className="btn primary"
                     aria-label={$t('client.rules.move_down')}
                     title={$t('client.rules.move_down')}
@@ -359,6 +361,7 @@ const ListItem = (props: {
                 <Popconfirm
                     trigger={
                         <button
+                            type="button"
                             className="btn danger"
                             aria-label={$t('client.rules.delete')}
                             title={$t('client.rules.delete')}
@@ -413,7 +416,7 @@ export default () => {
             await dispatch(RulesStore.loadAll()).unwrap();
             setFirstLoad(false);
         }
-    }, [dispatch, firstLoad, setFirstLoad]);
+    }, [dispatch, firstLoad]);
 
     useEffect(() => {
         void loadRules();

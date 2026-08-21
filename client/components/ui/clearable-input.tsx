@@ -38,13 +38,10 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
     const [value, setValue] = useState(props.value || '');
     const [valueObserver, dispatchValueChange] = useReducer((x: number) => x + 1, 0);
 
-    const onChange = useCallback(
-        (newValue: string) => {
-            setValue(newValue);
-            dispatchValueChange();
-        },
-        [setValue, dispatchValueChange]
-    );
+    const onChange = useCallback((newValue: string) => {
+        setValue(newValue);
+        dispatchValueChange();
+    }, []);
 
     const { onChange: propsOnChange } = props;
     useEffectUpdate(() => {
@@ -71,7 +68,7 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
                 setValue('');
             },
         }),
-        [setValue]
+        []
     );
 
     let { className = '' } = props;

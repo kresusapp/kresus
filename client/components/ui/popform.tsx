@@ -57,10 +57,10 @@ function Popform(props: PopformProps) {
                 <>
                     {props.children}
                     <Form.Toolbar>
-                        <button className="btn" onClick={close}>
+                        <button type="button" className="btn" onClick={close}>
                             {cancelText}
                         </button>
-                        <button className={`btn ${confirmClass}`} onClick={onConfirm}>
+                        <button type="button" className={`btn ${confirmClass}`} onClick={onConfirm}>
                             {confirmText}
                         </button>
                     </Form.Toolbar>

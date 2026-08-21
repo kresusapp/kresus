@@ -33,7 +33,7 @@ export default () => {
     let predefinedAmount = 0;
     if (rawPredefinedAmount) {
         predefinedAmount = Number.parseFloat(rawPredefinedAmount);
-        if (isNaN(predefinedAmount)) {
+        if (Number.isNaN(predefinedAmount)) {
             predefinedAmount = 0;
         }
     }

@@ -23,7 +23,7 @@ const Form = (props: FormProps) => {
     const { onSubmit: propsOnSubmit } = props;
 
     const onSubmit = useCallback(
-        (event: React.FormEvent<HTMLFormElement>) => {
+        (event: React.SubmitEvent<HTMLFormElement>) => {
             event.preventDefault();
             if (propsOnSubmit) {
                 return propsOnSubmit();

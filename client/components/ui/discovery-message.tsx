@@ -33,7 +33,7 @@ const DiscoveryMessage = (props: DiscoveryMessageProps) => {
             <p className={`alerts ${level} with-action`}>
                 <span>{props.message}</span>
                 <Popconfirm
-                    trigger={<button className="fa fa-times-circle" />}
+                    trigger={<button type="button" className="fa fa-times-circle" />}
                     onConfirm={handleDisable}
                     confirmClass="success"
                 >

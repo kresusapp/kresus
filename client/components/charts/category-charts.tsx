@@ -142,29 +142,26 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
     // How to filter transactions, based on the value in the date range picker?
     const [filterDate, setFilterDate] = useState<null | ((t: Transaction) => boolean)>(null);
 
-    const onChangePeriod = useCallback(
-        (dates: [Date, Date?] | null) => {
-            if (dates === null) {
-                setDateRange(undefined);
-                setFilterDate(null);
-            } else if (dates.length === 2) {
-                if (typeof dates[1] === 'undefined') {
-                    setDateRange([dates[0]]);
-                    setFilterDate(
-                        () => (t: Transaction) =>
-                            t.date.setHours(0, 0, 0, 0) === dates[0].setHours(0, 0, 0, 0)
-                    );
-                } else {
-                    setDateRange([dates[0], dates[1]]);
-                    // Note: When React sees a functor, React calls it; hence the
-                    // double function-wrapping here.
-                    const d1 = dates[1];
-                    setFilterDate(() => (t: Transaction) => t.date >= dates[0] && t.date <= d1);
-                }
+    const onChangePeriod = useCallback((dates: [Date, Date?] | null) => {
+        if (dates === null) {
+            setDateRange(undefined);
+            setFilterDate(null);
+        } else if (dates.length === 2) {
+            if (typeof dates[1] === 'undefined') {
+                setDateRange([dates[0]]);
+                setFilterDate(
+                    () => (t: Transaction) =>
+                        t.date.setHours(0, 0, 0, 0) === dates[0].setHours(0, 0, 0, 0)
+                );
+            } else {
+                setDateRange([dates[0], dates[1]]);
+                // Note: When React sees a functor, React calls it; hence the
+                // double function-wrapping here.
+                const d1 = dates[1];
+                setFilterDate(() => (t: Transaction) => t.date >= dates[0] && t.date <= d1);
             }
-        },
-        [setDateRange, setFilterDate]
-    );
+        }
+    }, []);
 
     // Only on mount.
     useEffect(() => {
@@ -225,7 +222,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
         refBarchart.current.hide();
         refPiecharts.current.hide();
         setHiddenCategories(allCategoriesNames);
-    }, [setHiddenCategories, allCategoriesNames]);
+    }, [allCategoriesNames]);
 
     const handleLegendClick = useCallback(
         (legendItem: LegendItem) => {
@@ -249,7 +246,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
 
             setHiddenCategories(updatedHiddenList);
         },
-        [setHiddenCategories, hiddenCategories]
+        [hiddenCategories]
     );
 
     let allTransactions = props.transactions;
@@ -352,7 +349,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
                     dontPropagateId={true}
                     label={$t('client.menu.categories')}
                 >
-                    <p className="buttons-group" role="group" aria-label="Show/Hide categories">
+                    <p className="buttons-group">
                         <button type="button" className="btn" onClick={handleHideAll}>
                             {$t('client.general.unselect_all')}
                         </button>

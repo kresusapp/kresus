@@ -56,7 +56,7 @@ export default (props: UncontrolledTextInputProps) => {
         return () => {
             currentRef.removeEventListener('change', onSubmit);
         };
-    }, [ref, onSubmit]);
+    }, [onSubmit]);
 
     return (
         <input

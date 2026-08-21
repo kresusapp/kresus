@@ -61,26 +61,26 @@ const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
 
     return (
         <components.Menu {...props}>
-            <>
-                {/* wrap the children in a fragment as components.Menu expects a single child. */}
-                <div
-                    ref={innerRef}
-                    className={cx(
-                        {
-                            menu: true,
-                            'multiple-select-menu': true,
-                        },
-                        className
-                    )}
-                    {...innerProps}
-                    onClick={toggleAll}
-                    onTouchEnd={toggleAll}
-                >
-                    <input type="checkbox" checked={isAllSelected} readOnly={true} />
-                    <label>{$t('client.general.select_all')}</label>
-                </div>
-                {children}
-            </>
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: required by the dependency */}
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: required by the dependency */}
+            <div
+                ref={innerRef}
+                className={cx(
+                    {
+                        menu: true,
+                        'multiple-select-menu': true,
+                    },
+                    className
+                )}
+                {...innerProps}
+                onClick={toggleAll}
+                onTouchEnd={toggleAll}
+            >
+                <input type="checkbox" checked={isAllSelected} readOnly={true} />
+                {/* biome-ignore lint/a11y/noLabelWithoutControl: changes the semantics and closes the menu */}
+                <label>{$t('client.general.select_all')}</label>
+            </div>
+            {children}
         </components.Menu>
     );
 };
@@ -117,6 +117,7 @@ const Option = (props: OptionProps<MultiSelectOptionProps, IsMulti>) => {
                 )}
             >
                 <input type="checkbox" checked={props.isSelected} readOnly={true} />
+                {/* biome-ignore lint/a11y/noLabelWithoutControl: changes the semantics and closes the menu */}
                 <label>{props.label}</label>
             </div>
         </components.Option>

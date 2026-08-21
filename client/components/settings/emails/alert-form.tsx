@@ -43,7 +43,7 @@ const AlertForm = () => {
             ).unwrap();
 
             navigate(URL.all);
-        }, [dispatch, navigate, type, limit, refSelectOrder, refSelectAccount])
+        }, [dispatch, navigate, type, limit])
     );
 
     const isBalanceAlert = type === 'balance';
@@ -84,7 +84,7 @@ const AlertForm = () => {
                 </div>
             </Form.Input>
 
-            <button className="btn success" disabled={isSubmitDisabled}>
+            <button type="button" className="btn success" disabled={isSubmitDisabled}>
                 {$t('client.settings.emails.create')}
             </button>
         </Form>

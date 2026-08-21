@@ -37,7 +37,7 @@ export interface PopoverRef {
 const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
     const [isOpen, setOpen] = useState(false);
 
-    const close = useCallback(() => setOpen(false), [setOpen]);
+    const close = useCallback(() => setOpen(false), []);
 
     const trigger = React.cloneElement(
         props.trigger as React.ReactElement<Record<string, unknown>>,

@@ -245,13 +245,13 @@ const Reports = () => {
     const toggleBulkEditMode = useCallback(() => {
         setInBulkEditMode(!inBulkEditMode);
         setBulkEditSelectedSet(new Set());
-    }, [setBulkEditSelectedSet, setInBulkEditMode, inBulkEditMode]);
+    }, [inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
         (isChecked: boolean) => {
             setBulkEditSelectedSet(new Set(isChecked ? filteredTransactionIds : []));
         },
-        [filteredTransactionIds, setBulkEditSelectedSet]
+        [filteredTransactionIds]
     );
 
     const toggleBulkItem = useCallback(
@@ -267,7 +267,7 @@ const Reports = () => {
 
             setBulkEditSelectedSet(selectedSet);
         },
-        [filteredSelectedTransactions, setBulkEditSelectedSet]
+        [filteredSelectedTransactions]
     );
 
     const renderItems = useCallback(
@@ -317,7 +317,7 @@ const Reports = () => {
 
     useEffect(() => {
         // On every re-render.
-        let newHeightAbove;
+        let newHeightAbove: number;
         if (!refTransactionTable.current || !refThead.current) {
             newHeightAbove = 0;
         } else {
@@ -326,7 +326,7 @@ const Reports = () => {
         if (heightAbove !== newHeightAbove) {
             setHeightAbove(newHeightAbove);
         }
-    }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
+    }, [heightAbove, refTransactionTable, refThead]);
 
     const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state));
     const balance = useKresusState(state => driver.getBalance(state));
@@ -344,9 +344,9 @@ const Reports = () => {
 
     const lastCheckDateTooltip = `${$t(
         'client.transactions.last_sync_full'
-    )} ${formatDate.toLongString(lastCheckDate)}`;
+    )} ${formatDate.toLongString(lastCheckDate)} `;
 
-    let syncButton;
+    let syncButton: React.JSX.Element | undefined;
     if (accounts.length === 1 && !onlyOneManualAccount) {
         syncButton = (
             <li>
@@ -380,6 +380,7 @@ const Reports = () => {
                     <p className="main-balance">
                         <span className="label">
                             <span className="date">{formatDate.fromNow(lastCheckDate)}</span>
+                            {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                             <span
                                 className="tooltipped tooltipped-sw tooltipped-multiline"
                                 aria-label={lastCheckDateTooltip}
@@ -439,7 +440,7 @@ const Reports = () => {
                 <p className="alerts info">
                     {$t('client.transactions.no_transaction_found')}
                     <DisplayIf condition={hasSearchFields}>
-                        {` ${$t('client.transactions.broaden_search')}`}
+                        {` ${$t('client.transactions.broaden_search')} `}
                     </DisplayIf>
                 </p>
             </DisplayIf>

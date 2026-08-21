@@ -38,7 +38,7 @@ const SyncButton = (props: SyncButtonProps) => {
             ).unwrap();
 
             // There might be errors along with the values
-            if (result && result.errors instanceof Array && result.errors.length) {
+            if (result && Array.isArray(result.errors) && result.errors.length) {
                 notify.error(
                     $t('client.sync.partial_errors', {
                         errors: result.errors.map((err: string) => `”${err}”`).join(', '),
@@ -55,7 +55,9 @@ const SyncButton = (props: SyncButtonProps) => {
     }
 
     const label = $t('client.transactions.sync_now');
+
     return (
+        // biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped
         <span className="tooltipped tooltipped-n" aria-label={label}>
             <button type="button" onClick={handleSync} className="btn">
                 <span className="fa fa-refresh" />

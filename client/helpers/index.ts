@@ -166,7 +166,7 @@ export function areWeFunYet() {
 }
 
 export function computeIsSmallScreen(width: number | null = null) {
-    let actualWidth;
+    let actualWidth: number;
     if (width === null) {
         // Mocha does not know window, tests fail without testing window != undefined.
         actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;

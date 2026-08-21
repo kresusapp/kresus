@@ -158,7 +158,9 @@ const rulesSlice = createSlice({
             })
             .addCase(loadAll.fulfilled, (state, action) => {
                 state.rules = action.payload;
-                state.rules.forEach(rule => rule.conditions.sort(sortConditions));
+                state.rules.forEach(rule => {
+                    rule.conditions.sort(sortConditions);
+                });
             });
     },
 });

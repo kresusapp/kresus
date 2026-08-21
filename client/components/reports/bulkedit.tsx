@@ -73,7 +73,7 @@ const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) =
             setCurrentValue(newValInt);
             propsOnChange(newValInt);
         },
-        [setCurrentValue, propsOnChange]
+        [propsOnChange]
     );
 
     const updateOnCreate = useCallback(
@@ -81,7 +81,7 @@ const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) =
             propsOnChange(value);
             setCurrentValue(value);
         },
-        [setCurrentValue, propsOnChange]
+        [propsOnChange]
     );
 
     const onCreateCategory = useOnCreateCategory(dispatch, updateOnCreate);

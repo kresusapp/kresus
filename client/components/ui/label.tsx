@@ -28,12 +28,9 @@ const CustomLabelInput = (props: {
     const [value, setValue] = useState<string | null>(null);
     const { item, getLabel, setCustomLabel } = props;
 
-    const handleChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setValue(e.target.value);
-        },
-        [setValue]
-    );
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+    }, []);
 
     const handleFocus = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
         // Set the caret at the end of the text.
@@ -42,18 +39,15 @@ const CustomLabelInput = (props: {
         event.target.selectionEnd = end;
     }, []);
 
-    const handleKeyUp = useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
-            const { target } = event;
-            if (event.key === 'Enter') {
-                (target as HTMLInputElement).blur();
-            } else if (event.key === 'Escape') {
-                setValue(null);
-                (target as HTMLInputElement).blur();
-            }
-        },
-        [setValue]
-    );
+    const handleKeyUp = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+        const { target } = event;
+        if (event.key === 'Enter') {
+            (target as HTMLInputElement).blur();
+        } else if (event.key === 'Escape') {
+            setValue(null);
+            (target as HTMLInputElement).blur();
+        }
+    }, []);
 
     const handleBlur = useCallback(() => {
         if (value === null) {
@@ -73,7 +67,7 @@ const CustomLabelInput = (props: {
         }
 
         setValue(null);
-    }, [value, getLabel, item, setCustomLabel, setValue]);
+    }, [value, getLabel, item, setCustomLabel]);
 
     const displayLabelIfNoCustom = props.displayLabelIfNoCustom || true;
 

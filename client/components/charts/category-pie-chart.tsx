@@ -154,13 +154,7 @@ const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
 
         // We cannot hide the categories on redraw, it needs to be done dynamically.
         const chart = container.current;
-        if (
-            props.hiddenCategories &&
-            props.hiddenCategories.length &&
-            chart &&
-            chart.legend &&
-            chart.legend.legendItems
-        ) {
+        if (props.hiddenCategories?.length && chart?.legend?.legendItems) {
             for (const legend of chart.legend.legendItems) {
                 if (
                     props.hiddenCategories.includes(legend.text) &&
@@ -222,6 +216,7 @@ export const PieChartWithHelp = forwardRef<Hideable, PieChartWithHelpProps>((pro
     return (
         <div>
             <h3>
+                {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required for tooltipped */}
                 <span
                     className="tooltipped tooltipped-ne tooltipped-multiline"
                     aria-label={$t(props.helpKey)}

@@ -15,7 +15,7 @@ import AccessList from './access-list';
 import UserViewList from './user-view-list';
 
 import './menu.css';
-import { Driver, DriverContext, DriverType } from '../drivers';
+import { type Driver, DriverContext, DriverType } from '../drivers';
 
 interface EntryProps {
     // The path to which the link directs.
@@ -42,6 +42,7 @@ const Entry = (props: EntryProps) => {
     const handleHideMenu = isSmallScreen ? hideMenu : undefined;
 
     return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: doesn't seem needed, in mobile emulation mode in firefox
         <li className={className} onClick={handleHideMenu}>
             <NavLink to={props.path}>
                 <i className={`fa fa-${props.icon}`} />

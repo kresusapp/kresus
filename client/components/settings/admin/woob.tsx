@@ -32,7 +32,7 @@ const UpdateButton = () => {
         setIsLoading(true);
         await safeOnClick();
         setIsLoading(false);
-    }, [setIsLoading, safeOnClick]);
+    }, [safeOnClick]);
 
     return (
         <LoadingButton
@@ -129,7 +129,7 @@ const WoobParameters = () => {
         };
     }, [dispatch, fetchWoobVersion]);
 
-    let woobVersion;
+    let woobVersion: React.JSX.Element | string;
     if (version !== UNKNOWN_WOOB_VERSION) {
         woobVersion = version;
     } else {

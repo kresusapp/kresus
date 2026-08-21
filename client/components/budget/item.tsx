@@ -48,7 +48,7 @@ function getBars(threshold: number | null, amount: number, warningThresholdInPct
         }
     } else if (threshold > 0) {
         // Positive threshold, it's an income: invert all the meanings.
-        let state;
+        let state: string;
         if (amountPct < warningThresholdInPct) {
             state = 'danger';
         } else if (amountPct < 100) {

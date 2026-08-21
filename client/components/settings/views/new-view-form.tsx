@@ -41,12 +41,9 @@ const NewViewForm = (props: {
         return ret;
     });
 
-    const handleAccountsListChange = useCallback(
-        (newValue: (string | number)[]) => {
-            setAccountsIds(newValue as number[]);
-        },
-        [setAccountsIds]
-    );
+    const handleAccountsListChange = useCallback((newValue: (string | number)[]) => {
+        setAccountsIds(newValue as number[]);
+    }, []);
 
     const isFormValid = useCallback(() => {
         if (!label) {

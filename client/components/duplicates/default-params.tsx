@@ -40,7 +40,7 @@ const DefaultParameters = () => {
         <Popform
             small={false}
             trigger={
-                <button className="btn">
+                <button type="button" className="btn">
                     <span>{$t('client.general.default_parameters')}</span>
                 </button>
             }

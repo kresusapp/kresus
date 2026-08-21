@@ -65,7 +65,7 @@ const ImportForm = (props: {
         });
         setPassword(null);
         dispatchFormReset();
-    }, [dispatchFormReset, setPassword, setDoc]);
+    }, []);
 
     const handleAccessChange = useCallback(
         (accessId: string | null) => {
@@ -75,7 +75,7 @@ const ImportForm = (props: {
                 accessId: accessId && accessId !== 'new' ? parseInt(accessId, 10) || null : null,
             });
         },
-        [doc, setDoc]
+        [doc]
     );
 
     const handleContentChange = useCallback(
@@ -101,11 +101,11 @@ const ImportForm = (props: {
             setPassword(null);
             dispatchShowPassword();
         },
-        [props.type, doc.accessId, setDoc, setPassword, dispatchShowPassword, resetForm]
+        [props.type, doc.accessId, resetForm]
     );
 
     useEffectUpdate(() => {
-        if (doc.jsonContent && doc.jsonContent.encrypted && refPassword.current) {
+        if (doc.jsonContent?.encrypted && refPassword.current) {
             refPassword.current.focus();
         }
     }, [observeShowPassword, doc]);
@@ -231,9 +231,9 @@ const ImportForm = (props: {
                 </DisplayIf>
 
                 <p className="data-and-format">
-                    <label>{$t('client.general.select_file')}</label>
+                    <label htmlFor="file-input">{$t('client.general.select_file')}</label>
 
-                    <FileInput ref={refFileInput} onChange={handleContentChange} />
+                    <FileInput id="file-input" ref={refFileInput} onChange={handleContentChange} />
                 </p>
 
                 <DisplayIf condition={hasEncryptedContent}>
@@ -261,6 +261,7 @@ const ImportForm = (props: {
 
             <Form.Toolbar>
                 <button
+                    type="button"
                     className="btn primary"
                     tabIndex={0}
                     disabled={disableSubmit}

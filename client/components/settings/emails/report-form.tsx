@@ -33,7 +33,7 @@ const CreateReportForm = () => {
                 })
             ).unwrap();
             navigate(URL.all);
-        }, [dispatch, navigate, refSelectAccount, refSelectFrequency])
+        }, [dispatch, navigate])
     );
 
     return (

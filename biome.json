@@ -3,7 +3,7 @@
     "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["**/*", "!**/*.svg"]
+        "includes": ["**/*", "!**/*.svg", "!**/*.html"]
     },
     "formatter": {
         "enabled": true,
@@ -22,7 +22,7 @@
     "linter": {
         "enabled": true,
         "rules": { "preset": "recommended" },
-        "includes": ["./server/**", "./shared/**", "./tests/**", "./bin/**", "!.woob"]
+        "includes": ["**", "!.woob", "!**/*.css"]
     },
     "javascript": {
         "formatter": {

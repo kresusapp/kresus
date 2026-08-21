@@ -90,7 +90,7 @@ const CategorySelector = (props: Props) => {
                 return;
             }
             const categoryId = parseInt(value, 10);
-            if (isNaN(categoryId)) {
+            if (Number.isNaN(categoryId)) {
                 return;
             }
             propsOnChange(categoryId);

@@ -79,7 +79,8 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
 
             const dk = datekey(op);
             const amount = props.invertSign ? -op.amount : op.amount;
-            (categoryDates[dk] = categoryDates[dk] || []).push(amount);
+            categoryDates[dk] = categoryDates[dk] || [];
+            categoryDates[dk].push(amount);
             dateset.set(dk, +(op.budgetDate || op.date));
 
             colorMap[cat.label] = colorMap[cat.label] || cat.color;
@@ -105,7 +106,8 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 const dk = dates[j][0];
                 const mapEntry = map.get(categoryName);
                 assert(typeof mapEntry !== 'undefined', 'found by construction');
-                const values = (mapEntry[dk] = mapEntry[dk] || []);
+                mapEntry[dk] = mapEntry[dk] || [];
+                const values = mapEntry[dk];
                 data.push(round2(values.reduce((a, b) => a + b, 0)));
             }
 
@@ -116,14 +118,14 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 data,
                 backgroundColor: colorMap[categoryName],
                 hidden:
-                    props.hiddenCategories instanceof Array &&
+                    Array.isArray(props.hiddenCategories) &&
                     props.hiddenCategories.includes(categoryName),
                 categoryId,
             });
         }
 
         // Undefined means the default locale.
-        let defaultLocale;
+        const defaultLocale = undefined;
 
         const labels: string[] = [];
         for (let i = 0; i < dates.length; i++) {

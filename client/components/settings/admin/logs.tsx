@@ -22,7 +22,7 @@ const Logs = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [setIsLoading, setLogs]);
+    }, []);
 
     const clearLogs = useNotifyError(
         'client.settings.logs.clear_logs_error',
@@ -47,7 +47,7 @@ const Logs = () => {
         }
     }, []);
 
-    let displayedLogs;
+    let displayedLogs: React.JSX.Element;
     if (isLoading) {
         displayedLogs = (
             <p>
@@ -65,20 +65,27 @@ const Logs = () => {
         <div className="settings-container settings-logs">
             <DiscoveryMessage message={$t('client.settings.logs.share_notice')} />
             <Form.Toolbar align="right">
-                <button className="btn" onClick={handleCopy} disabled={logs === null}>
+                <button type="button" className="btn" onClick={handleCopy} disabled={logs === null}>
                     {$t('client.general.copy')}
                 </button>
 
                 <Popconfirm
                     trigger={
-                        <button className="btn danger">{$t('client.settings.logs.clear')}</button>
+                        <button type="button" className="btn danger">
+                            {$t('client.settings.logs.clear')}
+                        </button>
                     }
                     onConfirm={clearLogs}
                 >
                     <p>{$t('client.settings.logs.confirm_clear')}</p>
                 </Popconfirm>
 
-                <button className="btn primary" onClick={fetchLogs} disabled={isLoading}>
+                <button
+                    type="button"
+                    className="btn primary"
+                    onClick={fetchLogs}
+                    disabled={isLoading}
+                >
                     {loadButtonText}
                 </button>
             </Form.Toolbar>

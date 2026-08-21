@@ -54,7 +54,7 @@ const GracePeriodForm = (props: { account: Account }) => {
     const updateTemporaryGracePeriod = useCallback(
         async (gracePeriod: string | null) =>
             setTemporaryGracePeriod(gracePeriod ? Number.parseInt(gracePeriod, 10) : 0),
-        [setTemporaryGracePeriod]
+        []
     );
 
     return (
@@ -72,7 +72,8 @@ const GracePeriodForm = (props: { account: Account }) => {
                     className="warning"
                     isLoading={false}
                     disabled={
-                        temporaryGracePeriod === account.gracePeriod || isNaN(temporaryGracePeriod)
+                        temporaryGracePeriod === account.gracePeriod ||
+                        Number.isNaN(temporaryGracePeriod)
                     }
                     label={$t('client.general.save')}
                     onClick={saveGracePeriod}
@@ -129,7 +130,7 @@ export const SyncAccount = (props: { accountId: number; fields?: AccessCustomFie
     return (
         <Popconfirm
             trigger={
-                <button className="btn warning">
+                <button type="button" className="btn warning">
                     {$t('client.settings.resync_account_button')}
                 </button>
             }
@@ -173,7 +174,7 @@ const SetBalanceForm = (props: {
             id="balance"
             label={$t('client.settings.set_balance_title')}
             sub={
-                <button onClick={onSubmit} className="btn small primary">
+                <button type="button" onClick={onSubmit} className="btn small primary">
                     {$t('client.settings.set_balance_submit')}
                 </button>
             }
@@ -257,7 +258,7 @@ export default () => {
 
     const refIban = useRef<HTMLSpanElement>(null);
 
-    const handleMergeTargetChange = useCallback(setMergeTargetAccountId, [setMergeTargetAccountId]);
+    const handleMergeTargetChange = useCallback(setMergeTargetAccountId, []);
 
     const handleMergeValidate = useCallback(async () => {
         try {
@@ -292,7 +293,12 @@ export default () => {
         <Form.Input id="iban" label={$t('client.settings.iban_title')}>
             <div>
                 <span ref={refIban}>{formatIBAN(account.iban)}</span>
-                <button title={$t('client.general.copy')} onClick={handleCopy} className="btn">
+                <button
+                    type="button"
+                    title={$t('client.general.copy')}
+                    onClick={handleCopy}
+                    className="btn"
+                >
                     <span className="fa fa-copy" />
                 </button>
             </div>
@@ -300,122 +306,118 @@ export default () => {
     ) : null;
 
     return (
-        <>
-            <Form center={true} className="account-edition">
-                <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
-                <h2>
-                    {$t('client.accesses.edit_account_form_title')}: {displayLabel(account)}
-                </h2>
+        <Form center={true} className="account-edition">
+            <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
+            <h2>
+                {$t('client.accesses.edit_account_form_title')}: {displayLabel(account)}
+            </h2>
 
-                <CustomLabelForm account={account} />
+            <CustomLabelForm account={account} />
 
-                <Form.Input id="original-label" label={$t('client.general.original_label')}>
-                    <div>{account.label}</div>
-                </Form.Input>
+            <Form.Input id="original-label" label={$t('client.general.original_label')}>
+                <div>{account.label}</div>
+            </Form.Input>
 
-                <DisplayIf condition={!isManualAccess(access)}>
-                    <Form.Input
-                        id="last-sync"
-                        label={$t('client.transactions.last_sync_full')}
-                        help={account.isOrphan ? $t('client.accesses.orphan_account') : undefined}
-                    >
-                        <div>{formatDate.toLongString(account.lastCheckDate)}</div>
-                    </Form.Input>
-                </DisplayIf>
-
-                {maybeIban}
-
-                <SetBalanceForm access={access} account={account} updateAccount={updateAccount} />
-
+            <DisplayIf condition={!isManualAccess(access)}>
                 <Form.Input
-                    inline={true}
-                    id="exclude-from-balance"
-                    label={$t('client.settings.include_in_balance')}
+                    id="last-sync"
+                    label={$t('client.transactions.last_sync_full')}
+                    help={account.isOrphan ? $t('client.accesses.orphan_account') : undefined}
                 >
-                    <Switch
-                        onChange={onToggleExcludeFromBalance}
-                        ariaLabel={$t('client.settings.include_in_balance')}
-                        checked={!account.excludeFromBalance}
+                    <div>{formatDate.toLongString(account.lastCheckDate)}</div>
+                </Form.Input>
+            </DisplayIf>
+
+            {maybeIban}
+
+            <SetBalanceForm access={access} account={account} updateAccount={updateAccount} />
+
+            <Form.Input
+                inline={true}
+                id="exclude-from-balance"
+                label={$t('client.settings.include_in_balance')}
+            >
+                <Switch
+                    onChange={onToggleExcludeFromBalance}
+                    ariaLabel={$t('client.settings.include_in_balance')}
+                    checked={!account.excludeFromBalance}
+                />
+            </Form.Input>
+
+            <hr />
+
+            <h3>{$t('client.editaccess.danger_zone_title')}</h3>
+
+            <h4>{$t('client.editaccess.merge_accounts')}</h4>
+
+            <p className="alerts info">{$t('client.editaccess.merge_accounts_desc')}</p>
+
+            <Form.Input
+                inline={true}
+                id="merge-into-account"
+                label={$t('client.editaccess.merge_accounts_label')}
+            >
+                <div>
+                    <AnyAccountSelector
+                        accessId={account.accessId}
+                        exclude={[accountId]}
+                        includeNone={true}
+                        onChange={handleMergeTargetChange}
+                        initial={mergeTargetAccountId}
                     />
-                </Form.Input>
+                    <Popconfirm
+                        confirmClass="warning"
+                        trigger={
+                            <LoadingButton
+                                className="warning"
+                                isLoading={isMergingAccounts}
+                                disabled={mergeTargetAccountId === -1}
+                                label={$t('client.general.save')}
+                            />
+                        }
+                        onConfirm={handleMergeValidate}
+                    >
+                        <p>{$t('client.editaccess.merge_accounts_confirm')}</p>
+                    </Popconfirm>
+                </div>
+            </Form.Input>
 
-                <hr />
+            <DisplayIf condition={!isManualAccess(access)}>
+                <h4>{$t('client.editaccess.grace_period')}</h4>
+                <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
+                <GracePeriodForm account={account} />
+            </DisplayIf>
 
-                <h3>{$t('client.editaccess.danger_zone_title')}</h3>
+            <hr />
 
-                <h4>{$t('client.editaccess.merge_accounts')}</h4>
-
-                <p className="alerts info">{$t('client.editaccess.merge_accounts_desc')}</p>
-
-                <Form.Input
-                    inline={true}
-                    id="merge-into-account"
-                    label={$t('client.editaccess.merge_accounts_label')}
-                >
-                    <div>
-                        <AnyAccountSelector
-                            accessId={account.accessId}
-                            exclude={[accountId]}
-                            includeNone={true}
-                            onChange={handleMergeTargetChange}
-                            initial={mergeTargetAccountId}
-                        />
-                        <Popconfirm
-                            confirmClass="warning"
-                            trigger={
-                                <LoadingButton
-                                    className="warning"
-                                    isLoading={isMergingAccounts}
-                                    disabled={mergeTargetAccountId === -1}
-                                    label={$t('client.general.save')}
-                                />
-                            }
-                            onConfirm={handleMergeValidate}
+            <Form.Toolbar align="left">
+                <DisplayIf condition={!isManualAccess(access) && !access.isBankVendorDeprecated}>
+                    {access.enabled ? (
+                        <SyncAccount accountId={account.id} />
+                    ) : (
+                        <Link
+                            to={URL.manualResyncAccount(account.id)}
+                            state={{ backLink: URL.editAccount(account.id) }}
+                            className="btn warning"
                         >
-                            <p>{$t('client.editaccess.merge_accounts_confirm')}</p>
-                        </Popconfirm>
-                    </div>
-                </Form.Input>
-
-                <DisplayIf condition={!isManualAccess(access)}>
-                    <h4>{$t('client.editaccess.grace_period')}</h4>
-                    <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
-                    <GracePeriodForm account={account} />
+                            {$t('client.settings.resync_account_button')}
+                        </Link>
+                    )}
                 </DisplayIf>
 
-                <hr />
-
-                <Form.Toolbar align="left">
-                    <DisplayIf
-                        condition={!isManualAccess(access) && !access.isBankVendorDeprecated}
+                <DisplayIf condition={!isDemoEnabled}>
+                    <Popconfirm
+                        trigger={
+                            <button type="button" className="btn danger">
+                                {$t('client.settings.delete_account_button')}
+                            </button>
+                        }
+                        onConfirm={onDeleteAccount}
                     >
-                        {access.enabled ? (
-                            <SyncAccount accountId={account.id} />
-                        ) : (
-                            <Link
-                                to={URL.manualResyncAccount(account.id)}
-                                state={{ backLink: URL.editAccount(account.id) }}
-                                className="btn warning"
-                            >
-                                {$t('client.settings.resync_account_button')}
-                            </Link>
-                        )}
-                    </DisplayIf>
-
-                    <DisplayIf condition={!isDemoEnabled}>
-                        <Popconfirm
-                            trigger={
-                                <button className="btn danger">
-                                    {$t('client.settings.delete_account_button')}
-                                </button>
-                            }
-                            onConfirm={onDeleteAccount}
-                        >
-                            <p>{$t('client.settings.erase_account', { label: account.label })}</p>
-                        </Popconfirm>
-                    </DisplayIf>
-                </Form.Toolbar>
-            </Form>
-        </>
+                        <p>{$t('client.settings.erase_account', { label: account.label })}</p>
+                    </Popconfirm>
+                </DisplayIf>
+            </Form.Toolbar>
+        </Form>
     );
 };

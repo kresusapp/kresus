@@ -35,7 +35,7 @@ const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
             setValid(!!date);
             onSelect(date);
         },
-        [setValid, onSelect]
+        [onSelect]
     );
 
     useImperativeHandle(

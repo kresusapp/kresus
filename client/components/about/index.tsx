@@ -70,7 +70,7 @@ const About = () => {
     for (const dependencyName of Object.keys(dependencies).sort()) {
         const descriptor = dependencies[dependencyName];
 
-        let maybeDepLink;
+        let maybeDepLink: React.JSX.Element;
         if (descriptor.website) {
             maybeDepLink = <ExternalLink href={descriptor.website}>{dependencyName}</ExternalLink>;
         } else {
@@ -91,6 +91,7 @@ const About = () => {
         );
     }
 
+    // biome-ignore lint/suspicious/noArrayIndexKey: not performance critical
     const license = (LICENSE as string).split('\n\n').map((x, i) => <p key={i}>{x}</p>);
 
     return (

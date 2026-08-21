@@ -62,18 +62,15 @@ const DefaultParams = () => {
         dispatch,
     ]);
 
-    const handleDisplayTypeChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
-            setDisplayType(event.target.value);
-        },
-        [setDisplayType]
-    );
+    const handleDisplayTypeChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+        setDisplayType(event.target.value);
+    }, []);
 
     return (
         <Popform
             small={false}
             trigger={
-                <button className="btn">
+                <button type="button" className="btn">
                     <span>{$t('client.general.default_parameters')}</span>
                 </button>
             }

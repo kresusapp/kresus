@@ -22,7 +22,7 @@ const CustomBankField = (props: {
         (event: string | null) => {
             const field = props.field;
 
-            let value;
+            let value: string | null;
             switch (field.type) {
                 case 'select':
                     if (event !== null) {
@@ -54,7 +54,7 @@ const CustomBankField = (props: {
     const optional = !!field.optional;
     const checkValidityClass = optional ? '' : 'check-validity';
 
-    let customFieldFormInput;
+    let customFieldFormInput: React.JSX.Element;
     switch (field.type) {
         case 'select':
             customFieldFormInput = (

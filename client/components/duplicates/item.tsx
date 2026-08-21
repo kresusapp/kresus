@@ -25,6 +25,7 @@ const TransactionLine = (props: {
         <div className="duplicate-transaction">
             <div>
                 <h3>
+                    {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                     <span
                         className="tooltipped tooltipped-ne tooltipped-multiline"
                         aria-label={more}
@@ -129,7 +130,7 @@ const DuplicatePair = (props: {
             <TransactionLine
                 label={toRemove.label}
                 customLabel={toRemove.customLabel}
-                rawLabel={toRemove.rawLabel}
+                rawLabel={toKeep.rawLabel}
                 date={toRemove.date}
                 importDate={toRemove.importDate}
                 categoryLabel={toRemoveCategory.label}
@@ -144,20 +145,20 @@ const DuplicatePair = (props: {
                 </span>
 
                 {ignored ? (
-                    <button className="btn primary" onClick={unignoreCb}>
+                    <button type="button" className="btn primary" onClick={unignoreCb}>
                         <span className="fa fa-eye" aria-hidden="true" />
                         <span>{$t('client.similarity.unignore')}</span>
                     </button>
                 ) : (
                     <>
-                        <button className="btn" onClick={ignoreCb}>
+                        <button type="button" className="btn" onClick={ignoreCb}>
                             <span className="fa fa-eye-slash" aria-hidden="true" />
                             <span>{$t('client.similarity.ignore')}</span>
                         </button>
 
                         <Popconfirm
                             trigger={
-                                <button className="btn primary">
+                                <button type="button" className="btn primary">
                                     <span className="fa fa-compress" aria-hidden="true" />
                                     <span className="merge-title">
                                         {$t('client.similarity.merge')}

@@ -45,7 +45,9 @@ function PrefsPopover(props: BudgetsPopoverProps) {
     return (
         <Popover
             trigger={
-                <button className="btn btn-info">{$t('client.general.default_parameters')}</button>
+                <button type="button" className="btn btn-info">
+                    {$t('client.general.default_parameters')}
+                </button>
             }
             content={
                 <>
@@ -199,9 +201,9 @@ const BudgetsList = (): ReactElement => {
     });
 
     const onChange = useCallback(
-        async (event: ChangeEvent<HTMLSelectElement>) => {
+        (event: ChangeEvent<HTMLSelectElement>) => {
             const period = event.currentTarget.value.split('-');
-            await setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
+            setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
         },
         [setPeriod]
     );
@@ -397,6 +399,7 @@ const BudgetsList = (): ReactElement => {
                         <th className="category-amount">{$t('client.budget.amount')}</th>
                         <th className="category-threshold">
                             {$t('client.budget.threshold')}
+                            {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required for tooltipped */}
                             <span
                                 className="tooltipped tooltipped-s"
                                 aria-label={$t('client.budget.threshold_help')}

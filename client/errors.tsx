@@ -62,7 +62,7 @@ export function genericErrorHandler(err: any) {
 - stringified: ${JSON.stringify(kerr)}
 `);
 
-    let msg;
+    let msg: string;
     if (kerr.shortMessage) {
         msg = kerr.shortMessage;
     } else {

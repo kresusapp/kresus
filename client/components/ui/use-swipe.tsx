@@ -32,6 +32,7 @@ export function useSwipeDetection<T extends HTMLElement>(
         event.stopPropagation();
     }, []);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: explicitly required before; TODO?
     const onTouchMove = useCallback(
         (event: TouchEvent) => {
             if (!ref.current) {
@@ -60,9 +61,10 @@ export function useSwipeDetection<T extends HTMLElement>(
             // eslint-disable-next-line react-hooks/exhaustive-deps
             deltaX = newDeltaX;
         },
-        [ref, onSwipeChange]
+        [initialXPosition, initialYPosition, onSwipeStart, onSwipeChange]
     );
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: explicitly required before; TODO?
     const onTouchEnd = useCallback(
         (event: TouchEvent) => {
             if (!ref.current) {
@@ -108,7 +110,7 @@ export function useSwipeDetection<T extends HTMLElement>(
             }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ref, onTouchMove, onContextMenu, onSwipeEnd]
+        [onTouchMove, onContextMenu, onSwipeEnd]
     );
 
     const onTouchStart = useCallback(
@@ -145,7 +147,7 @@ export function useSwipeDetection<T extends HTMLElement>(
                 event.target.addEventListener('contextmenu', onContextMenu);
             }
         },
-        [ref, onSwipeStart, onTouchMove, onTouchEnd, onContextMenu]
+        [excludeSelector, onTouchMove, onTouchEnd, onContextMenu]
     );
 
     // On mount.
@@ -166,7 +168,7 @@ export function useSwipeDetection<T extends HTMLElement>(
             elem.removeEventListener('touchcancel', onTouchEnd);
             elem.removeEventListener('contextmenu', onContextMenu);
         };
-    }, [ref, onTouchStart, onTouchMove, onTouchEnd, onContextMenu]);
+    }, [onTouchStart, onTouchMove, onTouchEnd, onContextMenu]);
 
     return ref;
 }

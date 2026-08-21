@@ -225,6 +225,7 @@ const Kresus = () => {
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // biome-ignore lint/correctness/useExhaustiveDependencies: we have a global keydown handler above.
     const handleWindowResize = useCallback(
         throttle(event => {
             const newIsSmallScreen = computeIsSmallScreen(event.target.innerWidth);
@@ -299,7 +300,11 @@ const Kresus = () => {
                         element={
                             <DisplayOrRedirectToInitialScreen>
                                 <header>
-                                    <button className="menu-toggle" onClick={handleToggleMenu}>
+                                    <button
+                                        type="button"
+                                        className="menu-toggle"
+                                        onClick={handleToggleMenu}
+                                    >
                                         <span className="fa fa-navicon" />
                                     </button>
                                     <h1>
@@ -325,6 +330,7 @@ const Kresus = () => {
                                 </header>
 
                                 <DriverProvider>
+                                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: TODO: re-check */}
                                     <main onClick={handleAutoCloseMenu}>
                                         <Routes>
                                             <Route path="/*" element={<Menu />} />
@@ -421,6 +427,7 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                 {$t('client.fun.message')
                     .split('\n')
                     .map((line, idx) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: Don't bother me for something silly :P
                         <p key={idx}>{line}</p>
                     ))}
             </div>

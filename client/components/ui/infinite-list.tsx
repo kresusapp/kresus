@@ -58,7 +58,7 @@ const InfiniteList = (props: Props) => {
             }
             return prev;
         });
-    }, [setBounds, heightAbove, itemHeight, ballast, numItems]);
+    }, [heightAbove, itemHeight, ballast, numItems]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleScroll = useCallback(
@@ -66,7 +66,7 @@ const InfiniteList = (props: Props) => {
             e.preventDefault();
             recomputeWindow();
         }, SCROLL_THROTTLING),
-        [recomputeWindow]
+        []
     );
 
     useEffect(() => {

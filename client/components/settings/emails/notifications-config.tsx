@@ -20,7 +20,7 @@ const SendTestButton = (props: { onClick: () => Promise<any>; disabled: boolean 
         setIsLoading(true);
         await propsOnClick();
         setIsLoading(false);
-    }, [setIsLoading, propsOnClick]);
+    }, [propsOnClick]);
 
     return (
         <LoadingButton

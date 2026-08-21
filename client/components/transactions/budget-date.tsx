@@ -71,7 +71,7 @@ const BudgetDateComponent = (props: Props) => {
     }, [budgetDate, setBudgetDate, followingMonth]);
 
     return (
-        <div className="budget-date buttons-group" role="group">
+        <fieldset className="budget-date buttons-group">
             {toggleButton(
                 $t('client.transactions.assign_to_previous_month'),
                 budgetDate !== null && +budgetDate === +previousMonth,
@@ -90,7 +90,7 @@ const BudgetDateComponent = (props: Props) => {
                 'fa-calendar-plus-o',
                 handleToggleFollowingMonth
             )}
-        </div>
+        </fieldset>
     );
 };
 

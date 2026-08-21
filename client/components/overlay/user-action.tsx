@@ -21,10 +21,8 @@ const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
 
     // Focus on the first input field, if there's one.
     useEffect(() => {
-        if (refFirstInput && refFirstInput.current) {
-            refFirstInput.current.focus();
-        }
-    }, [refFirstInput]);
+        refFirstInput?.current?.focus();
+    }, []);
 
     const makeUpdateField = useCallback(
         (fieldId: string) => (value: string | null) => {
@@ -42,11 +40,13 @@ const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
             extraRef.ref = refFirstInput;
         }
 
+        const fieldId = `field-${field.id}`;
+
         return (
             <Form.Input
-                key={key}
+                key={fieldId}
                 label={field.label || $t('client.user-action.code')}
-                id={`field-${field.id}`}
+                id={fieldId}
             >
                 <ValidatedTextInput {...extraRef} onChange={makeUpdateField(field.id)} />
             </Form.Input>
@@ -71,7 +71,7 @@ const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
             {/* Typescript does not accept inclusion of Element[] in the component tree,
             see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20356 .
             Wrap Element[] in a fragment to make it an Element.*/}
-            <>{fieldForms}</>
+            {fieldForms}
 
             <input
                 type="submit"

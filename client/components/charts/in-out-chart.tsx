@@ -37,7 +37,7 @@ function dateToMonthlyKey(d: Date) {
 
 function formatLabelMonthly(date: Date) {
     // Undefined means the default locale
-    let defaultLocale;
+    const defaultLocale = undefined;
     return date.toLocaleDateString(defaultLocale, {
         year: '2-digit',
         month: 'short',
@@ -60,7 +60,7 @@ function createChartPositiveNegative(
 ) {
     let dateKey: (d: Date) => string;
     let decrement: (d: Date) => Date;
-    let formatLabel;
+    let formatLabel: (d: Date) => string;
     switch (frequency) {
         case 'monthly':
             dateKey = dateToMonthlyKey;
@@ -211,7 +211,7 @@ function createChartPositiveNegative(
 
                 // e.index is the index in the date set. Reconstruct a date from it.
                 const dateLow = moment(ascTicks[e.index]);
-                let dateHigh;
+                let dateHigh: moment.Moment;
                 if (frequency === 'monthly') {
                     dateLow.date(1);
                     dateHigh = moment(dateLow).date(dateLow.daysInMonth());
@@ -319,28 +319,22 @@ const InOutChart = () => {
     const [fromDate, setFromDate] = useState<Date | undefined>();
     const [toDate, setToDate] = useState<Date | undefined>();
 
-    const selectDateRange = useCallback(
-        (dates: [Date, Date?] | null) => {
-            if (dates === null) {
-                setFromDate(undefined);
-                setToDate(undefined);
-            } else {
-                setFromDate(dates[0]);
-                if (typeof dates[1] !== 'undefined') {
-                    setToDate(dates[1]);
-                }
-            }
-        },
-        [setFromDate, setToDate]
-    );
-
-    const setDateRange = useCallback(
-        (dates: [Date, Date]) => {
+    const selectDateRange = useCallback((dates: [Date, Date?] | null) => {
+        if (dates === null) {
+            setFromDate(undefined);
+            setToDate(undefined);
+        } else {
             setFromDate(dates[0]);
-            setToDate(dates[1]);
-        },
-        [setFromDate, setToDate]
-    );
+            if (typeof dates[1] !== 'undefined') {
+                setToDate(dates[1]);
+            }
+        }
+    }, []);
+
+    const setDateRange = useCallback((dates: [Date, Date]) => {
+        setFromDate(dates[0]);
+        setToDate(dates[1]);
+    }, []);
 
     let dateRangeValue: [Date] | [Date, Date] | undefined;
     if (typeof fromDate !== 'undefined') {

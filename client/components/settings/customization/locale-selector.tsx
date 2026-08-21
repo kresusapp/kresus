@@ -14,7 +14,7 @@ const LocaleSelector = (props: { id?: string; className?: string }) => {
             try {
                 await dispatch(SettingsStore.set(LOCALE, e.target.value)).unwrap();
                 notify.success($t('client.settings.customization.locale_change_success'));
-            } catch (error) {
+            } catch (_error) {
                 notify.error($t('client.settings.customization.update_setting_error'));
             }
         },

@@ -231,7 +231,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             INPUT_DEBOUNCING,
             { trailing: true }
         ),
-        [setKeywords]
+        []
     );
 
     const handleClearSearch = useCallback(
@@ -273,7 +273,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
                 setAmountLowHigh(low, high);
             }
         }, INPUT_DEBOUNCING),
-        [searchFields, setAmountLowHigh]
+        []
     );
 
     useEffect(() => {
@@ -315,7 +315,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             </div>
 
             <div className="search-amounts">
-                <label>{$t('client.search.amount')}</label>
+                <span>{$t('client.search.amount')}</span>
                 <MinMaxInput
                     low={searchFields.amountLow}
                     high={searchFields.amountHigh}

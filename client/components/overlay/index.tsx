@@ -22,7 +22,7 @@ const Overlay = () => {
         }
     }, [reason, action]);
 
-    let child;
+    let child: React.JSX.Element;
     // Note that both processingReason and action may be set at the same time:
     // for instance, after confirming a user action, a long request might be
     // sent to the server and trigger the processingReason spinner screen. In
@@ -34,11 +34,12 @@ const Overlay = () => {
             <div>
                 <p>{$t(reason.reasonTranslationKey)}</p>
                 {reason.extra.map((msg, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: doesn't get re-rendered.
                     <p key={`extra-${index}`}>{msg}</p>
                 ))}
             </div>
         ) : (
-            <>{$t(reason.reasonTranslationKey)}</>
+            $t(reason.reasonTranslationKey)
         );
         child = <LoadingMessage message={message} />;
     } else if (action) {

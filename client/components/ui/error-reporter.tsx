@@ -57,7 +57,7 @@ class ErrorReporter extends Component<ErrorReporterProps, ErrorReporterState> {
                         </ExternalLink>
                     </p>
                     <p>
-                        <button className="btn" onClick={this.handleCopy}>
+                        <button type="button" className="btn" onClick={this.handleCopy}>
                             {$t('client.general.copy')}
                         </button>
                     </p>

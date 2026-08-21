@@ -38,7 +38,7 @@ const MergeAll = ({ pairs }: MergeAllProps) => {
         <Popform
             small={false}
             trigger={
-                <button className="btn">
+                <button type="button" className="btn">
                     <span>{$t('client.general.merge_all')}</span>
                 </button>
             }

@@ -84,9 +84,9 @@ const CredentialsForm = (props: CredentialsFormProps) => {
     return (
         <Form center={true} onSubmit={handleSubmit} className="sub-form">
             <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
-                {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
+                {bankDesc.customFields.map((field: CustomFieldDescriptor) => (
                     <CustomBankField
-                        key={index}
+                        key={field.name}
                         onChange={onChangeCustomField}
                         field={field}
                         value={customFields[field.name]}

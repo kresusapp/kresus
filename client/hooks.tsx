@@ -61,6 +61,7 @@ export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
         if (!isFirstRender.current) {
             effect();
         }
+        // biome-ignore lint/correctness/useExhaustiveDependencies: it works?
     }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {

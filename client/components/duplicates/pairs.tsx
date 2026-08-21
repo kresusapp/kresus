@@ -1,11 +1,11 @@
 import { useContext } from 'react';
 import type { DuplicatesByAccount } from '../../../shared/types';
 import { translate as $t } from '../../helpers';
-import { Transaction } from '../../models';
-import { GlobalState, useKresusState } from '../../store';
+import type { Transaction } from '../../models';
+import { type GlobalState, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as DuplicatesStore from '../../store/duplicates';
-import { Driver, DriverContext } from '../drivers';
+import { type Driver, DriverContext } from '../drivers';
 import { LoadingMessage } from '../overlay/loading';
 import Pair from './item';
 

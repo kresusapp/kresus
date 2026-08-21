@@ -92,7 +92,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
                 onChange(newVal, highNumber);
             }
         },
-        [setLowNumber, lowNumber, setLowText, highNumber, onChange]
+        [lowNumber, highNumber, onChange]
     );
 
     const updateHigh = useCallback(
@@ -103,7 +103,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
                 onChange(lowNumber, newVal);
             }
         },
-        [setHighNumber, setHighText, lowNumber, onChange, highNumber]
+        [lowNumber, onChange, highNumber]
     );
 
     const validateLow = useCallback(
@@ -138,7 +138,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
                 validateLow(newLow);
             }
         },
-        [setLowText, validateLow]
+        [validateLow]
     );
 
     const handleLowBlur = useCallback(() => {
@@ -149,7 +149,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
         } else {
             validateLow(newLow);
         }
-    }, [lowText, setLowText, lowNumber, validateLow]);
+    }, [lowText, lowNumber, validateLow]);
 
     const handleHigh = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +164,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
                 validateHigh(newHigh);
             }
         },
-        [setHighText, validateHigh]
+        [validateHigh]
     );
 
     const handleHighBlur = useCallback(() => {
@@ -175,7 +175,7 @@ const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) =>
         } else {
             validateHigh(newHigh);
         }
-    }, [highText, setHighText, validateHigh, highNumber]);
+    }, [highText, validateHigh, highNumber]);
 
     const handleSlider = useCallback(
         (values: number | number[]) => {
