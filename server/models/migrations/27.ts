@@ -19,7 +19,7 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
         // fields in CASCADE. Disable the foreign keys checks beforehand and re-enable them afterwards.
         // However, doing the "PRAGMA foreign_keys" thing in a transaction is a no-op
         // (see https://www.sqlite.org/pragma.html), so we commit the transaction first.
-        const isSqliteDriver = isSqlite(queryRunner.connection);
+        const isSqliteDriver = isSqlite(queryRunner.dataSource);
         let wasInTransaction = false;
 
         if (isSqliteDriver) {
