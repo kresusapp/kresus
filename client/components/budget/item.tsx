@@ -1,19 +1,16 @@
+import type * as React from 'react';
 import { useCallback, useContext } from 'react';
-import * as React from 'react';
 import { Link } from 'react-router';
-import URL from '../../urls';
-
+import { translate as $t, NONE_CATEGORY_ID, round2 } from '../../helpers';
+import { useGenericError } from '../../hooks';
+import type { Budget } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
+import * as BudgetStore from '../../store/budgets';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
-import * as BudgetStore from '../../store/budgets';
-
-import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
-
+import URL from '../../urls';
+import { type Driver, DriverContext } from '../drivers';
 import AmountInput from '../ui/amount-input';
-import { Budget } from '../../models';
-import { Driver, DriverContext } from '../drivers';
-import { useGenericError } from '../../hooks';
 
 function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {

@@ -1,9 +1,9 @@
 import assert from 'node:assert';
 
 import {
+    obfuscateEmails,
     obfuscateKeywords,
     obfuscatePasswords,
-    obfuscateEmails,
 } from '../../server/controllers/helpers';
 
 describe('logs', () => {

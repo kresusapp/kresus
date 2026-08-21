@@ -1,13 +1,11 @@
 import { useCallback } from 'react';
 
 import { translate as $t } from '../../helpers';
-
-import { Popform } from '../ui';
 import { useGenericError } from '../../hooks';
-import { Transaction } from '../../models';
-
+import type { Transaction } from '../../models';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
+import { Popform } from '../ui';
 
 interface MergeAllProps {
     pairs: Transaction[][];

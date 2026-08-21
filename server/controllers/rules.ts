@@ -1,13 +1,13 @@
-import express from 'express';
+import type express from 'express';
 import { assert, asyncErr, KError } from '../helpers';
 import { TransactionRule, TransactionRuleAction, TransactionRuleCondition } from '../models';
+import type { TransactionRuleConditionType } from '../shared/types';
 import {
     hasForbiddenField,
-    hasMissingField,
     hasForbiddenOrMissingField,
+    hasMissingField,
 } from '../shared/validators';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
-import type { TransactionRuleConditionType } from '../shared/types';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 export const conditionTypesList: TransactionRuleConditionType[] = [
     'label_matches_text',
@@ -65,7 +65,7 @@ export async function all(req: IdentifiedRequest<any>, res: express.Response) {
 
 function checkDependencies(actions: any[], conditions: any[], allowIds: boolean) {
     const extraFields = allowIds ? ['id'] : [];
-    let error;
+    let error: string | null;
     for (const action of actions) {
         if (action.type === 'categorize') {
             error = hasForbiddenOrMissingField(action, ['type', 'categoryId', ...extraFields]);

@@ -1,7 +1,7 @@
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import Access from './access';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
+import Access from './access';
 
 import './dashboard.css';
 

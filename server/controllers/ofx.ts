@@ -1,7 +1,7 @@
 import { parse as parseOfx } from 'ofx-js';
 
 import { assert, KError, makeLogger } from '../helpers';
-import { Account, Transaction } from '../models';
+import type { Account, Transaction } from '../models';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 
 const log = makeLogger('controllers/ofx');

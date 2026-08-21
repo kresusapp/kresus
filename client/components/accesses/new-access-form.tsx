@@ -1,23 +1,20 @@
+import type * as React from 'react';
 import { useCallback, useState } from 'react';
-import * as React from 'react';
-
-import * as CategoriesStore from '../../store/categories';
-import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import * as InstanceStore from '../../store/instance';
-import { useKresusDispatch, useKresusState } from '../../store';
-import { assert, translate as $t, noValueFoundMessage, notify } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
-
-import { BackLink, Switch, Form } from '../ui';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import DisplayIf from '../ui/display-if';
-import TextInput from '../ui/text-input';
-
-import CustomBankField from './custom-bank-field';
-import { Bank, AccessCustomField } from '../../models';
+import { translate as $t, assert, notify, noValueFoundMessage } from '../../helpers';
 import { useFirstSyncError } from '../../hooks';
+import type { AccessCustomField, Bank } from '../../models';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
+import * as InstanceStore from '../../store/instance';
+import * as SettingsStore from '../../store/settings';
+import { BackLink, Form, Switch } from '../ui';
+import DisplayIf from '../ui/display-if';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import TextInput from '../ui/text-input';
+import CustomBankField from './custom-bank-field';
 
 export type CustomFieldMap = Record<string, string | null>;
 

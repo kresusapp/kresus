@@ -1,9 +1,9 @@
 import assert from 'node:assert';
 
 import {
-    hasMissingField,
     hasForbiddenField,
     hasForbiddenOrMissingField,
+    hasMissingField,
 } from '../../shared/validators';
 
 const objectToCheck = {

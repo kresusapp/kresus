@@ -1,24 +1,21 @@
 import {
-    In,
     Between,
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    type DeepPartial,
+    Entity,
+    type FindManyOptions,
+    In,
     JoinColumn,
     ManyToOne,
-    Repository,
-    DeepPartial,
-    FindManyOptions,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
+import { UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
 import { getRepository } from '..';
-
-import User from './users';
+import { bulkInsert, DatetimeType, ForceNumericColumn, mergeWith } from '../helpers';
 import Account from './accounts';
 import Category from './categories';
-
-import { UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
-import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
+import User from './users';
 
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.

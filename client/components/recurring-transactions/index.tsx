@@ -1,11 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router';
-
+import { Navigate, Route, Routes } from 'react-router';
+import URL from '../../urls';
+import AccountRecurringTransactionsList from './account-recurring-transactions-list';
+import EditRecurringTransaction from './edit-recurring-transaction';
 import List from './list';
 import NewRecurringTransaction from './new-recurring-transaction';
-import EditRecurringTransaction from './edit-recurring-transaction';
-import AccountRecurringTransactionsList from './account-recurring-transactions-list';
-
-import URL from '../../urls';
 
 export default () => {
     return (

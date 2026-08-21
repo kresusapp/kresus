@@ -1,17 +1,16 @@
-import { useKresusState } from '../../../store';
-import * as SettingsStore from '../../../store/settings';
-import * as InstanceStore from '../../../store/instance';
-import { translate as $t } from '../../../helpers';
 import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL, EMAIL_RECIPIENT } from '../../../../shared/settings';
-
-import AlertList from './alert-list';
+import { translate as $t } from '../../../helpers';
+import { useKresusState } from '../../../store';
+import * as InstanceStore from '../../../store/instance';
+import * as SettingsStore from '../../../store/settings';
+import DisplayIf from '../../ui/display-if';
 import AlertForm from './alert-form';
-import ReportForm from './report-form';
+import AlertList from './alert-list';
 import EmailConfig from './email-config';
 import NotificationsConfig from './notifications-config';
+import ReportForm from './report-form';
 import Reports from './report-list';
-import DisplayIf from '../../ui/display-if';
 
 import './alerts.css';
 

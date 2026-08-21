@@ -1,13 +1,12 @@
-import { Routes, Route, Navigate, Link } from 'react-router';
+import { Link, Navigate, Route, Routes } from 'react-router';
 
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
-
-import BackLink from '../ui/back-link';
 import NewAccessForm from '../accesses/new-access-form';
+import Admin from '../settings/admin';
 import ImportForm from '../settings/backup/import-form';
 import LocaleSelector from '../settings/customization/locale-selector';
-import Admin from '../settings/admin';
+import BackLink from '../ui/back-link';
 
 import Demo from './demo';
 import './onboarding.css';

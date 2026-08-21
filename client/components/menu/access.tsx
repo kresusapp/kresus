@@ -1,15 +1,12 @@
 import { useCallback, useState } from 'react';
-
+import { fetchStatusToLabel } from '../../errors';
+import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
-import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
-import { fetchStatusToLabel } from '../../errors';
-
-import AccountItem from './account';
-
 import { AccessTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
+import AccountItem from './account';
 
 interface AccessItemProps {
     // The access identifier.

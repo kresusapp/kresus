@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { resetManualBankAccountsBalance } from '../data-migrations/reset-manual-accounts-balance';
 

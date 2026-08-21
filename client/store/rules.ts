@@ -1,9 +1,9 @@
-import { DeepPartial } from 'typeorm';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { DeepPartial } from 'typeorm';
 import { assert } from '../helpers';
-import { Rule, RuleAction, RuleCondition, assertValidRule } from '../models';
-import { mergeInArray, removeInArrayById, resetStoreReducer } from './helpers';
+import { assertValidRule, type Rule, type RuleAction, type RuleCondition } from '../models';
 import * as backend from './backend';
+import { mergeInArray, removeInArrayById, resetStoreReducer } from './helpers';
 
 export type RuleState = {
     rules: Rule[];

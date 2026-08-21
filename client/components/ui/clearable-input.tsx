@@ -1,10 +1,10 @@
 import {
+    type ChangeEvent,
+    forwardRef,
     useCallback,
+    useImperativeHandle,
     useReducer,
     useState,
-    ChangeEvent,
-    forwardRef,
-    useImperativeHandle,
 } from 'react';
 
 import { translate as $t } from '../../helpers';

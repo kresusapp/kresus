@@ -1,13 +1,12 @@
-import {
-    forwardRef,
-    useState,
-    useImperativeHandle,
-    ChangeEvent,
-    useCallback,
-    useLayoutEffect,
-} from 'react';
-
 import Slider from 'rc-slider';
+import {
+    type ChangeEvent,
+    forwardRef,
+    useCallback,
+    useImperativeHandle,
+    useLayoutEffect,
+    useState,
+} from 'react';
 
 import 'rc-slider/assets/index.css';
 import './min-max-input.css';

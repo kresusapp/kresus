@@ -1,35 +1,33 @@
 import moment from 'moment';
-
+import {
+    assert,
+    currency,
+    FETCH_STATUS_SUCCESS,
+    getErrorCode,
+    KError,
+    makeLogger,
+    shouldIncludeInBalance,
+    UNKNOWN_TRANSACTION_TYPE,
+} from '../helpers';
 import {
     Access,
     Account,
+    Alert,
+    AppliedRecurringTransaction,
+    type MinimalTransaction,
+    RecurringTransaction,
     Setting,
-    MinimalTransaction,
     Transaction,
     TransactionRule,
-    RecurringTransaction,
-    AppliedRecurringTransaction,
-    Alert,
 } from '../models';
-
-import { accountTypeIdToName } from './account-types';
-import { transactionTypeIdToName } from './transaction-types';
-import applyRules from './rule-engine';
-import errors from '../shared/errors.json';
-
-import { bankVendorByUuid, getProvider, ProviderAccount, ProviderTransaction } from '../providers';
-import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
-
 import {
-    KError,
-    getErrorCode,
-    makeLogger,
-    currency,
-    assert,
-    UNKNOWN_TRANSACTION_TYPE,
-    shouldIncludeInBalance,
-    FETCH_STATUS_SUCCESS,
-} from '../helpers';
+    bankVendorByUuid,
+    getProvider,
+    type ProviderAccount,
+    type ProviderTransaction,
+} from '../providers';
+import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
+import errors from '../shared/errors.json';
 import {
     DEFAULT_ACCOUNT_ID,
     DUPLICATE_LAX_MODE,
@@ -39,14 +37,16 @@ import {
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
-import { SharedTransaction, UserActionResponse } from '../shared/types';
-
-import AsyncQueue from './async-queue';
+import type { SharedTransaction, UserActionResponse } from '../shared/types';
+import { accountTypeIdToName } from './account-types';
 import alertManager from './alert-manager';
+import AsyncQueue from './async-queue';
 import diffAccounts from './diff-accounts';
 import diffTransactions from './diff-transactions';
 import filterDuplicateTransactions from './filter-duplicate-transactions';
+import applyRules from './rule-engine';
 import SessionManager from './session-manager';
+import { transactionTypeIdToName } from './transaction-types';
 
 const log = makeLogger('accounts-manager');
 

@@ -1,17 +1,16 @@
 import {
-    Entity,
-    Repository,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
-    JoinColumn,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
 
 import { assert, unwrap } from '../../helpers';
-import { PartialOnePlus } from '../helpers';
-
 import { getRepository } from '..';
+import type { PartialOnePlus } from '../helpers';
 
 import User from './users';
 import ViewAccount from './view-accounts';

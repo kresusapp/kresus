@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class SetDefaultBalance1648536789093 implements MigrationInterface {
     public async up(_q: QueryRunner): Promise<void> {

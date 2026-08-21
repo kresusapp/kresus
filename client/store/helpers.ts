@@ -1,6 +1,5 @@
-import { assert } from '../helpers';
-
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { assert } from '../helpers';
 
 // To reset a store's (as a redux slice) state following an instance import or demo switch.
 // The payload is the new state.

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BatchRequest } from '../../shared/api/batch';
+import type { BatchRequest } from '../../shared/api/batch';
 import { NONE_CATEGORY_ID } from '../helpers';
 import * as backend from './backend';
 

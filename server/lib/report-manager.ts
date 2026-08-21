@@ -1,19 +1,19 @@
 import moment from 'moment';
 
 import {
-    makeLogger,
-    KError,
     translate as $t,
-    formatDate,
-    POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR,
     displayLabel,
+    formatDate,
+    KError,
+    makeLogger,
+    POLLER_START_HIGH_HOUR,
+    POLLER_START_LOW_HOUR,
     unwrap,
 } from '../helpers';
 
 import { Access, Account, Alert, Category, Transaction } from '../models';
-import { I18NObject, shortLabel } from '../shared/helpers';
-import getEmailer, { Emailer } from './emailer';
+import { type I18NObject, shortLabel } from '../shared/helpers';
+import getEmailer, { type Emailer } from './emailer';
 import { getTranslator } from './translator';
 
 const log = makeLogger('report-manager');
@@ -173,7 +173,7 @@ class ReportManager {
         transactionsByAccount: Map<number, { account: Account; transactions: Transaction[] }>,
         frequencyKey: FrequencyString
     ): Promise<{ subject: string; content: string }> {
-        let frequency;
+        let frequency: string | undefined;
         switch (frequencyKey) {
             case 'daily':
                 frequency = $t(i18n, 'server.email.report.daily');
@@ -190,7 +190,7 @@ class ReportManager {
 
         const today = formatDate(i18n.localeId).toShortString(new Date());
 
-        let content;
+        let content: string;
         content = $t(i18n, 'server.email.hello');
         content += '\n\n';
         content += $t(i18n, 'server.email.report.pre', { today });

@@ -1,13 +1,13 @@
-import { useCallback } from 'react';
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import Select, {
-    createFilter,
     components,
-    MenuProps,
-    ValueContainerProps,
-    OptionProps,
-    OnChangeValue,
+    createFilter,
+    type MenuProps,
+    type OnChangeValue,
+    type OptionProps,
+    type ValueContainerProps,
 } from 'react-select';
 
 import { translate as $t } from '../../helpers';

@@ -1,9 +1,8 @@
 import express from 'express';
 import basicAuth from 'express-basic-auth';
 import log4js from 'log4js';
-
-import { makeUrlPrefixRegExp } from './helpers';
 import routes from './controllers/routes';
+import { makeUrlPrefixRegExp } from './helpers';
 import init from './init';
 import { User } from './models';
 

@@ -1,13 +1,11 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
-
-import { useKresusState, useKresusDispatch } from '../../../store';
-import * as ViewsStore from '../../../store/views';
 import { translate as $t } from '../../../helpers';
-
-import URL from './urls';
-import DisplayIf from '../../ui/display-if';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import * as ViewsStore from '../../../store/views';
 import { Popconfirm } from '../../ui';
+import DisplayIf from '../../ui/display-if';
+import URL from './urls';
 
 import './views.css';
 

@@ -1,13 +1,12 @@
 import assert from 'node:assert';
-
+import moment from 'moment';
 import {
-    UNKNOWN_TRANSACTION_TYPE,
     DEFERRED_CARD_TYPE,
-    TRANSACTION_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
+    TRANSACTION_CARD_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../server/helpers';
 import filterDuplicateTransactions from '../../server/lib/filter-duplicate-transactions';
-import moment from 'moment';
 
 describe('filtering duplicate transactions', () => {
     const A = {

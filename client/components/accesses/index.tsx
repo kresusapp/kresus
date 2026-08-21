@@ -1,11 +1,11 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 
 import AccessesList from './accesses-list';
-import NewAccess from './new-access';
 import EditAccess from './edit-access';
 import EditAccount from './edit-account';
-import ManualSync from './manual-sync';
 import ManualResyncAccount from './manual-resync-account';
+import ManualSync from './manual-sync';
+import NewAccess from './new-access';
 
 import URL from './urls';
 import './accesses.css';

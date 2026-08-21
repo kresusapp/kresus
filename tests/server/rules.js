@@ -1,12 +1,11 @@
 import assert from 'node:assert';
-
+import applyRules from '../../server/lib/rule-engine';
 import {
-    TransactionRule,
     Transaction,
+    TransactionRule,
     TransactionRuleAction,
     TransactionRuleCondition,
 } from '../../server/models';
-import applyRules from '../../server/lib/rule-engine';
 
 describe('rule based engine for transactions', () => {
     let textCondition,

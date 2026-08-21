@@ -68,9 +68,11 @@ interface DiffReturn<T, PT = Partial<T>> {
     duplicateCandidates: [T, PT][];
 }
 
-interface MakeDiffReturn<T, PT = Partial<T>> {
-    (known: T[], provided: PT[], params?: DiffParams): DiffReturn<T, PT>;
-}
+type MakeDiffReturn<T, PT = Partial<T>> = (
+    known: T[],
+    provided: PT[],
+    params?: DiffParams
+) => DiffReturn<T, PT>;
 
 // Given a list of `known` objects (known to Kresus and saved into the
 // database), and a list of objects `provided` by the source backend, compute

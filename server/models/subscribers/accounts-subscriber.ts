@@ -1,4 +1,9 @@
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm';
+import {
+    type EntitySubscriberInterface,
+    EventSubscriber,
+    type InsertEvent,
+    type UpdateEvent,
+} from 'typeorm';
 
 import Account from '../entities/accounts';
 import View from '../entities/views';

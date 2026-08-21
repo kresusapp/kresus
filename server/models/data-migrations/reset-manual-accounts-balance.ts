@@ -1,8 +1,7 @@
 /* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
-import { EntityManager, In } from 'typeorm';
-
-import { Access, Account } from '..';
+import { type EntityManager, In } from 'typeorm';
 import { makeLogger } from '../../helpers';
+import { Access, Account } from '..';
 
 const log = makeLogger('models/data-migrations');
 

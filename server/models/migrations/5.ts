@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { run as removeMigratedFromCozydb } from '../data-migrations/remove-migrated-from-cozydb';
 

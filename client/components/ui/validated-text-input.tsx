@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import TextInput, { TextInputProps, TextInputRef } from './text-input';
+import TextInput, { type TextInputProps, type TextInputRef } from './text-input';
 
 const ValidatedTextInput = forwardRef<TextInputRef, TextInputProps>(
     ({ initialValue = '', ...rest }, ref) => {

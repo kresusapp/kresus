@@ -1,11 +1,10 @@
-import { DataSource, DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
-import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
-import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
-
-import { UNKNOWN_TRANSACTION_TYPE, makeLogger } from '../helpers';
-import { Transaction, AccessField } from './';
+import type { DataSource, DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
+import type { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
+import type { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
+import type { BankVendor } from '../../shared/types';
+import { makeLogger, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 import { bankVendorByUuid } from '../providers';
-import { BankVendor } from '../../shared/types';
+import type { AccessField, Transaction } from './';
 
 const log = makeLogger('models/helpers');
 
@@ -87,7 +86,7 @@ export class ForceNumericColumn {
 
     // Converts from a string to a number.
     from(data: any) {
-        let ret;
+        let ret: number | undefined | null;
         if (['undefined', 'number'].includes(typeof data) || data === null) {
             ret = data;
         } else {

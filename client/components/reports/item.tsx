@@ -1,20 +1,18 @@
-import { useCallback, useContext, useRef, useImperativeHandle } from 'react';
 import * as React from 'react';
+import { useCallback, useContext, useImperativeHandle, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 
-import { displayLabel, formatDate, NONE_CATEGORY_ID, notify, translate as $t } from '../../helpers';
+import { translate as $t, displayLabel, formatDate, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import TransactionUrls from '../transactions/urls';
-
+import * as CategoriesStore from '../../store/categories';
 import { DriverContext } from '../drivers';
-import LabelComponent from './label';
+import TransactionUrls from '../transactions/urls';
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
-import TransactionTypeSelect from './editable-type-select';
-import CategorySelect from './editable-category-select';
-
 import { useTableRowSwipeDetection } from '../ui/use-swipe';
+import CategorySelect from './editable-category-select';
+import TransactionTypeSelect from './editable-type-select';
+import LabelComponent from './label';
 
 const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     if (props.budgetDate === null || +props.budgetDate === +props.date) {

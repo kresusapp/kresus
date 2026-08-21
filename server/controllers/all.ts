@@ -1,53 +1,48 @@
-import express from 'express';
 import crypto from 'crypto';
-
-import {
-    Access,
-    Account,
-    Alert,
-    Budget,
-    Category,
-    RecurringTransaction,
-    Setting,
-    MinimalTransaction,
-    Transaction,
-    TransactionRule,
-    AppliedRecurringTransaction,
-    View,
-    User,
-} from '../models';
-
-import runDataMigrations from '../models/data-migrations';
-
-import {
-    assert,
-    makeLogger,
-    isEmailEnabled,
-    KError,
-    asyncErr,
-    getErrorCode,
-    UNKNOWN_TRANSACTION_TYPE,
-    isAppriseApiEnabled,
-    unwrap,
-} from '../helpers';
-
-import { bankVendorByUuid, getBankVendors } from '../providers';
-import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
-import { validatePassword } from '../shared/helpers';
-import DefaultSettings from '../shared/default-settings';
+import type express from 'express';
 import {
     DEFAULT_ACCOUNT_ID,
     DEMO_MODE,
     DUPLICATE_LAX_MODE,
     DUPLICATE_THRESHOLD,
 } from '../../shared/settings';
-
-import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
-import { isDemoEnabled } from './instance';
-import { ofxToKresus } from './ofx';
-import { IdentifiedRequest } from './routes';
+import {
+    assert,
+    asyncErr,
+    getErrorCode,
+    isAppriseApiEnabled,
+    isEmailEnabled,
+    KError,
+    makeLogger,
+    UNKNOWN_TRANSACTION_TYPE,
+    unwrap,
+} from '../helpers';
 import diffAccount from '../lib/diff-accounts';
 import diffTransactions from '../lib/diff-transactions';
+import { ConfigGhostSettings, getAll as getAllInstanceProperties } from '../lib/instance';
+import {
+    Access,
+    Account,
+    Alert,
+    AppliedRecurringTransaction,
+    Budget,
+    Category,
+    type MinimalTransaction,
+    RecurringTransaction,
+    Setting,
+    Transaction,
+    TransactionRule,
+    User,
+    View,
+} from '../models';
+import runDataMigrations from '../models/data-migrations';
+import { bankVendorByUuid, getBankVendors } from '../providers';
+import DefaultSettings from '../shared/default-settings';
+import { validatePassword } from '../shared/helpers';
+import { type AllData, type ClientAccess, cleanData, type Remapping } from './helpers';
+import { isDemoEnabled } from './instance';
+import { ofxToKresus } from './ofx';
+import type { IdentifiedRequest } from './routes';
 
 const log = makeLogger('controllers/all');
 
@@ -301,14 +296,14 @@ function applyRenamings(model: any): (arg: AnyObject) => AnyObject {
 }
 
 export function parseDate(date: any) {
-    let parsedDate;
     switch (typeof date) {
-        case 'string':
-            parsedDate = Date.parse(date);
+        case 'string': {
+            const parsedDate = Date.parse(date);
             if (!isNaN(parsedDate)) {
                 return new Date(parsedDate);
             }
             break;
+        }
 
         case 'number':
             if (!isNaN(date) && date > -8640000000000000 && date < 8640000000000000) {
@@ -1206,7 +1201,9 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
 
             // Replace the accessId in the converted data by this one.
             convertedData.accesses[0].id = userData.accessId;
-            convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
+            convertedData.accounts.forEach(acc => {
+                acc.accessId = userData.accessId;
+            });
             dontCreateAccess = true;
         }
 

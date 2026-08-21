@@ -1,5 +1,5 @@
+import type * as React from 'react';
 import { useCallback } from 'react';
-import * as React from 'react';
 import { Navigate, NavLink, useLocation, useNavigate } from 'react-router';
 
 export interface TabDescriptor {

@@ -1,16 +1,14 @@
 import { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
-
+import { translate as $t, currency, displayLabel } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
-import { displayLabel, translate as $t, currency } from '../../helpers';
 import URL from '../../urls';
+import { DriverContext, DriverType } from '../drivers';
 import { DriverAccount } from '../drivers/account';
-
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
-import { DriverType, DriverContext } from '../drivers';
 
 interface AccountItemProps {
     // The account unique id.

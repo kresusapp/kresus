@@ -1,7 +1,7 @@
 import { assert } from '../helpers';
-import makeDiff, { DiffParams } from './diff-list';
+import type { Account } from '../models';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
-import { Account } from '../models';
+import makeDiff, { type DiffParams } from './diff-list';
 
 function isPerfectMatch(known: Account, provided: Partial<Account>): boolean {
     assert(known.accessId === provided.accessId, 'data inconsistency');

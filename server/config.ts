@@ -1,9 +1,8 @@
-import path from 'path';
 import ospath from 'ospath';
-
+import path from 'path';
+import repositoryInfo from '../package.json';
 import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger';
-import repositoryInfo from '../package.json';
 
 type KresusConfig = { [key: string]: any };
 type DependentCheck = (value: KresusConfig) => void;

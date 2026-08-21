@@ -1,13 +1,11 @@
 import { useCallback } from 'react';
-
+import { DISCOVERY_MODE } from '../../../shared/settings';
+import { translate as $t } from '../../helpers';
+import { useNotifyError } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { translate as $t } from '../../helpers';
-import { DISCOVERY_MODE } from '../../../shared/settings';
-
 import DisplayIf from './display-if';
 import { Popconfirm } from './index';
-import { useNotifyError } from '../../hooks';
 
 interface DiscoveryMessageProps {
     // The help message to display.

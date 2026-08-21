@@ -1,11 +1,9 @@
+import { WOOB_VERSION } from '../../../shared/instance';
+import { translate as $t, MIN_WOOB_VERSION as minVersion } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as InstanceStore from '../../store/instance';
-
-import { translate as $t, MIN_WOOB_VERSION as minVersion } from '../../helpers';
-
-import ExternalLink from '../ui/external-link';
 import LocaleSelector from '../settings/customization/locale-selector';
-import { WOOB_VERSION } from '../../../shared/instance';
+import ExternalLink from '../ui/external-link';
 
 export default () => {
     const version = useKresusState(state => InstanceStore.get(state.instance, WOOB_VERSION));

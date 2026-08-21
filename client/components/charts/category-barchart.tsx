@@ -1,16 +1,15 @@
-import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { Chart, type LegendItem } from 'chart.js';
-
-import { assert, round2, localeComparator } from '../../helpers';
-import { Category, Transaction } from '../../models';
-import { Hideable } from './hidable-chart';
-import moment, { Moment } from 'moment';
-import { useNavigate } from 'react-router';
-import URLs from '../../urls';
-import * as UiStore from '../../store/ui';
+import moment, { type Moment } from 'moment';
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { assert, localeComparator, round2 } from '../../helpers';
+import type { Category, Transaction } from '../../models';
+import * as UiStore from '../../store/ui';
+import URLs from '../../urls';
 import { DriverContext } from '../drivers';
-import { AmountKindType } from './amount-select';
+import type { AmountKindType } from './amount-select';
+import type { Hideable } from './hidable-chart';
 
 function datekey(op: Transaction) {
     const d = op.budgetDate || op.date;

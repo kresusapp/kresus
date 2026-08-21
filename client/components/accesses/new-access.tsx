@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { notify, translate as $t } from '../../helpers';
-import URL from './urls';
-
+import { translate as $t, notify } from '../../helpers';
 import NewAccessForm from './new-access-form';
+import URL from './urls';
 
 export default () => {
     const navigate = useNavigate();

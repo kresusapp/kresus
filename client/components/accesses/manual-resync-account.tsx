@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { assert, translate as $t, notify } from '../../helpers';
+import { translate as $t, assert, notify } from '../../helpers';
 import { useRequiredParams, useSyncError } from '../../hooks';
+import type { AccessCustomField } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { AccessCustomField } from '../../models';
 
 import { BackLink } from '../ui';
 import CredentialsForm from './sync-form';

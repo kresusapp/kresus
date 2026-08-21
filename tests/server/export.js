@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
+import { importData, testing } from '../../server/controllers/all';
 import { Access, User } from '../../server/models';
-import { testing, importData } from '../../server/controllers/all';
 
 const { getAllData: exportData } = testing;
 

@@ -1,14 +1,12 @@
 import { useCallback } from 'react';
-
-import { useKresusDispatch, useKresusState, getUnusedCategories } from '../../store';
+import { translate as $t, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { getUnusedCategories, useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
-import { notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
-import { Popconfirm, ButtonLink } from '../ui';
+import { ButtonLink, Popconfirm } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
-
-import URL from './urls';
 import { CategoryListItem, SwipeableCategoryListItem } from './item';
+import URL from './urls';
 
 import './categories.css';
 

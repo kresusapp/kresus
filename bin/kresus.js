@@ -4,9 +4,9 @@
 /* eslint no-process-exit: 0 */
 /* eslint import/no-dynamic-require: 0 */
 
-let path = require('path');
-let fs = require('fs');
-let ini = require('ini');
+const path = require('node:path');
+const fs = require('node:fs');
+const ini = require('ini');
 
 function help(binaryName) {
     console.log(
@@ -25,7 +25,7 @@ let explainedChmodError = false;
 function tryChmod(pathname, mode) {
     try {
         fs.chmodSync(pathname, mode);
-    } catch (err) {
+    } catch (_err) {
         if (!explainedChmodError) {
             console.warn(`To help ensuring your private data is safe, Kresus tried to chmod the
 data directory (datadir in config.ini, or KRESUS_DATA_DIR as environment variable) with predefined
@@ -37,7 +37,7 @@ restrictive settings, but an error occurred:`);
 }
 
 function recursiveChmod(pathname, fileMode, dirMode) {
-    let stats = fs.statSync(pathname);
+    const stats = fs.statSync(pathname);
     if (stats.isFile()) {
         if (stats.mode !== fileMode) {
             tryChmod(pathname, fileMode);
@@ -57,19 +57,19 @@ function recursiveChmod(pathname, fileMode, dirMode) {
 function readConfigFromFile(pathname) {
     // In the stats retrieved from a file, the rights are the last 9 bits :
     // user rights / group rights / other rights
-    let configFileACLMask = 0x1ff;
+    const configFileACLMask = 0x1ff;
 
     let content = null;
     try {
-        let mode = fs.statSync(pathname).mode;
+        const mode = fs.statSync(pathname).mode;
 
-        let rights = mode & configFileACLMask;
+        const rights = mode & configFileACLMask;
 
         // Allow:
         // - readable by user
         // - writeable by user
         // - readable by group
-        let allowedFlags = fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP;
+        const allowedFlags = fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP;
 
         // In production, check the config file has r or rw rights for the owner.
         if (process.env.NODE_ENV === 'production' && (rights & ~allowedFlags) !== 0) {
@@ -111,16 +111,16 @@ const configurator = require(path.join(ROOT, 'server', 'config.js'));
 
 function runServer() {
     // Then only, import the server.
-    let server = require(path.join(ROOT, 'server'));
+    const server = require(path.join(ROOT, 'server'));
 
-    let dataDir = process.kresus.dataDir;
+    const dataDir = process.kresus.dataDir;
     if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir);
     }
 
     // The server should only create files with +rw permissions for the current
     // user.
-    let processUmask = 0o0077;
+    const processUmask = 0o0077;
     process.umask(processUmask);
 
     // Ensure the data directory contains files only the current user can read and
@@ -137,7 +137,7 @@ function runServer() {
 }
 
 function createUser(login, admin = false) {
-    let cli = require(path.join(ROOT, 'server', 'cli'));
+    const cli = require(path.join(ROOT, 'server', 'cli'));
     cli.createUser(login, admin).catch(error => {
         console.error(error);
         process.exit(-1);
@@ -145,7 +145,7 @@ function createUser(login, admin = false) {
 }
 
 function deleteUser(login) {
-    let cli = require(path.join(ROOT, 'server', 'cli'));
+    const cli = require(path.join(ROOT, 'server', 'cli'));
     cli.deleteUser(login).catch(error => {
         console.error(error);
         process.exit(-1);
@@ -153,7 +153,7 @@ function deleteUser(login) {
 }
 
 function listUsers() {
-    let cli = require(path.join(ROOT, 'server', 'cli'));
+    const cli = require(path.join(ROOT, 'server', 'cli'));
     cli.listUsers().catch(error => {
         console.error(error);
         process.exit(-1);
@@ -161,18 +161,18 @@ function listUsers() {
 }
 
 // First two args are [node, binaryname]
-let numActualArgs = Math.max(process.argv.length - 2, 0);
+const numActualArgs = Math.max(process.argv.length - 2, 0);
 function actualArg(n) {
     return process.argv[2 + n];
 }
 
 let command = runServer;
-let commandArgs = [];
+const commandArgs = [];
 
 let config = null;
-let binaryName = actualArg(-1);
+const binaryName = actualArg(-1);
 for (let i = 0; i < numActualArgs; i++) {
-    let arg = actualArg(i);
+    const arg = actualArg(i);
     if (['help', '-h', '--help'].includes(arg)) {
         help(binaryName);
         process.exit(0);
@@ -182,7 +182,7 @@ for (let i = 0; i < numActualArgs; i++) {
             help(binaryName);
             process.exit(-1);
         }
-        let configFilePath = actualArg(i + 1);
+        const configFilePath = actualArg(i + 1);
         i += 1;
         config = readConfigFromFile(configFilePath);
     } else if (arg === 'create:user') {
@@ -191,7 +191,7 @@ for (let i = 0; i < numActualArgs; i++) {
             help(binaryName);
             process.exit(-1);
         }
-        let login = actualArg(i + 1);
+        const login = actualArg(i + 1);
 
         command = createUser;
         commandArgs.push(login);
@@ -208,7 +208,7 @@ for (let i = 0; i < numActualArgs; i++) {
             help(binaryName);
             process.exit(-1);
         }
-        let login = actualArg(i + 1);
+        const login = actualArg(i + 1);
 
         command = deleteUser;
         commandArgs.push(login);

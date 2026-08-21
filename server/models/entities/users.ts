@@ -1,4 +1,4 @@
-import { DeepPartial, Entity, Repository, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Column, type DeepPartial, Entity, PrimaryGeneratedColumn, type Repository } from 'typeorm';
 
 import { getRepository } from '..';
 

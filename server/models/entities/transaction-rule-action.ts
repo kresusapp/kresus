@@ -1,11 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { unwrap } from '../../helpers';
-
+import type { TransactionRuleActionType } from '../../shared/types';
 import { getRepository } from '..';
-
-import { TransactionRuleActionType } from '../../shared/types';
-import TransactionRule from './transaction-rule';
 import Category from './categories';
+import TransactionRule from './transaction-rule';
 import User from './users';
 
 @Entity('transaction-rule-action')

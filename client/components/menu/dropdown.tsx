@@ -1,9 +1,8 @@
+import type * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import * as React from 'react';
 import { NavLink } from 'react-router';
-
-import URL from '../../urls';
 import { translate as $t } from '../../helpers';
+import URL from '../../urls';
 
 import DisplayIf from '../ui/display-if';
 

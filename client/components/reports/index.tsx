@@ -1,30 +1,28 @@
-import { createRef, useCallback, useContext, useEffect, useState, useMemo } from 'react';
+import { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { translate as $t, localeComparator, formatDate } from '../../helpers';
+import { translate as $t, formatDate, localeComparator } from '../../helpers';
 
-import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
-import * as UiStore from '../../store/ui';
-import * as SettingsStore from '../../store/settings';
+import { type GlobalState, useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-
-import InfiniteList from '../ui/infinite-list';
-import TransactionUrls from '../transactions/urls';
-
-import SearchComponent from './search';
-import BulkEditComponent from './bulkedit';
-import { TransactionItem, SwipeableTransactionItem } from './item';
-import MonthYearSeparator from './month-year-separator';
-import SyncButton from './sync-button';
-import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import * as SettingsStore from '../../store/settings';
+import * as UiStore from '../../store/ui';
 import { DriverContext, isAccountDriver } from '../drivers';
+import TransactionUrls from '../transactions/urls';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import InfiniteList from '../ui/infinite-list';
+import BulkEditComponent from './bulkedit';
+import { SwipeableTransactionItem, TransactionItem } from './item';
+import MonthYearSeparator from './month-year-separator';
+import SearchComponent from './search';
+import SyncButton from './sync-button';
 
 import './reports.css';
 import './account-summary.css';
 import './toolbar.css';
 
-import { Transaction } from '../../models';
-import { ButtonLink } from '../ui';
 import { LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../../shared/settings';
+import type { Transaction } from '../../models';
+import { ButtonLink } from '../ui';
 
 // Keep in sync with reports.css.
 function getTransactionHeight(isSmallScreen: boolean) {

@@ -1,12 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
-import { UNKNOWN_TRANSACTION_TYPE, assert, unwrap } from '../../helpers';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
+import { assert, UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
+import { getRepository } from '..';
 import { ForceNumericColumn } from '../helpers';
 
-import { getRepository } from '..';
-
 import Account from './accounts';
-import User from './users';
 import AppliedRecurringTransaction from './applied-recurring-transactions';
+import User from './users';
 
 @Entity('recurring-transaction')
 export default class RecurringTransaction {

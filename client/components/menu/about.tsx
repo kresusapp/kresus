@@ -1,8 +1,7 @@
 import { Fragment } from 'react';
-
-import ExternalLink from '../ui/external-link';
+import { license, repository, version } from '../../../package.json';
 import { translate as $t } from '../../helpers';
-import { version, repository, license } from '../../../package.json';
+import ExternalLink from '../ui/external-link';
 
 import './about.css';
 

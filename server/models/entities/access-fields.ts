@@ -1,11 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Repository } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import Access from './accesses';
-
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { assert, unwrap } from '../../helpers';
+import { getRepository } from '..';
+import Access from './accesses';
+import User from './users';
 
 @Entity('access_fields')
 export default class AccessField {

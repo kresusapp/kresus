@@ -1,10 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router';
-
-import ViewsList from './views-list';
-import NewView from './new-view';
+import { Navigate, Route, Routes } from 'react-router';
 import EditView from './edit-view';
-
+import NewView from './new-view';
 import URL from './urls';
+import ViewsList from './views-list';
 
 export default () => {
     return (

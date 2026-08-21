@@ -1,29 +1,28 @@
 import * as path from 'path';
 import {
     DataSource,
-    DataSourceOptions,
-    EntityTarget,
-    EntityManager,
-    Repository,
-    ObjectLiteral,
+    type DataSourceOptions,
+    type EntityManager,
+    type EntityTarget,
+    type ObjectLiteral,
+    type Repository,
 } from 'typeorm';
 
-import { assert, panic, makeLogger } from '../helpers';
-
-import Access from './entities/accesses';
+import { assert, makeLogger, panic } from '../helpers';
 import AccessField from './entities/access-fields';
+import Access from './entities/accesses';
 import Account from './entities/accounts';
 import Alert from './entities/alerts';
+import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
 import Budget from './entities/budgets';
 import Category from './entities/categories';
+import RecurringTransaction from './entities/recurring-transactions';
 import Setting from './entities/settings';
-import Transaction from './entities/transactions';
 import TransactionRule from './entities/transaction-rule';
 import TransactionRuleAction from './entities/transaction-rule-action';
 import TransactionRuleCondition from './entities/transaction-rule-condition';
+import Transaction from './entities/transactions';
 import User from './entities/users';
-import RecurringTransaction from './entities/recurring-transactions';
-import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
 import View from './entities/views';
 
 type MinimalTransaction = Partial<Transaction> &
@@ -34,17 +33,17 @@ export {
     AccessField,
     Account,
     Alert,
+    AppliedRecurringTransaction,
     Budget,
     Category,
+    type MinimalTransaction,
+    RecurringTransaction,
     Setting,
     Transaction,
-    MinimalTransaction,
     TransactionRule,
     TransactionRuleAction,
     TransactionRuleCondition,
     User,
-    RecurringTransaction,
-    AppliedRecurringTransaction,
     View,
 };
 

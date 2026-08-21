@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
 
 import { translate as $t, notify, noValueFoundMessage } from '../../helpers';
-
+import type { CustomFieldDescriptor } from '../../models';
 import { Form } from '../ui';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import PasswordInput from '../ui/password-input';
 import TextInput from '../ui/text-input';
 import ValidatedTextInput from '../ui/validated-text-input';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import { CustomFieldDescriptor } from '../../models';
 
 const CustomBankField = (props: {
     // The static custom field descriptor object.

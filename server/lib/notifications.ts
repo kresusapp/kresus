@@ -1,15 +1,13 @@
-import * as https from 'https';
 import * as http from 'http';
-import { TextEncoder } from 'util';
+import * as https from 'https';
 import { resolve } from 'url';
+import { TextEncoder } from 'util';
 
-import { assert, makeLogger, translate as $t, KError, isAppriseApiEnabled } from '../helpers';
-import { APPRISE_URL } from '../shared/settings';
-
+import { translate as $t, assert, isAppriseApiEnabled, KError, makeLogger } from '../helpers';
 import Settings from '../models/entities/settings';
-
-import { getTranslator } from './translator';
 import DefaultSettings from '../shared/default-settings';
+import { APPRISE_URL } from '../shared/settings';
+import { getTranslator } from './translator';
 
 const log = makeLogger('notifications');
 

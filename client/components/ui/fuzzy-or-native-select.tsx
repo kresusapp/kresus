@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
-
+import { translate as $t, assert } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
-import { assert, translate as $t } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
     ignoreCase: true,

@@ -1,8 +1,8 @@
-import express from 'express';
+import type express from 'express';
 import { asString, asyncErr, KError } from '../helpers';
 import { Account, RecurringTransaction } from '../models';
 import { hasForbiddenOrMissingField } from '../shared/validators';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 export async function preload(
     req: IdentifiedRequest<RecurringTransaction>,

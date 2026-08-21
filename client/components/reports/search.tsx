@@ -1,27 +1,27 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import * as React from 'react';
-import { matchPath } from 'react-router';
 import debounce from 'lodash.debounce';
+import * as React from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { matchPath } from 'react-router';
 
 import {
     translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
+    assert,
+    endOfDay,
     NONE_CATEGORY_ID,
     startOfDay,
-    endOfDay,
-    assert,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
 import URL from '../../urls';
 
-import ClearableInput, { ClearableInputRef } from '../ui/clearable-input';
+import ClearableInput, { type ClearableInputRef } from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import MinMaxInput, { type MinMaxInputRef } from '../ui/min-max-input';
 import MultipleSelect from '../ui/multiple-select';
-import MinMaxInput, { MinMaxInputRef } from '../ui/min-max-input';
 
 import './search.css';
 

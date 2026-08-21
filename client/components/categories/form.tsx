@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-
+import { translate as $t, assertNotNull, generateColor, notify } from '../../helpers';
+import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
-import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
-import { useRequiredParams } from '../../hooks';
-import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
-
+import { BackLink, ColorPicker, Form, ValidatedTextInput } from '../ui';
+import type { ValidatedTextInputRef } from '../ui/validated-text-input';
 import URL from './urls';
-import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 const CategoryForm = (props: { id?: number }) => {
     const dispatch = useKresusDispatch();

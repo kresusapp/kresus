@@ -1,7 +1,6 @@
 import { translate as $t } from '../../../helpers';
-
-import ImportModule from './import';
 import ExportModule from './export';
+import ImportModule from './import';
 
 const BackupSection = () => {
     return (

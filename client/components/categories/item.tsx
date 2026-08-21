@@ -1,13 +1,11 @@
 import { forwardRef, useCallback } from 'react';
 import { useNavigate } from 'react-router';
-
+import { translate as $t } from '../../helpers';
+import type { Category } from '../../models';
 import { ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
 import { useTableRowSwipeDetection } from '../ui/use-swipe';
-
 import URL from './urls';
-import { Category } from '../../models';
-import { translate as $t } from '../../helpers';
 
 interface CategoryItemProps {
     // The category related to this item.

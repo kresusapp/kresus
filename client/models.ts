@@ -1,8 +1,11 @@
+import type { TransactionRuleActionType, TransactionRuleConditionType } from '../shared/types';
+
+import { checkAlert, checkBudget } from '../shared/validators';
 import {
-    debug,
-    assertHas,
     assert,
+    assertHas,
     currency,
+    debug,
     FETCH_STATUS_SUCCESS,
     maybeHas,
     NONE_CATEGORY_ID,
@@ -10,9 +13,6 @@ import {
     UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_TRANSACTION_TYPE,
 } from './helpers';
-
-import { checkAlert, checkBudget } from '../shared/validators';
-import { TransactionRuleActionType, TransactionRuleConditionType } from '../shared/types';
 
 type CustomField = {
     // A key describing the name of the field.

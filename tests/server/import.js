@@ -1,26 +1,25 @@
 import assert from 'node:assert';
 
 import fs from 'fs';
-import path from 'path';
 import moment from 'moment';
-
+import path from 'path';
+import { importData, testing } from '../../server/controllers/all';
+import { testing as ofxTesting } from '../../server/controllers/ofx';
 import {
     Access,
     AccessField,
     Account,
     Alert,
+    AppliedRecurringTransaction,
     Budget,
     Category,
+    RecurringTransaction,
     Setting,
     Transaction,
-    User,
     TransactionRule,
-    RecurringTransaction,
-    AppliedRecurringTransaction,
+    User,
     View,
 } from '../../server/models';
-import { testing, importData } from '../../server/controllers/all';
-import { testing as ofxTesting } from '../../server/controllers/ofx';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 import { checkObjectIsSubsetOf } from '../helpers';
@@ -373,7 +372,9 @@ describe('import', () => {
 
         let actualAccounts = await Account.all(USER_ID);
         assert.strictEqual(actualAccounts.length, data.accounts.length);
-        actualAccounts.forEach(account => (account.balance = null));
+        actualAccounts.forEach(account => {
+            account.balance = null;
+        });
         assert.ok(
             data.accounts.every(c => actualAccounts.some(ac => checkObjectIsSubsetOf(c, ac)))
         );

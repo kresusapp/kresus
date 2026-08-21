@@ -1,4 +1,4 @@
-import { forwardRef, ChangeEvent, useCallback } from 'react';
+import { type ChangeEvent, forwardRef, useCallback } from 'react';
 
 export interface TextInputProps {
     // Callback receiving the validated text input.

@@ -1,21 +1,20 @@
+import {
+    checkMinimalWoobVersion,
+    isAppriseApiEnabled,
+    isEmailEnabled,
+    UNKNOWN_WOOB_VERSION,
+} from '../helpers';
 import { getVersion as getWoobVersion } from '../providers/woob';
 
 import {
-    isEmailEnabled,
-    isAppriseApiEnabled,
-    checkMinimalWoobVersion,
-    UNKNOWN_WOOB_VERSION,
-} from '../helpers';
-
-import {
     CAN_ENCRYPT,
+    DEV_ENV,
     EMAILS_ENABLED,
     FORCE_DEMO_MODE,
     NOTIFICATIONS_ENABLED,
     URL_PREFIX,
     WOOB_INSTALLED,
     WOOB_VERSION,
-    DEV_ENV,
 } from '../shared/instance';
 
 export type InstancePropertiesType = { [key: string]: string };

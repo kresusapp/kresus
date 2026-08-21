@@ -1,11 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { translate as $t, notify, copyContentToClipboard } from '../../../helpers';
+import { translate as $t, copyContentToClipboard, notify } from '../../../helpers';
+import { useNotifyError } from '../../../hooks';
 import * as backend from '../../../store/backend';
-
 import { Form, Popconfirm } from '../../ui';
 import DiscoveryMessage from '../../ui/discovery-message';
-import { useNotifyError } from '../../../hooks';
 
 const Logs = () => {
     const [logs, setLogs] = useState<string | null>(null);

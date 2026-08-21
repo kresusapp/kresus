@@ -1,12 +1,10 @@
-import express from 'express';
-
-import { Account, Setting, Transaction, User } from '../models';
+import type express from 'express';
 import { asyncErr } from '../helpers';
-import { IdentifiedRequest } from './routes';
 import { findRedundantPairs } from '../lib/duplicates-manager';
+import { Account, Setting, Transaction, User } from '../models';
 import { DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, DUPLICATE_THRESHOLD } from '../shared/settings';
-
 import type { Duplicates } from '../shared/types';
+import type { IdentifiedRequest } from './routes';
 
 export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Response) {
     try {

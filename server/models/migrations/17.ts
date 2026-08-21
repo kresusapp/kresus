@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { run as removeWoobUseNss } from '../data-migrations/remove-woob-nss-setting';
 

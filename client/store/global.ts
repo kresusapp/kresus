@@ -1,7 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-
-import { assertHas } from '../helpers';
-
 import {
     DARK_MODE,
     DEFAULT_ACCOUNT_ID,
@@ -10,25 +7,23 @@ import {
     FLUID_LAYOUT,
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../shared/settings';
-
-import {
-    Account,
-    Category,
-    Transaction,
+import type { BankVendor } from '../../shared/types';
+import { assertHas } from '../helpers';
+import type {
     Access,
+    Account,
     Alert,
-    Setting,
+    Category,
     RecurringTransaction,
+    Setting,
+    Transaction,
     User,
 } from '../models';
-
 import * as backend from './backend';
-
 import * as BudgetStore from './budgets';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
-import { regenerateAllViews, ServerView } from './views';
-import type { BankVendor } from '../../shared/types';
+import { regenerateAllViews, type ServerView } from './views';
 
 type ImportType = 'ofx' | 'json';
 

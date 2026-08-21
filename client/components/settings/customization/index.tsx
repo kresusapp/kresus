@@ -1,17 +1,16 @@
 import { useCallback } from 'react';
-
-import { translate as $t } from '../../../helpers';
-import { useKresusDispatch, useKresusState } from '../../../store';
-import * as SettingsStore from '../../../store/settings';
-import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
 import {
     DARK_MODE,
     DISCOVERY_MODE,
     FLUID_LAYOUT,
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../../../shared/settings';
+import { translate as $t } from '../../../helpers';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
+import * as SettingsStore from '../../../store/settings';
 
-import { Switch, Form } from '../../ui';
+import { Form, Switch } from '../../ui';
 import AnyAccountSelector from '../../ui/account-select';
 
 import LocaleSelector from './locale-selector';

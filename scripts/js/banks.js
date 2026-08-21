@@ -1,10 +1,9 @@
 /* eslint no-process-exit: 0 */
 
-import * as path from 'path';
 import * as fs from 'fs';
-
-import { getBankVendors } from '../../server/providers';
+import * as path from 'path';
 import { makeLogger } from '../../server/helpers';
+import { getBankVendors } from '../../server/providers';
 
 const banks = getBankVendors();
 

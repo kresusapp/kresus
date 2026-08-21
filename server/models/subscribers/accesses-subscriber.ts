@@ -1,4 +1,4 @@
-import { EventSubscriber, EntitySubscriberInterface } from 'typeorm';
+import { type EntitySubscriberInterface, EventSubscriber } from 'typeorm';
 
 import Access from '../entities/accesses';
 import View from '../entities/views';

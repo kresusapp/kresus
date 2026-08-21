@@ -1,9 +1,8 @@
-import express from 'express';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
-
-import { Account, Category, Transaction } from '../models';
+import type express from 'express';
+import { asyncErr, KError, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
-import { KError, asyncErr, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
+import { Account, Category, Transaction } from '../models';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 async function preload(
     varName: string,

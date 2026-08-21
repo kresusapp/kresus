@@ -1,29 +1,26 @@
 import regexEscape from 'regex-escape';
-
-import { assert, makeLogger } from '../helpers';
-import { ConfigGhostSettings, InstancePropertiesType } from '../lib/instance';
-import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import type { BankVendor } from '../../shared/types';
+import { assert, makeLogger } from '../helpers';
+import { ConfigGhostSettings, type InstancePropertiesType } from '../lib/instance';
 
-import {
+import type {
     Account,
     Alert,
-    Category,
-    Transaction,
-    Budget,
-    RecurringTransaction,
     AppliedRecurringTransaction,
-    User,
-    View,
+    Budget,
+    Category,
+    RecurringTransaction,
     Setting,
+    Transaction,
     TransactionRule,
     TransactionRuleAction,
     TransactionRuleCondition,
+    User,
+    View,
 } from '../models';
-
+import DefaultSettings from '../shared/default-settings';
 import { conditionTypesList } from './rules';
-
-import type { BankVendor } from '../../shared/types';
 
 const log = makeLogger('controllers/helpers');
 

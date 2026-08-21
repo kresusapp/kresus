@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 // Banks update, 2020-04-14
 export class BanksUpdate1586890559919 implements MigrationInterface {

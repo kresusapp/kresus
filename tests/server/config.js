@@ -43,7 +43,9 @@ function checkHasConfigKeys(env) {
         'dbLog',
     ];
 
-    configKeys.forEach(key => assert.ok(key in env));
+    configKeys.forEach(key => {
+        assert.ok(key in env);
+    });
 
     // Note: Checking the length as well so that test will fail if someone adds
     // new config options and does not update the tests.

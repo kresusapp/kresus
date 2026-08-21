@@ -1,10 +1,9 @@
-import express from 'express';
-
-import { Account, Alert } from '../models';
+import type express from 'express';
 import { asyncErr, KError } from '../helpers';
+import { Account, Alert } from '../models';
 import { checkAlert } from '../shared/validators';
 
-import { IdentifiedRequest, PreloadedRequest } from './routes';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 export async function loadAlert(
     req: IdentifiedRequest<Alert>,

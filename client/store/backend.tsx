@@ -1,22 +1,22 @@
-import { assert, translate as $t } from '../helpers';
-import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
-import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import type { DeepPartial } from 'typeorm';
+import type { BatchRequest, BatchResponse } from '../../shared/api/batch';
 import DefaultSettings from '../../shared/default-settings';
-import {
-    Account,
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { hasForbiddenField, hasForbiddenOrMissingField } from '../../shared/validators';
+import { translate as $t, assert } from '../helpers';
+import type {
     Access,
     AccessCustomField,
+    Account,
     Alert,
     Budget,
     Category,
     PartialTransaction,
-    Rule,
     RecurringTransaction,
+    Rule,
 } from '../models';
-import { ServerView } from './views';
-import { FinishUserActionFields } from './banks';
-import { DeepPartial } from 'typeorm';
-import { BatchRequest, BatchResponse } from '../../shared/api/batch';
+import type { FinishUserActionFields } from './banks';
+import type { ServerView } from './views';
 
 class Request {
     url: string;

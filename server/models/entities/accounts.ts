@@ -1,32 +1,29 @@
 import {
-    In,
-    Entity,
-    PrimaryGeneratedColumn,
-    JoinColumn,
     Column,
+    Entity,
+    In,
+    JoinColumn,
     ManyToOne,
-    Repository,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import Access from './accesses';
-import Transaction from './transactions';
-import Setting from './settings';
-
 import {
     assert,
+    type CurrencyFormatter,
     currency,
     currencyFormatter,
-    CurrencyFormatter,
-    UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
+    UNKNOWN_ACCOUNT_TYPE,
     unwrap,
 } from '../../helpers';
-import { ForceNumericColumn, DatetimeType } from '../helpers';
 import { DEFAULT_CURRENCY, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
+import { getRepository } from '..';
+import { DatetimeType, ForceNumericColumn } from '../helpers';
+import Access from './accesses';
+import Setting from './settings';
+import Transaction from './transactions';
+import User from './users';
 
 @Entity('account')
 export default class Account {
@@ -164,7 +161,7 @@ export default class Account {
     };
 
     getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
-        let checkedCurrency;
+        let checkedCurrency: string | null;
         if (currency.isKnown(this.currency)) {
             checkedCurrency = this.currency;
         } else {

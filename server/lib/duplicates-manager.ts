@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
+import { makeLogger, NONE_CATEGORY_ID, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 
 import type { MinimalTransaction, Transaction } from '../models';
 

@@ -1,13 +1,11 @@
 import { createRef, useCallback, useReducer, useState } from 'react';
-
-import { assert, translate as $t, validatePassword } from '../../../helpers';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
+import { translate as $t, assert, validatePassword } from '../../../helpers';
+import { useEffectUpdate, useNotifyError } from '../../../hooks';
 import { useKresusState } from '../../../store';
 import * as InstanceStore from '../../../store/instance';
+import { LoadingButton, Switch } from '../../ui';
 import DisplayIf from '../../ui/display-if';
-import { Switch, LoadingButton } from '../../ui';
-
-import { useEffectUpdate, useNotifyError } from '../../../hooks';
 
 const finishExport = (content: Record<string, unknown> | string) => {
     let blob;

@@ -1,15 +1,15 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
     JoinColumn,
     ManyToOne,
-    Repository,
     OneToMany,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
 import { assert, unwrap } from '../../helpers';
-import { PartialOnePlus } from '../helpers';
+import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
+import type { PartialOnePlus } from '../helpers';
 
 import User from './users';
 

@@ -1,14 +1,13 @@
+import type * as React from 'react';
 import { createRef, useCallback } from 'react';
-import * as React from 'react';
 
-import { assert, translate as $t, displayLabel } from '../../../helpers';
+import { translate as $t, assert, displayLabel } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
+import type { Account, Alert } from '../../../models';
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-
+import AmountInput, { type AmountInputRef } from '../../ui/amount-input';
 import DeleteAlertButton from './confirm-delete';
-import AmountInput, { AmountInputRef } from '../../ui/amount-input';
-import { Account, Alert } from '../../../models';
-import { useGenericError } from '../../../hooks';
 
 const AlertItem = (props: {
     // Description of the type of alert.

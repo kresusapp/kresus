@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { handleSyncError } from '../../errors';
 import { translate as $t, notify } from '../../helpers';
+import type { Account } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { Account } from '../../models';
 import AccessesURL from '../accesses/urls';
 
 interface SyncButtonProps {

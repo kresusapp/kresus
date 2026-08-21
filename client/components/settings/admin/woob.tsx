@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-
-import { translate as $t, UNKNOWN_WOOB_VERSION, notify } from '../../../helpers';
+import { WOOB_VERSION } from '../../../../shared/instance';
 import {
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
@@ -8,17 +7,15 @@ import {
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
 } from '../../../../shared/settings';
-import { WOOB_VERSION } from '../../../../shared/instance';
-
+import Errors, { genericErrorHandler } from '../../../errors';
+import { translate as $t, notify, UNKNOWN_WOOB_VERSION } from '../../../helpers';
+import { useGenericError, useNotifyError } from '../../../hooks';
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
-import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-
-import { Form, Switch, LoadingButton } from '../../ui';
+import * as SettingsStore from '../../../store/settings';
+import { Form, LoadingButton, Switch } from '../../ui';
 import ExternalLink from '../../ui/external-link';
-import Errors, { genericErrorHandler } from '../../../errors';
-import { useGenericError, useNotifyError } from '../../../hooks';
 
 const UpdateButton = () => {
     const [isLoading, setIsLoading] = useState(false);

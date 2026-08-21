@@ -2,7 +2,7 @@ import assert from 'node:assert';
 
 import semver from 'semver';
 
-import { MIN_WOOB_VERSION, normalizeVersion, checkMinimalWoobVersion } from '../../server/helpers';
+import { checkMinimalWoobVersion, MIN_WOOB_VERSION, normalizeVersion } from '../../server/helpers';
 
 describe('server getters', () => {
     describe("'isWoobInstalled'", () => {

@@ -1,10 +1,9 @@
-import express from 'express';
-
+import type express from 'express';
+import { asyncErr, KError } from '../helpers';
 import { View } from '../models';
-import { KError, asyncErr } from '../helpers';
 
 import { isDemoEnabled } from './instance';
-import { PreloadedRequest, IdentifiedRequest } from './routes';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 // Prefills the @view field with a queried bank account.
 export async function preloadView(

@@ -1,7 +1,4 @@
-import express from 'express';
-
-import manifestRoute from './manifest';
-
+import type express from 'express';
 import * as accesses from './accesses';
 import * as accounts from './accounts';
 import * as alerts from './alerts';
@@ -10,14 +7,15 @@ import * as batch from './batch';
 import * as budgets from './budgets';
 import * as categories from './categories';
 import * as demo from './demo';
+import * as duplicates from './duplicates';
 import * as instance from './instance';
 import * as logs from './logs';
-import * as transactions from './transactions';
+import manifestRoute from './manifest';
+import * as recurringTransactions from './recurring-transactions';
 import * as rules from './rules';
 import * as settings from './settings';
-import * as recurringTransactions from './recurring-transactions';
+import * as transactions from './transactions';
 import * as views from './views';
-import * as duplicates from './duplicates';
 
 const namespace = 'api';
 

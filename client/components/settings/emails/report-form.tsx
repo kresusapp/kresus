@@ -1,12 +1,12 @@
 import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
-import { assert, translate as $t } from '../../../helpers';
+import { translate as $t, assert } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
 import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-import AccountSelector from '../../ui/account-select';
-import { useGenericError } from '../../../hooks';
 import { BackLink, Form } from '../../ui';
+import AccountSelector from '../../ui/account-select';
 import URL from './urls';
 
 const CreateReportForm = () => {

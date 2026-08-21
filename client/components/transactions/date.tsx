@@ -1,13 +1,11 @@
-import { useCallback } from 'react';
 import moment from 'moment';
-
+import { useCallback } from 'react';
+import { translate as $t, formatDate, notify } from '../../helpers';
+import { useGenericError } from '../../hooks';
+import type { Transaction } from '../../models';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { formatDate, notify, translate as $t } from '../../helpers';
-
 import ValidatedDatePicker from '../ui/validated-date-picker';
-import { Transaction } from '../../models';
-import { useGenericError } from '../../hooks';
 
 interface Props {
     // The transaction from which to get the budget date.

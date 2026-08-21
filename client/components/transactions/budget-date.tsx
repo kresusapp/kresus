@@ -1,13 +1,13 @@
-import { useCallback } from 'react';
 import moment from 'moment';
+import { useCallback } from 'react';
 
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 import './budget-date.css';
-import { Transaction } from '../../models';
 import { useGenericError } from '../../hooks';
+import type { Transaction } from '../../models';
 
 interface Props {
     // The transaction from which to get the budget date.

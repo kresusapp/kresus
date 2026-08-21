@@ -1,8 +1,7 @@
-import { useCallback } from 'react';
 import * as React from 'react';
-
-import DisplayIf from './display-if';
+import { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
+import DisplayIf from './display-if';
 
 import './form.css';
 

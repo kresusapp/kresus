@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 
-import { displayLabel, assert, assertHas, translate as $t } from '../../../helpers';
+import { translate as $t, assert, assertHas, displayLabel } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
+import type { Account, Alert } from '../../../models';
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-
 import DeleteAlertButton from './confirm-delete';
-import { Account, Alert } from '../../../models';
-import { useGenericError } from '../../../hooks';
 
 const ReportItem = (props: {
     // The alert

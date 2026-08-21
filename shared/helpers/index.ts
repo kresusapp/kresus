@@ -3,7 +3,7 @@
 
 import { memoize } from 'micro-memoize';
 
-import { SharedTransaction } from '../types';
+import type { SharedTransaction } from '../types';
 
 // Locales
 // It is necessary to load the locale files statically,
@@ -13,18 +13,15 @@ import { SharedTransaction } from '../types';
 // - for moment, in client/main.tsx
 // - for flatpickr, in client/components/ui/flatpicker.ts
 
-import FR_LOCALE from '../locales/fr.json';
+import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+import moment from 'moment';
+import Polyglot from 'node-polyglot';
+import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
+import ACCOUNT_TYPES from '../account-types.json';
 import EN_LOCALE from '../locales/en.json';
 import ES_LOCALE from '../locales/es.json';
+import FR_LOCALE from '../locales/fr.json';
 import TR_LOCALE from '../locales/tr.json';
-
-import Polyglot from 'node-polyglot';
-import { format as currencyFormatter, findCurrency } from 'currency-formatter';
-
-import moment from 'moment';
-
-import ACCOUNT_TYPES from '../account-types.json';
-import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
 import { endOfMonth } from './dates';
 
 export function maybeHas(obj: object, prop: string): boolean {
@@ -201,7 +198,7 @@ export const currency = {
         }
         const { decimalDigits } = found;
         return (amount: number) => {
-            const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+            const am = Math.abs(amount) < 10 ** (-decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
     }),

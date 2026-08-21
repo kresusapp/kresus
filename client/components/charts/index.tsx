@@ -1,31 +1,24 @@
+import { Chart as ChartJS, registerables } from 'chart.js';
+import chartZoomPlugin from 'chartjs-plugin-zoom';
 import { useContext } from 'react';
 import { useLocation } from 'react-router';
-
-import URL from '../../urls';
+import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
+import { translate as $t, getFontColor } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { getFontColor, translate as $t } from '../../helpers';
-
-import { Chart as ChartJS, registerables } from 'chart.js';
-
-import chartZoomPlugin from 'chartjs-plugin-zoom';
-
-import chartsPlaceholderPlugin from './placeholder-plugin';
-
-import InOutChart from './in-out-chart';
+import URL from '../../urls';
+import { DriverContext } from '../drivers';
+import TabsContainer, { type TabDescriptor } from '../ui/tabs';
 import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
-
-import TabsContainer, { TabDescriptor } from '../ui/tabs';
-import { DriverContext } from '../drivers';
-
-import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import DefaultParameters from './default-params';
+import InOutChart from './in-out-chart';
+import chartsPlaceholderPlugin from './placeholder-plugin';
 
 import './charts.css';
 import { Form } from '../ui';
 
-export const initializeCharts = (function () {
+export const initializeCharts = (() => {
     let initialized = false;
     return () => {
         if (initialized) {

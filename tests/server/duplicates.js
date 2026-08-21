@@ -1,12 +1,11 @@
 import assert from 'node:assert';
-
-import { getDuplicatePairScore, findRedundantPairs } from '../../server/lib/duplicates-manager';
 import {
-    UNKNOWN_TRANSACTION_TYPE,
     INTERNAL_TRANSFER_TYPE,
-    TRANSACTION_CARD_TYPE,
     NONE_CATEGORY_ID,
+    TRANSACTION_CARD_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../server/helpers';
+import { findRedundantPairs, getDuplicatePairScore } from '../../server/lib/duplicates-manager';
 
 describe('getDuplicatePairScore', () => {
     const BaseTransaction = {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 
-import { handleSyncError, handleFirstSyncError, genericErrorHandler } from './errors';
+import { genericErrorHandler, handleFirstSyncError, handleSyncError } from './errors';
 import { notify, translate } from './helpers';
 
 // Return a wrapped callback that calls onError with the caught error, when

@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableColumn } from 'typeorm';
 
 // Add the "isOrphan" column to accounts.
 export class AddIsOrphanColumn1704905841767 implements MigrationInterface {

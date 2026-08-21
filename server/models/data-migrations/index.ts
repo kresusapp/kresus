@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import type { EntityManager } from 'typeorm';
 
 import { getManager } from '..';
 

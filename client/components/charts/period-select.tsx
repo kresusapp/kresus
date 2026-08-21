@@ -1,5 +1,5 @@
+import type * as React from 'react';
 import { useCallback } from 'react';
-import * as React from 'react';
 import { translate as $t } from '../../helpers';
 
 const PeriodSelect = (props: {

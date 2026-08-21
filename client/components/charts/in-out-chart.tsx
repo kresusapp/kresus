@@ -1,34 +1,31 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { Dispatch } from '@reduxjs/toolkit';
 import { Chart } from 'chart.js';
-
-import { useKresusState } from '../../store';
-import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import {
-    getWellsColors,
-    assert,
-    translate as $t,
-    round2,
-    INTERNAL_TRANSFER_TYPE,
-    getFontColor,
-} from '../../helpers';
-import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
-
-import DisplayIf from '../ui/display-if';
-import DiscoveryMessage from '../ui/discovery-message';
-
-import FrequencySelect from './frequency-select';
-import CurrencySelect from './currency-select';
-import { Transaction } from '../../models';
-import { DateRange, Form, PredefinedDateRanges } from '../ui';
-import { initializeCharts } from '.';
-import { Driver, DriverContext } from '../drivers';
 import moment from 'moment';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { NavigateFunction, useNavigate } from 'react-router';
-import { Dispatch } from '@reduxjs/toolkit';
+import { type NavigateFunction, useNavigate } from 'react-router';
+import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
+import {
+    translate as $t,
+    assert,
+    getFontColor,
+    getWellsColors,
+    INTERNAL_TRANSFER_TYPE,
+    round2,
+} from '../../helpers';
+import type { Transaction } from '../../models';
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as SettingsStore from '../../store/settings';
 import * as UiStore from '../../store/ui';
 import URLs from '../../urls';
+import { type Driver, DriverContext } from '../drivers';
+import { DateRange, Form, PredefinedDateRanges } from '../ui';
+import DiscoveryMessage from '../ui/discovery-message';
+import DisplayIf from '../ui/display-if';
+import { initializeCharts } from '.';
+import CurrencySelect from './currency-select';
+import FrequencySelect from './frequency-select';
 
 initializeCharts();
 

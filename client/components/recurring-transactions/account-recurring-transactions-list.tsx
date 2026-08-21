@@ -1,23 +1,17 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-
-import * as BanksStore from '../../store/banks';
-import { useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
-
-import { RecurringTransaction } from '../../models';
-
 import { translate as $t } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
-
-import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import type { RecurringTransaction } from '../../models';
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
+import URL from '../../urls';
 import ButtonLink from '../ui/button-link';
-
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import RecurringTransactionItem, {
     SwipeableRecurringTransactionItem,
 } from './recurring-transaction-item';
-
-import URL from '../../urls';
 
 const RecurringTransactionsList = () => {
     const navigate = useNavigate();

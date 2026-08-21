@@ -1,14 +1,14 @@
 import { Chart, type LegendItem } from 'chart.js';
-import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
-import { assert, localeComparator, round2, translate as $t } from '../../helpers';
-import { Hideable } from './hidable-chart';
-import type { TransactionsChartProps } from './category-barchart';
-import { useDispatch } from 'react-redux';
-import * as UiStore from '../../store/ui';
 import moment from 'moment';
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { DriverContext } from '../drivers';
+import { translate as $t, assert, localeComparator, round2 } from '../../helpers';
+import * as UiStore from '../../store/ui';
 import URLs from '../../urls';
+import { DriverContext } from '../drivers';
+import type { TransactionsChartProps } from './category-barchart';
+import type { Hideable } from './hidable-chart';
 
 const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
     const container = useRef<Chart<'pie'> | null>(null);

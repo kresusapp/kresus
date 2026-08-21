@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router';
+import { Route, Routes } from 'react-router';
 
 import CreateTransaction from './create';
 import Details from './details';

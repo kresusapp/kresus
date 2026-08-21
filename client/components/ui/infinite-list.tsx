@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as React from 'react';
-
 import throttle from 'lodash.throttle';
+import type * as React from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { assert } from '../../helpers';
 
 // Throttling for the scroll event (ms)

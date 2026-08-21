@@ -1,7 +1,7 @@
-import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import * as React from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t, assert } from '../../helpers';
 
 // Note this password input doesn't accept passwords starting with or ending
 // with spaces (or passwords only containing spaces).

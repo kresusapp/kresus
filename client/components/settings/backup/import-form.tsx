@@ -1,20 +1,18 @@
-import { useRef, createRef, useCallback, useReducer, useState } from 'react';
-
+import { createRef, useCallback, useReducer, useRef, useState } from 'react';
+import { CAN_ENCRYPT } from '../../../../shared/instance';
+import { genericErrorHandler, get as getErrorCode } from '../../../errors';
+import { translate as $t, assert, notify } from '../../../helpers';
+import { useEffectUpdate } from '../../../hooks';
 // Global variables
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-import * as InstanceStore from '../../../store/instance';
 import * as GlobalStore from '../../../store/global';
-import { get as getErrorCode, genericErrorHandler } from '../../../errors';
-import { translate as $t, notify, assert } from '../../../helpers';
-
+import * as InstanceStore from '../../../store/instance';
 import DisplayIf from '../../ui/display-if';
-import PasswordInput from '../../ui/password-input';
+import FileInput, { type FileInputRef } from '../../ui/file-input';
 import Form from '../../ui/form';
-import FileInput, { FileInputRef } from '../../ui/file-input';
-import Select, { ComboboxProps } from '../../ui/fuzzy-or-native-select';
-import { CAN_ENCRYPT } from '../../../../shared/instance';
-import { useEffectUpdate } from '../../../hooks';
+import Select, { type ComboboxProps } from '../../ui/fuzzy-or-native-select';
+import PasswordInput from '../../ui/password-input';
 
 const handleError = (error: any) => {
     switch (error.errCode) {

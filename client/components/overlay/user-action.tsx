@@ -1,11 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-
-import * as UiStore from '../../store/ui';
-import { notify, translate as $t } from '../../helpers';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { translate as $t, notify } from '../../helpers';
+import type * as UiStore from '../../store/ui';
 
 import { Form, ValidatedTextInput } from '../ui';
 import DisplayIf from '../ui/display-if';
-import { ValidatedTextInputRef } from '../ui/validated-text-input';
+import type { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
     const [formFields, setFormFields] = useState({});

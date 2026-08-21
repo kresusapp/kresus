@@ -1,24 +1,20 @@
 import { Fragment, useCallback, useContext } from 'react';
-
-import { translate as $t } from '../../helpers';
 import { DUPLICATE_THRESHOLD } from '../../../shared/settings';
+import { translate as $t } from '../../helpers';
 
-import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
-import * as SettingsStore from '../../store/settings';
+import { type GlobalState, useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as DuplicatesStore from '../../store/duplicates';
-
-import DefaultParameters from './default-params';
-
-import Pair from './item';
+import * as SettingsStore from '../../store/settings';
 import { DriverContext } from '../drivers';
+import DefaultParameters from './default-params';
+import Pair from './item';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
-
+import { LoadingMessage } from '../overlay/loading';
 import DiscoveryMessage from '../ui/discovery-message';
 import MergeAll from './merge-all';
-import { LoadingMessage } from '../overlay/loading';
 
 export function findRedundantPairs(state: GlobalState, accountId: number) {
     const accountDuplicates = DuplicatesStore.byAccountId(state.duplicates, accountId);

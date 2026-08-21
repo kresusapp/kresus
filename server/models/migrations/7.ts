@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
-import { bulkDelete } from '../helpers';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 import { Budget } from '..';
+import { bulkDelete } from '../helpers';
 
 // This cannot be run as a data migration, because data migrations are run after the import, and the
 // unique constraint might be present before the data has been imported, which would cause errors

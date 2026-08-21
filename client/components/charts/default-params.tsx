@@ -1,21 +1,18 @@
+import type * as React from 'react';
 import { useCallback, useState } from 'react';
-import * as React from 'react';
-
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as SettingsStore from '../../store/settings';
-import { assert, translate as $t } from '../../helpers';
-
 import {
     DEFAULT_CHART_DISPLAY_TYPE,
     DEFAULT_CHART_FREQUENCY,
     DEFAULT_CHART_PERIOD,
     DEFAULT_CHART_TYPE,
 } from '../../../shared/settings';
-
-import FrequencySelect from './frequency-select';
+import { translate as $t, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as SettingsStore from '../../store/settings';
 import { Form, Popform } from '../ui';
+import AmountKindSelect, { type AmountKindType } from './amount-select';
+import FrequencySelect from './frequency-select';
 import PeriodSelect from './period-select';
-import AmountKindSelect, { AmountKindType } from './amount-select';
 
 const DefaultParams = () => {
     const initialAmountKind = useKresusState(state =>

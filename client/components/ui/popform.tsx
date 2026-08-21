@@ -1,9 +1,8 @@
+import type * as React from 'react';
 import { useCallback, useRef } from 'react';
-import * as React from 'react';
-
-import Popover, { PopoverRef } from './popover';
+import { translate as $t, assert } from '../../helpers';
 import Form from './form';
-import { assert, translate as $t } from '../../helpers';
+import Popover, { type PopoverRef } from './popover';
 
 interface PopformShorthandProps {
     // Element to show as the trigger that will show the popconfirm.

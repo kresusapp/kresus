@@ -1,24 +1,24 @@
 import {
-    createSelector,
     configureStore,
-    createListenerMiddleware,
     createAction,
+    createListenerMiddleware,
+    createSelector,
     isAnyOf,
 } from '@reduxjs/toolkit';
-import logger from 'redux-logger';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AnyAction } from 'redux';
+import logger from 'redux-logger';
 
 import * as BankStore from './banks';
 import * as BudgetStore from './budgets';
 import * as CategoryStore from './categories';
 import * as DuplicatesStore from './duplicates';
+import * as GlobalStore from './global';
 import * as InstanceStore from './instance';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
 import * as UiStore from './ui';
 import * as ViewStore from './views';
-import * as GlobalStore from './global';
 
 // Reset the stores' states following an instance import or the enablement of the demo mode.
 // Any store that is subject to reset after these actions should be added to the list below or
@@ -123,9 +123,8 @@ export const reduxStore = configureStore({
 export type GlobalState = ReturnType<typeof reduxStore.getState>;
 
 // A pre-typed useSelector that embeds the app's global state.
-export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
-    return useSelector<GlobalState, T>(func);
-};
+export const useKresusState = <T>(func: (state: GlobalState) => T): T =>
+    useSelector<GlobalState, T>(func);
 
 export const useKresusDispatch = () => useDispatch<typeof reduxStore.dispatch>();
 

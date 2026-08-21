@@ -1,21 +1,19 @@
-import { useCallback, useState, ReactElement } from 'react';
 import moment from 'moment';
+import { type ReactElement, useCallback, useState } from 'react';
 
 import {
     translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
-    noValueFoundMessage,
     notify,
+    noValueFoundMessage,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../helpers';
 
-import { RecurringTransaction } from '../../models';
-
+import type { RecurringTransaction } from '../../models';
+import TypeSelect from '../reports/type-select';
 import { Form, ValidatedTextInput } from '../ui';
 import AmountInput from '../ui/amount-input';
 import Select from '../ui/fuzzy-or-native-select';
-import MultipleSelect, { MultiSelectOptionProps } from '../ui/multiple-select';
-
-import TypeSelect from '../reports/type-select';
+import MultipleSelect, { type MultiSelectOptionProps } from '../ui/multiple-select';
 
 type OrphanRecurringTransaction = Omit<RecurringTransaction, 'id' | 'accountId'>;
 

@@ -1,13 +1,11 @@
-import { createSlice, createAsyncThunk, isAnyOf } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 
-import { assertDefined, assert } from '../helpers';
+import { assert, assertDefined } from '../helpers';
 
-import { Account, View } from '../models';
-
-import { createAccess, deleteAccess, deleteAccount, runAccountsSync } from './banks';
-
-import { mergeInArray, removeInArrayById } from './helpers';
+import type { Account, View } from '../models';
 import * as backend from './backend';
+import { createAccess, deleteAccess, deleteAccount, runAccountsSync } from './banks';
+import { mergeInArray, removeInArrayById } from './helpers';
 
 export interface ViewState {
     items: View[];

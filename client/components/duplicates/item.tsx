@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-
+import { translate as $t, displayLabel, formatDate } from '../../helpers';
+import type { Transaction } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import { translate as $t, formatDate, displayLabel } from '../../helpers';
+import * as CategoriesStore from '../../store/categories';
 import { Popconfirm } from '../ui';
-import { Transaction } from '../../models';
 
 const TransactionLine = (props: {
     label: string;

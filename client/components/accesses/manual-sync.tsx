@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { assert, translate as $t, notify } from '../../helpers';
-import { useSyncError, useRequiredParams } from '../../hooks';
+import { translate as $t, assert, notify } from '../../helpers';
+import { useRequiredParams, useSyncError } from '../../hooks';
+import type { Access, AccessCustomField, Bank } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { Access, AccessCustomField, Bank } from '../../models';
 
 import { BackLink } from '../ui';
 import CredentialsForm from './sync-form';

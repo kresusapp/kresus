@@ -1,6 +1,6 @@
 import { unwrap } from '../helpers';
 import { Setting } from '../models';
-import { I18NObject, setupTranslator } from '../shared/helpers';
+import { type I18NObject, setupTranslator } from '../shared/helpers';
 
 const LOCALE_ID_TO_TRANSLATOR: Map<string, I18NObject> = new Map();
 const USER_TO_TRANSLATOR: Map<number, I18NObject> = new Map();

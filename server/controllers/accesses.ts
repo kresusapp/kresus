@@ -1,19 +1,16 @@
-import express from 'express';
-
-import { Access, AccessField, Account, Transaction, View } from '../models';
-
-import accountManager, { GLOBAL_CONTEXT, UserActionOrValue } from '../lib/accounts-manager';
-import { UserActionResponse } from '../shared/types';
-import { fullPoll } from '../lib/poller';
-import { bankVendorByUuid } from '../providers';
-
-import { registerStartupTask } from './all';
-import * as AccountController from './accounts';
-import { isDemoEnabled } from './instance';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
-
+import type express from 'express';
 import { assert, asyncErr, getErrorCode, KError, makeLogger, unwrap } from '../helpers';
-import { hasMissingField, hasForbiddenField } from '../shared/validators';
+
+import accountManager, { GLOBAL_CONTEXT, type UserActionOrValue } from '../lib/accounts-manager';
+import { fullPoll } from '../lib/poller';
+import { Access, AccessField, Account, type Transaction, View } from '../models';
+import { bankVendorByUuid } from '../providers';
+import type { UserActionResponse } from '../shared/types';
+import { hasForbiddenField, hasMissingField } from '../shared/validators';
+import * as AccountController from './accounts';
+import { registerStartupTask } from './all';
+import { isDemoEnabled } from './instance';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 const log = makeLogger('controllers/accesses');
 

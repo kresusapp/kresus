@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { shortLabel } from '../../../shared/helpers';
-import { Transaction } from '../../models';
+import type { Transaction } from '../../models';
 
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';

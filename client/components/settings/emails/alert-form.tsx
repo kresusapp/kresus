@@ -1,15 +1,14 @@
 import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { assert, translate as $t } from '../../../helpers';
+import { translate as $t, assert } from '../../../helpers';
+import { useGenericError, useRequiredParams } from '../../../hooks';
 import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-
+import { BackLink, Form } from '../../ui';
 import AccountSelector from '../../ui/account-select';
 import AmountInput from '../../ui/amount-input';
-import { BackLink, Form } from '../../ui';
 import URL from './urls';
-import { useGenericError, useRequiredParams } from '../../../hooks';
 
 const AlertForm = () => {
     const { type } = useRequiredParams<{ type: 'balance' | 'transaction' }>();

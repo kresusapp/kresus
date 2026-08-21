@@ -1,4 +1,4 @@
-import { Driver } from './components/drivers/';
+import type { Driver } from './components/drivers/';
 
 // The list of the available sections and settings subsections.
 //

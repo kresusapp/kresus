@@ -1,17 +1,15 @@
 import { useCallback, useState } from 'react';
-
-import { useKresusDispatch, useKresusState } from '../../../store';
-import * as backend from '../../../store/backend';
-import * as SettingsStore from '../../../store/settings';
-import * as InstanceStore from '../../../store/instance';
-import { translate as $t, notify } from '../../../helpers';
 import { EMAILS_ENABLED } from '../../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../../shared/settings';
-
+import { translate as $t, notify } from '../../../helpers';
+import { useGenericError, useNotifyError } from '../../../hooks';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import * as backend from '../../../store/backend';
+import * as InstanceStore from '../../../store/instance';
+import * as SettingsStore from '../../../store/settings';
+import { Form } from '../../ui';
 import ClearableInput from '../../ui/clearable-input';
 import LoadingButton from '../../ui/loading-button';
-import { useGenericError, useNotifyError } from '../../../hooks';
-import { Form } from '../../ui';
 
 const SendTestButton = (props: { onClick: () => Promise<any>; disabled: boolean }) => {
     const [isLoading, setIsLoading] = useState(false);

@@ -1,12 +1,11 @@
-import { createSlice, PayloadAction, isAnyOf } from '@reduxjs/toolkit';
-
-import { translate as $t, assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
+import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
-import { FinishUserAction } from './banks';
-import { UserActionField } from '../../shared/types';
-import * as SettingsStore from './settings';
+import type { UserActionField } from '../../shared/types';
+import { translate as $t, assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
+import type { FinishUserAction } from './banks';
 import * as BanksStore from './banks';
 import * as GlobalStore from './global';
+import * as SettingsStore from './settings';
 
 // All the possible search fields.
 // Note: update `setSearchFields` if you add a field here.

@@ -1,13 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-import * as backend from './backend';
-import { mergeTransactions, deleteTransaction, deleteAccount } from './banks';
-import { setPair as setSetting } from './settings';
-import { enableDemo, importInstance } from './global';
-
-import { assertDefined } from '../helpers';
-
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { Duplicates } from '../../shared/types';
+import { assertDefined } from '../helpers';
+import * as backend from './backend';
+import { deleteAccount, deleteTransaction, mergeTransactions } from './banks';
+import { enableDemo, importInstance } from './global';
+import { setPair as setSetting } from './settings';
 
 export interface DuplicatesState {
     items: Duplicates['new'];

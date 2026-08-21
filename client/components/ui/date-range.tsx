@@ -1,14 +1,10 @@
-import { useCallback, useRef } from 'react';
-
-import Flatpickr, { type DateTimePickerHandle } from './flatpickr';
-
 import moment from 'moment';
-
+import { useCallback, useRef } from 'react';
+import { LOCALE } from '../../../shared/settings';
+import { translate as $t, endOfMonth, startOfMonth } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-
-import { endOfMonth, startOfMonth, translate as $t } from '../../helpers';
-import { LOCALE } from '../../../shared/settings';
+import Flatpickr, { type DateTimePickerHandle } from './flatpickr';
 import './date-range.css';
 
 const DateRange = (props: {

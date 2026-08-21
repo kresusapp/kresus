@@ -1,15 +1,13 @@
 import { useCallback, useState } from 'react';
-
+import { translate as $t, assert, displayLabel, noValueFoundMessage } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
+import type { View } from '../../../models';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import * as ViewsStore from '../../../store/views';
-import { useKresusDispatch, useKresusState } from '../../../store';
-import { assert, translate as $t, noValueFoundMessage, displayLabel } from '../../../helpers';
-
 import { BackLink, Form } from '../../ui';
 import MultipleSelect from '../../ui/multiple-select';
 import TextInput from '../../ui/text-input';
-import { useGenericError } from '../../../hooks';
-import { View } from '../../../models';
 
 const NewViewForm = (props: {
     backUrl: string;

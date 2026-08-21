@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableColumn } from 'typeorm';
 
 // Add the "gracePeriod" column to accounts
 export class addGracePeriod1727285965918 implements MigrationInterface {

@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm';
 import { foreignKey, foreignKeyUserId, idColumn } from '../helpers';
 
 export class AddRules1607288457201 implements MigrationInterface {

@@ -1,10 +1,8 @@
 import fs from 'fs';
-
-import { Access } from '../models';
+import type { BankVendor } from '../../shared/types';
 import { assert, KError, unwrap } from '../helpers';
-
-import { UserActionResponse } from '../shared/types';
-import { BankVendor } from '../../shared/types';
+import type { Access } from '../models';
+import type { UserActionResponse } from '../shared/types';
 
 const BANK_HANDLERS = new Map<string, Provider>();
 const ALL_BANKS: BankVendor[] = [];

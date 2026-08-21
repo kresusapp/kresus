@@ -1,10 +1,8 @@
 import { useCallback, useMemo } from 'react';
-
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t, assert } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 function noTypeFound(): string {
     return $t('client.transactions.no_type_found');

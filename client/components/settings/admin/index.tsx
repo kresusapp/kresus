@@ -1,10 +1,9 @@
 import { Fragment } from 'react';
-
-import { getCurrentUser } from '../../../store/global';
 import { translate as $t } from '../../../helpers';
+import { getCurrentUser } from '../../../store/global';
 import DisplayIf from '../../ui/display-if';
-import Woob from './woob';
 import Logs from './logs';
+import Woob from './woob';
 
 export default () => {
     const currentUser = getCurrentUser();

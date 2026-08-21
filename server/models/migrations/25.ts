@@ -1,20 +1,17 @@
 import {
-    MigrationInterface,
-    QueryRunner,
+    type MigrationInterface,
+    type QueryRunner,
     TableColumn,
     TableForeignKey,
     TableUnique,
 } from 'typeorm';
-
-import { foreignKey } from '../helpers';
 import { makeLogger } from '../../helpers';
-
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-
-import User from '../entities/users';
-import Setting from '../entities/settings';
-import View from '../entities/views';
 import Account from '../entities/accounts';
+import Setting from '../entities/settings';
+import User from '../entities/users';
+import View from '../entities/views';
+import { foreignKey } from '../helpers';
 
 const log = makeLogger('controllers/categories');
 

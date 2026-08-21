@@ -1,15 +1,19 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-
-import URL from './urls';
 import {
-    assert,
     translate as $t,
-    displayLabel,
-    notify,
-    formatDate,
+    assert,
     copyContentToClipboard,
+    displayLabel,
+    formatDate,
+    notify,
 } from '../../helpers';
+import { useNotifyError, useRequiredParams, useSyncError } from '../../hooks';
+import { type Access, type AccessCustomField, type Account, isManualAccess } from '../../models';
+import { useKresusDispatch, useKresusState } from '../../store';
+import { mergeAccountInto } from '../../store/backend';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
 import {
     AmountInput,
     BackLink,
@@ -19,15 +23,9 @@ import {
     Switch,
     UncontrolledTextInput,
 } from '../ui';
-import * as UiStore from '../../store/ui';
-import * as BanksStore from '../../store/banks';
-import { useKresusDispatch, useKresusState } from '../../store';
-import { Access, Account, isManualAccess, type AccessCustomField } from '../../models';
-import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
 import AnyAccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
-
-import { mergeAccountInto } from '../../store/backend';
+import URL from './urls';
 
 const formatIBAN = (iban: string) => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');

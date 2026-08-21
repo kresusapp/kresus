@@ -1,15 +1,12 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { notify, translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import { useRequiredParams } from '../../../hooks';
-
-import * as ViewsStore from '../../../store/views';
 import { useKresusState } from '../../../store';
-
-import URL from './urls';
-
+import * as ViewsStore from '../../../store/views';
 import NewViewForm from './new-view-form';
+import URL from './urls';
 
 export default () => {
     const { viewId: viewIdStr } = useRequiredParams<{ viewId: string }>();

@@ -1,6 +1,5 @@
-import * as ViewStore from '../../store/views';
-
 import { assert } from '../../helpers';
+import * as ViewStore from '../../store/views';
 
 import { Driver, DriverType } from './base';
 

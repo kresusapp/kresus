@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 import { isSqlite } from '../helpers';
 
 export class MoveLoginPasswordToFields1756391927839 implements MigrationInterface {

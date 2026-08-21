@@ -1,3 +1,5 @@
+import type { LegendItem } from 'chart.js';
+import moment from 'moment';
 import {
     createRef,
     forwardRef,
@@ -7,25 +9,19 @@ import {
     useRef,
     useState,
 } from 'react';
-
-import { assert, translate as $t } from '../../helpers';
-
+import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settings';
+import { translate as $t, assert } from '../../helpers';
+import type { Transaction } from '../../models';
 import { useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
 import * as UiStore from '../../store/ui';
-
-import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settings';
-
-import DiscoveryMessage from '../ui/discovery-message';
-import BarChart, { BaseChartProps } from './category-barchart';
-import PieChart, { PieChartWithHelp } from './category-pie-chart';
-import AmountKindSelect, { AmountKindType } from './amount-select';
-import { Transaction } from '../../models';
-import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
-import moment from 'moment';
-import type { LegendItem } from 'chart.js';
+import DiscoveryMessage from '../ui/discovery-message';
+import AmountKindSelect, { type AmountKindType } from './amount-select';
+import BarChart, { type BaseChartProps } from './category-barchart';
+import PieChart, { PieChartWithHelp } from './category-pie-chart';
+import type { Hideable } from './hidable-chart';
 
 interface AllPieChartsProps extends BaseChartProps {
     rawIncomeOps: Transaction[];

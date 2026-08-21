@@ -1,15 +1,14 @@
 import { cloneElement, useCallback, useEffect, useState } from 'react';
-import { Route, Routes, Navigate, useNavigate } from 'react-router';
-
-import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
-import CategorySelect from '../reports/category-select';
-import URL from './urls';
+import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
+import type { Category, Rule } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
-import { Category, Rule } from '../../models';
+import CategorySelect from '../reports/category-select';
+import { AmountInput, BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput } from '../ui';
+import URL from './urls';
 
 import './rules.css';
 import { LoadingMessage } from '../overlay/loading';

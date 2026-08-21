@@ -1,8 +1,8 @@
 import { createContext } from 'react';
-import { DriverAccount } from './account';
-import { DriverCurrency } from './currency';
 import { assert } from '../../helpers';
-import { Driver, DriverType, DriverValueType, NoDriver } from './base';
+import { DriverAccount } from './account';
+import { type Driver, DriverType, type DriverValueType, NoDriver } from './base';
+import { DriverCurrency } from './currency';
 
 export * from './base';
 

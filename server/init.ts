@@ -1,9 +1,8 @@
-import { makeLogger } from './helpers';
-import { DEMO_MODE } from './shared/settings';
-
-import { initModels, Setting, User } from './models';
-import Poller from './lib/poller';
 import * as DemoController from './controllers/demo';
+import { makeLogger } from './helpers';
+import Poller from './lib/poller';
+import { initModels, Setting, User } from './models';
+import { DEMO_MODE } from './shared/settings';
 
 const log = makeLogger('init');
 

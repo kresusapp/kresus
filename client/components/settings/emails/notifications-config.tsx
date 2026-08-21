@@ -1,18 +1,16 @@
-import { useState, useCallback } from 'react';
-
-import { useKresusDispatch, useKresusState } from '../../../store';
-import * as backend from '../../../store/backend';
-import * as SettingsStore from '../../../store/settings';
-import * as InstanceStore from '../../../store/instance';
-import { translate as $t, notify, assert } from '../../../helpers';
+import { useCallback, useState } from 'react';
 import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL } from '../../../../shared/settings';
-
+import { translate as $t, assert, notify } from '../../../helpers';
+import { useGenericError, useNotifyError } from '../../../hooks';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import * as backend from '../../../store/backend';
+import * as InstanceStore from '../../../store/instance';
+import * as SettingsStore from '../../../store/settings';
+import { Form } from '../../ui';
 import ClearableInput from '../../ui/clearable-input';
 import ExternalLink from '../../ui/external-link';
 import LoadingButton from '../../ui/loading-button';
-import { useGenericError, useNotifyError } from '../../../hooks';
-import { Form } from '../../ui';
 
 const SendTestButton = (props: { onClick: () => Promise<any>; disabled: boolean }) => {
     const [isLoading, setIsLoading] = useState(false);

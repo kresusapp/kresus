@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableColumn } from 'typeorm';
 
 export class AddIsUserDefinedTypeToTransaction1586769077310 implements MigrationInterface {
     public async up(q: QueryRunner): Promise<void> {

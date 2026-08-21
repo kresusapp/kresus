@@ -1,7 +1,7 @@
-import { Table, MigrationInterface, QueryRunner } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm';
 import {
-    UNKNOWN_ACCOUNT_TYPE,
     FETCH_STATUS_SUCCESS,
+    UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_TRANSACTION_TYPE,
 } from '../../helpers';
 import { datetimeType, foreignKey, foreignKeyUserId, idColumn } from '../helpers';

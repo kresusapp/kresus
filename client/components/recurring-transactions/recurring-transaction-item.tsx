@@ -1,21 +1,16 @@
-import { useCallback, useRef, useImperativeHandle } from 'react';
-import * as React from 'react';
-import { useNavigate } from 'react-router';
 import moment from 'moment';
-
-import * as BankStore from '../../store/banks';
-import { useKresusDispatch } from '../../store';
-
-import { RecurringTransaction } from '../../models';
-
+import * as React from 'react';
+import { useCallback, useImperativeHandle, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import { translate as $t, currency, notify } from '../../helpers';
-
-import Popconfirm from '../ui/popform';
+import type { RecurringTransaction } from '../../models';
+import { useKresusDispatch } from '../../store';
+import * as BankStore from '../../store/banks';
+import URL from '../../urls';
 import { ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
+import Popconfirm from '../ui/popform';
 import { useTableRowSwipeDetection } from '../ui/use-swipe';
-
-import URL from '../../urls';
 
 type RecurringTransactionItemProps = {
     recurringTransaction: RecurringTransaction;

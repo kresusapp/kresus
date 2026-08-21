@@ -1,14 +1,11 @@
 import { Link } from 'react-router';
-
-import { useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
-import * as BanksStore from '../../store/banks';
 import { translate as $t } from '../../helpers';
-
-import URL from './urls';
-
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
 import DisplayIf from '../ui/display-if';
 import BankAccessItem from './access';
+import URL from './urls';
 
 const AccessList = () => {
     const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));

@@ -1,12 +1,10 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
-
+import { useNotifyError } from '../../hooks';
+import type { Account } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { Account } from '../../models';
-
 import LabelComponent from '../ui/label';
-import { useNotifyError } from '../../hooks';
 
 import URL from './urls';
 

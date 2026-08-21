@@ -5,15 +5,15 @@ import moment from 'moment';
 
 import { makeLogger } from '../helpers';
 import { accountTypeNameToId } from '../lib/account-types';
-import { Access } from '../models';
+import type { Access } from '../models';
 
-import {
+import type {
     FetchAccountsOptions,
     FetchTransactionsOptions,
-    ProviderTransactionResponse,
-    ProviderAccountResponse,
     Provider,
+    ProviderAccountResponse,
     ProviderTransaction,
+    ProviderTransactionResponse,
 } from './index';
 
 const log = makeLogger('providers/demo');

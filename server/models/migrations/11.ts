@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableColumn } from 'typeorm';
 
 export class AddBalanceInAccount1631037503295 implements MigrationInterface {
     async up(q: QueryRunner): Promise<void> {

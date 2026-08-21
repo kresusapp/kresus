@@ -1,14 +1,13 @@
 import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
-import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';
+import { translate as $t, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import URL from './urls';
-
+import * as CategoriesStore from '../../store/categories';
 import { BackLink, Form } from '../ui';
+import URL from './urls';
 
 const DeleteForm = () => {
     const { categoryId: categoryStringId } = useRequiredParams<{ categoryId: string }>();

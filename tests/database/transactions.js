@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
-import { Access, Account, Transaction } from '../../server/models';
 import { importData } from '../../server/controllers/all';
+import { Access, Account, Transaction } from '../../server/models';
 
 import { checkObjectIsSubsetOf } from '../helpers';
 

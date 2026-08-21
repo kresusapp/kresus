@@ -1,8 +1,7 @@
-import { createRef, Component, ReactNode } from 'react';
-
-import { copyContentToClipboard, translate as $t } from '../../helpers';
-import ExternalLink from '../ui/external-link';
+import { Component, createRef, type ReactNode } from 'react';
 import { repository } from '../../../package.json';
+import { translate as $t, copyContentToClipboard } from '../../helpers';
+import ExternalLink from '../ui/external-link';
 
 import './error-reporter.css';
 

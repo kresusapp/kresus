@@ -1,7 +1,6 @@
-import { EntityManager } from 'typeorm';
-
-import { Setting } from '../';
+import type { EntityManager } from 'typeorm';
 import { makeLogger } from '../../helpers';
+import { Setting } from '../';
 
 const log = makeLogger('models/data-migrations');
 

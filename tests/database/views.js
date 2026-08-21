@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import { Access, Account, View, User } from '../../server/models';
+import { Access, Account, User, View } from '../../server/models';
 import ViewAccount from '../../server/models/entities/view-accounts';
 
 describe('Views database CRUD tests', () => {

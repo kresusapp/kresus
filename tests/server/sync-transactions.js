@@ -1,22 +1,20 @@
 import assert from 'node:assert';
 import { mock } from 'node:test';
-
-import accountsManager from '../../server/lib/accounts-manager';
 import { importData } from '../../server/controllers/all';
-import * as demoProvider from '../../server/providers/demo';
+import { TRANSACTION_CARD_TYPE } from '../../server/helpers';
+import accountsManager from '../../server/lib/accounts-manager';
 
 import {
     Access,
     Account,
+    AppliedRecurringTransaction,
+    RecurringTransaction,
     Setting,
     Transaction,
-    RecurringTransaction,
-    AppliedRecurringTransaction,
     User,
 } from '../../server/models';
-
+import * as demoProvider from '../../server/providers/demo';
 import { DUPLICATE_LAX_MODE } from '../../shared/settings';
-import { TRANSACTION_CARD_TYPE } from '../../server/helpers';
 
 async function cleanAll(userId) {
     await Access.destroyAll(userId);

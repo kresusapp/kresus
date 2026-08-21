@@ -1,9 +1,9 @@
 import { assert } from '../helpers';
 import {
-    Transaction,
+    type Transaction,
     TransactionRule,
     TransactionRuleAction,
-    TransactionRuleCondition,
+    type TransactionRuleCondition,
 } from '../models';
 
 function match(conditions: TransactionRuleCondition[], transaction: Partial<Transaction>): boolean {

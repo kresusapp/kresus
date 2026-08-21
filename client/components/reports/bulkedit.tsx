@@ -1,15 +1,14 @@
+import type * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import * as React from 'react';
 
-import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
-import * as BanksStore from '../../store/banks';
-
-import ClearableInput from '../ui/clearable-input';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import { translate as $t, assert, NONE_CATEGORY_ID } from '../../helpers';
 import { useGenericError } from '../../hooks';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
+import ClearableInput from '../ui/clearable-input';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { formatCreateCategoryLabel, useOnCreateCategory } from './category-select';
 
 const NO_TYPE_ID = null;

@@ -1,5 +1,5 @@
 import URL from '../../urls';
-import { Driver } from '../drivers';
+import type { Driver } from '../drivers';
 
 const BASE = URL.transactions.pattern;
 

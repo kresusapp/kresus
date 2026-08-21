@@ -1,8 +1,7 @@
 import { Link } from 'react-router';
-
+import { translate as $t } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 import DisplayIf from '../ui/display-if';
 

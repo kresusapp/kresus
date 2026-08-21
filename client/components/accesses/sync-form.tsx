@@ -1,17 +1,16 @@
 import { useCallback, useState } from 'react';
 
-import { assert, assertDefined, translate as $t } from '../../helpers';
-import { AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
-import {
-    CustomFieldMap,
-    areCustomFieldsValid,
-    customFieldsContainCredentials,
-    bankCustomFieldsMapBuilder,
-} from './new-access-form';
-
-import CustomBankField from './custom-bank-field';
-import DisplayIf from '../ui/display-if';
+import { translate as $t, assert, assertDefined } from '../../helpers';
+import type { AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
 import { Form, Switch } from '../ui';
+import DisplayIf from '../ui/display-if';
+import CustomBankField from './custom-bank-field';
+import {
+    areCustomFieldsValid,
+    bankCustomFieldsMapBuilder,
+    type CustomFieldMap,
+    customFieldsContainCredentials,
+} from './new-access-form';
 
 export interface CredentialsFormProps {
     bankDesc: Bank;

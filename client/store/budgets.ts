@@ -1,13 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-
-import { Budget, assertValidBudget } from '../models';
-
-import * as backend from './backend';
-import { create as createCategories, destroy as destroyCategories } from './categories';
-
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { assert, assertDefined } from '../helpers';
-import { resetStoreReducer } from './helpers';
+import { assertValidBudget, type Budget } from '../models';
+import * as backend from './backend';
 import { batch } from './batch';
+import { create as createCategories, destroy as destroyCategories } from './categories';
+import { resetStoreReducer } from './helpers';
 
 type Period = { year: number; month: number };
 
@@ -109,7 +106,6 @@ const budgetsSlice = createSlice({
                         const updatedBudget = { ...budget, ...updated };
                         assertValidBudget(updatedBudget);
                         state.budgets[key][index] = updatedBudget;
-                        continue;
                     }
                 }
             })

@@ -1,12 +1,10 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
-
+import { translate as $t } from '../../helpers';
+import { useGenericError } from '../../hooks';
 import { useKresusDispatch } from '../../store';
 import * as GlobalStore from '../../store/global';
-import { translate as $t } from '../../helpers';
-
 import URL from '../../urls';
-import { useGenericError } from '../../hooks';
 import { Form } from '../ui';
 
 const BASE_PATH = URL.onboarding.url();

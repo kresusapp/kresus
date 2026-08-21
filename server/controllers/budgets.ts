@@ -1,9 +1,8 @@
-import express from 'express';
+import type express from 'express';
+import { asString, asyncErr, KError } from '../helpers';
 import { Budget, Category } from '../models';
-
-import { KError, asString, asyncErr } from '../helpers';
 import { checkBudget } from '../shared/validators';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 async function createBudget(
     userId: number,

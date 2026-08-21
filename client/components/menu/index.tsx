@@ -1,13 +1,12 @@
+import type * as React from 'react';
 import { useCallback, useContext } from 'react';
-import * as React from 'react';
 import { NavLink } from 'react-router';
-
-import URL from '../../urls';
-import { Driver, DriverType, DriverContext } from '../drivers';
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
+import URL from '../../urls';
+import { type Driver, DriverContext, DriverType } from '../drivers';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
@@ -65,7 +64,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
         }
 
         const accounts = driver.getAccounts(state);
-        return accounts.map(account => findRedundantPairs(state, account.id)).flat().length;
+        return accounts.flatMap(account => findRedundantPairs(state, account.id)).length;
     });
 
     if (driver.type === DriverType.None) {

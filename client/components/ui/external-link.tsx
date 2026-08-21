@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export default (props: { href: string; children?: ReactNode }) => (
     <a href={props.href} rel="noopener noreferrer" target="_blank">

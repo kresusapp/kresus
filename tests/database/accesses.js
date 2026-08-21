@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import { AccessField, Access } from '../../server/models';
+import { Access, AccessField } from '../../server/models';
 
 import { checkObjectIsSubsetOf } from '../helpers';
 

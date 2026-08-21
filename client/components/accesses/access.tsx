@@ -1,17 +1,13 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
-
-import { useKresusDispatch, useKresusState } from '../../store';
 import { assert } from '../../helpers';
-import * as BanksStore from '../../store/banks';
-
-import AccountItem from './account';
-import Label from '../ui/label';
-import DisplayIf from '../ui/display-if';
-
-import URL from './urls';
-
 import { useNotifyError } from '../../hooks';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import DisplayIf from '../ui/display-if';
+import Label from '../ui/label';
+import AccountItem from './account';
+import URL from './urls';
 
 const AccessItem = (props: { accessId: number }) => {
     const access = useKresusState(state => {

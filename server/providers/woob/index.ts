@@ -1,34 +1,32 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
-
-import { Access } from '../../models/';
-
 import {
     assert,
-    makeLogger,
-    KError,
     checkMinimalWoobVersion,
+    KError,
+    makeLogger,
     UNKNOWN_WOOB_VERSION,
 } from '../../helpers';
+import type { Access } from '../../models/';
 
 import {
-    WOOB_NOT_INSTALLED,
+    EXPIRED_PASSWORD,
+    GENERIC_EXCEPTION,
     INTERNAL_ERROR,
     INVALID_PARAMETERS,
-    UNKNOWN_WOOB_MODULE,
-    GENERIC_EXCEPTION,
     INVALID_PASSWORD,
-    EXPIRED_PASSWORD,
+    UNKNOWN_WOOB_MODULE,
+    WOOB_NOT_INSTALLED,
 } from '../../shared/errors.json';
-import { UserActionField, UserActionKind, UserActionResponse } from '../../shared/types';
+import type { UserActionField, UserActionKind, UserActionResponse } from '../../shared/types';
 
-import {
-    Provider,
-    FetchTransactionsOptions,
+import type {
     FetchAccountsOptions,
-    SessionManager,
+    FetchTransactionsOptions,
+    Provider,
     ProviderAccountResponse,
     ProviderTransactionResponse,
+    SessionManager,
 } from '../';
 
 import BankVendors from './banks.json';
@@ -88,6 +86,8 @@ function subcommand(
 interface PythonResponse {
     kind: 'error' | 'user_action' | 'success';
     session: Record<string, unknown>;
+    error_code?: string;
+    action_kind?: UserActionKind;
 }
 
 // An error returned by Woob.
@@ -153,7 +153,7 @@ async function woobCommand(envParam: OptionalEnvParams, cliArgs: string[]): Prom
     // legit error from Woob) will result in a non-zero error code. Hence, we
     // should first try to parse stdout as JSON, to retrieve an eventual legit
     // error, and THEN check the return code.
-    let jsonResponse;
+    let jsonResponse: PythonResponse;
     try {
         jsonResponse = JSON.parse(stdout);
     } catch (e) {
@@ -183,7 +183,7 @@ ${stderr}`
         jsonResponse.kind = 'success';
     }
 
-    return jsonResponse;
+    return jsonResponse as WoobResponse;
 }
 
 interface WoobOptions {
@@ -343,7 +343,7 @@ async function callWoob(
         }
     }
 
-    const response = (await woobCommand(env, cliArgs)) as WoobResponse;
+    const response = await woobCommand(env, cliArgs);
 
     // If valid JSON output, check for an error within JSON.
     if (response.kind === 'error') {
@@ -404,7 +404,7 @@ async function callWoob(
 
             default: {
                 throw new KError(
-                    `Likely a programmer error: unknown user action kind ${response.action_kind}`
+                    `Likely a programmer error: unknown user action kind ${(response as any).action_kind}`
                 );
             }
         }

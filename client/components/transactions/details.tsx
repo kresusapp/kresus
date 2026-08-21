@@ -1,27 +1,25 @@
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
-
-import rulesUrl from '../rules/urls';
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as BanksStore from '../../store/banks';
 import {
+    translate as $t,
     assertNotNull,
+    currency,
     displayLabel,
     formatDate,
     notify,
-    translate as $t,
-    currency,
 } from '../../helpers';
-import MainURLs from '../../urls';
 import { useNotifyError, useRequiredParams } from '../../hooks';
-
-import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
-import Label from '../reports/label';
-import TransactionTypeSelect from '../reports/editable-type-select';
-import CategorySelect from '../reports/editable-category-select';
-import DateComponent from './date';
-import BudgetDateComponent from './budget-date';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import MainURLs from '../../urls';
 import { DriverContext } from '../drivers';
+import CategorySelect from '../reports/editable-category-select';
+import TransactionTypeSelect from '../reports/editable-type-select';
+import Label from '../reports/label';
+import rulesUrl from '../rules/urls';
+import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
+import BudgetDateComponent from './budget-date';
+import DateComponent from './date';
 
 const TransactionDetails = (props: { transactionId: number }) => {
     const { transactionId } = props;

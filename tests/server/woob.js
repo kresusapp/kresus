@@ -2,18 +2,17 @@ import assert from 'node:assert';
 
 import { KError } from '../../server/helpers';
 import { testing } from '../../server/providers/woob';
-import { applyTestConfig } from '../database/config';
-
 import {
-    UNKNOWN_WOOB_MODULE,
-    INVALID_PASSWORD,
-    EXPIRED_PASSWORD,
     ACTION_NEEDED,
-    WOOB_NOT_INSTALLED,
-    INVALID_PARAMETERS,
-    NO_PASSWORD,
     AUTH_METHOD_NYI,
+    EXPIRED_PASSWORD,
+    INVALID_PARAMETERS,
+    INVALID_PASSWORD,
+    NO_PASSWORD,
+    UNKNOWN_WOOB_MODULE,
+    WOOB_NOT_INSTALLED,
 } from '../../shared/errors.json';
+import { applyTestConfig } from '../database/config';
 
 const { callWoob, defaultOptions, CallWoobCommand } = testing;
 

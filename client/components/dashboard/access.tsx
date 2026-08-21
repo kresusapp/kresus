@@ -1,12 +1,11 @@
+import { fetchStatusToLabel } from '../../errors';
+import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
-import { fetchStatusToLabel } from '../../errors';
-
-import DisplayIf from '../ui/display-if';
+import { DashboardInOutChart } from '../charts/in-out-chart';
 import AccountListItem from '../menu/account';
 import { AccessTotalBalance } from '../ui/accumulated-balances';
-import { DashboardInOutChart } from '../charts/in-out-chart';
+import DisplayIf from '../ui/display-if';
 
 const Access = (props: { accessId: number }) => {
     const access = useKresusState(state => BanksStore.accessById(state.banks, props.accessId));

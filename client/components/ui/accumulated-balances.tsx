@@ -1,10 +1,9 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { NavLink, useLocation } from 'react-router';
-
-import { useKresusState } from '../../store';
-import * as BanksStore from '../../store/banks';
 import { translate as $t } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
 import { DriverType } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';

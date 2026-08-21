@@ -1,15 +1,13 @@
 import { useCallback, useState } from 'react';
-
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as SettingsStore from '../../store/settings';
-import { translate as $t } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_LAX_MODE,
 } from '../../../shared/settings';
-
-import { Switch, Form, Popform } from '../ui';
+import { translate as $t } from '../../helpers';
 import { useGenericError } from '../../hooks';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as SettingsStore from '../../store/settings';
+import { Form, Popform, Switch } from '../ui';
 
 const DefaultParameters = () => {
     const initialIgnore = useKresusState(state =>

@@ -1,14 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
-
-import DefaultSettings from '../../shared/default-settings';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
+import { assert, KError, makeLogger, unwrap } from '../../helpers';
 import { ConfigGhostSettings } from '../../lib/instance';
-
-import { getRepository } from '..';
-
-import User from './users';
-
-import { assert, makeLogger, KError, unwrap } from '../../helpers';
+import DefaultSettings from '../../shared/default-settings';
 import { LOCALE } from '../../shared/settings';
+import { getRepository } from '..';
+import User from './users';
 
 const log = makeLogger('models/entities/settings');
 

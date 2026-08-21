@@ -1,8 +1,8 @@
-import { IdentifiedRequest } from './routes';
-import express from 'express';
+import type express from 'express';
 import { asyncErr } from '../helpers';
+import { type BatchRequest, type BatchResponse, BatchStatus } from '../shared/api/batch';
 import { createOneCategory, destroyOneCategory } from './categories';
-import { BatchRequest, BatchResponse, BatchStatus } from '../shared/api/batch';
+import type { IdentifiedRequest } from './routes';
 
 // Run batch operations.
 //

@@ -1,7 +1,6 @@
-import express from 'express';
-
-import { IdentifiedRequest, RoutesDescriptor } from './routes';
+import type express from 'express';
 import { Setting } from '../models';
+import type { IdentifiedRequest, RoutesDescriptor } from './routes';
 
 export async function getManifest(req: IdentifiedRequest<any>, res: express.Response) {
     const iconsDirectory = 'favicon/';

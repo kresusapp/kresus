@@ -1,21 +1,18 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
     JoinColumn,
     ManyToOne,
     OneToMany,
-    Repository,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import AccessField from './access-fields';
-
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../providers';
+import { getRepository } from '..';
 import { areFieldsComplete } from '../helpers';
+import AccessField from './access-fields';
+import User from './users';
 
 @Entity('access')
 export default class Access {

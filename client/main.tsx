@@ -1,20 +1,20 @@
-import { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
+import throttle from 'lodash.throttle';
 import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import {
     HashRouter,
+    Link,
+    matchPath,
+    Navigate,
+    type NavigateOptions,
     Route,
     Routes,
-    Link,
-    Navigate,
-    useMatch,
-    useLocation,
-    matchPath,
-    type NavigateOptions,
     type To,
+    useLocation,
+    useMatch,
 } from 'react-router';
-import { Provider } from 'react-redux';
-import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
 // Moment.js locales (must be imported from this file to avoid being run in
@@ -23,42 +23,39 @@ import 'moment/dist/locale/fr';
 import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
+import { DEV_ENV, FORCE_DEMO_MODE, WOOB_INSTALLED } from '../shared/instance';
+// Components
+import About from './components/about';
+import Accesses from './components/accesses';
+import Budget from './components/budget';
+import Categories from './components/categories';
+import Dashboard from './components/dashboard';
+import { DriverContext, DriverType, getDriver, NoDriver } from './components/drivers';
+import { DriverAccount } from './components/drivers/account';
+import DuplicatesList from './components/duplicates';
+import DemoButton from './components/header/demo-button';
+import Menu from './components/menu';
+import DropdownMenu from './components/menu/dropdown';
+import Onboarding from './components/onboarding';
+import WoobInstallIndex from './components/onboarding/woob-readme';
+import Overlay, { LoadingMessage } from './components/overlay';
+import RecurringTransactions from './components/recurring-transactions/index';
+import Reports from './components/reports';
+import TransactionRules from './components/rules';
+import Settings from './components/settings';
+import Transactions from './components/transactions';
+import DisplayIf from './components/ui/display-if';
+import ErrorReporter from './components/ui/error-reporter';
+import Form from './components/ui/form';
+import { translate as $t, areWeFunYet, assert, computeIsSmallScreen, debug } from './helpers';
+import { useRequiredParams } from './hooks';
 // Global variables
 import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState } from './store';
 import * as BanksStore from './store/banks';
-import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
+import * as UiStore from './store/ui';
 import * as ViewStore from './store/views';
-import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
-import { useRequiredParams } from './hooks';
 import URL from './urls';
-import { DEV_ENV, FORCE_DEMO_MODE, WOOB_INSTALLED } from '../shared/instance';
-
-// Components
-import About from './components/about';
-import Reports from './components/reports';
-import Budget from './components/budget';
-import DuplicatesList from './components/duplicates';
-import Settings from './components/settings';
-import Accesses from './components/accesses';
-import Categories from './components/categories';
-import Transactions from './components/transactions';
-import RecurringTransactions from './components/recurring-transactions/index';
-import Onboarding from './components/onboarding';
-import WoobInstallIndex from './components/onboarding/woob-readme';
-import Dashboard from './components/dashboard';
-import TransactionRules from './components/rules';
-import Menu from './components/menu';
-import DropdownMenu from './components/menu/dropdown';
-
-import DemoButton from './components/header/demo-button';
-
-import Form from './components/ui/form';
-import DisplayIf from './components/ui/display-if';
-import ErrorReporter from './components/ui/error-reporter';
-import Overlay, { LoadingMessage } from './components/overlay';
-import { DriverAccount } from './components/drivers/account';
-import { getDriver, DriverContext, NoDriver, DriverType } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';

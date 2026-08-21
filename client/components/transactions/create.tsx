@@ -1,28 +1,25 @@
 import { useCallback, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
-
+import {
+    translate as $t,
+    assert,
+    NONE_CATEGORY_ID,
+    notify,
+    UNKNOWN_TRANSACTION_TYPE,
+} from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
-import {
-    translate as $t,
-    NONE_CATEGORY_ID,
-    UNKNOWN_TRANSACTION_TYPE,
-    notify,
-    assert,
-} from '../../helpers';
-
+import { DriverContext } from '../drivers';
 import CategorySelect from '../reports/category-select';
 import TypeSelect from '../reports/type-select';
-
+import { BackLink, Form } from '../ui';
 import { AccountSelector } from '../ui/account-select';
 import AmountInput from '../ui/amount-input';
+import DiscoveryMessage from '../ui/discovery-message';
 import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
-import { BackLink, Form } from '../ui';
-import DiscoveryMessage from '../ui/discovery-message';
-import { DriverContext } from '../drivers';
 
 const CreateTransaction = () => {
     const navigate = useNavigate();

@@ -1,14 +1,10 @@
-import { translate as $t } from '../../helpers';
-
-import ExternalLink from '../ui/external-link';
-
-import rawDependencies from './dependencies.json';
-import { repository } from '../../../package.json';
-
 // eslint-disable-next-line
 import { plainText as LICENSE } from '../../../LICENSE';
-
+import { repository } from '../../../package.json';
+import { translate as $t } from '../../helpers';
 import DisplayIf from '../ui/display-if';
+import ExternalLink from '../ui/external-link';
+import rawDependencies from './dependencies.json';
 
 import './about.css';
 

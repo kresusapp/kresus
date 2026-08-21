@@ -1,20 +1,16 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-
+import { translate as $t, assert, displayLabel, notify } from '../../helpers';
+import { useNotifyError, useRequiredParams, useSyncError } from '../../hooks';
+import { type Access, type AccessCustomField, type Bank, isManualAccess } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
-import { assert, translate as $t, notify, displayLabel } from '../../helpers';
-
 import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
-
 import DisplayIf from '../ui/display-if';
 import CredentialsForm from './sync-form';
-
 import URL from './urls';
-import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
-import { Access, AccessCustomField, Bank, isManualAccess } from '../../models';
 
 const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;

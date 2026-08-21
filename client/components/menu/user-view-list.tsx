@@ -1,12 +1,11 @@
 import { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
-
+import { translate as $t } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as ViewsStore from '../../store/views';
 import URL from '../../urls';
+import { DriverContext, DriverType } from '../drivers';
 import { DriverAccount } from '../drivers/account';
-import { DriverType, DriverContext } from '../drivers';
-import { translate as $t } from '../../helpers';
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 

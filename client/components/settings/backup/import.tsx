@@ -1,6 +1,6 @@
+import { translate as $t } from '../../../helpers';
 import { useKresusState } from '../../../store';
 import * as UiStore from '../../../store/ui';
-import { translate as $t } from '../../../helpers';
 
 import ImportForm from './import-form';
 

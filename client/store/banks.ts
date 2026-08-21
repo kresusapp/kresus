@@ -1,57 +1,57 @@
-import { createSlice, createAsyncThunk, createSelector, Dispatch, isAnyOf } from '@reduxjs/toolkit';
-
 import {
+    createAsyncThunk,
+    createSelector,
+    createSlice,
+    type Dispatch,
+    isAnyOf,
+} from '@reduxjs/toolkit';
+import { BatchStatus } from '../../shared/api/batch';
+import DefaultAlerts from '../../shared/default-alerts.json';
+import DefaultSettings from '../../shared/default-settings';
+import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
+import TransactionTypes from '../../shared/transaction-types.json';
+import type { BankVendor, UserActionResponse } from '../../shared/types';
+import {
+    translate as $t,
     assert,
+    assertDefined,
     assertNotNull,
     currency,
+    displayLabel,
     FETCH_STATUS_SUCCESS,
     localeComparator,
     NONE_CATEGORY_ID,
-    UNKNOWN_ACCOUNT_TYPE,
-    displayLabel,
     shouldIncludeInOutstandingSum,
-    assertDefined,
-    translate as $t,
+    UNKNOWN_ACCOUNT_TYPE,
 } from '../helpers';
-
 import {
-    Access,
-    Account,
-    Alert,
-    Bank,
-    Transaction,
-    AlertType,
-    AccessCustomField,
-    CustomFieldDescriptor,
-    Type,
-    PartialTransaction,
+    type Access,
+    type AccessCustomField,
+    type Account,
+    type Alert,
+    type AlertType,
+    assertValidAlert,
+    assertValidRecurringTransaction,
+    assertValidType,
+    type Bank,
+    type CustomFieldDescriptor,
     createValidAccess,
     createValidAccount,
     createValidBank,
     createValidTransaction,
-    assertValidType,
-    assertValidAlert,
-    updateAccountFrom,
-    assertValidRecurringTransaction,
-    RecurringTransaction,
     isManualAccess,
+    type PartialTransaction,
+    type RecurringTransaction,
+    type Transaction,
+    type Type,
+    updateAccountFrom,
 } from '../models';
-
-import DefaultAlerts from '../../shared/default-alerts.json';
-import DefaultSettings from '../../shared/default-settings';
-import type { BankVendor, UserActionResponse } from '../../shared/types';
-import TransactionTypes from '../../shared/transaction-types.json';
-
-import * as UiStore from './ui';
 import * as backend from './backend';
-import * as CategoriesStore from './categories';
-import * as SettingsStore from './settings';
-
-import { mergeInArray, removeInArrayById, mergeInObject, removeInArray } from './helpers';
-
-import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
-import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
+import * as CategoriesStore from './categories';
+import { mergeInArray, mergeInObject, removeInArray, removeInArrayById } from './helpers';
+import * as SettingsStore from './settings';
+import * as UiStore from './ui';
 
 export interface BankState {
     // Bank descriptors.
@@ -1559,8 +1559,7 @@ export function transactionsByAccountId(state: BankState, accountId: number): Tr
 
 export function transactionsByAccountIds(state: BankState, accountIds: number[]): Transaction[] {
     return accountIds
-        .map(accountId => transactionsByAccountId(state, accountId))
-        .flat()
+        .flatMap(accountId => transactionsByAccountId(state, accountId))
         .sort((a, b) => +b.date - +a.date);
 }
 

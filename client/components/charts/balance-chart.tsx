@@ -1,15 +1,12 @@
-import { Fragment, useCallback, useEffect, useRef } from 'react';
-
 import { Chart, type ScriptableLineSegmentContext } from 'chart.js';
+import { Fragment, useCallback, useEffect, useRef } from 'react';
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
 
-import { getChartsDefaultColors, round2, translate as $t, assert, startOfDay } from '../../helpers';
-
+import { translate as $t, assert, getChartsDefaultColors, round2, startOfDay } from '../../helpers';
+import type { Transaction } from '../../models';
 import DiscoveryMessage from '../ui/discovery-message';
-
-import { Transaction } from '../../models';
 
 // Number of milliseconds in a day.
 const DAY = 1000 * 60 * 60 * 24;
