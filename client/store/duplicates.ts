@@ -40,6 +40,9 @@ const duplicatesSlice = createSlice({
     reducers: {},
     extraReducers: builder => {
         builder
+            .addCase(updateDuplicatesList.pending, state => {
+                state.isLoaded = false;
+            })
             .addCase(updateDuplicatesList.fulfilled, (state, action) => {
                 state.items = action.payload.new;
                 state.isLoaded = true;
