@@ -7,8 +7,6 @@ import { enableDemo, importInstance } from './global';
 
 import { assertDefined } from '../helpers';
 
-import { DUPLICATE_THRESHOLD } from '../../shared/settings';
-
 import type { Duplicates } from '../../shared/types';
 
 export interface DuplicatesState {
