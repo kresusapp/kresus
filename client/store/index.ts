@@ -23,9 +23,8 @@ import * as GlobalStore from './global';
 // Reset the stores' states following an instance import or the enablement of the demo mode.
 // Any store that is subject to reset after these actions should be added to the list below or
 // implement a reducer for these actions directly.
-// This is meant for "stores" created as redux-toolkit slices. For legacy reducers see augmentReducer.
 // Note: since duplicates are lazy-loaded (not part of the global state), they are not reset on
-// import: they will be fetched on reset below.
+// import: they will be fetched on reset in the duplicatesMiddleware.
 const storesToReset = [
     CategoryStore,
     BudgetStore,
