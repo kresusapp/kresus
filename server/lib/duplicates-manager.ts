@@ -1,9 +1,8 @@
 import moment from 'moment';
 
 import { makeLogger, NONE_CATEGORY_ID, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
-
-import { DuplicatesIgnored } from '../models';
 import type { MinimalTransaction, Transaction } from '../models';
+import { DuplicatesIgnored } from '../models';
 import type { DuplicatesByAccount } from '../shared/types';
 
 const log = makeLogger('duplicates-manager');

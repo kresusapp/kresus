@@ -1,27 +1,19 @@
 import { Fragment, useCallback, useContext } from 'react';
 import { Link, Navigate, Route, Routes } from 'react-router';
-
-import { translate as $t } from '../../helpers';
 import { DUPLICATE_THRESHOLD } from '../../../shared/settings';
 import { translate as $t } from '../../helpers';
-
-import URL from '../../urls';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-
-import DefaultParameters from './default-params';
-
+import URL from '../../urls';
 import { DriverContext } from '../drivers';
 import DefaultParameters from './default-params';
-import Pair from './item';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
-import { LoadingMessage } from '../overlay/loading';
 import DiscoveryMessage from '../ui/discovery-message';
+import IgnoredDuplicates from './ignored';
 import MergeAll from './merge-all';
 import PairsList, { usePairsByAccount } from './pairs';
-import IgnoredDuplicates from './ignored';
 
 const THRESHOLDS_SUITE = [24, 24 * 2, 24 * 3, 24 * 4, 24 * 7, 24 * 14];
 const NUM_THRESHOLDS_SUITE = THRESHOLDS_SUITE.length;

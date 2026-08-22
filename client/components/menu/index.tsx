@@ -5,6 +5,7 @@ import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
+import URL from '../../urls';
 import { findRedundantPairs } from '../duplicates/pairs';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
@@ -14,6 +15,7 @@ import AccessList from './access-list';
 import UserViewList from './user-view-list';
 
 import './menu.css';
+import { Driver, DriverContext, DriverType } from '../drivers';
 
 interface EntryProps {
     // The path to which the link directs.

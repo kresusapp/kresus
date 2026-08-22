@@ -16,6 +16,7 @@ import Alert from './entities/alerts';
 import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
 import Budget from './entities/budgets';
 import Category from './entities/categories';
+import DuplicatesIgnored from './entities/duplicates-ignored';
 import RecurringTransaction from './entities/recurring-transactions';
 import Setting from './entities/settings';
 import TransactionRule from './entities/transaction-rule';
@@ -24,7 +25,6 @@ import TransactionRuleCondition from './entities/transaction-rule-condition';
 import Transaction from './entities/transactions';
 import User from './entities/users';
 import View from './entities/views';
-import DuplicatesIgnored from './entities/duplicates-ignored';
 
 type MinimalTransaction = Partial<Transaction> &
     Pick<Transaction, 'date' | 'importDate' | 'amount' | 'rawLabel'>;
@@ -37,6 +37,7 @@ export {
     AppliedRecurringTransaction,
     Budget,
     Category,
+    DuplicatesIgnored,
     type MinimalTransaction,
     RecurringTransaction,
     Setting,
@@ -46,7 +47,6 @@ export {
     TransactionRuleCondition,
     User,
     View,
-    DuplicatesIgnored,
 };
 
 const log = makeLogger('models/index');

@@ -14,6 +14,7 @@ import {
     Budget,
     Category,
     DuplicatesIgnored,
+    RecurringTransaction,
     Setting,
     Transaction,
     TransactionRule,

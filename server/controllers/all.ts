@@ -1,40 +1,6 @@
 import crypto from 'crypto';
+import type express from 'express';
 
-import {
-    Access,
-    Account,
-    Alert,
-    Budget,
-    Category,
-    RecurringTransaction,
-    Setting,
-    MinimalTransaction,
-    Transaction,
-    TransactionRule,
-    AppliedRecurringTransaction,
-    View,
-    User,
-    DuplicatesIgnored,
-} from '../models';
-
-import runDataMigrations from '../models/data-migrations';
-
-import {
-    assert,
-    makeLogger,
-    isEmailEnabled,
-    KError,
-    asyncErr,
-    getErrorCode,
-    UNKNOWN_TRANSACTION_TYPE,
-    isAppriseApiEnabled,
-    unwrap,
-} from '../helpers';
-
-import { bankVendorByUuid, getBankVendors } from '../providers';
-import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
-import { validatePassword } from '../shared/helpers';
-import DefaultSettings from '../shared/default-settings';
 import {
     DEFAULT_ACCOUNT_ID,
     DEMO_MODE,
@@ -62,6 +28,7 @@ import {
     AppliedRecurringTransaction,
     Budget,
     Category,
+    DuplicatesIgnored,
     type MinimalTransaction,
     RecurringTransaction,
     Setting,
@@ -74,12 +41,11 @@ import runDataMigrations from '../models/data-migrations';
 import { bankVendorByUuid, getBankVendors } from '../providers';
 import DefaultSettings from '../shared/default-settings';
 import { validatePassword } from '../shared/helpers';
+import type { DuplicatesPairs } from '../shared/types';
 import { type AllData, type ClientAccess, cleanData, type Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import type { IdentifiedRequest } from './routes';
-
-import type { DuplicatesPairs } from '../shared/types';
 
 const log = makeLogger('controllers/all');
 

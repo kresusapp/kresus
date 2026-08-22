@@ -1,9 +1,8 @@
 import regexEscape from 'regex-escape';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-import type { BankVendor } from '../../shared/types';
+import type { BankVendor, DuplicatesPairs } from '../../shared/types';
 import { assert, makeLogger } from '../helpers';
 import { ConfigGhostSettings, type InstancePropertiesType } from '../lib/instance';
-
 import type {
     Account,
     Alert,
@@ -21,8 +20,6 @@ import type {
 } from '../models';
 import DefaultSettings from '../shared/default-settings';
 import { conditionTypesList } from './rules';
-
-import type { BankVendor, DuplicatesPairs } from '../../shared/types';
 
 const log = makeLogger('controllers/helpers');
 

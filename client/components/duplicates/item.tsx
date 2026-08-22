@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
 import { translate as $t, displayLabel, formatDate } from '../../helpers';
+import { useGenericError } from '../../hooks';
 import type { Transaction } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
 import * as DuplicatesStore from '../../store/duplicates';
-import { translate as $t, formatDate, displayLabel } from '../../helpers';
 import { Popconfirm } from '../ui';
-import { useGenericError } from '../../hooks';
-import { Transaction } from '../../models';
 
 const TransactionLine = (props: {
     label: string;
