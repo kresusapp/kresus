@@ -180,7 +180,7 @@ jobs:
           KRESUS_WOOB_DIR: .woob
         run: |
           . venv/bin/activate
-          yarn run --silent ci:test -- ./tests/server/woob.js
+          yarn run --silent ci:test ./tests/server/woob.js
 
   tests:
     name: JS tests
