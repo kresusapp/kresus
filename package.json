@@ -88,7 +88,6 @@
     "scripts": {
         "build:ci": "./scripts/build/ci.sh",
         "build:server": "./scripts/build/server.sh",
-        "build:server-common": "./scripts/build/server-common.sh",
         "build:prod": "./scripts/build/prod.sh",
         "build": "./scripts/build/dev.sh",
         "build:dev": "./scripts/build/dev.sh",
@@ -113,8 +112,7 @@
         "docker:nightly": "./scripts/docker/nightly.sh",
         "release": "./scripts/release.sh",
         "tsdev": "./scripts/tsdev.sh",
-        "start": "node bin/kresus.js",
-        "onchange": "onchange"
+        "start": "node bin/kresus.js"
     },
     "bin": {
         "kresus": "bin/kresus.js"
