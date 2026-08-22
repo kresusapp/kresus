@@ -1,7 +1,6 @@
 import { Chart, type ScriptableLineSegmentContext } from 'chart.js';
 import { Fragment, useCallback, useEffect, useRef } from 'react';
 
-// eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
 
 import { translate as $t, assert, getChartsDefaultColors, round2, startOfDay } from '../../helpers';

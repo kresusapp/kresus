@@ -224,7 +224,6 @@ const Kresus = () => {
     );
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // biome-ignore lint/correctness/useExhaustiveDependencies: we have a global keydown handler above.
     const handleWindowResize = useCallback(
         throttle(event => {

@@ -1,5 +1,3 @@
-/* eslint-disable import/unambiguous */
-
 type EmailTransport = 'smtp' | 'sendmail';
 
 type KresusProcess = {

@@ -60,7 +60,6 @@ const InfiniteList = (props: Props) => {
         });
     }, [heightAbove, itemHeight, ballast, numItems]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleScroll = useCallback(
         throttle((e: Event) => {
             e.preventDefault();

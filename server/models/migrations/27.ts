@@ -27,8 +27,6 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
                 await queryRunner.commitTransaction();
 
                 wasInTransaction = true;
-
-                // eslint-disable-next-line no-empty
             } catch (ignore) {}
 
             await queryRunner.query('PRAGMA foreign_keys = OFF');
@@ -42,7 +40,6 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
             if (wasInTransaction) {
                 try {
                     await queryRunner.startTransaction();
-                    // eslint-disable-next-line no-empty
                 } catch (ignore) {}
             }
         }

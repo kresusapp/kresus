@@ -1,5 +1,3 @@
-/* eslint no-process-exit: 0 */
-
 import * as fs from 'fs';
 import * as path from 'path';
 import { makeLogger } from '../../server/helpers';

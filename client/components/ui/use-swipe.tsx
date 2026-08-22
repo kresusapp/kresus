@@ -56,9 +56,7 @@ export function useSwipeDetection<T extends HTMLElement>(
                 onSwipeChange(ref.current, deltaX);
             }
 
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             started = true;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             deltaX = newDeltaX;
         },
         [initialXPosition, initialYPosition, onSwipeStart, onSwipeChange]
@@ -109,7 +107,6 @@ export function useSwipeDetection<T extends HTMLElement>(
                 event.target.removeEventListener('contextmenu', onContextMenu);
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [onTouchMove, onContextMenu, onSwipeEnd]
     );
 
@@ -128,13 +125,9 @@ export function useSwipeDetection<T extends HTMLElement>(
                 return;
             }
 
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             started = false;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             initialXPosition = event.touches[0].clientX;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             initialYPosition = event.touches[0].clientY;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             deltaX = 0;
 
             // Do not fire the swipe start event yet, it will be done on the first

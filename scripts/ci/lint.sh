@@ -30,7 +30,6 @@ then
 fi
 
 concurrently \
-    "yarn run -- eslint --cache $QUIET $FIX $TARGET" \
     "yarn run ci:lint-css $QUIET $FIX" \
-    "yarn biome format $BIOME_WRITE" \
-    "yarn biome lint --diagnostic-level=error"
+    "yarn biome format $BIOME_WRITE $TARGET" \
+    "yarn biome lint --diagnostic-level=error $TARGET"

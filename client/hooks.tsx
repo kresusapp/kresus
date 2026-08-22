@@ -62,7 +62,7 @@ export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
             effect();
         }
         // biome-ignore lint/correctness/useExhaustiveDependencies: it works?
-    }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
+    }, dependencies);
 
     useEffect(() => {
         isFirstRender.current = false;
@@ -77,7 +77,6 @@ export const useCompareWithPrev = (itemName: string, item: any) => {
     const prev = useRef<any>(null);
     useEffect(() => {
         if (prev.current !== item) {
-            /* eslint-disable-next-line no-console */
             console.log('new version of', itemName);
             prev.current = item;
         }

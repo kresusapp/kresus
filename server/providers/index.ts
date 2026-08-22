@@ -107,7 +107,6 @@ function init() {
             continue;
         }
 
-        // eslint-disable-next-line import/no-dynamic-require
         const handler: Provider = require(`./${fileOrDirName}`);
 
         addBackend(handler);

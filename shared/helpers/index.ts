@@ -1,6 +1,3 @@
-/* eslint no-console: 0 */
-/* eslint @typescript-eslint/no-var-requires: 0 */
-
 import { memoize } from 'micro-memoize';
 
 import type { SharedTransaction } from '../types';

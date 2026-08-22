@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint no-console: 0 */
-/* eslint no-process-exit: 0 */
-/* eslint import/no-dynamic-require: 0 */
-
 const path = require('node:path');
 const fs = require('node:fs');
 const ini = require('ini');

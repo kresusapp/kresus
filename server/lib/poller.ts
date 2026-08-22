@@ -30,11 +30,9 @@ async function managePollingErrors(
     const i18n = await getTranslator(userId);
 
     const blockingStatusLocale = $t(i18n, `server.email.fetch_error.${type}`, {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
     });
     const subject = $t(i18n, 'server.email.fetch_error.subject', {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
 
         type: blockingStatusLocale,

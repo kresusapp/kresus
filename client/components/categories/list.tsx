@@ -46,7 +46,6 @@ export default () => {
         deleteUnusedButtonLabel = $t('client.category.no_unused_categories');
     } else {
         deleteUnusedButtonLabel = $t('client.category.delete_unused', {
-            // eslint-disable-next-line camelcase
             smart_count: numUnused,
         });
     }

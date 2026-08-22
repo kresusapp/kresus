@@ -46,7 +46,6 @@ export default class SessionManager implements ISessionManager {
         }
 
         // Explicitly return nothing, for TypeScript.
-        // eslint-disable-next-line no-useless-return
         return;
     }
 }

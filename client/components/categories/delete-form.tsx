@@ -50,7 +50,6 @@ const DeleteForm = () => {
     let replaceForm: React.JSX.Element | undefined;
     if (numTransactions > 0) {
         explainer = $t('client.category.attached_transactions', {
-            // eslint-disable-next-line camelcase
             smart_count: numTransactions,
         });
 

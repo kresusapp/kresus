@@ -101,7 +101,6 @@ describe('migrations', () => {
         const migration25ConstraintMigration = new AddViewIdInBudgetMigration();
         try {
             await migration25ConstraintMigration.down(queryRunner);
-            // eslint-disable-next-line
         } catch (ignore) {}
 
         const migration8ConstraintMigration = new BudgetsConstraintMigration();

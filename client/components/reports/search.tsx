@@ -222,7 +222,6 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     const refKeywordsInput = React.createRef<ClearableInputRef>();
     const refMinMaxInput = React.createRef<MinMaxInputRef>();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleKeyword = useCallback(
         debounce(
             (value: string) => {
@@ -265,7 +264,6 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
         [handleClearSearch, resetAll]
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleMinMaxChange = useCallback(
         debounce((low: number | null, high: number | null) => {
             // Don't trigger a false rerender if the values haven't changed.

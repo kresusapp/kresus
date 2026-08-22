@@ -1,4 +1,3 @@
-/* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
 import { type EntityManager, In } from 'typeorm';
 import { makeLogger } from '../../helpers';
 import { Access, Account } from '..';

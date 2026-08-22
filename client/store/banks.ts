@@ -383,7 +383,6 @@ export const resyncBalance = createAsyncThunk(
         }
 
         // We need to return at some point, to please typescript.
-        // eslint-disable-next-line no-useless-return
         return;
     }
 );

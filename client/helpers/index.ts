@@ -2,8 +2,6 @@
  * HELPERS
  */
 
-/* eslint no-console: 0 */
-
 import moment from 'moment';
 import { toast } from 'react-toastify';
 

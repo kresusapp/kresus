@@ -160,7 +160,6 @@ export async function ofxToKresus(ofx: string) {
 
             transactions = transactions.concat(
                 accountTransactions
-                    // eslint-disable-next-line no-loop-func
                     .map((transaction: any) => {
                         const debitDate = parseOfxDate(transaction.DTPOSTED);
                         let realizationDate = parseOfxDate(transaction.DTUSER);

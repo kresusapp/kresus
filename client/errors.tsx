@@ -1,5 +1,3 @@
-/* eslint no-console: 0 */
-
 import errors from '../shared/errors.json';
 import { translate as $t, notify } from './helpers';
 

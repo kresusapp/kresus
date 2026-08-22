@@ -1,4 +1,3 @@
-// eslint-disable-next-line
 import { plainText as LICENSE } from '../../../LICENSE';
 import { repository } from '../../../package.json';
 import { translate as $t } from '../../helpers';
