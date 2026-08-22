@@ -300,10 +300,23 @@ const generate = (access: Access): ProviderTransaction[] => {
     return transactions;
 };
 
+// Allow mocking what transactions will be preset and returned, for testing purposes.
+let presetTransactions: ProviderTransaction[] | null = null;
+
 export const fetchTransactions = ({
     access,
 }: FetchTransactionsOptions): Promise<ProviderTransactionResponse> => {
+    if (presetTransactions !== null) {
+        return Promise.resolve({
+            kind: 'values',
+            values: presetTransactions,
+        });
+    }
     return Promise.resolve({ kind: 'values', values: generate(access) });
+};
+
+export const setPresetTransactions = (transactions: ProviderTransaction[]) => {
+    presetTransactions = transactions;
 };
 
 export const getBankVendors = () => [
@@ -329,4 +342,8 @@ export const _: Provider = {
     getBankVendors,
     fetchAccounts,
     fetchTransactions,
+};
+
+export const testing = {
+    setPresetTransactions,
 };

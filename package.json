@@ -75,7 +75,7 @@
         "rollup-plugin-sprite": "~0.1.2",
         "stylelint": "~17.14.1",
         "stylelint-config-standard": "~40.0.0",
-        "ts-node": "~10.9.2",
+        "tsx": "^4.23.12",
         "typescript": "~6.0.0",
         "vite": "~8.1.5",
         "vite-plugin-plain-text": "^1.4.2",
@@ -118,5 +118,8 @@
     },
     "bin": {
         "kresus": "bin/kresus.js"
+    },
+    "mocha": {
+        "node-option": ["import=tsx"]
     }
 }
