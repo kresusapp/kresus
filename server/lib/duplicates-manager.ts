@@ -127,11 +127,6 @@ export function findRedundantPairs(
         while (j < transactions.length) {
             const next = sorted[j];
 
-            if (ignoredKeys.has(pairKey(tr.id, next.id))) {
-                j += 1;
-                continue;
-            }
-
             const duplicateScore = getDuplicatePairScore(
                 tr,
                 next,
@@ -139,7 +134,7 @@ export function findRedundantPairs(
                 ignoreDuplicatesWithDifferentCustomFields
             );
 
-            if (duplicateScore > 0) {
+            if (duplicateScore > 0 && !ignoredKeys.has(pairKey(tr.id, next.id))) {
                 similar.push([tr, next]);
             }
 
@@ -188,8 +183,9 @@ export async function findIgnoredDuplicates(userId: number): Promise<DuplicatesB
         }
     }
 
-    return Array.from(pairsByAccount.entries()).map(([accountId, duplicates]) => ({
-        accountId,
-        duplicates,
-    }));
+    const ret: DuplicatesByAccount = [];
+    for (const [accountId, duplicates] of pairsByAccount) {
+        ret.push({ accountId, duplicates });
+    }
+    return ret;
 }

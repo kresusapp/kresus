@@ -114,7 +114,7 @@ export function datetimeType(queryRunner: QueryRunner): string {
 // case, we need to split up the batches into smaller ones.
 //
 // 50 ought to be enough for everyone, since it allows up to 19 fields.
-const LOW_NUM_ENTITIES_IN_BATCH = 50;
+export const LOW_NUM_ENTITIES_IN_BATCH = 50;
 
 // The same issue happens with postgres which can't bind more than 64K features at once.
 const NUM_ENTITIES_IN_BATCH = 1000;

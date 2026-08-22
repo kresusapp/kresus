@@ -75,7 +75,7 @@ export async function getIgnoredDuplicates(req: IdentifiedRequest<any>, res: exp
 }
 
 // Reads and validates the pair of transactions referenced in the request's body.
-async function readPair(
+async function extractPairFromRequest(
     userId: number,
     body: any
 ): Promise<[transaction: Transaction, otherTransaction: Transaction]> {
@@ -99,13 +99,20 @@ async function readPair(
         pair.push(transaction);
     }
 
+    if (pair[0].accountId !== pair[1].accountId) {
+        throw new KError(
+            `transaction ${pair[0].id} and ${pair[1].id} don't belong to the same account`,
+            400
+        );
+    }
+
     return [pair[0], pair[1]];
 }
 
 export async function ignoreDuplicate(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const [transaction, otherTransaction] = await readPair(userId, req.body);
+        const [transaction, otherTransaction] = await extractPairFromRequest(userId, req.body);
 
         await DuplicatesIgnored.create(userId, transaction.id, otherTransaction.id);
 
@@ -118,28 +125,36 @@ export async function ignoreDuplicate(req: IdentifiedRequest<any>, res: express.
 export async function unignoreDuplicate(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const [transaction, otherTransaction] = await readPair(userId, req.body);
+        const [transaction, otherTransaction] = await extractPairFromRequest(userId, req.body);
 
-        await DuplicatesIgnored.destroy(userId, transaction.id, otherTransaction.id);
+        const deleted = await DuplicatesIgnored.destroy(
+            userId,
+            transaction.id,
+            otherTransaction.id
+        );
 
-        // Let the client know whether the pair is detected as a duplicate again, so that it can
-        // add it back to the list of duplicates without refetching the whole list.
-        const threshold = await Setting.findOrCreateDefault(userId, DUPLICATE_THRESHOLD);
-        const ignoreDuplicatesWithDifferentCustomFields =
-            await Setting.findOrCreateDefaultBooleanValue(
-                userId,
-                DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
-            );
+        let isDuplicate = false;
 
-        // The threshold setting is in hours, transform it to days.
-        const thresholdInDays = Math.round(parseInt(threshold.value, 10) / 24);
-        const isDuplicate =
-            getDuplicatePairScore(
-                transaction,
-                otherTransaction,
-                thresholdInDays,
-                ignoreDuplicatesWithDifferentCustomFields
-            ) > 0;
+        if (deleted) {
+            // Let the client know whether the pair is detected as a duplicate again, so that it can
+            // add it back to the list of duplicates without refetching the whole list.
+            const threshold = await Setting.findOrCreateDefault(userId, DUPLICATE_THRESHOLD);
+            const ignoreDuplicatesWithDifferentCustomFields =
+                await Setting.findOrCreateDefaultBooleanValue(
+                    userId,
+                    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
+                );
+
+            // The threshold setting is in hours, transform it to days.
+            const thresholdInDays = Math.round(parseInt(threshold.value, 10) / 24);
+            isDuplicate =
+                getDuplicatePairScore(
+                    transaction,
+                    otherTransaction,
+                    thresholdInDays,
+                    ignoreDuplicatesWithDifferentCustomFields
+                ) > 0;
+        }
 
         res.status(200).json({ isDuplicate });
     } catch (err) {

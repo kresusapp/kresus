@@ -64,8 +64,8 @@ export default class DuplicatesIgnored {
 
     // Static methods.
 
-    // Returns the pair in its canonical form: smallest id first.
-    static sortPair(
+    // Returns a new sorted pair in its canonical form: smallest id first.
+    static sortedPair(
         transactionId: number,
         otherTransactionId: number
     ): [first: number, second: number] {
@@ -92,7 +92,7 @@ export default class DuplicatesIgnored {
         transactionId: number,
         otherTransactionId: number
     ): Promise<DuplicatesIgnored | null> {
-        const [first, second] = DuplicatesIgnored.sortPair(transactionId, otherTransactionId);
+        const [first, second] = DuplicatesIgnored.sortedPair(transactionId, otherTransactionId);
         return await DuplicatesIgnored.repo().findOneBy({
             userId,
             transactionId: first,
@@ -105,7 +105,7 @@ export default class DuplicatesIgnored {
         transactionId: number,
         otherTransactionId: number
     ): Promise<DuplicatesIgnored> {
-        const [first, second] = DuplicatesIgnored.sortPair(transactionId, otherTransactionId);
+        const [first, second] = DuplicatesIgnored.sortedPair(transactionId, otherTransactionId);
 
         // Don't create the same pair twice.
         const existing = await DuplicatesIgnored.find(userId, first, second);
@@ -121,17 +121,23 @@ export default class DuplicatesIgnored {
         return await DuplicatesIgnored.repo().save(entity);
     }
 
+    // Destroy the ignored pair from the database.
+    //
+    // Order of the transaction id doesn't matter as it's normalized before deletion.
+    //
+    // Returns a boolean indicating whether a deletion actually happened.
     static async destroy(
         userId: number,
         transactionId: number,
         otherTransactionId: number
-    ): Promise<void> {
-        const [first, second] = DuplicatesIgnored.sortPair(transactionId, otherTransactionId);
-        await DuplicatesIgnored.repo().delete({
+    ): Promise<boolean> {
+        const [first, second] = DuplicatesIgnored.sortedPair(transactionId, otherTransactionId);
+        const deleteResult = await DuplicatesIgnored.repo().delete({
             userId,
             transactionId: first,
             otherTransactionId: second,
         });
+        return typeof deleteResult.affected === 'number' && deleteResult.affected > 0;
     }
 
     static async destroyAll(userId: number): Promise<void> {

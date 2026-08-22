@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import { importData } from '../../server/controllers/all';
 import { Access, Account, Transaction } from '../../server/models';
+import { LOW_NUM_ENTITIES_IN_BATCH } from '../../server/models/helpers';
 
 import { checkObjectIsSubsetOf } from '../helpers';
 
@@ -134,7 +135,7 @@ describe('Transaction model API', () => {
 
         // Builds `count` distinct transactions for the test account.
         function makeTransactions(count) {
-            return Array.from({ length: count }, (unused, i) => ({
+            return Array.from({ length: count }, (_unused, i) => ({
                 accountId,
                 type: 'type.card',
                 label: `bulk transaction ${i}`,
@@ -203,8 +204,7 @@ describe('Transaction model API', () => {
         });
 
         it('should return one id per inserted transaction when split in several batches', async () => {
-            // The sqlite batch size is 50 entities, so this spans several batches.
-            const toInsert = makeTransactions(120);
+            const toInsert = makeTransactions(LOW_NUM_ENTITIES_IN_BATCH * 2);
             const insertedIds = await Transaction.bulkCreate(USER_ID, toInsert);
 
             assert.strictEqual(insertedIds.length, toInsert.length);

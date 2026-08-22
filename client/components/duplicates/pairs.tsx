@@ -78,7 +78,7 @@ const PairsList = (props: {
 
         content.push(
             ...pairs.map(p => {
-                const key = p[0].id.toString() + p[1].id.toString();
+                const key = `${p[0].id}-${p[1].id}`;
                 return (
                     <Pair
                         key={key}
