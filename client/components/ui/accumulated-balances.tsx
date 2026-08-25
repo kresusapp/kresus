@@ -1,11 +1,11 @@
 import type * as React from 'react';
+import { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
 import { translate as $t } from '../../helpers';
-import { useRequiredParams } from '../../hooks';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
-import { DriverType } from '../drivers';
+import { DriverType, DriverContext } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';
 
 import ColoredAmount from './colored-amount';
@@ -29,10 +29,7 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
     const totalEntries = Object.entries(props.totals);
 
     const { pathname } = useLocation();
-    const { driver = null, value: driverValue } = useRequiredParams<{
-        driver?: string;
-        value: string;
-    }>();
+    const driver = useContext(DriverContext);
 
     let totalElement: React.ReactNode | string;
     if (totalEntries.length) {
@@ -40,10 +37,10 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
             .map(([key, value]): React.ReactNode => {
                 if (props.isCurrencyLink) {
                     const newPathName =
-                        driver !== null
+                        driver !== null && driver.value !== null
                             ? pathname
-                                  .replace(driver, DriverType.Currency)
-                                  .replace(driverValue, key)
+                                  .replace(driver.type, DriverType.Currency)
+                                  .replace(driver.value, key)
                             : URL.reports.url(new DriverCurrency(key));
                     return (
                         <span className="total-balance-item" key={`item-${key}`}>
