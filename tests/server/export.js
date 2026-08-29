@@ -247,3 +247,141 @@ describe('export duplicates pairs to ignore', () => {
         assert.strictEqual(typeof data.duplicates, 'undefined');
     });
 });
+
+describe('export/import of accounts without a vendor-provided balance', () => {
+    let USER_ID = null;
+
+    before(async () => {
+        const users = await User.all();
+        if (!users.length) {
+            throw new Error('user should have been created!');
+        }
+        USER_ID = users[0].id;
+        if (typeof USER_ID !== 'number') {
+            throw new Error('missing user id in test.');
+        }
+    });
+
+    after(async () => {
+        await cleanAll(USER_ID);
+    });
+
+    // A manual access, whose accounts never get a balance from the vendor and must therefore keep
+    // a NULL balance in database, plus a regular one used as a control.
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+                login: 'manual-balance-login',
+            },
+            {
+                id: 1,
+                vendorId: 'fakewoobbank',
+                login: 'woob-balance-login',
+                password: 'whatever',
+            },
+        ],
+        accounts: [
+            {
+                id: 0,
+                accessId: 0,
+                vendorAccountId: 'manual-balance-account',
+                type: 'account-type.checking',
+                initialBalance: 0,
+                label: 'Manual account',
+                currency: 'EUR',
+                importDate: new Date('2020-01-01T00:00:00.000Z'),
+            },
+            {
+                id: 1,
+                accessId: 1,
+                vendorAccountId: 'woob-balance-account',
+                type: 'account-type.checking',
+                initialBalance: 0,
+                balance: 500,
+                label: 'Polled account',
+                currency: 'EUR',
+                importDate: new Date('2020-01-01T00:00:00.000Z'),
+            },
+        ],
+        transactions: [
+            {
+                accountId: 0,
+                type: 'type.card',
+                label: 'Wholemart',
+                rawLabel: 'card 07/07/2020 wholemart',
+                date: new Date('2020-07-07T00:00:00.000Z'),
+                importDate: new Date('2020-07-07T00:00:00.000Z'),
+                amount: -100,
+            },
+            {
+                accountId: 0,
+                type: 'type.card',
+                label: 'Wholemart',
+                rawLabel: 'card 09/07/2020 wholemart',
+                date: new Date('2020-07-09T00:00:00.000Z'),
+                importDate: new Date('2020-07-09T00:00:00.000Z'),
+                amount: -50,
+            },
+        ],
+    };
+
+    const COMPUTED_BALANCE = -150;
+
+    async function accountByVendorId(vendorAccountId) {
+        return await Account.repo().findOneBy({ userId: USER_ID, vendorAccountId });
+    }
+
+    it('should keep the manual account balance NULL in database after an import', async () => {
+        await cleanAll(USER_ID);
+        await importData(USER_ID, structuredClone(world));
+
+        const manualAccount = await accountByVendorId('manual-balance-account');
+        assert.strictEqual(manualAccount.balance, null);
+
+        // The control account keeps the balance it was imported with.
+        const polledAccount = await accountByVendorId('woob-balance-account');
+        assert.strictEqual(polledAccount.balance, 500);
+    });
+
+    it('should not export a computed balance for a manual account', async () => {
+        const data = await exportData(USER_ID, { isExport: true });
+
+        const manualAccount = data.accounts.find(
+            acc => acc.vendorAccountId === 'manual-balance-account'
+        );
+        assert.ok(manualAccount, 'the manual account should be exported');
+        assert.strictEqual(manualAccount.balance, null);
+
+        const polledAccount = data.accounts.find(
+            acc => acc.vendorAccountId === 'woob-balance-account'
+        );
+        assert.strictEqual(polledAccount.balance, 500);
+    });
+
+    it('should still return the computed balance to the /all endpoint', async () => {
+        const data = await exportData(USER_ID, { isExport: false });
+
+        const manualAccount = data.accounts.find(
+            acc => acc.vendorAccountId === 'manual-balance-account'
+        );
+        assert.strictEqual(manualAccount.balance, COMPUTED_BALANCE);
+    });
+
+    it('should recompute the balance of a re-imported manual account', async () => {
+        // Simulate a full round-trip: export to a JSON file, then import it back.
+        const exported = JSON.parse(
+            JSON.stringify(await exportData(USER_ID, { isExport: true, cleanPassword: false }))
+        );
+
+        await cleanAll(USER_ID);
+        await importData(USER_ID, exported);
+
+        const manualAccount = await accountByVendorId('manual-balance-account');
+        assert.strictEqual(manualAccount.balance, null);
+
+        const account = await Account.find(USER_ID, manualAccount.id);
+        assert.strictEqual(account.balance, COMPUTED_BALANCE);
+    });
+});

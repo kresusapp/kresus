@@ -123,7 +123,11 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         ret.accesses.push(clientAccess);
     }
 
-    ret.accounts = await Account.all(userId);
+    // On export we don't want the balance to be returned for manual accounts, otherwise
+    // on import the balance won't be automatically re-computed on transactions
+    // creation/update/deletion.
+    ret.accounts = await Account.all(userId, !isExport);
+
     ret.categories = await Category.all(userId);
     ret.transactions = await Transaction.all(userId);
     ret.settings = await Setting.all(userId);
