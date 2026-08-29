@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import { Access, Account, User, View } from '../../server/models';
+import { Access, Account, getManager, User, View } from '../../server/models';
 import ViewAccount from '../../server/models/entities/view-accounts';
 
 describe('Views database CRUD tests', () => {
@@ -236,6 +236,34 @@ describe('Views database CRUD tests', () => {
         views = await View.all(USER_ID);
         assert.strictEqual(views.length, 1);
         assert.strictEqual(views[0].label, 'Better name');
+    });
+
+    it('should not throw when accounts are updated in bulk', async () => {
+        await Account.destroyAll(USER_ID);
+        await View.destroyAll(USER_ID);
+
+        const account = await Account.create(USER_ID, {
+            accessId: classicAccess.id,
+            vendorAccountId: 66666,
+            label: 'Bulk updated',
+            initialBalance: 300,
+            balance: 1234,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        // On such an update, typeorm only hands the partial set of updated values to the
+        // subscriber, without any id or userId: it must not try to rename any view. This is what
+        // the data migrations do, see resetManualBankAccountsBalance().
+        await getManager().update(Account, { accessId: classicAccess.id }, { balance: null });
+
+        const updated = await Account.repo().findOneBy({ userId: USER_ID, id: account.id });
+        assert.strictEqual(updated.balance, null);
+
+        // The view was left untouched.
+        const views = await View.all(USER_ID);
+        assert.strictEqual(views.length, 1);
+        assert.strictEqual(views[0].label, 'Bulk updated');
     });
 
     it('should remove ViewAccount properly when destroying a view', async () => {

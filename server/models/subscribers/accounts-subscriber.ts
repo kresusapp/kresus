@@ -35,7 +35,13 @@ export class AccountsSubscriber implements EntitySubscriberInterface<Account> {
     /* Renames associated views after account renaming */
     async afterUpdate(event: UpdateEvent<Account>) {
         const account = event.entity;
-        if (!account) {
+        // On a bulk update (`manager.update(Account, criteria, partialValues)`), typeorm only
+        // provides the partial set of updated values, without any id or userId.
+        if (
+            !account ||
+            typeof account.id === 'undefined' ||
+            typeof account.userId === 'undefined'
+        ) {
             return;
         }
 
