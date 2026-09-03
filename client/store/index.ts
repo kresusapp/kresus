@@ -69,6 +69,7 @@ duplicatesMiddleware.startListening({
         BankStore.setTransactionType.fulfilled,
         BankStore.setTransactionCustomLabel.fulfilled,
         BankStore.setTransactionDate.fulfilled,
+        BankStore.setTransactionAmount.fulfilled,
         BankStore.runAccountsSync.fulfilled,
         BankStore.createAccess.fulfilled,
         BankStore.deleteAccess.fulfilled,

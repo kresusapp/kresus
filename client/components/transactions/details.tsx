@@ -20,6 +20,7 @@ import rulesUrl from '../rules/urls';
 import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
 import BudgetDateComponent from './budget-date';
 import DateComponent from './date';
+import AmountComponent from './amount';
 
 const TransactionDetails = (props: { transactionId: number }) => {
     const { transactionId } = props;
@@ -91,7 +92,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 </Form.Input>
 
                 <Form.Input id="value" label={$t('client.transactions.amount')}>
-                    <span>{currencyFormatter(transaction.amount)}</span>
+                    <AmountComponent transaction={transaction} />
                 </Form.Input>
 
                 <Form.Input

@@ -139,6 +139,10 @@ type setTransactionDateError = setTransactionBudgetDateError & {
     formerDate: Date | null;
 };
 
+type setTransactionAmountError = {
+    formerAmount: number;
+};
+
 export const setTransactionDate = createAsyncThunk(
     'banks/setTransactionDate',
     async (
@@ -184,6 +188,28 @@ export const setTransactionBudgetDate = createAsyncThunk(
         } catch (error: unknown) {
             rejectWithValue({
                 formerBudgetDate,
+            });
+        }
+    }
+);
+
+export const setTransactionAmount = createAsyncThunk(
+    'banks/setTransactionAmount',
+    async (
+        params: {
+            transaction: Transaction;
+            amount: number;
+        },
+        { rejectWithValue }
+    ) => {
+        const { transaction, amount } = params;
+        const formerAmount = transaction.amount;
+
+        try {
+            return await backend.updateTransaction(transaction.id, { amount });
+        } catch (error: unknown) {
+            rejectWithValue({
+                formerAmount,
             });
         }
     }
@@ -1311,6 +1337,33 @@ const banksSlice = createSlice({
                     budgetDate: formerBudgetDate,
                 });
             })
+            .addCase(setTransactionAmount.pending, (state, action) => {
+                // Optimistic update.
+                const { amount, transaction } = action.meta.arg;
+
+                mergeInObject(state.transactionMap, transaction.id, {
+                    amount,
+                });
+
+                const account = accountById(state, transaction.accountId);
+
+                // Make sure the ongoing amount is still right.
+                account.outstandingSum = recomputeAccountOutstandingSum(state, account.id);
+            })
+            .addCase(setTransactionAmount.rejected, (state, action) => {
+                // Optimistic update.
+                const { transaction } = action.meta.arg;
+                const { formerAmount } = action.payload as setTransactionAmountError;
+
+                mergeInObject(state.transactionMap, transaction.id, {
+                    amount: formerAmount,
+                });
+
+                const account = accountById(state, transaction.accountId);
+
+                // Make sure the ongoing amount is still right.
+                account.outstandingSum = recomputeAccountOutstandingSum(state, account.id);
+            })
             .addCase(applyBulkEdit.fulfilled, (state, action) => {
                 const { transactionIds, newFields } = action.payload;
                 for (const id of transactionIds) {
@@ -1447,6 +1500,7 @@ const banksSlice = createSlice({
                 isAnyOf(
                     setTransactionDate.fulfilled,
                     setTransactionBudgetDate.fulfilled,
+                    setTransactionAmount.fulfilled
                 ),
                 (state, action) => {
                     const updated = action.payload;

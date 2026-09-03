@@ -29,6 +29,10 @@
     max-width: 18em;
 }
 
+.form-input .input input {
+    min-width: 0;
+}
+
 @media (width <= 768px) {
     /* Put the input and label on different lines. */
     .form-input .input {

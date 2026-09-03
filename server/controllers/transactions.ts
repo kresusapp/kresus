@@ -56,7 +56,8 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined' &&
             typeof attr.budgetDate === 'undefined' &&
-            (typeof attr.date === 'undefined' || !req.preloaded.transaction.createdByUser)
+            (typeof attr.date === 'undefined' || !req.preloaded.transaction.createdByUser) &&
+            (typeof attr.amount === 'undefined' || !req.preloaded.transaction.createdByUser)
         ) {
             throw new KError('Missing parameter', 400);
         }
@@ -108,7 +109,15 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             }
         }
 
-        const updatedTransaction = await Transaction.update(userId, req.preloaded.transaction.id, opUpdate);
+        if (typeof attr.amount === 'number') {
+            opUpdate.amount = attr.amount;
+        }
+
+        const updatedTransaction = await Transaction.update(
+            userId,
+            req.preloaded.transaction.id,
+            opUpdate
+        );
 
         // Send back the transaction as well as the (possibly) updated account balance.
         const account = await Account.find(userId, updatedTransaction.accountId);
