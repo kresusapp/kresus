@@ -108,8 +108,19 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             }
         }
 
-        await Transaction.update(userId, req.preloaded.transaction.id, opUpdate);
-        res.status(200).end();
+        const updatedTransaction = await Transaction.update(userId, req.preloaded.transaction.id, opUpdate);
+
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await Account.find(userId, updatedTransaction.accountId);
+        if (!account) {
+            throw new KError('bank account not found', 404);
+        }
+
+        res.status(201).json({
+            transaction: updatedTransaction,
+            accountBalance: account.balance,
+            accountId: updatedTransaction.accountId,
+        });
     } catch (err) {
         asyncErr(res, err, 'when updating attributes of transaction');
     }

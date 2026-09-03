@@ -1442,6 +1442,17 @@ const banksSlice = createSlice({
                     const { accessId } = action.meta.arg;
                     updateAccessFetchStatus(state, accessId, action.error.code);
                 }
+            )
+            .addMatcher(
+                isAnyOf(
+                    setTransactionDate.fulfilled,
+                    setTransactionBudgetDate.fulfilled,
+                ),
+                (state, action) => {
+                    const updated = action.payload;
+                    assertDefined(updated);
+                    updateAccountBalance(state, updated.accountId, updated.accountBalance);
+                }
             );
     },
 });
