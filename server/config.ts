@@ -172,6 +172,31 @@ const OPTIONS: {
     },
 
     {
+        envName: 'KRESUS_SERVER_TIMEOUT',
+        configPath: 'config.kresus.server_timeout',
+        defaultVal: '300',
+        processPath: 'serverTimeout',
+        cleanupAction: (timeoutVal: any | null) => {
+            const timeout = Number.parseInt(timeoutVal, 10);
+            if (Number.isNaN(timeout) || timeout < 1) {
+                throw new Error('the timeout value must be a valid non-negative integer');
+            }
+            if (timeout < 300) {
+                // Let the user know this value might be small, while accepting it.
+                log.warn(
+                    `the timeout value is set to ${timeout} seconds; a small value is likely to
+                    cause issues when syncing bank data, consider raising it to at least 300
+                    seconds (5 minutes).`
+                );
+            }
+            return timeout;
+        },
+        doc: `Timeout value (in seconds) for the Kresus embedded HTTP server (express).
+        It's important to keep a high value because some banking modules could be very long to
+        fetch data on their website, and a bank fetch happens synchroneously at this time.`,
+    },
+
+    {
         envName: 'KRESUS_PYTHON_EXEC',
         configPath: 'config.kresus.python_exec',
         defaultVal: 'python3',

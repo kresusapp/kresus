@@ -165,9 +165,9 @@ async function start() {
 
     const server = app.listen(process.kresus.port, process.kresus.host);
 
-    // Raise the timeout limit, since some banking modules can be quite
-    // long at fetching new transactions. Time is in milliseconds.
-    server.timeout = 5 * 60 * 1000;
+    // Raise the timeout limit, since some banking modules can be quite long at fetching new
+    // transactions. Time is in seconds, so convert it to milliseconds like Express expects it.
+    server.timeout = process.kresus.serverTimeout * 1000;
 
     await init();
 }

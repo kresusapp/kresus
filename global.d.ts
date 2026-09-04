@@ -11,6 +11,7 @@ type KresusProcess = {
     dataDir: string;
     port: number;
     host: string;
+    serverTimeout: number;
     pythonExec: string;
     urlPrefix: string;
     salt: string | null;
