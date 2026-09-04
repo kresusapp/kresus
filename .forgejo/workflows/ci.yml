@@ -133,7 +133,7 @@ jobs:
           path: ${{ env.APT_CACHE_DIR }}
           key: apt-python
           restore-keys: |
-            apt-
+            apt-python
 
       - name: Install JS dependencies
         run: yarn install --frozen-lockfile
