@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
     translate as $t,
@@ -36,6 +36,11 @@ const CreateTransaction = () => {
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
     const [type, setType] = useState<string>(UNKNOWN_TRANSACTION_TYPE);
     const [accountId, setAccountId] = useState<number>(accounts[0].id);
+
+    // When the user switches accounts in the view, reset the target account id.
+    useEffect(() => {
+        setAccountId(accounts[0].id);
+    }, [accounts]);
 
     const handleSetCategoryId = useCallback((newVal: number | null) => {
         // Normalize null into undefined.
@@ -112,7 +117,11 @@ const CreateTransaction = () => {
 
             <DisplayIf condition={accounts.length > 1}>
                 <Form.Input id="account" label={$t('client.addtransaction.account')}>
-                    <AccountSelector onChange={setAccountId} accounts={accounts} />
+                    <AccountSelector
+                        accounts={accounts}
+                        initial={accountId}
+                        onChange={setAccountId}
+                    />
                 </Form.Input>
             </DisplayIf>
 
