@@ -84,7 +84,7 @@ const AlertForm = () => {
                 </div>
             </Form.Input>
 
-            <button type="button" className="btn success" disabled={isSubmitDisabled}>
+            <button type="submit" className="btn success" disabled={isSubmitDisabled}>
                 {$t('client.settings.emails.create')}
             </button>
         </Form>
