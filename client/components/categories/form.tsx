@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 import { translate as $t, assertNotNull, generateColor, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -7,22 +7,15 @@ import * as CategoriesStore from '../../store/categories';
 import { BackLink, ColorPicker, Form, ValidatedTextInput } from '../ui';
 import type { ValidatedTextInputRef } from '../ui/validated-text-input';
 import URL from './urls';
+import type { Category } from '../../models';
 
-const CategoryForm = (props: { id?: number }) => {
+const CategoryForm = (props: { category?: Category }) => {
     const dispatch = useKresusDispatch();
     const navigate = useNavigate();
 
     const labelRef = useRef<ValidatedTextInputRef>(null);
 
-    const category = useKresusState(state => {
-        if (props.id) {
-            // Edition mode.
-            return CategoriesStore.fromId(state.categories, props.id);
-        }
-        // Creation mode.
-        return null;
-    });
-
+    const { category } = props;
     const initialLabel = category ? category.label : null;
     const initialColor = category ? category.color : generateColor();
     const header = category ? $t('client.category.edition') : $t('client.category.creation');
@@ -37,7 +30,7 @@ const CategoryForm = (props: { id?: number }) => {
             color,
         };
 
-        if (category === null) {
+        if (typeof category === 'undefined') {
             // Creation mode.
             try {
                 await dispatch(CategoriesStore.create(newFields)).unwrap();
@@ -100,7 +93,16 @@ const CategoryForm = (props: { id?: number }) => {
 const EditForm = () => {
     const { categoryId: categoryIdStr } = useRequiredParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryIdStr, 10);
-    return <CategoryForm id={categoryId} />;
+
+    const category = useKresusState(state => {
+        return CategoriesStore.fromId(state.categories, categoryId);
+    });
+
+    if (!category) {
+        return <Navigate to={URL.list} />;
+    }
+
+    return <CategoryForm category={category} />;
 };
 
 const NewForm = CategoryForm;
