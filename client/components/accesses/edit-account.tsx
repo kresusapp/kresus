@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 import {
     translate as $t,
     assert,
@@ -283,8 +283,7 @@ export default () => {
     }, [accountId, mergeTargetAccountId]);
 
     if (account === null) {
-        // Zombie!
-        return null;
+        return <Navigate to={URL.accessList} />;
     }
 
     assert(access !== null, 'access must be defined at this point');

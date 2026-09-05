@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 
 import { translate as $t, notify } from '../../../helpers';
 import { useRequiredParams } from '../../../hooks';
@@ -25,7 +25,7 @@ export default () => {
     }, [navigate]);
 
     if (!view) {
-        return null;
+        return <Navigate to={URL.viewsList} />;
     }
 
     return (

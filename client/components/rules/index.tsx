@@ -167,8 +167,9 @@ const EditForm = () => {
     }
 
     if (rule === null) {
-        // Still loading the rules...
-        return null;
+        // Could be that the rule doesn't exist, or isn't loaded yet; in any case, redirect to the
+        // list of rules.
+        return <Navigate to={URL.list} />;
     }
 
     assert(rule.conditions.length > 0, 'must have at least a single condition');

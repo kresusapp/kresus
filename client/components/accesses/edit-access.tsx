@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 import { translate as $t, assert, displayLabel, notify } from '../../helpers';
 import { useNotifyError, useRequiredParams, useSyncError } from '../../hooks';
 import { type Access, type AccessCustomField, type Bank, isManualAccess } from '../../models';
@@ -244,8 +244,9 @@ export default () => {
     });
 
     if (access === null) {
-        return null;
+        return <Navigate to={URL.accessList} />;
     }
+
     assert(bankDesc !== null, 'bank descriptor must be set at this point');
 
     return (
