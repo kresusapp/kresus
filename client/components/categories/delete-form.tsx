@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 
 import { translate as $t, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
@@ -80,6 +80,11 @@ const DeleteForm = () => {
         );
     } else {
         explainer = $t('client.category.no_transactions_attached');
+    }
+
+    if (category === null) {
+        // If the category to delete doesn't exist, redirect to the list of categories.
+        return <Navigate to={URL.list}></Navigate>;
     }
 
     return (

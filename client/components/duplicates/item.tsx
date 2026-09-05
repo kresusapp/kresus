@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { translate as $t, displayLabel, formatDate } from '../../helpers';
 import { useGenericError } from '../../hooks';
 import type { Transaction } from '../../models';
@@ -7,6 +7,10 @@ import * as BanksStore from '../../store/banks';
 import * as CategoriesStore from '../../store/categories';
 import * as DuplicatesStore from '../../store/duplicates';
 import { Popconfirm } from '../ui';
+import { Navigate } from 'react-router';
+
+import URL from '../../urls';
+import { DriverContext } from '../drivers';
 
 const TransactionLine = (props: {
     label: string;
@@ -78,6 +82,7 @@ const DuplicatePair = (props: {
         CategoriesStore.fromId(state.categories, toRemove.categoryId)
     );
 
+    const driver = useContext(DriverContext);
     const dispatch = useKresusDispatch();
     const mergeTransactionsCb = useCallback(async () => {
         try {
@@ -113,6 +118,10 @@ const DuplicatePair = (props: {
     );
 
     const key = `dpair-${toKeep.id}-${toRemove.id}`;
+
+    if (toKeepCategory === null || toRemoveCategory === null) {
+        return <Navigate to={URL.duplicates.url(driver)} />;
+    }
 
     return (
         <div key={key} className="duplicate">

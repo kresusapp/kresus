@@ -91,7 +91,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                         try {
                             await dispatch(BanksStore.deleteTransaction(transaction.id)).unwrap();
                             notify.success($t('client.transactions.deletion_success'));
-                        } catch (error) {
+                        } catch (_error) {
                             notify.error($t('client.transactions.deletion_error'));
                         }
                     }
@@ -103,7 +103,8 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             if (!transaction || transaction.categoryId === NONE_CATEGORY_ID) {
                 return null;
             }
-            return CategoriesStore.fromId(state.categories, transaction.categoryId).color;
+            const c = CategoriesStore.fromId(state.categories, transaction.categoryId);
+            return c === null ? null : c.color;
         });
 
         const isFromManualAccess = useKresusState(state => {

@@ -38,6 +38,11 @@ const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
         let totalAmount = 0;
         for (const [catId, amount] of catMap) {
             const c = props.getCategoryById(catId);
+            if (c === null) {
+                console.warn(`unknown category with ID ${catId}`);
+                continue;
+            }
+
             labels.push(c.label);
             colors.push(c.color);
             categoryIds.push(c.id);

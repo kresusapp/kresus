@@ -18,7 +18,7 @@ function datekey(op: Transaction) {
 
 export interface BaseChartProps {
     // Function to map from a category id to its content.
-    getCategoryById: (id: number) => Category;
+    getCategoryById: (id: number) => Category | null;
 
     // Click handler on a legend item, to select/deselect it.
     handleLegendClick: (legendItem: LegendItem) => void;
@@ -70,6 +70,12 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
 
         for (const op of props.transactions) {
             const cat = props.getCategoryById(op.categoryId);
+            if (cat === null) {
+                console.warn(
+                    `unknown category id ${op.categoryId} for transaction ${op.id}, dismissing`
+                );
+                continue;
+            }
 
             map.set(cat.label, map.get(cat.label) || {});
             categoryNameToId.set(cat.label, cat.id);

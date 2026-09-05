@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import { useCallback, useContext } from 'react';
 import { Link } from 'react-router';
-import { translate as $t, NONE_CATEGORY_ID, round2 } from '../../helpers';
+import { translate as $t, assertNotNull, NONE_CATEGORY_ID, round2 } from '../../helpers';
 import { useGenericError } from '../../hooks';
 import type { Budget } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
@@ -171,6 +171,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
     const { showTransactions } = props;
     const handleViewTransactions = useCallback(() => {
+        assertNotNull(category);
         showTransactions(category.id);
         dispatch(UiStore.toggleSearchDetails(true));
     }, [showTransactions, dispatch, category]);
@@ -243,6 +244,10 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
         return <ProgressBar />;
     };
+
+    if (category === null) {
+        return;
+    }
 
     return (
         <tr>
