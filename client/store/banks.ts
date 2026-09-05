@@ -1351,7 +1351,7 @@ const banksSlice = createSlice({
                 account.outstandingSum = recomputeAccountOutstandingSum(state, account.id);
             })
             .addCase(setTransactionAmount.rejected, (state, action) => {
-                // Optimistic update.
+                // Revert the optimistic update.
                 const { transaction } = action.meta.arg;
                 const { formerAmount } = action.payload as setTransactionAmountError;
 

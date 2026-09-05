@@ -11,11 +11,17 @@ interface Props {
     transaction: Transaction;
 }
 
+// Either a raw display of the amount, or an amount input if the transaction was created by the user.
 const AmountComponent = (props: Props) => {
     const dispatch = useKresusDispatch();
     const setAmount = useGenericError(
         useCallback(
             async (amount: number) => {
+                // Don't send the request is the amount hasn't changed.
+                if (props.transaction.amount === amount) {
+                    return;
+                }
+
                 await dispatch(
                     BanksStore.setTransactionAmount({
                         transaction: props.transaction,
