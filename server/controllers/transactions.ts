@@ -62,7 +62,7 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             throw new KError('Missing parameter', 400);
         }
 
-        const opUpdate: Partial<Transaction> = {};
+        const transactionUpdate: Partial<Transaction> = {};
         if (typeof attr.categoryId !== 'undefined') {
             if (attr.categoryId !== null) {
                 const found = await Category.find(userId, attr.categoryId);
@@ -70,53 +70,53 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
                     throw new KError('Category not found', 404);
                 }
             }
-            opUpdate.categoryId = attr.categoryId;
+            transactionUpdate.categoryId = attr.categoryId;
         }
 
         if (typeof attr.type !== 'undefined') {
             if (isKnownTransactionTypeName(attr.type)) {
-                opUpdate.type = attr.type;
+                transactionUpdate.type = attr.type;
             } else {
-                opUpdate.type = UNKNOWN_TRANSACTION_TYPE;
+                transactionUpdate.type = UNKNOWN_TRANSACTION_TYPE;
             }
         }
 
-        if (typeof opUpdate.type !== 'undefined') {
-            opUpdate.isUserDefinedType = true;
+        if (typeof transactionUpdate.type !== 'undefined') {
+            transactionUpdate.isUserDefinedType = true;
         }
 
         if (typeof attr.customLabel !== 'undefined') {
             if (attr.customLabel === '') {
-                opUpdate.customLabel = null;
+                transactionUpdate.customLabel = null;
             } else {
-                opUpdate.customLabel = attr.customLabel;
+                transactionUpdate.customLabel = attr.customLabel;
             }
         }
 
         if (typeof attr.budgetDate !== 'undefined') {
             if (attr.budgetDate === null) {
-                opUpdate.budgetDate = null;
+                transactionUpdate.budgetDate = null;
             } else {
-                opUpdate.budgetDate = new Date(attr.budgetDate);
+                transactionUpdate.budgetDate = new Date(attr.budgetDate);
             }
         }
 
         if (typeof attr.date !== 'undefined') {
-            opUpdate.date = new Date(attr.date);
+            transactionUpdate.date = new Date(attr.date);
 
             if (typeof attr.debitDate !== 'undefined') {
-                opUpdate.debitDate = new Date(attr.debitDate);
+                transactionUpdate.debitDate = new Date(attr.debitDate);
             }
         }
 
         if (typeof attr.amount === 'number') {
-            opUpdate.amount = attr.amount;
+            transactionUpdate.amount = attr.amount;
         }
 
         const updatedTransaction = await Transaction.update(
             userId,
             req.preloaded.transaction.id,
-            opUpdate
+            transactionUpdate
         );
 
         // Send back the transaction as well as the (possibly) updated account balance.
@@ -214,19 +214,19 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
 export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const op = req.preloaded.transaction;
+        const tr = req.preloaded.transaction;
 
-        await Transaction.destroy(userId, op.id);
+        await Transaction.destroy(userId, tr.id);
 
         // Send back the transaction as well as the (possibly) updated account balance.
-        const account = await Account.find(userId, op.accountId);
+        const account = await Account.find(userId, tr.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
 
         res.status(200).json({
             accountBalance: account.balance,
-            accountId: op.accountId,
+            accountId: tr.accountId,
         });
     } catch (err) {
         asyncErr(res, err, 'when deleting transaction');

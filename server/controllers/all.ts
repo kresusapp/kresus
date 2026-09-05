@@ -528,19 +528,22 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         // handmade JSON file), there might be no lastCheckDate.
         accountCopy.lastCheckDate = parseDate(accountCopy.lastCheckDate);
         if (accountCopy.lastCheckDate === null) {
-            let latestOpDate: Date | null = null;
+            let latestTransactionDate: Date | null = null;
             if (world.transactions) {
-                const accountOps = world.transactions.filter(
-                    (op: any) => op.accountId === accountId
+                const accountTransactions = world.transactions.filter(
+                    (tr: any) => tr.accountId === accountId
                 );
-                for (const op of accountOps) {
-                    const opDate = parseDate(op.date);
-                    if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
-                        latestOpDate = opDate;
+                for (const tr of accountTransactions) {
+                    const trDate = parseDate(tr.date);
+                    if (
+                        trDate !== null &&
+                        (latestTransactionDate === null || trDate > latestTransactionDate)
+                    ) {
+                        latestTransactionDate = trDate;
                     }
                 }
             }
-            accountCopy.lastCheckDate = latestOpDate || new Date();
+            accountCopy.lastCheckDate = latestTransactionDate || new Date();
         }
 
         // If the access containing this account was known, then try to match this account against

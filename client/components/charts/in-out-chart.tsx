@@ -95,18 +95,18 @@ function createChartPositiveNegative(
     // Datekey -> Date
     const dateSet = new Map();
     for (let i = 0; i < transactions.length; i++) {
-        const op = transactions[i];
-        const dk = transactionToKey(op);
+        const tr = transactions[i];
+        const dk = transactionToKey(tr);
         map.set(dk, map.get(dk) || [0, 0, 0]);
 
         const triplet = map.get(dk);
         assert(typeof triplet !== 'undefined', 'just created');
 
-        triplet[POS] += op.amount > 0 ? op.amount : 0;
-        triplet[NEG] += op.amount < 0 ? -op.amount : 0;
-        triplet[BAL] += op.amount;
+        triplet[POS] += tr.amount > 0 ? tr.amount : 0;
+        triplet[NEG] += tr.amount < 0 ? -tr.amount : 0;
+        triplet[BAL] += tr.amount;
 
-        dateSet.set(dk, +(op.budgetDate || op.date));
+        dateSet.set(dk, +(tr.budgetDate || tr.date));
     }
 
     // Sort date in ascending order: push all pairs of (transactionToKey, date) in an

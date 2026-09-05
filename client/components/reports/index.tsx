@@ -166,12 +166,12 @@ const Reports = () => {
 
         let month = null;
         let year = null;
-        for (const opId of filteredTransactionIds) {
-            if (!BanksStore.transactionExists(state.banks, opId)) {
+        for (const trId of filteredTransactionIds) {
+            if (!BanksStore.transactionExists(state.banks, trId)) {
                 continue;
             }
 
-            const transaction = BanksStore.transactionById(state.banks, opId);
+            const transaction = BanksStore.transactionById(state.banks, trId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
 
@@ -192,7 +192,7 @@ const Reports = () => {
 
             ret.push({
                 kind: ITEM_KIND_TRANSACTION,
-                transactionId: opId,
+                transactionId: trId,
             });
         }
 
@@ -565,9 +565,9 @@ function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[
             return false;
         }
 
-        const op = BanksStore.transactionById(state.banks, id);
-        const opDate = op.budgetDate || op.date;
-        return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
+        const tr = BanksStore.transactionById(state.banks, id);
+        const trDate = tr.budgetDate || tr.date;
+        return trDate.getFullYear() === currentYear && trDate.getMonth() === currentMonth;
     });
 }
 
@@ -578,13 +578,12 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
         if (!BanksStore.transactionExists(state.banks, id)) {
             continue;
         }
-
-        const op = BanksStore.transactionById(state.banks, id);
-        if (op.amount < min) {
-            min = op.amount;
+        const tr = BanksStore.transactionById(state.banks, id);
+        if (tr.amount < min) {
+            min = tr.amount;
         }
-        if (op.amount > max) {
-            max = op.amount;
+        if (tr.amount > max) {
+            max = tr.amount;
         }
     }
     // Round the values to the nearest integer.
@@ -595,7 +594,7 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
 
 function computeTotal(
     state: GlobalState,
-    filterFunction: (op: Transaction) => boolean,
+    filterFunction: (tr: Transaction) => boolean,
     transactionIds: number[]
 ) {
     let total = 0;

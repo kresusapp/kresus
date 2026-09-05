@@ -231,27 +231,27 @@ const SUMMARY_CARD_TYPE = unwrap(
 const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (
-    op: SharedTransaction,
+    tr: SharedTransaction,
     balanceDate: Date,
     accountType: string
 ) => {
-    const opDebitMoment = moment(op.debitDate || op.date);
+    const trDebitMoment = moment(tr.debitDate || tr.date);
     return (
-        opDebitMoment.isSameOrBefore(balanceDate, 'day') &&
-        (op.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
+        trDebitMoment.isSameOrBefore(balanceDate, 'day') &&
+        (tr.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
     );
 };
 
 export const shouldIncludeInOutstandingSum = (
-    op: SharedTransaction,
+    tr: SharedTransaction,
     limitToCurrentMonth: boolean
 ) => {
-    const opDebitMoment = moment(op.debitDate || op.date);
+    const trDebitMoment = moment(tr.debitDate || tr.date);
     const today = new Date();
     return (
-        opDebitMoment.isAfter(today, 'day') &&
-        (!limitToCurrentMonth || !opDebitMoment.isAfter(endOfMonth(today), 'day')) &&
-        op.type !== SUMMARY_CARD_TYPE.name
+        trDebitMoment.isAfter(today, 'day') &&
+        (!limitToCurrentMonth || !trDebitMoment.isAfter(endOfMonth(today), 'day')) &&
+        tr.type !== SUMMARY_CARD_TYPE.name
     );
 };
 

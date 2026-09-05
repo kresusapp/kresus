@@ -8,17 +8,17 @@ import type { AccessField, Transaction } from './';
 
 const log = makeLogger('models/helpers');
 
-const hasCategory = (op: Transaction): boolean => op.categoryId !== null;
+const hasCategory = (tr: Transaction): boolean => tr.categoryId !== null;
 
-const hasType = (op: Transaction): boolean => {
-    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_TRANSACTION_TYPE;
+const hasType = (tr: Transaction): boolean => {
+    return typeof tr.type !== 'undefined' && tr.type !== UNKNOWN_TRANSACTION_TYPE;
 };
-const hasCustomLabel = (op: Transaction): boolean => typeof op.customLabel === 'string';
-const hasBudgetDate = (op: Transaction): boolean => {
-    return typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
+const hasCustomLabel = (tr: Transaction): boolean => typeof tr.customLabel === 'string';
+const hasBudgetDate = (tr: Transaction): boolean => {
+    return typeof tr.budgetDate !== 'undefined' && tr.budgetDate !== null;
 };
-const hasDebitDate = (op: Transaction): boolean => {
-    return typeof op.debitDate !== 'undefined' && op.debitDate !== null;
+const hasDebitDate = (tr: Transaction): boolean => {
+    return typeof tr.debitDate !== 'undefined' && tr.debitDate !== null;
 };
 
 export function mergeWith(target: Transaction, other: Transaction): DeepPartial<Transaction> {

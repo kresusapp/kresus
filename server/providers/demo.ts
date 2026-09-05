@@ -277,21 +277,21 @@ const generate = (access: Access): ProviderTransaction[] => {
     // one.
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
-        const op = {
+        const transaction = {
             label: 'Ye Olde Transaction',
             rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
             account: hashAccount(access).main,
             date: new Date('01/01/2000'),
         };
-        transactions.push(op);
+        transactions.push(transaction);
     }
 
     log.info(`Generated ${transactions.length} fake transactions:`);
     const accountMap = new Map();
-    for (const op of transactions) {
-        const prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
-        accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
+    for (const tr of transactions) {
+        const prev = accountMap.has(tr.account) ? accountMap.get(tr.account) : [0, 0];
+        accountMap.set(tr.account, [prev[0] + 1, prev[1] + +tr.amount]);
     }
     for (const [account, [num, amount]] of accountMap) {
         log.info(`- ${num} new transactions (${amount}) for account ${account}.`);

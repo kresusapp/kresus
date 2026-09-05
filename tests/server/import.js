@@ -432,16 +432,16 @@ describe('import', () => {
         it('transaction without date, amount or labels and raw labels should be ignored', async () => {
             let transactions = newWorld()
                 .transactions.filter(
-                    op =>
-                        typeof op.date !== 'undefined' &&
+                    t =>
+                        typeof t.date !== 'undefined' &&
                         typeof amount === 'number' &&
-                        (typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined')
+                        (typeof t.label !== 'undefined' || typeof t.rawLabel !== 'undefined')
                 )
-                .map(op => {
+                .map(t => {
                     // Import ids are remapped.
-                    delete op.accountId;
-                    delete op.categoryId;
-                    return op;
+                    delete t.accountId;
+                    delete t.categoryId;
+                    return t;
                 });
             let actualTransactions = await Transaction.all(USER_ID);
             assert.strictEqual(actualTransactions.length, 8);

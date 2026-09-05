@@ -24,10 +24,10 @@ import PieChart, { PieChartWithHelp } from './category-pie-chart';
 import type { Hideable } from './hidable-chart';
 
 interface AllPieChartsProps extends BaseChartProps {
-    rawIncomeOps: Transaction[];
-    rawSpendingOps: Transaction[];
-    netIncomeOps: Transaction[];
-    netSpendingOps: Transaction[];
+    rawIncomeTransactions: Transaction[];
+    rawSpendingTransactions: Transaction[];
+    netIncomeTransactions: Transaction[];
+    netSpendingTransactions: Transaction[];
     dateRange?: [Date] | [Date, Date];
 }
 
@@ -67,7 +67,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 helpKey="client.charts.help_raw_income"
                 titleKey="client.charts.raw_income"
                 getCategoryById={props.getCategoryById}
-                transactions={props.rawIncomeOps}
+                transactions={props.rawIncomeTransactions}
                 ref={refRawIncome}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
@@ -80,7 +80,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 helpKey="client.charts.help_raw_spendings"
                 titleKey="client.charts.raw_spendings"
                 getCategoryById={props.getCategoryById}
-                transactions={props.rawSpendingOps}
+                transactions={props.rawSpendingTransactions}
                 ref={refRawSpendings}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
@@ -93,7 +93,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 helpKey="client.charts.help_net_income"
                 titleKey="client.charts.net_income"
                 getCategoryById={props.getCategoryById}
-                transactions={props.netIncomeOps}
+                transactions={props.netIncomeTransactions}
                 ref={refNetIncome}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
@@ -106,7 +106,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 helpKey="client.charts.help_net_spendings"
                 titleKey="client.charts.net_spendings"
                 getCategoryById={props.getCategoryById}
-                transactions={props.netSpendingOps}
+                transactions={props.netSpendingTransactions}
                 ref={refNetSpendings}
                 handleLegendClick={props.handleLegendClick}
                 hiddenCategories={props.hiddenCategories}
@@ -256,9 +256,9 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
     const onlyNegative = amountKind === 'negative';
 
     if (onlyNegative) {
-        allTransactions = allTransactions.filter(op => op.amount < 0);
+        allTransactions = allTransactions.filter(tr => tr.amount < 0);
     } else if (onlyPositive) {
-        allTransactions = allTransactions.filter(op => op.amount > 0);
+        allTransactions = allTransactions.filter(tr => tr.amount > 0);
     }
 
     let pies = null;
@@ -281,37 +281,37 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
         );
     } else {
         // Compute raw income/spending.
-        const rawIncomeOps = transactionsInPeriod.filter(op => op.amount > 0);
-        const rawSpendingOps = transactionsInPeriod.filter(op => op.amount < 0);
+        const rawIncomeTransactions = transactionsInPeriod.filter(tr => tr.amount > 0);
+        const rawSpendingTransactions = transactionsInPeriod.filter(tr => tr.amount < 0);
 
         // Compute net income/spending.
         const catMap = new Map<number, Transaction[]>();
-        for (const op of transactionsInPeriod) {
-            if (!catMap.has(op.categoryId)) {
-                catMap.set(op.categoryId, []);
+        for (const tr of transactionsInPeriod) {
+            if (!catMap.has(tr.categoryId)) {
+                catMap.set(tr.categoryId, []);
             }
-            const e = catMap.get(op.categoryId);
+            const e = catMap.get(tr.categoryId);
             assert(typeof e !== 'undefined', 'just created');
-            e.push(op);
+            e.push(tr);
         }
 
-        let netIncomeOps: Transaction[] = [];
-        let netSpendingOps: Transaction[] = [];
+        let netIncomeTransactions: Transaction[] = [];
+        let netSpendingTransactions: Transaction[] = [];
         for (const categoryTransactions of catMap.values()) {
-            if (categoryTransactions.reduce((acc, op) => acc + op.amount, 0) > 0) {
-                netIncomeOps = netIncomeOps.concat(categoryTransactions);
+            if (categoryTransactions.reduce((acc, tr) => acc + tr.amount, 0) > 0) {
+                netIncomeTransactions = netIncomeTransactions.concat(categoryTransactions);
             } else {
-                netSpendingOps = netSpendingOps.concat(categoryTransactions);
+                netSpendingTransactions = netSpendingTransactions.concat(categoryTransactions);
             }
         }
 
         pies = (
             <AllPieCharts
                 getCategoryById={getCatById}
-                rawIncomeOps={rawIncomeOps}
-                netIncomeOps={netIncomeOps}
-                rawSpendingOps={rawSpendingOps}
-                netSpendingOps={netSpendingOps}
+                rawIncomeTransactions={rawIncomeTransactions}
+                netIncomeTransactions={netIncomeTransactions}
+                rawSpendingTransactions={rawSpendingTransactions}
+                netSpendingTransactions={netSpendingTransactions}
                 ref={refPiecharts}
                 handleLegendClick={handleLegendClick}
                 hiddenCategories={hiddenCategories}

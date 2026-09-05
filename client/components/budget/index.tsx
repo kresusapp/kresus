@@ -266,9 +266,9 @@ const BudgetsList = (): ReactElement => {
         const fromDate = new Date(year, month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
 
-        const dateFilter = (op: Transaction) => {
-            const opDate = op.budgetDate || op.date;
-            return opDate >= fromDate && opDate <= toDate;
+        const dateFilter = (tr: Transaction) => {
+            const trDate = tr.budgetDate || tr.date;
+            return trDate >= fromDate && trDate <= toDate;
         };
         const transactions = accountTransactions.filter(dateFilter);
 

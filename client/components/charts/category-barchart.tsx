@@ -11,8 +11,8 @@ import { DriverContext } from '../drivers';
 import type { AmountKindType } from './amount-select';
 import type { Hideable } from './hidable-chart';
 
-function datekey(op: Transaction) {
-    const d = op.budgetDate || op.date;
+function datekey(tr: Transaction) {
+    const d = tr.budgetDate || tr.date;
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
@@ -68,11 +68,11 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         // Datekey -> Date.
         const dateset = new Map<string, number>();
 
-        for (const op of props.transactions) {
-            const cat = props.getCategoryById(op.categoryId);
+        for (const tr of props.transactions) {
+            const cat = props.getCategoryById(tr.categoryId);
             if (cat === null) {
                 console.warn(
-                    `unknown category id ${op.categoryId} for transaction ${op.id}, dismissing`
+                    `unknown category id ${tr.categoryId} for transaction ${tr.id}, dismissing`
                 );
                 continue;
             }
@@ -83,11 +83,11 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             const categoryDates = map.get(cat.label);
             assert(typeof categoryDates !== 'undefined', 'defensively created above');
 
-            const dk = datekey(op);
-            const amount = props.invertSign ? -op.amount : op.amount;
+            const dk = datekey(tr);
+            const amount = props.invertSign ? -tr.amount : tr.amount;
             categoryDates[dk] = categoryDates[dk] || [];
             categoryDates[dk].push(amount);
-            dateset.set(dk, +(op.budgetDate || op.date));
+            dateset.set(dk, +(tr.budgetDate || tr.date));
 
             colorMap[cat.label] = colorMap[cat.label] || cat.color;
         }

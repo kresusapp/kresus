@@ -752,11 +752,11 @@ merging as per request`);
             // `otherTransactions`.
             const providerTransactions: MinimalTransaction[] = [];
             const otherTransactions: MinimalTransaction[] = [];
-            for (const op of filteredTransactions) {
-                if (op.accountId === account.id) {
-                    providerTransactions.push(op);
+            for (const tr of filteredTransactions) {
+                if (tr.accountId === account.id) {
+                    providerTransactions.push(tr);
                 } else {
-                    otherTransactions.push(op);
+                    otherTransactions.push(tr);
                 }
             }
             transactions = otherTransactions;
@@ -772,18 +772,18 @@ merging as per request`);
             );
             const minDate = moment(
                 new Date(
-                    providerTransactions.reduce((min, op) => {
-                        assert(typeof op.date !== 'undefined', 'date has been set at this point');
-                        return Math.min(+op.date, min);
+                    providerTransactions.reduce((min, tr) => {
+                        assert(typeof tr.date !== 'undefined', 'date has been set at this point');
+                        return Math.min(+tr.date, min);
                     }, +providerTransactions[0].date)
                 )
             )
                 .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
                 .toDate();
             const maxDate = new Date(
-                providerTransactions.reduce((max, op) => {
-                    assert(typeof op.date !== 'undefined', 'date has been set at this point');
-                    return Math.max(+op.date, max);
+                providerTransactions.reduce((max, tr) => {
+                    assert(typeof tr.date !== 'undefined', 'date has been set at this point');
+                    return Math.max(+tr.date, max);
                 }, +providerTransactions[0].date)
             );
 
@@ -811,15 +811,15 @@ merging as per request`);
             // the balance correctly.
             const accountImportDate = new Date(account.importDate);
             accountInfo.balanceOffset = providerOrphans
-                .filter((op: Partial<Transaction>) =>
-                    shouldIncludeInBalance(op as SharedTransaction, accountImportDate, account.type)
+                .filter((tr: Partial<Transaction>) =>
+                    shouldIncludeInBalance(tr as SharedTransaction, accountImportDate, account.type)
                 )
-                .reduce((sum: number, op: Partial<Transaction>) => {
+                .reduce((sum: number, tr: Partial<Transaction>) => {
                     assert(
-                        typeof op.amount !== 'undefined',
+                        typeof tr.amount !== 'undefined',
                         'transaction must have an amount at least'
                     );
-                    return sum + op.amount;
+                    return sum + tr.amount;
                 }, 0);
         }
 

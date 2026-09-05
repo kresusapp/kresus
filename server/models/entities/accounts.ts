@@ -134,29 +134,29 @@ export default class Account {
 
         // We only select the columns we need, to avoid migrations issues when
         // columns are added later to the transaction model.
-        const ops = await Transaction.byAccount(this.userId, this.id, [
+        const transactions = await Transaction.byAccount(this.userId, this.id, [
             'amount',
             'type',
             'debitDate',
             'date',
         ]);
         const today = new Date();
-        const s = ops
-            .filter(op => shouldIncludeInBalance(op, today, this.type))
-            .reduce((sum, op) => sum + op.amount, offset);
+        const s = transactions
+            .filter(tr => shouldIncludeInBalance(tr, today, this.type))
+            .reduce((sum, tr) => sum + tr.amount, offset);
 
         return Math.round(s * 100) / 100;
     };
 
     computeOutstandingSum = async (): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this.id);
+        const transactions = await Transaction.byAccount(this.userId, this.id);
         const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
             this.userId,
             LIMIT_ONGOING_TO_CURRENT_MONTH
         );
-        const s = ops
-            .filter(op => shouldIncludeInOutstandingSum(op, isOngoingLimitedToCurrentMonth))
-            .reduce((sum, op) => sum + op.amount, 0);
+        const s = transactions
+            .filter(tr => shouldIncludeInOutstandingSum(tr, isOngoingLimitedToCurrentMonth))
+            .reduce((sum, tr) => sum + tr.amount, 0);
         return Math.round(s * 100) / 100;
     };
 
