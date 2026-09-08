@@ -37,7 +37,7 @@ const AccumulatedBalances = (props: AccumulatedBalancesProps) => {
             .map(([key, value]): React.ReactNode => {
                 if (props.isCurrencyLink) {
                     const newPathName =
-                        driver !== null && driver.value !== null
+                        driver.type !== DriverType.None && driver.value !== null
                             ? pathname
                                   .replace(driver.type, DriverType.Currency)
                                   .replace(driver.value, key)
