@@ -127,7 +127,7 @@ const OPTIONS: {
 
     {
         envName: 'KRESUS_USER_LOGIN_HTTP_HEADER',
-        configPath: 'config.kresus.userLoginHttpHeader',
+        configPath: 'config.kresus.user_login_http_header',
         defaultVal: null,
         processPath: 'userLoginHttpHeader',
         doc: `A HTTP header name to check when trying to retrieve the login of a pre-authenticated
