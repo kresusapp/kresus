@@ -159,6 +159,14 @@ main nav .views-details .views-list > li a.active:focus {
     border-left-color: #5959D4;
 }
 
+main nav .views-details .views-list a.active .colored-amount.positive {
+    color: white;
+}
+
+main nav .views-details .views-list a.active .colored-amount.negative {
+    color: #F5A4A4;
+}
+
 main nav .views-details.bank-total-accesses > a .total-balance-item {
     color: inherit;
 }
