@@ -180,7 +180,7 @@ main nav span.amount {
     white-space: nowrap;
 }
 
-main nav .bank-total-accesses {
+main nav .overall-balance {
     font-size: 1.15em;
     font-weight: 600;
     padding-left: 20px;

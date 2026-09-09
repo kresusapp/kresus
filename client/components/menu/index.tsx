@@ -112,7 +112,7 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
+            <OverallTotalBalance className="overall-balance" isCurrencyLink={true} />
 
             <AccessList driver={driver} />
 

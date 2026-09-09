@@ -1,4 +1,4 @@
-#dashboard .bank-total-accesses {
+#dashboard .overall-balance {
     font-size: 1.75em;
     margin-bottom: 1em;
 }
@@ -118,7 +118,7 @@ body.dark #dashboard .accesses-list > li .accounts li a:focus::before {
 }
 
 @media (width <= 768px) {
-    #dashboard .bank-total-accesses {
+    #dashboard .overall-balance {
         font-size: 1.25em;
     }
 
