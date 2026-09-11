@@ -3,6 +3,11 @@
     display: inline-block;
 }
 
+.total-balance-item a {
+    padding: 5px;
+    border: solid 1px lightgrey;
+}
+
 main nav .views-details.overall-balance .total-balance-item a {
     padding: 5px;
     color: inherit;
