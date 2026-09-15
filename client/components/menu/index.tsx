@@ -7,7 +7,6 @@ import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
 import URL from '../../urls';
 import { findRedundantPairs } from '../duplicates/pairs';
-import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
 
 import About from './about';
@@ -113,8 +112,6 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance className="overall-balance" isCurrencyLink={true} />
-
             <OverallViewList />
 
             <AccessList driver={driver} />
