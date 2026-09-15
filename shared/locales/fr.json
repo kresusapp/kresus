@@ -553,6 +553,7 @@
             },
             "views": {
                 "title": "Vues personnalisées",
+                "overall": "Vues globales",
                 "none": "Vous n'avez aucune vue personnalisée.",
                 "manage": "Gérer les vues",
                 "back_to_views_list": "Retourner à la liste des vues",

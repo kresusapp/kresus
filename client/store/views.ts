@@ -177,6 +177,10 @@ export function all(state: ViewState): View[] {
     return state.items;
 }
 
+export function allCurrencyViews(state: ViewState): View[] {
+    return state.items.filter(v => v.type === 'currency');
+}
+
 export function allUserViews(state: ViewState): View[] {
     return state.items.filter(v => v.createdByUser);
 }

@@ -557,6 +557,7 @@
             },
             "views": {
                 "title": "Custom views",
+                "overall": "Overall views",
                 "none": "You have no custom views yet.",
                 "manage": "Manage views",
                 "back_to_views_list": "Go back to the views list",
