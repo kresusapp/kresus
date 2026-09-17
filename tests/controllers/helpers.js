@@ -1,6 +1,7 @@
 // Minimal express response mock, for testing controllers without a HTTP layer.
-// Note both json() and send() are needed: the controllers' happy paths use
-// res.status(x).json(), while asyncErr() uses res.status(x).send().
+// Note json(), send() and end() are all needed: the controllers' happy paths use
+// res.status(x).json() or res.status(x).end() when there is no content, while
+// asyncErr() uses res.status(x).send().
 export const makeRes = () => {
     return {
         statusCode: null,
@@ -18,6 +19,10 @@ export const makeRes = () => {
 
         send(payload) {
             this.body = payload;
+            return this;
+        },
+
+        end() {
             return this;
         },
     };

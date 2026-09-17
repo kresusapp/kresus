@@ -160,16 +160,18 @@ export default class Account {
         return Math.round(s * 100) / 100;
     };
 
-    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
-        let checkedCurrency: string | null;
+    // Returns the account's currency, falling back to the user's default currency when the
+    // account has no currency or an unknown one.
+    getCurrency = async (): Promise<string> => {
         if (currency.isKnown(this.currency)) {
-            checkedCurrency = this.currency;
-        } else {
-            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY))
-                .value;
+            assert(this.currency !== null, 'currency is known at this point');
+            return this.currency;
         }
-        assert(checkedCurrency !== null, 'currency is known at this point');
-        return currencyFormatter(checkedCurrency);
+        return (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY)).value;
+    };
+
+    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
+        return currencyFormatter(await this.getCurrency());
     };
 
     static async ensureBalance(account: Account): Promise<void> {

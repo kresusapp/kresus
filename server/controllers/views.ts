@@ -1,6 +1,6 @@
 import type express from 'express';
 import { asyncErr, KError } from '../helpers';
-import { View } from '../models';
+import { Account, View } from '../models';
 
 import { isDemoEnabled } from './instance';
 import type { IdentifiedRequest, PreloadedRequest } from './routes';
@@ -30,23 +30,54 @@ export async function preloadView(
     }
 }
 
+async function checkViewAccounts(userId: number, accounts: any): Promise<void> {
+    const accountIds: number[] = [];
+    if (accounts instanceof Array) {
+        for (const viewAccount of accounts) {
+            if (typeof viewAccount?.accountId !== 'number') {
+                throw new KError('a view account must have a numeric accountId', 400);
+            }
+
+            if (accountIds.includes(viewAccount.accountId)) {
+                throw new KError('a view cannot include an account several times', 400);
+            }
+
+            accountIds.push(viewAccount.accountId);
+        }
+    }
+
+    if (!accountIds.length) {
+        throw new KError('a view should have at least one account', 400);
+    }
+
+    const accountsFromIds = await Account.findMany(userId, accountIds);
+    if (accountsFromIds.length !== accountIds.length) {
+        throw new KError('some view accounts could not be found', 404);
+    }
+
+    const currencies = new Set(
+        await Promise.all(accountsFromIds.map(account => account.getCurrency()))
+    );
+    if (currencies.size > 1) {
+        throw new KError('a view cannot contain accounts of different currencies', 400);
+    }
+}
+
 export async function create(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
         const newView = req.body;
-        if (!newView || !(newView.accounts instanceof Array) || typeof newView.label !== 'string') {
+        if (!newView || typeof newView.label !== 'string') {
             throw new KError('missing parameters', 400);
         }
 
-        if (!newView.accounts.length) {
-            throw new KError('a view should have at least one account', 400);
-        }
+        await checkViewAccounts(userId, newView.accounts);
 
         const view = await View.create(userId, newView);
         res.status(201).json(view);
     } catch (err) {
-        asyncErr(res, err, 'when creating an alert');
+        asyncErr(res, err, 'when creating a view');
     }
 }
 
@@ -55,16 +86,17 @@ export async function update(req: PreloadedRequest<View>, res: express.Response)
         const { id: userId } = req.user;
 
         const newFields = req.body;
-
-        if (
-            newFields &&
-            newFields.accounts &&
-            (!(newFields.accounts instanceof Array) || !newFields.accounts.length)
-        ) {
-            throw new KError('a view should have at least one account', 400);
-        }
-
         const view = req.preloaded.view;
+
+        // Always validate, even for a plain rename: a view which already mixes currencies (it
+        // may predate this restriction, or an account's currency may have changed on the bank's
+        // side) must be fixed by the user before it can be modified at all.
+        const accounts =
+            newFields && typeof newFields.accounts !== 'undefined'
+                ? newFields.accounts
+                : view.accounts;
+        await checkViewAccounts(userId, accounts);
+
         const newView = await View.update(userId, view.id, newFields);
         res.status(200).json(newView);
     } catch (err) {
