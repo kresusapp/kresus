@@ -102,9 +102,23 @@ function makeWorld() {
                 isUserDefinedType: false,
             },
 
-            // A transaction with a custom label, used to check which fields `merge` transfers.
+            // A second Wholemart transaction, on the same account as the imported one: used to
+            // check which fields `merge` transfers.
             {
                 accountId: 0,
+                type: 'type.card',
+                label: 'Wholemart bis',
+                rawLabel: 'card 07/07/2019 wholemart',
+                customLabel: 'Groceries of the week',
+                date: new Date('2019-07-07T06:00:00.000Z'),
+                importDate: new Date('2019-07-09T00:00:00.000Z'),
+                amount: -83.8,
+                isUserDefinedType: false,
+            },
+
+            // A transaction on another account, which `merge` must refuse to merge.
+            {
+                accountId: 1,
                 type: 'type.transfer',
                 label: 'SEPA rent',
                 rawLabel: 'transfer to m. john doe rent',
@@ -126,7 +140,8 @@ describe('transactions controller', () => {
     let books = null;
     let imported = null;
     let userCreated = null;
-    let withCustomLabel = null;
+    let sameAccountTransaction = null;
+    let otherAccountTransaction = null;
 
     beforeEach(async () => {
         await cleanAll(USER_ID);
@@ -143,7 +158,8 @@ describe('transactions controller', () => {
         const transactions = await Transaction.all(USER_ID);
         imported = transactions.find(t => t.label === 'Wholemart');
         userCreated = transactions.find(t => t.label === 'Bakery');
-        withCustomLabel = transactions.find(t => t.label === 'SEPA rent');
+        sameAccountTransaction = transactions.find(t => t.label === 'Wholemart bis');
+        otherAccountTransaction = transactions.find(t => t.label === 'SEPA rent');
 
         for (const entity of [
             checkingAccount,
@@ -152,7 +168,8 @@ describe('transactions controller', () => {
             books,
             imported,
             userCreated,
-            withCustomLabel,
+            sameAccountTransaction,
+            otherAccountTransaction,
         ]) {
             assert.ok(entity, 'fixtures should have been imported');
         }
@@ -552,18 +569,35 @@ describe('transactions controller', () => {
         });
 
         it('should transfer fields from the other transaction, as mergeWith does', async () => {
-            // `imported` has no custom label, `withCustomLabel` has one: it is transferred.
+            // `imported` has no custom label, `sameAccountTransaction` has one: it is transferred.
             assert.strictEqual(imported.customLabel, null);
 
             const res = makeRes();
-            await merge(makeMergeReq(imported, withCustomLabel), res);
+            await merge(makeMergeReq(imported, sameAccountTransaction), res);
 
             assert.strictEqual(res.statusCode, 200);
-            assert.strictEqual(res.body.transaction.customLabel, 'Rent');
+            assert.strictEqual(res.body.transaction.customLabel, 'Groceries of the week');
             assert.strictEqual(
                 res.body.transaction.importDate.getTime(),
-                withCustomLabel.importDate.getTime()
+                sameAccountTransaction.importDate.getTime()
             );
+
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(res.body.accountId, checkingAccount.id);
+            assert.strictEqual(res.body.accountBalance, await balanceOf(checkingAccount.id));
+        });
+
+        it('should refuse to merge transactions from different accounts', async () => {
+            const res = makeRes();
+            await merge(makeMergeReq(imported, otherAccountTransaction), res);
+
+            assert.strictEqual(res.statusCode, 400);
+
+            // Both transactions are left untouched.
+            const kept = await Transaction.find(USER_ID, imported.id);
+            assert.ok(kept);
+            assert.strictEqual(kept.customLabel, null);
+            assert.ok(await Transaction.find(USER_ID, otherAccountTransaction.id));
         });
     });
 

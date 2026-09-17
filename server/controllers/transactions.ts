@@ -143,6 +143,14 @@ export async function merge(req: PreloadedRequest<Transaction>, res: express.Res
         const otherTr = req.preloaded.otherTransaction;
         let tr = req.preloaded.transaction;
 
+        // Check that both transactions belong to the same account.
+        if (tr.accountId !== otherTr.accountId) {
+            throw new KError(
+                'transactions merge is only possible for transactions of a same account',
+                400
+            );
+        }
+
         // Transfer various fields upon deletion
         const newFields = tr.mergeWith(otherTr);
 
