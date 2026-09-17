@@ -1,4 +1,11 @@
-import type { DataSource, DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
+import {
+    type DataSource,
+    type DeepPartial,
+    type ObjectLiteral,
+    QueryFailedError,
+    type QueryRunner,
+    type Repository,
+} from 'typeorm';
 import type { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
 import type { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 import type { BankVendor } from '../../shared/types';
@@ -122,6 +129,20 @@ const NUM_ENTITIES_IN_BATCH = 1000;
 export function isSqlite(connection: DataSource): boolean {
     const dbType = connection.driver.options.type;
     return dbType === 'better-sqlite3';
+}
+
+export function isUniqueConstraintViolation(err: unknown): boolean {
+    if (!(err instanceof QueryFailedError)) {
+        return false;
+    }
+
+    const code = (err.driverError as { code?: string } | undefined)?.code;
+
+    // The error codes reported when a UNIQUE constraint is violated: better-sqlite3 uses an extended
+    // sqlite result code, postgres the SQLSTATE for unique_violation.
+    // See https://www.sqlite.org/c3ref/c_abort_rollback.html#:~:text=SQLITE_CONSTRAINT_UNIQUE
+    // See https://www.postgresql.org/docs/current/errcodes-appendix.html#:~:text=23505
+    return typeof code === 'string' && (code === 'SQLITE_CONSTRAINT_UNIQUE' || code === '23505');
 }
 
 // Note: doesn't return the inserted entities, only their ids, in the same order as the entities
