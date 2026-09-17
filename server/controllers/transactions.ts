@@ -183,6 +183,8 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
 
         // We fill potentially missing fields.
         transaction.rawLabel = transaction.rawLabel || transaction.label;
+        transaction.customLabel =
+            transaction.customLabel || transaction.label || transaction.rawLabel;
         transaction.importDate = transaction.importDate || new Date();
         transaction.debitDate = transaction.debitDate || transaction.date;
         transaction.createdByUser = true;
