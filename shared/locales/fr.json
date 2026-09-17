@@ -561,6 +561,8 @@
                 "edit": "Éditer une vue",
                 "label": "Libellé de la vue",
                 "accounts": "Liste de comptes",
+                "same_currency_help": "Tous les comptes d'une vue doivent avoir la même devise.",
+                "mixed_currencies_error": "Cette vue mélange des comptes de devises différentes, ce qui n'est pas autorisé.",
                 "creation_success": "Vue créée avec succès !",
                 "creation_error": "Erreur lors de la création de la vue : %{err}",
                 "creation_form_title": "Créer une nouvelle vue",

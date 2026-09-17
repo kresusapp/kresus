@@ -565,6 +565,8 @@
                 "edit": "Edit a view",
                 "label": "View label",
                 "accounts": "List of accounts",
+                "same_currency_help": "All the accounts of a view must share the same currency.",
+                "mixed_currencies_error": "This view mixes accounts of different currencies, which isn't allowed.",
                 "creation_success": "View successfully created!",
                 "creation_error": "Error when creating the view: %{err}",
                 "creation_form_title": "Create a new view",
