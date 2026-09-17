@@ -120,6 +120,37 @@ the email settings.
 
 # Misc
 
+## AI Policy
+
+Kresus intends to provide a safe piece of software that users can trust, especially as it processes
+sensitive personal data. To this end, many design decisions and writing the code itself require
+meticulous consideration.
+
+Our stance on generative AI contributions for Kresus is to generally **disallow** its use for
+development of the core features (any code in the bin/, client/, server/, shared/ directories) or
+generation of text that will be read by other humans (comments, issues, pull requests,
+documentation, etc.).
+
+We have the following exceptions to the rule:
+
+- Diagnosis and reporting of bugs or security vulnerabilities
+- Use for integration or unit tests (in tests/).
+- Utilities and tooling (in scripts/).
+- Repository CI (in .forgejo/).
+- Help translating from your native language to English.
+- Help understanding the code base better.
+
+**Usage of AI must be disclosed in pull requests**, following our template:
+
+- Type of assistance: Code generation, documentation, debugging, testing, refactoring, etc.
+- Scope of usage: which files, functions, or sections were AI-assisted
+- Tool(s) used: Name of the AI system(s) employed (e.g., GitHub Copilot, ChatGPT, etc.)
+- Level of modification: whether AI-generated content was used as-is, modified, reviewed, or used
+  as inspiration.
+
+The Kresus maintainers reserve the right to close any issue/pull request that does not meet the
+standards of this policy.
+
 ## About branches/tags
 
 - `main` contains all changes in the current development version, including
