@@ -11,7 +11,7 @@ import DisplayIf from '../ui/display-if';
 
 import About from './about';
 import AccessList from './access-list';
-import OverallViewList from './overall-view-list';
+import CurrencyViewList from './currency-view-list';
 import UserViewList from './user-view-list';
 
 import './menu.css';
@@ -112,7 +112,7 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallViewList />
+            <CurrencyViewList />
 
             <AccessList driver={driver} />
 

@@ -9,7 +9,8 @@ import { DriverCurrency } from '../drivers/currency';
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 
-const OverallViewList = () => {
+// Show a list of views, per currency.
+const CurrencyViewList = () => {
     const { pathname } = useLocation();
     const currentDriver = useContext(DriverContext);
 
@@ -19,9 +20,16 @@ const OverallViewList = () => {
                 return null;
             }
 
+            // For these views, exclude accounts that should be excluded from the total balance as
+            // well.
+            const excludeMarkedAccountsFromBalance = true;
+
             const currencyDriver = new DriverCurrency(view.currency);
             const currencyFormatter = currencyDriver.getCurrencyFormatter(state);
-            const outstandingSum = currencyDriver.getOutstandingSum(state);
+            const outstandingSum = currencyDriver.getOutstandingSum(
+                state,
+                excludeMarkedAccountsFromBalance
+            );
 
             const newPathname =
                 currentDriver.type !== DriverType.None
@@ -36,7 +44,10 @@ const OverallViewList = () => {
                         <span>{view.label}</span>
                         &nbsp;
                         <ColoredAmount
-                            amount={currencyDriver.getBalance(state)}
+                            amount={currencyDriver.getBalance(
+                                state,
+                                excludeMarkedAccountsFromBalance
+                            )}
                             formatCurrency={currencyFormatter}
                         />
                         <DisplayIf condition={outstandingSum !== 0}>
@@ -70,6 +81,6 @@ const OverallViewList = () => {
     );
 };
 
-OverallViewList.displayName = 'OverallViewList';
+CurrencyViewList.displayName = 'CurrencyViewList';
 
-export default OverallViewList;
+export default CurrencyViewList;
