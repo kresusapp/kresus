@@ -185,7 +185,7 @@ export function allUserViews(state: ViewState): View[] {
     return state.items.filter(v => v.createdByUser);
 }
 
-export function fromId(state: ViewState, id: number): View | null {
+export function byId(state: ViewState, id: number): View | null {
     return state.items.find(view => view.id === id) || null;
 }
 

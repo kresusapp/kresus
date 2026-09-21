@@ -16,7 +16,7 @@ export default () => {
     const navigate = useNavigate();
 
     const view = useKresusState(state => {
-        return ViewsStore.fromId(state.views, viewId);
+        return ViewsStore.byId(state.views, viewId);
     });
 
     const onSubmit = useCallback(() => {
