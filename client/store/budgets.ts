@@ -155,6 +155,6 @@ export function getSelectedPeriod(state: BudgetState): Period {
     return { year: state.year, month: state.month };
 }
 
-export function fromSelectedPeriod(state: BudgetState, viewId: number): Budget[] | null {
+export function bySelectedPeriodAndView(state: BudgetState, viewId: number): Budget[] | null {
     return state.budgets[makeKey(viewId, state.year, state.month)] || null;
 }

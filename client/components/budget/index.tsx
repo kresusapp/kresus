@@ -187,7 +187,7 @@ const BudgetsList = (): ReactElement => {
     );
     const { year, month } = useKresusState(state => BudgetsStore.getSelectedPeriod(state.budgets));
     const budgets: Budget[] | null = useKresusState(state =>
-        BudgetsStore.fromSelectedPeriod(state.budgets, viewId)
+        BudgetsStore.bySelectedPeriodAndView(state.budgets, viewId)
     );
 
     const categoriesNamesMap = useKresusState(state => {
