@@ -95,7 +95,7 @@ const EditForm = () => {
     const categoryId = Number.parseInt(categoryIdStr, 10);
 
     const category = useKresusState(state => {
-        return CategoriesStore.fromId(state.categories, categoryId);
+        return CategoriesStore.byId(state.categories, categoryId);
     });
 
     if (!category) {

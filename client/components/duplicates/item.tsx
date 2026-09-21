@@ -76,10 +76,10 @@ const DuplicatePair = (props: {
     }
 
     const toKeepCategory = useKresusState(state =>
-        CategoriesStore.fromId(state.categories, toKeep.categoryId)
+        CategoriesStore.byId(state.categories, toKeep.categoryId)
     );
     const toRemoveCategory = useKresusState(state =>
-        CategoriesStore.fromId(state.categories, toRemove.categoryId)
+        CategoriesStore.byId(state.categories, toRemove.categoryId)
     );
 
     const driver = useContext(DriverContext);

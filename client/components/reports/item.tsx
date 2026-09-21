@@ -103,7 +103,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             if (!transaction || transaction.categoryId === NONE_CATEGORY_ID) {
                 return null;
             }
-            const c = CategoriesStore.fromId(state.categories, transaction.categoryId);
+            const c = CategoriesStore.byId(state.categories, transaction.categoryId);
             return c === null ? null : c.color;
         });
 

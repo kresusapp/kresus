@@ -13,7 +13,7 @@ const DeleteForm = () => {
     const { categoryId: categoryStringId } = useRequiredParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryStringId, 10);
 
-    const category = useKresusState(state => CategoriesStore.fromId(state.categories, categoryId));
+    const category = useKresusState(state => CategoriesStore.byId(state.categories, categoryId));
     const categories = useKresusState(state => CategoriesStore.all(state.categories));
     const numTransactions = useKresusState(
         state => BanksStore.transactionIdsByCategoryId(state.banks, categoryId).length

@@ -237,7 +237,7 @@ export function allUnused(state: CategoryState, usedCategoriesSet: Set<number>):
     return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
 }
 
-export function fromId(state: CategoryState, id: number): Category | null {
+export function byId(state: CategoryState, id: number): Category | null {
     const map = state.map;
     return map[id] || null;
 }

@@ -132,7 +132,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
     });
 
     const getCatById = useKresusState(
-        state => (id: number) => CategoriesStore.fromId(state.categories, id)
+        state => (id: number) => CategoriesStore.byId(state.categories, id)
     );
 
     const [amountKind, setAmountKind] = useState(defaultAmountKind);

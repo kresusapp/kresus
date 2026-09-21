@@ -143,7 +143,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     const driver = useContext(DriverContext);
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const category = useKresusState(state =>
-        CategoriesStore.fromId(state.categories, props.budget.categoryId)
+        CategoriesStore.byId(state.categories, props.budget.categoryId)
     );
 
     const dispatch = useKresusDispatch();
