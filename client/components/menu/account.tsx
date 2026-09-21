@@ -31,7 +31,7 @@ const AccountItem = (props: AccountItemProps) => {
             return null;
         }
 
-        return ViewStore.fromAccountId(state.views, account.id);
+        return ViewStore.byAccountId(state.views, account.id);
     });
 
     const { pathname } = useLocation();

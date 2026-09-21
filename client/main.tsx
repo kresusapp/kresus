@@ -97,7 +97,7 @@ const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.Rea
     const initialViewId = useKresusState(state => {
         const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
         if (initialAccountId !== null) {
-            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            const view = ViewStore.byAccountId(state.views, initialAccountId);
             if (view) {
                 return view.id;
             }
@@ -211,7 +211,7 @@ const Kresus = () => {
     const initialViewId = useKresusState(state => {
         const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
         if (initialAccountId !== null) {
-            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            const view = ViewStore.byAccountId(state.views, initialAccountId);
             if (view) {
                 return view.id;
             }

@@ -33,7 +33,7 @@ const AccessItem = (props: AccessItemProps) => {
         }
 
         return access.accountIds.some(id => {
-            const accountView = ViewStore.fromAccountId(state.views, id);
+            const accountView = ViewStore.byAccountId(state.views, id);
             return (
                 accountView && !accountView.createdByUser && accountView.id === props.currentViewId
             );

@@ -193,7 +193,7 @@ export function byCurrencyCode(state: ViewState, currencyCode: string): View | n
     return state.items.find(view => view.currency === currencyCode) || null;
 }
 
-export function fromAccountId(state: ViewState, accountId: number) {
+export function byAccountId(state: ViewState, accountId: number): View | null {
     return (
         state.items.find(
             view =>
