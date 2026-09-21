@@ -13,7 +13,7 @@ import type { SharedTransaction } from '../types';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 import Polyglot from 'node-polyglot';
-import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
+import TRANSACTION_TYPES from '../../shared/transaction-types.json';
 import ACCOUNT_TYPES from '../account-types.json';
 import EN_LOCALE from '../locales/en.json';
 import ES_LOCALE from '../locales/es.json';
@@ -217,17 +217,16 @@ export function validatePassword(password: string) {
 }
 
 export const DEFERRED_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.deferred_card')
+    TRANSACTION_TYPES.find(type => type.name === 'type.deferred_card')
 );
 export const TRANSACTION_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.card')
+    TRANSACTION_TYPES.find(type => type.name === 'type.card')
 );
+export const TRANSFER_TYPE = unwrap(TRANSACTION_TYPES.find(type => type.name === 'type.transfer'));
 export const INTERNAL_TRANSFER_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.internal_transfer')
+    TRANSACTION_TYPES.find(type => type.name === 'type.internal_transfer')
 );
-const SUMMARY_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.card_summary')
-);
+const SUMMARY_CARD_TYPE = unwrap(TRANSACTION_TYPES.find(type => type.name === 'type.card_summary'));
 const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (

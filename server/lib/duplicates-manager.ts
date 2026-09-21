@@ -4,6 +4,7 @@ import { makeLogger, NONE_CATEGORY_ID, UNKNOWN_TRANSACTION_TYPE } from '../helpe
 import type { MinimalTransaction, Transaction } from '../models';
 import { DuplicatesIgnored } from '../models';
 import type { DuplicatesByAccount } from '../shared/types';
+import { INTERNAL_TRANSFER_TYPE, TRANSFER_TYPE } from '../shared/helpers';
 
 const log = makeLogger('duplicates-manager');
 
@@ -55,10 +56,18 @@ export function getDuplicatePairScore(
             return 0;
         }
 
+        // They could be duplicates if one of these is true:
+        // - `tr` is the unknown transaction type,
+        // - `next` is the unknown transaction type,
+        // - types are the same
+        // - types are respectively internal_transfer and transfer
+        // - or the opposite
         if (
             tr.type !== UNKNOWN_TRANSACTION_TYPE &&
             next.type !== UNKNOWN_TRANSACTION_TYPE &&
-            tr.type !== next.type
+            tr.type !== next.type &&
+            !(tr.type === INTERNAL_TRANSFER_TYPE.name && next.type === TRANSFER_TYPE.name) &&
+            !(tr.type === TRANSFER_TYPE.name && next.type === INTERNAL_TRANSFER_TYPE.name)
         ) {
             return 0;
         }

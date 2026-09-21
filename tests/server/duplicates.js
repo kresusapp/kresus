@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import {
     INTERNAL_TRANSFER_TYPE,
+    TRANSFER_TYPE,
     NONE_CATEGORY_ID,
     TRANSACTION_CARD_TYPE,
     UNKNOWN_TRANSACTION_TYPE,
@@ -69,16 +70,31 @@ describe('getDuplicatePairScore', () => {
     it('should return 0 for transactions with everything similar but different type and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
         const BaseWithType = {
             ...BaseTransaction,
-            type: TRANSACTION_CARD_TYPE,
+            type: TRANSACTION_CARD_TYPE.name,
         };
 
         const comparison = {
             ...BaseTransaction,
-            type: INTERNAL_TRANSFER_TYPE,
+            type: INTERNAL_TRANSFER_TYPE.name,
         };
 
         const score = getDuplicatePairScore(comparison, BaseWithType, 1, true);
         assert.strictEqual(score, 0);
+    });
+
+    it('should return 1 for transactions that are the same, but of types internal transfer and transfer, and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
+        const BaseWithType = {
+            ...BaseTransaction,
+            type: TRANSFER_TYPE.name,
+        };
+
+        const comparison = {
+            ...BaseTransaction,
+            type: INTERNAL_TRANSFER_TYPE.name,
+        };
+
+        const score = getDuplicatePairScore(comparison, BaseWithType, 1, true);
+        assert.strictEqual(score, 1);
     });
 
     it('should return 1 for transactions with everything similar and one unkwown type and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
@@ -89,6 +105,10 @@ describe('getDuplicatePairScore', () => {
 
         const score = getDuplicatePairScore(comparison, BaseTransaction, 1, true);
         assert.strictEqual(score, 1);
+
+        // Also true when passing the transcations in the other direction.
+        const score2 = getDuplicatePairScore(BaseTransaction, comparison, 1, true);
+        assert.strictEqual(score2, 1);
     });
 
     it('should return 0 for transactions with everything similar but different custom label and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
