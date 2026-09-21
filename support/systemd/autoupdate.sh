@@ -31,7 +31,7 @@ cd $KRESUS_DIR
 rm -r ./prebuild
 mkdir -p ./prebuild
 cd ./prebuild
-curl -A kresus-auto-updater https://codeberg.org/kresus/kresus/releases/download/pre-release/build.zip -o build.zip
+curl -A kresus-auto-updater https://git.kresus.org/kresus/kresus/releases/download/pre-release/build.zip -o build.zip
 unzip build.zip
 rm build.zip
 chown -R $USER:$GROUP ../prebuild

@@ -40,7 +40,7 @@ RUN pip install --break-system-packages --upgrade setuptools && \
 
 # Install and compile the app.
 RUN cd /home/user && \
-    wget https://codeberg.org/kresus/kresus/archive/main.zip && \
+    wget https://git.kresus.org/kresus/kresus/archive/main.zip && \
     unzip main.zip && \
     rm main.zip && \
     mv kresus app && \

@@ -15,18 +15,18 @@ For up to date installation instructions, please refer to the
 [kresus.org](https://kresus.org/en/install.html) website.
 
 Note that this website is opensource as well and you can
-[contribute](https://codeberg.org/kresus/kresus.org/src/branch/main/content/pages/en/01-install.md)
+[contribute](https://git.kresus.org/kresus/kresus.org/src/branch/main/content/pages/en/01-install.md)
 to improve installation instructions.
 
 ## Contributing
 
-See the [contributing file](https://codeberg.org/kresus/kresus/src/branch/main/CONTRIBUTING.md).
+See the [contributing file](https://git.kresus.org/kresus/kresus/src/branch/main/CONTRIBUTING.md).
 
-A big thank you to all of our [contributors](https://codeberg.org/kresus/kresus/activity/contributors)!
+A big thank you to all of our [contributors](https://git.kresus.org/kresus/kresus/activity/contributors)!
 
 ## Code of conduct
 
-Kresus project adopted a [code of conduct](https://codeberg.org/kresus/kresus/src/branch/main/CodeOfConduct.md) that everybody is
+Kresus project adopted a [code of conduct](https://git.kresus.org/kresus/kresus/src/branch/main/CodeOfConduct.md) that everybody is
 expected to follow. Read it for further information about how to behave, how
 to report abuses, etc.
 
