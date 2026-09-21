@@ -189,7 +189,7 @@ export function byId(state: ViewState, id: number): View | null {
     return state.items.find(view => view.id === id) || null;
 }
 
-export function fromCurrencyCode(state: ViewState, currencyCode: string): View | null {
+export function byCurrencyCode(state: ViewState, currencyCode: string): View | null {
     return state.items.find(view => view.currency === currencyCode) || null;
 }
 
