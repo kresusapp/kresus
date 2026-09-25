@@ -16,32 +16,28 @@
 
 support/Browserstack-logo.png
 
-eslint.config.mjs
-.eslintignore
-.eslintrc.yml
-.eslintcache
-.pylintrc
+# Keep these alphabetically ordered, to ease comparison with `ls -al`.
+.dockerignore
 .stylelintrc
 .stylelintcache
 .stylelintignore
-.prettierrc
-.prettierignore
-tsconfig.json
-global.d.ts
 .tsbuildinfo
-Makefile
-vite.config.js
-.gitlab/
-.github/
-.gitpod.yml
-.claude/
-.forgejo/
-.dockerignore
+biome.json
 
+CodeOfConduct.md
+CONTRIBUTING.md
+DEPENDENCIES.md
+
+global.d.ts
+
+RELEASE.md
+
+tsconfig.json
+vite.config.js
 yarn.lock
 
-**/*.pyc
+.github/
+.forgejo/
+.claude/
 
-CONTRIBUTING.md
-CodeOfConduct.md
-RELEASE.md
+**/*.pyc
