@@ -18,13 +18,12 @@ class MoveLoginPasswordToFields1756391927839 {
         // fields in CASCADE. Disable the foreign keys checks beforehand and re-enable them afterwards.
         // However, doing the "PRAGMA foreign_keys" thing in a transaction is a no-op
         // (see https://www.sqlite.org/pragma.html), so we commit the transaction first.
-        const isSqliteDriver = (0, helpers_1.isSqlite)(queryRunner.connection);
+        const isSqliteDriver = (0, helpers_1.isSqlite)(queryRunner.dataSource);
         let wasInTransaction = false;
         if (isSqliteDriver) {
             try {
                 await queryRunner.commitTransaction();
                 wasInTransaction = true;
-                // eslint-disable-next-line no-empty
             }
             catch (ignore) { }
             await queryRunner.query('PRAGMA foreign_keys = OFF');
@@ -35,7 +34,6 @@ class MoveLoginPasswordToFields1756391927839 {
             if (wasInTransaction) {
                 try {
                     await queryRunner.startTransaction();
-                    // eslint-disable-next-line no-empty
                 }
                 catch (ignore) { }
             }

@@ -6,10 +6,10 @@ exports.create = create;
 exports.update = update;
 exports.destroyOneCategory = destroyOneCategory;
 exports.destroy = destroy;
-const models_1 = require("../models");
 const helpers_1 = require("../helpers");
-const validators_1 = require("../shared/validators");
 const rule_engine_1 = require("../lib/rule-engine");
+const models_1 = require("../models");
+const validators_1 = require("../shared/validators");
 const log = (0, helpers_1.makeLogger)('controllers/categories');
 async function preloadCategory(req, res, nextHandler, id) {
     try {

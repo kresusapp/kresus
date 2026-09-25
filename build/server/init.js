@@ -37,11 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = init;
-const helpers_1 = require("./helpers");
-const settings_1 = require("./shared/settings");
-const models_1 = require("./models");
-const poller_1 = __importDefault(require("./lib/poller"));
 const DemoController = __importStar(require("./controllers/demo"));
+const helpers_1 = require("./helpers");
+const poller_1 = __importDefault(require("./lib/poller"));
+const models_1 = require("./models");
+const settings_1 = require("./shared/settings");
 const log = (0, helpers_1.makeLogger)('init');
 // Checks if the demo mode is enabled, and set it up if that's the case.
 async function checkDemoMode() {

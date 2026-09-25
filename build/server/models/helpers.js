@@ -1,27 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.areFieldsComplete = exports.DatetimeType = exports.ForceNumericColumn = void 0;
+exports.areFieldsComplete = exports.LOW_NUM_ENTITIES_IN_BATCH = exports.DatetimeType = exports.ForceNumericColumn = void 0;
 exports.mergeWith = mergeWith;
 exports.datetimeType = datetimeType;
 exports.isSqlite = isSqlite;
+exports.isUniqueConstraintViolation = isUniqueConstraintViolation;
 exports.bulkInsert = bulkInsert;
 exports.bulkDelete = bulkDelete;
 exports.idColumn = idColumn;
 exports.foreignKey = foreignKey;
 exports.foreignKeyUserId = foreignKeyUserId;
+const typeorm_1 = require("typeorm");
 const helpers_1 = require("../helpers");
 const providers_1 = require("../providers");
 const log = (0, helpers_1.makeLogger)('models/helpers');
-const hasCategory = (op) => op.categoryId !== null;
-const hasType = (op) => {
-    return typeof op.type !== 'undefined' && op.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE;
+const hasCategory = (tr) => tr.categoryId !== null;
+const hasType = (tr) => {
+    return typeof tr.type !== 'undefined' && tr.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE;
 };
-const hasCustomLabel = (op) => typeof op.customLabel === 'string';
-const hasBudgetDate = (op) => {
-    return typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
+const hasCustomLabel = (tr) => typeof tr.customLabel === 'string';
+const hasBudgetDate = (tr) => {
+    return typeof tr.budgetDate !== 'undefined' && tr.budgetDate !== null;
 };
-const hasDebitDate = (op) => {
-    return typeof op.debitDate !== 'undefined' && op.debitDate !== null;
+const hasDebitDate = (tr) => {
+    return typeof tr.debitDate !== 'undefined' && tr.debitDate !== null;
 };
 function mergeWith(target, other) {
     const update = {};
@@ -105,34 +107,48 @@ function datetimeType(queryRunner) {
 // case, we need to split up the batches into smaller ones.
 //
 // 50 ought to be enough for everyone, since it allows up to 19 fields.
-const LOW_NUM_ENTITIES_IN_BATCH = 50;
+exports.LOW_NUM_ENTITIES_IN_BATCH = 50;
 // The same issue happens with postgres which can't bind more than 64K features at once.
 const NUM_ENTITIES_IN_BATCH = 1000;
 function isSqlite(connection) {
     const dbType = connection.driver.options.type;
-    return dbType === 'sqlite' || dbType === 'better-sqlite3';
+    return dbType === 'better-sqlite3';
 }
-// Note: doesn't return the inserted entities.
-async function bulkInsert(repository, 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-entities) {
+function isUniqueConstraintViolation(err) {
+    var _a;
+    if (!(err instanceof typeorm_1.QueryFailedError)) {
+        return false;
+    }
+    const code = (_a = err.driverError) === null || _a === void 0 ? void 0 : _a.code;
+    // The error codes reported when a UNIQUE constraint is violated: better-sqlite3 uses an extended
+    // sqlite result code, postgres the SQLSTATE for unique_violation.
+    // See https://www.sqlite.org/c3ref/c_abort_rollback.html#:~:text=SQLITE_CONSTRAINT_UNIQUE
+    // See https://www.postgresql.org/docs/current/errcodes-appendix.html#:~:text=23505
+    return typeof code === 'string' && (code === 'SQLITE_CONSTRAINT_UNIQUE' || code === '23505');
+}
+// Note: doesn't return the inserted entities, only their ids, in the same order as the entities
+// which were passed as arguments.
+async function bulkInsert(repository, entities) {
     // Do not call `repository.insert` without actual entities, that will generate an empty insert
     // query and throw an error.
     // See https://github.com/typeorm/typeorm/issues/3111
     if (entities.length === 0) {
-        return;
+        return [];
     }
+    const insertedIds = [];
     let remaining = entities;
     let batchSize = NUM_ENTITIES_IN_BATCH;
     if (isSqlite(repository.manager.connection)) {
-        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
+        batchSize = exports.LOW_NUM_ENTITIES_IN_BATCH;
     }
     log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
     while (remaining.length > 0) {
         const nextRemaining = remaining.splice(batchSize);
-        await repository.insert(remaining);
+        const result = await repository.insert(remaining);
+        insertedIds.push(...result.identifiers.map(identifier => identifier.id));
         remaining = nextRemaining;
     }
+    return insertedIds;
 }
 async function bulkDelete(repository, ids) {
     if (ids.length === 0) {
@@ -141,7 +157,7 @@ async function bulkDelete(repository, ids) {
     let remaining = ids;
     let batchSize = NUM_ENTITIES_IN_BATCH;
     if (isSqlite(repository.manager.connection)) {
-        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
+        batchSize = exports.LOW_NUM_ENTITIES_IN_BATCH;
     }
     log.info(`bulk delete: splitting up batches with a size of ${batchSize}`);
     while (remaining.length > 0) {

@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Emailer = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const helpers_1 = require("../helpers");
-const settings_1 = require("../shared/settings");
 const models_1 = require("../models");
+const settings_1 = require("../shared/settings");
 const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('emailer');
 class Emailer {

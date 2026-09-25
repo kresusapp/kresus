@@ -42,12 +42,12 @@ exports.testEmail = testEmail;
 exports.testNotification = testNotification;
 exports.isDemoForced = isDemoForced;
 exports.isDemoEnabled = isDemoEnabled;
-const models_1 = require("../models");
-const woob = __importStar(require("../providers/woob"));
+const helpers_1 = require("../helpers");
 const emailer_1 = __importDefault(require("../lib/emailer"));
 const notifications_1 = require("../lib/notifications");
+const models_1 = require("../models");
+const woob = __importStar(require("../providers/woob"));
 const errors_json_1 = require("../shared/errors.json");
-const helpers_1 = require("../helpers");
 const settings_1 = require("../shared/settings");
 async function getWoobVersion(_req, res) {
     try {

@@ -72,6 +72,10 @@
         "license": "MIT",
         "website": "https://typeorm.io"
     },
+    "@biomejs/biome": {
+        "license": "MIT OR Apache-2.0",
+        "website": "https://biomejs.dev"
+    },
     "@reduxjs/toolkit": {
         "license": "MIT",
         "website": "https://redux-toolkit.js.org"
@@ -160,34 +164,6 @@
         "license": "MIT",
         "website": null
     },
-    "eslint": {
-        "license": "MIT",
-        "website": "https://eslint.org"
-    },
-    "eslint-config-prettier": {
-        "license": "MIT",
-        "website": "https://github.com/prettier/eslint-config-prettier#readme"
-    },
-    "eslint-plugin-dependencies": {
-        "license": "MIT",
-        "website": null
-    },
-    "eslint-plugin-import": {
-        "license": "MIT",
-        "website": "https://github.com/import-js/eslint-plugin-import"
-    },
-    "eslint-plugin-prettier": {
-        "license": "MIT",
-        "website": "https://github.com/prettier/eslint-plugin-prettier#readme"
-    },
-    "eslint-plugin-react": {
-        "license": "MIT",
-        "website": "https://github.com/jsx-eslint/eslint-plugin-react"
-    },
-    "eslint-plugin-react-hooks": {
-        "license": "MIT",
-        "website": "https://react.dev/"
-    },
     "font-awesome": {
         "license": "(OFL-1.1 AND MIT)",
         "website": "http://fontawesome.io/"
@@ -224,17 +200,9 @@
         "license": "MIT",
         "website": "https://github.com/Qard/onchange"
     },
-    "prettier": {
-        "license": "MIT",
-        "website": "https://prettier.io"
-    },
     "primer-tooltips": {
         "license": "MIT",
         "website": "http://primer.github.io/"
-    },
-    "rc-color-picker": {
-        "license": "MIT",
-        "website": "http://github.com/react-component/color-picker"
     },
     "rc-slider": {
         "license": "MIT",
@@ -284,17 +252,13 @@
         "license": "MIT",
         "website": null
     },
-    "ts-node": {
+    "tsx": {
         "license": "MIT",
-        "website": "https://typestrong.org/ts-node"
+        "website": "https://tsx.hirok.io"
     },
     "typescript": {
         "license": "Apache-2.0",
         "website": "https://www.typescriptlang.org/"
-    },
-    "typescript-eslint": {
-        "license": "MIT",
-        "website": "https://typescript-eslint.io/packages/typescript-eslint"
     },
     "vite": {
         "license": "MIT",

@@ -8,10 +8,10 @@ exports.obfuscatePasswords = obfuscatePasswords;
 exports.obfuscateKeywords = obfuscateKeywords;
 exports.obfuscateEmails = obfuscateEmails;
 const regex_escape_1 = __importDefault(require("regex-escape"));
+const settings_1 = require("../../shared/settings");
 const helpers_1 = require("../helpers");
 const instance_1 = require("../lib/instance");
 const default_settings_1 = __importDefault(require("../shared/default-settings"));
-const settings_1 = require("../../shared/settings");
 const rules_1 = require("./rules");
 const log = (0, helpers_1.makeLogger)('controllers/helpers');
 // Sync function
@@ -96,8 +96,6 @@ function cleanData(world) {
             }
         }
         o.accountId = accountMap[o.accountId];
-        // Strip away id.
-        delete o.id;
         delete o.userId;
     }
     world.settings = world.settings || [];

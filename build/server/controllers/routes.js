@@ -36,7 +36,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const manifest_1 = __importDefault(require("./manifest"));
 const accesses = __importStar(require("./accesses"));
 const accounts = __importStar(require("./accounts"));
 const alerts = __importStar(require("./alerts"));
@@ -45,14 +44,15 @@ const batch = __importStar(require("./batch"));
 const budgets = __importStar(require("./budgets"));
 const categories = __importStar(require("./categories"));
 const demo = __importStar(require("./demo"));
+const duplicates = __importStar(require("./duplicates"));
 const instance = __importStar(require("./instance"));
 const logs = __importStar(require("./logs"));
-const transactions = __importStar(require("./transactions"));
+const manifest_1 = __importDefault(require("./manifest"));
+const recurringTransactions = __importStar(require("./recurring-transactions"));
 const rules = __importStar(require("./rules"));
 const settings = __importStar(require("./settings"));
-const recurringTransactions = __importStar(require("./recurring-transactions"));
+const transactions = __importStar(require("./transactions"));
 const views = __importStar(require("./views"));
-const duplicates = __importStar(require("./duplicates"));
 const namespace = 'api';
 const routes = {
     // Initialization.
@@ -225,6 +225,11 @@ const routes = {
     // Duplicates
     duplicates: {
         get: duplicates.getDuplicates,
+    },
+    'duplicates/ignored': {
+        get: duplicates.getIgnoredDuplicates,
+        post: duplicates.ignoreDuplicate,
+        delete: duplicates.unignoreDuplicate,
     },
 };
 const exportedRoutes = {};

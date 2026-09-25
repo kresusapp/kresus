@@ -47,7 +47,7 @@ let View = View_1 = class View {
     static async find(userId, viewId) {
         return await View_1.repo().findOne({
             where: { id: viewId, userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
     static async exists(userId, viewId) {
@@ -57,7 +57,7 @@ let View = View_1 = class View {
     static async all(userId) {
         return await View_1.repo().find({
             where: { userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
     static async destroy(userId, viewId) {

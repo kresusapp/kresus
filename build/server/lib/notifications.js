@@ -37,15 +37,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendTestNotification = sendTestNotification;
-const https = __importStar(require("https"));
 const http = __importStar(require("http"));
-const util_1 = require("util");
+const https = __importStar(require("https"));
 const url_1 = require("url");
+const util_1 = require("util");
 const helpers_1 = require("../helpers");
-const settings_1 = require("../shared/settings");
-const settings_2 = __importDefault(require("../models/entities/settings"));
-const translator_1 = require("./translator");
+const settings_1 = __importDefault(require("../models/entities/settings"));
 const default_settings_1 = __importDefault(require("../shared/default-settings"));
+const settings_2 = require("../shared/settings");
+const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('notifications');
 function jsonRequest(url, method, jsonData) {
     const data = JSON.stringify(jsonData);
@@ -142,9 +142,9 @@ class UserNotifier {
         if (this.appriseUserUrl) {
             return;
         }
-        const appriseUrlSetting = await settings_2.default.byKey(this.userId, settings_1.APPRISE_URL);
+        const appriseUrlSetting = await settings_1.default.byKey(this.userId, settings_2.APPRISE_URL);
         if (appriseUrlSetting !== null &&
-            appriseUrlSetting.value !== default_settings_1.default.get(settings_1.APPRISE_URL)) {
+            appriseUrlSetting.value !== default_settings_1.default.get(settings_2.APPRISE_URL)) {
             this.forceReinit(appriseUrlSetting.value);
             log.info(`Apprise url fetched for user ${this.userId}`);
         }

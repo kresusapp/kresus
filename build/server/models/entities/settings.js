@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Setting_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const default_settings_1 = __importDefault(require("../../shared/default-settings"));
-const instance_1 = require("../../lib/instance");
-const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
 const helpers_1 = require("../../helpers");
+const instance_1 = require("../../lib/instance");
+const default_settings_1 = __importDefault(require("../../shared/default-settings"));
 const settings_1 = require("../../shared/settings");
+const __1 = require("..");
+const helpers_2 = require("../helpers");
+const users_1 = __importDefault(require("./users"));
 const log = (0, helpers_1.makeLogger)('models/entities/settings');
 let Setting = Setting_1 = class Setting {
     static repo() {
@@ -53,7 +54,18 @@ let Setting = Setting_1 = class Setting {
         if (found) {
             return found;
         }
-        return await Setting_1.create(userId, { key, value: defaultValue });
+        try {
+            return await Setting_1.create(userId, { key, value: defaultValue });
+        }
+        catch (err) {
+            // A concurrent call may have created the setting in between the read above and this
+            // insert, which the unique constraint on (userId, key) then rejects: read it back
+            // instead of failing. Otherwise re-throw the error.
+            if (!(0, helpers_2.isUniqueConstraintViolation)(err)) {
+                throw err;
+            }
+            return (0, helpers_1.unwrap)(await Setting_1.byKey(userId, key));
+        }
     }
     static async updateByKey(userId, key, value) {
         const newValue = `${value}`;
@@ -130,6 +142,7 @@ __decorate([
     __metadata("design:type", String)
 ], Setting.prototype, "value", void 0);
 Setting = Setting_1 = __decorate([
-    (0, typeorm_1.Entity)('setting')
+    (0, typeorm_1.Entity)('setting'),
+    (0, typeorm_1.Unique)(['userId', 'key'])
 ], Setting);
 exports.default = Setting;

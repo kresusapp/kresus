@@ -11,13 +11,13 @@ exports.update = update;
 exports.destroy = destroy;
 exports.resyncBalance = resyncBalance;
 exports.mergeInto = mergeInto;
-const models_1 = require("../models");
-const helpers_1 = require("../helpers");
 const settings_1 = require("../../shared/settings");
-const validators_1 = require("../shared/validators");
+const helpers_1 = require("../helpers");
 const accounts_manager_1 = __importDefault(require("../lib/accounts-manager"));
-const instance_1 = require("./instance");
+const models_1 = require("../models");
+const validators_1 = require("../shared/validators");
 const accesses_1 = require("./accesses");
+const instance_1 = require("./instance");
 const log = (0, helpers_1.makeLogger)('controllers/accounts');
 // Prefills the @account field with a queried bank account.
 async function preloadAccount(req, res, nextHandler, accountId) {

@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testing = void 0;
 const helpers_1 = require("../helpers");
-const diff_list_1 = __importDefault(require("./diff-list"));
 const manual_1 = require("../providers/manual");
+const diff_list_1 = __importDefault(require("./diff-list"));
 function isPerfectMatch(known, provided) {
     (0, helpers_1.assert)(known.accessId === provided.accessId, 'data inconsistency');
     (0, helpers_1.assert)(typeof provided.label !== 'undefined', 'account label must be defined at this point');

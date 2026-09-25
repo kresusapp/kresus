@@ -45,15 +45,15 @@ exports.fetchTransactions = fetchTransactions;
 exports.poll = poll;
 exports.update = update;
 exports.updateAndFetchAccounts = updateAndFetchAccounts;
-const models_1 = require("../models");
+const helpers_1 = require("../helpers");
 const accounts_manager_1 = __importStar(require("../lib/accounts-manager"));
 const poller_1 = require("../lib/poller");
+const models_1 = require("../models");
 const providers_1 = require("../providers");
-const all_1 = require("./all");
-const AccountController = __importStar(require("./accounts"));
-const instance_1 = require("./instance");
-const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
+const AccountController = __importStar(require("./accounts"));
+const all_1 = require("./all");
+const instance_1 = require("./instance");
 const log = (0, helpers_1.makeLogger)('controllers/accesses');
 // Preloads a bank access (sets @access).
 async function preloadAccess(req, res, nextHandler, accessId) {

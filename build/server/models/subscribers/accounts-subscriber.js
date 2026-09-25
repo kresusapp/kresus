@@ -13,8 +13,6 @@ exports.AccountsSubscriber = void 0;
 const typeorm_1 = require("typeorm");
 const accounts_1 = __importDefault(require("../entities/accounts"));
 const views_1 = __importDefault(require("../entities/views"));
-// eslint new-cap rule does not like decorators. See https://github.com/eslint/typescript-eslint-parser/issues/569
-// eslint-disable-next-line new-cap
 let AccountsSubscriber = class AccountsSubscriber {
     listenTo() {
         return accounts_1.default;
@@ -34,7 +32,11 @@ let AccountsSubscriber = class AccountsSubscriber {
     /* Renames associated views after account renaming */
     async afterUpdate(event) {
         const account = event.entity;
-        if (!account) {
+        // On a bulk update (`manager.update(Account, criteria, partialValues)`), typeorm only
+        // provides the partial set of updated values, without any id or userId.
+        if (!account ||
+            typeof account.id === 'undefined' ||
+            typeof account.userId === 'undefined') {
             return;
         }
         // No need to pass the repository, as there will not be dependencies on newly created

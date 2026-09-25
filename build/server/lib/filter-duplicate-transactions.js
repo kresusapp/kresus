@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = filterDuplicateTransactions;
 const moment_1 = __importDefault(require("moment"));
-const duplicates_manager_1 = require("./duplicates-manager");
 const helpers_1 = require("../helpers");
+const duplicates_manager_1 = require("./duplicates-manager");
 /*
     This function tries to be smarter in detecting which of the provided
     transactions can safely be used to update the known transaction.
@@ -34,10 +34,10 @@ function filterDuplicateTransactions(duplicates) {
         // or through the recurring transaction system and reset these flags to false, unless both
         // transactions have it enabled.
         const updateBase = {};
-        if (!!known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
+        if (known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
             updateBase.isRecurrentTransaction = false;
         }
-        if (!!known.createdByUser && !provided.createdByUser) {
+        if (known.createdByUser && !provided.createdByUser) {
             updateBase.createdByUser = false;
         }
         // If the type in the database is unknown, set it to the provided one.

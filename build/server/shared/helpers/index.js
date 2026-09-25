@@ -1,11 +1,9 @@
 "use strict";
-/* eslint no-console: 0 */
-/* eslint @typescript-eslint/no-var-requires: 0 */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.NONE_CATEGORY_ID = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = void 0;
+exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.NONE_CATEGORY_ID = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = void 0;
 exports.maybeHas = maybeHas;
 exports.getDefaultEnglishTranslator = getDefaultEnglishTranslator;
 exports.setupTranslator = setupTranslator;
@@ -20,15 +18,15 @@ const micro_memoize_1 = require("micro-memoize");
 // /!\ Add locale imports to dependencies too:
 // - for moment, in client/main.tsx
 // - for flatpickr, in client/components/ui/flatpicker.ts
-const fr_json_1 = __importDefault(require("../locales/fr.json"));
-const en_json_1 = __importDefault(require("../locales/en.json"));
-const es_json_1 = __importDefault(require("../locales/es.json"));
-const tr_json_1 = __importDefault(require("../locales/tr.json"));
-const node_polyglot_1 = __importDefault(require("node-polyglot"));
 const currency_formatter_1 = require("currency-formatter");
 const moment_1 = __importDefault(require("moment"));
-const account_types_json_1 = __importDefault(require("../account-types.json"));
+const node_polyglot_1 = __importDefault(require("node-polyglot"));
 const transaction_types_json_1 = __importDefault(require("../../shared/transaction-types.json"));
+const account_types_json_1 = __importDefault(require("../account-types.json"));
+const en_json_1 = __importDefault(require("../locales/en.json"));
+const es_json_1 = __importDefault(require("../locales/es.json"));
+const fr_json_1 = __importDefault(require("../locales/fr.json"));
+const tr_json_1 = __importDefault(require("../locales/tr.json"));
 const dates_1 = require("./dates");
 function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
@@ -169,7 +167,7 @@ exports.currency = {
         }
         const { decimalDigits } = found;
         return (amount) => {
-            const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+            const am = Math.abs(amount) < 10 ** (-decimalDigits - 2) ? 0 : amount;
             return (0, currency_formatter_1.format)(am, { code: c });
         };
     }),
@@ -186,21 +184,22 @@ function validatePassword(password) {
 }
 exports.DEFERRED_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.deferred_card'));
 exports.TRANSACTION_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.card'));
+exports.TRANSFER_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.transfer'));
 exports.INTERNAL_TRANSFER_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.internal_transfer'));
 const SUMMARY_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.card_summary'));
 const ACCOUNT_TYPE_CARD = unwrap(account_types_json_1.default.find(type => type.name === 'account-type.card'));
-const shouldIncludeInBalance = (op, balanceDate, accountType) => {
-    const opDebitMoment = (0, moment_1.default)(op.debitDate || op.date);
-    return (opDebitMoment.isSameOrBefore(balanceDate, 'day') &&
-        (op.type !== exports.DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name));
+const shouldIncludeInBalance = (tr, balanceDate, accountType) => {
+    const trDebitMoment = (0, moment_1.default)(tr.debitDate || tr.date);
+    return (trDebitMoment.isSameOrBefore(balanceDate, 'day') &&
+        (tr.type !== exports.DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name));
 };
 exports.shouldIncludeInBalance = shouldIncludeInBalance;
-const shouldIncludeInOutstandingSum = (op, limitToCurrentMonth) => {
-    const opDebitMoment = (0, moment_1.default)(op.debitDate || op.date);
+const shouldIncludeInOutstandingSum = (tr, limitToCurrentMonth) => {
+    const trDebitMoment = (0, moment_1.default)(tr.debitDate || tr.date);
     const today = new Date();
-    return (opDebitMoment.isAfter(today, 'day') &&
-        (!limitToCurrentMonth || !opDebitMoment.isAfter((0, dates_1.endOfMonth)(today), 'day')) &&
-        op.type !== SUMMARY_CARD_TYPE.name);
+    return (trDebitMoment.isAfter(today, 'day') &&
+        (!limitToCurrentMonth || !trDebitMoment.isAfter((0, dates_1.endOfMonth)(today), 'day')) &&
+        tr.type !== SUMMARY_CARD_TYPE.name);
 };
 exports.shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum;
 exports.FETCH_STATUS_SUCCESS = 'OK';

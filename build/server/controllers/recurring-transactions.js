@@ -25,7 +25,7 @@ async function preload(req, res, nextHandler, recurringTransactionId) {
 async function getByAccountId(req, res) {
     try {
         const userId = req.user.id;
-        const accountId = parseInt(req.params.accountId, 10);
+        const accountId = parseInt((0, helpers_1.asString)(req.params.accountId), 10);
         if (isNaN(accountId)) {
             throw new helpers_1.KError('Invalid account id', 400);
         }
@@ -43,7 +43,7 @@ async function getByAccountId(req, res) {
 async function create(req, res) {
     try {
         const userId = req.user.id;
-        const accountId = parseInt(req.params.accountId, 10);
+        const accountId = parseInt((0, helpers_1.asString)(req.params.accountId), 10);
         if (isNaN(accountId)) {
             throw new helpers_1.KError('Invalid account id', 400);
         }

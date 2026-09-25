@@ -5,24 +5,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fullPoll = fullPoll;
 const moment_1 = __importDefault(require("moment"));
+const settings_1 = require("../../shared/settings");
+const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 const providers_1 = require("../providers");
 const accounts_manager_1 = __importDefault(require("./accounts-manager"));
+const alert_manager_1 = __importDefault(require("./alert-manager"));
 const cron_1 = __importDefault(require("./cron"));
 const report_manager_1 = __importDefault(require("./report-manager"));
-const alert_manager_1 = __importDefault(require("./alert-manager"));
-const helpers_1 = require("../helpers");
-const settings_1 = require("../../shared/settings");
 const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('poller');
 async function managePollingErrors(userId, accessLabel, type, errorMessages, requiresUserAction = false) {
     const i18n = await (0, translator_1.getTranslator)(userId);
     const blockingStatusLocale = (0, helpers_1.translate)(i18n, `server.email.fetch_error.${type}`, {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
     });
     const subject = (0, helpers_1.translate)(i18n, 'server.email.fetch_error.subject', {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
         type: blockingStatusLocale,
     });

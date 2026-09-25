@@ -14,7 +14,8 @@
         "user-action": {
             "title": "One more step is needed",
             "help": "This bank connection requires that you supply an extra validation or information sent to you via a text or a mobile app. Please enter all the requested information or provide the app validation, and then hit the button to continue.",
-            "code": "Code"
+            "code": "Code",
+            "after-validation": "Once you've validated your login, the operation will automatically continue."
         },
         "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
@@ -320,7 +321,8 @@
             "deletion_error": "Error when deleting a transaction: %{error}.",
             "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets.",
             "date_update_success": "The transaction date was successfully modified.",
-            "date_update_success_budget_date_sync": "Please note that the budget month was automatically adjusted to remain in sync with the new date."
+            "date_update_success_budget_date_sync": "Please note that the budget month was automatically adjusted to remain in sync with the new date.",
+            "amount_update_success": "The transaction's amount was successfully modified."
         },
         "budget": {
             "amount": "Real amount",
@@ -550,6 +552,7 @@
             },
             "views": {
                 "title": "Custom views",
+                "overall": "Global views per currency",
                 "none": "You have no custom views yet.",
                 "manage": "Manage views",
                 "back_to_views_list": "Go back to the views list",
@@ -557,6 +560,8 @@
                 "edit": "Edit a view",
                 "label": "View label",
                 "accounts": "List of accounts",
+                "same_currency_help": "All the accounts of a view must share the same currency.",
+                "mixed_currencies_error": "This view mixes accounts of different currencies, which isn't allowed.",
                 "creation_success": "View successfully created!",
                 "creation_error": "Error when creating the view: %{err}",
                 "creation_form_title": "Create a new view",
@@ -567,6 +572,7 @@
             }
         },
         "similarity": {
+            "loading_duplicates": "Loading duplicates...",
             "nothing_found": "No similar transactions found.",
             "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
             "date": "Date",
@@ -587,7 +593,13 @@
             "lax_level_desc": "When enabled, the automatic duplicate detection algorithm will be more permissive. In particular it will reuse the user's duplicate time threshold instead of forbidding any date gap.",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
-            "will_be_removed": "This transaction will be removed."
+            "will_be_removed": "This transaction will be removed.",
+            "ignore": "Ignore",
+            "unignore": "Stop ignoring",
+            "show_ignored_duplicates": "Show the ignored pairs",
+            "back_to_duplicates": "Back to the detected duplicates",
+            "ignored_duplicates_desc": "These pairs of transactions have been marked as not being duplicates, so they are not listed with the detected duplicates anymore. You can stop ignoring them at any time.",
+            "no_ignored_duplicates": "No ignored pairs of transactions."
         },
         "about": {
             "title": "About",

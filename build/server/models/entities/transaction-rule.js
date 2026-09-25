@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var TransactionRule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 let TransactionRule = TransactionRule_1 = class TransactionRule {
     static repo() {
@@ -57,7 +57,7 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
     static async allOrdered(userId) {
         return await TransactionRule_1.repo().find({
             where: { userId },
-            relations: ['conditions', 'actions'],
+            relations: { conditions: true, actions: true },
             order: {
                 position: 'ASC',
             },

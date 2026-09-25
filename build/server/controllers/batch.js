@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = run;
 const helpers_1 = require("../helpers");
-const categories_1 = require("./categories");
 const batch_1 = require("../shared/api/batch");
+const categories_1 = require("./categories");
 // Run batch operations.
 //
 // Each operation can be fallible or successful, independently of the other.

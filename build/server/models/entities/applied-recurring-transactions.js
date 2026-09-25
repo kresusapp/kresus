@@ -16,8 +16,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../../helpers");
 const __1 = require("..");
-const recurring_transactions_1 = __importDefault(require("./recurring-transactions"));
 const accounts_1 = __importDefault(require("./accounts"));
+const recurring_transactions_1 = __importDefault(require("./recurring-transactions"));
 const users_1 = __importDefault(require("./users"));
 let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedRecurringTransaction {
     static repo() {

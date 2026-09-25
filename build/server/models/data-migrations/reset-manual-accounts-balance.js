@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetManualBankAccountsBalance = resetManualBankAccountsBalance;
-/* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
 const log = (0, helpers_1.makeLogger)('models/data-migrations');
 async function resetManualBankAccountsBalance(userId, manager) {
     // Do not use transactions, as this code might be called from migrations which are already
@@ -17,7 +16,7 @@ async function resetManualBankAccountsBalance(userId, manager) {
         userCondition.userId = userId;
     }
     const accesses = await manager.find(__1.Access, {
-        select: ['id'],
+        select: { id: true },
         where: {
             vendorId: (0, typeorm_1.In)(['manual', 'demo']),
             ...userCondition,

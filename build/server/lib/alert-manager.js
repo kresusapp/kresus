@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
-const notifications_1 = __importDefault(require("./notifications"));
 const emailer_1 = __importDefault(require("./emailer"));
+const notifications_1 = __importDefault(require("./notifications"));
 const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('alert-manager');
 class AlertManager {

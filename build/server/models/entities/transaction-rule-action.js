@@ -16,8 +16,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../../helpers");
 const __1 = require("..");
-const transaction_rule_1 = __importDefault(require("./transaction-rule"));
 const categories_1 = __importDefault(require("./categories"));
+const transaction_rule_1 = __importDefault(require("./transaction-rule"));
 const users_1 = __importDefault(require("./users"));
 let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleAction {
     static repo() {

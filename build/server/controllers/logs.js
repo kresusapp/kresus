@@ -5,18 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogs = getLogs;
 exports.clearLogs = clearLogs;
-const fs_1 = __importDefault(require("fs"));
-const util_1 = require("util");
-const models_1 = require("../models");
+const node_fs_1 = __importDefault(require("node:fs"));
+const node_util_1 = require("node:util");
 const helpers_1 = require("../helpers");
+const models_1 = require("../models");
 const helpers_2 = require("./helpers");
-const readFile = (0, util_1.promisify)(fs_1.default.readFile);
-const writeFile = (0, util_1.promisify)(fs_1.default.writeFile);
+const readFile = (0, node_util_1.promisify)(node_fs_1.default.readFile);
+const writeFile = (0, node_util_1.promisify)(node_fs_1.default.writeFile);
 async function getLogs(req, res) {
     try {
         const { id: userId } = req.user;
         const user = await models_1.User.find(userId);
-        if (!user || !user.isAdmin) {
+        if (!(user === null || user === void 0 ? void 0 : user.isAdmin)) {
             res.status(403).end();
             return;
         }
@@ -65,7 +65,7 @@ async function clearLogs(req, res) {
     try {
         const { id: userId } = req.user;
         const user = await models_1.User.find(userId);
-        if (!user || !user.isAdmin) {
+        if (!(user === null || user === void 0 ? void 0 : user.isAdmin)) {
             res.status(403).end();
             return;
         }

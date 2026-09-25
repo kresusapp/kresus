@@ -41,7 +41,6 @@ function parseOfxDate(date) {
         return null;
     }
     // See OFX_Common.xsd in https://www.ofx.net/downloads/OFX%202.2.0%20schema.zip
-    // eslint-disable-next-line max-len
     const parsedDate = /(\d{4})(\d{2})(\d{2})(?:(\d{2})(\d{2})(\d{2}))?(?:\.(\d{3}))?(?:\[([-+]?\d{1,2}):\w{3}\])?/.exec(date);
     if (!parsedDate) {
         return null;
@@ -124,7 +123,6 @@ async function ofxToKresus(ofx) {
             let oldestTransactionDate = Date.now();
             const dateNow = new Date();
             transactions = transactions.concat(accountTransactions
-                // eslint-disable-next-line no-loop-func
                 .map((transaction) => {
                 const debitDate = parseOfxDate(transaction.DTPOSTED);
                 let realizationDate = parseOfxDate(transaction.DTUSER);

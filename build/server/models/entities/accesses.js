@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Access_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
-const access_fields_1 = __importDefault(require("./access-fields"));
 const helpers_1 = require("../../helpers");
 const providers_1 = require("../../providers");
+const __1 = require("..");
 const helpers_2 = require("../helpers");
+const access_fields_1 = __importDefault(require("./access-fields"));
+const users_1 = __importDefault(require("./users"));
 let Access = Access_1 = class Access {
     constructor() {
         // Text status indicating whether the last poll was successful or not.
@@ -41,7 +41,8 @@ let Access = Access_1 = class Access {
     // Entity methods.
     // Helper to get a field value by name
     getFieldValue(fieldName) {
-        var _a, _b;
+        var _a;
+        var _b;
         const field = (_a = this.fields) === null || _a === void 0 ? void 0 : _a.find(f => f.name === fieldName);
         return (_b = field === null || field === void 0 ? void 0 : field.value) !== null && _b !== void 0 ? _b : null;
     }
@@ -89,13 +90,13 @@ let Access = Access_1 = class Access {
     static async find(userId, accessId) {
         return await Access_1.repo().findOne({
             where: { userId, id: accessId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
     static async all(userId) {
         return await Access_1.repo().find({
             where: { userId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
     static async exists(userId, accessId) {
@@ -119,7 +120,7 @@ let Access = Access_1 = class Access {
     static async byVendorId(userId, { uuid: vendorId }) {
         return await Access_1.repo().find({
             where: { userId, vendorId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
     static async byCredentials(userId, { uuid, login }) {

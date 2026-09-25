@@ -37,7 +37,6 @@ function init() {
             // Skip this file :)
             continue;
         }
-        // eslint-disable-next-line import/no-dynamic-require, @typescript-eslint/no-var-requires
         const handler = require(`./${fileOrDirName}`);
         addBackend(handler);
     }

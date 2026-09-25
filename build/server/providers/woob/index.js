@@ -57,7 +57,7 @@ const NOT_INSTALLED_ERRORS = [
     errors_json_1.GENERIC_EXCEPTION,
     errors_json_1.UNKNOWN_WOOB_MODULE,
 ];
-// Runs the subcommad `command`, with the given array of args, setting the
+// Runs the subcommand `command`, with the given array of args, setting the
 // environment to the given value.
 function subcommand(command, args, env) {
     return new Promise(accept => {
@@ -144,8 +144,6 @@ function defaultOptions() {
         userActionFields: null,
     };
 }
-// bug in eslint which thinks this is declared twice??
-// eslint-disable-next-line
 var CallWoobCommand;
 (function (CallWoobCommand) {
     CallWoobCommand[CallWoobCommand["Test"] = 0] = "Test";
@@ -254,7 +252,7 @@ async function callWoob(command, options, sessionManager, access = null) {
             cliArgs.push('--fromDate', timestamp);
         }
     }
-    const response = (await woobCommand(env, cliArgs));
+    const response = await woobCommand(env, cliArgs);
     // If valid JSON output, check for an error within JSON.
     if (response.kind === 'error') {
         log.info('Command returned an error code.');

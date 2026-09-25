@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddViews1734262035140 = void 0;
 const typeorm_1 = require("typeorm");
-const helpers_1 = require("../helpers");
 const accounts_1 = __importDefault(require("../entities/accounts"));
+const helpers_1 = require("../helpers");
 class AddViews1734262035140 {
     async up(q) {
         await q.createTable(new typeorm_1.Table({

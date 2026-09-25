@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var Alert_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("../");
 const helpers_1 = require("../../helpers");
 const helpers_2 = require("../../shared/helpers");
+const __1 = require("../");
 const helpers_3 = require("../helpers");
 let Alert = Alert_1 = class Alert {
     constructor() {

@@ -5,21 +5,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GLOBAL_CONTEXT = void 0;
 const moment_1 = __importDefault(require("moment"));
+const helpers_1 = require("../helpers");
 const models_1 = require("../models");
-const account_types_1 = require("./account-types");
-const transaction_types_1 = require("./transaction-types");
-const rule_engine_1 = __importDefault(require("./rule-engine"));
-const errors_json_1 = __importDefault(require("../shared/errors.json"));
 const providers_1 = require("../providers");
 const manual_1 = require("../providers/manual");
-const helpers_1 = require("../helpers");
+const errors_json_1 = __importDefault(require("../shared/errors.json"));
 const settings_1 = require("../shared/settings");
-const async_queue_1 = __importDefault(require("./async-queue"));
+const account_types_1 = require("./account-types");
 const alert_manager_1 = __importDefault(require("./alert-manager"));
+const async_queue_1 = __importDefault(require("./async-queue"));
 const diff_accounts_1 = __importDefault(require("./diff-accounts"));
 const diff_transactions_1 = __importDefault(require("./diff-transactions"));
 const filter_duplicate_transactions_1 = __importDefault(require("./filter-duplicate-transactions"));
+const rule_engine_1 = __importDefault(require("./rule-engine"));
 const session_manager_1 = __importDefault(require("./session-manager"));
+const transaction_types_1 = require("./transaction-types");
 const log = (0, helpers_1.makeLogger)('accounts-manager');
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // Effectively does a merge of two accounts that have been identified to be duplicates.
@@ -403,7 +403,8 @@ merging as per request`);
     }
     // Sync transactions.
     async syncTransactions(userId, access, pAccountInfoMap, isInteractive) {
-        var _a, _b, _c;
+        var _a;
+        var _b, _c;
         if (!access.isEnabled()) {
             // If the access has no password, check if it's an access that doesn't require
             // credentials.
@@ -434,9 +435,9 @@ merging as per request`);
             if (!account) {
                 continue;
             }
-            const gracePeriod = (_a = account.gracePeriod) !== null && _a !== void 0 ? _a : 0;
+            const gracePeriod = (_b = account.gracePeriod) !== null && _b !== void 0 ? _b : 0;
             if (gracePeriod <= 0 ||
-                ((_c = (_b = transaction.date) === null || _b === void 0 ? void 0 : _b.getTime()) !== null && _c !== void 0 ? _c : 0) <
+                ((_c = (_a = transaction.date) === null || _a === void 0 ? void 0 : _a.getTime()) !== null && _c !== void 0 ? _c : 0) <
                     currentMoment - gracePeriod * 24 * 60 * 60 * 1000) {
                 filteredTransactions.push(transaction);
             }
@@ -501,12 +502,12 @@ merging as per request`);
             // `otherTransactions`.
             const providerTransactions = [];
             const otherTransactions = [];
-            for (const op of filteredTransactions) {
-                if (op.accountId === account.id) {
-                    providerTransactions.push(op);
+            for (const tr of filteredTransactions) {
+                if (tr.accountId === account.id) {
+                    providerTransactions.push(tr);
                 }
                 else {
-                    otherTransactions.push(op);
+                    otherTransactions.push(tr);
                 }
             }
             transactions = otherTransactions;
@@ -515,15 +516,15 @@ merging as per request`);
             }
             // Find the time bounds of transactions given by the provider.
             (0, helpers_1.assert)(typeof providerTransactions[0].date !== 'undefined', 'date has been set at this point');
-            const minDate = (0, moment_1.default)(new Date(providerTransactions.reduce((min, op) => {
-                (0, helpers_1.assert)(typeof op.date !== 'undefined', 'date has been set at this point');
-                return Math.min(+op.date, min);
+            const minDate = (0, moment_1.default)(new Date(providerTransactions.reduce((min, tr) => {
+                (0, helpers_1.assert)(typeof tr.date !== 'undefined', 'date has been set at this point');
+                return Math.min(+tr.date, min);
             }, +providerTransactions[0].date)))
                 .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
                 .toDate();
-            const maxDate = new Date(providerTransactions.reduce((max, op) => {
-                (0, helpers_1.assert)(typeof op.date !== 'undefined', 'date has been set at this point');
-                return Math.max(+op.date, max);
+            const maxDate = new Date(providerTransactions.reduce((max, tr) => {
+                (0, helpers_1.assert)(typeof tr.date !== 'undefined', 'date has been set at this point');
+                return Math.max(+tr.date, max);
             }, +providerTransactions[0].date));
             const knowns = await models_1.Transaction.byBankSortedByDateBetweenDates(userId, account, minDate, maxDate);
             const { providerOrphans, duplicateCandidates } = (0, diff_transactions_1.default)(knowns, providerTransactions, { perfectMatchMaxDateThreshold });
@@ -536,10 +537,10 @@ merging as per request`);
             // the balance correctly.
             const accountImportDate = new Date(account.importDate);
             accountInfo.balanceOffset = providerOrphans
-                .filter((op) => (0, helpers_1.shouldIncludeInBalance)(op, accountImportDate, account.type))
-                .reduce((sum, op) => {
-                (0, helpers_1.assert)(typeof op.amount !== 'undefined', 'transaction must have an amount at least');
-                return sum + op.amount;
+                .filter((tr) => (0, helpers_1.shouldIncludeInBalance)(tr, accountImportDate, account.type))
+                .reduce((sum, tr) => {
+                (0, helpers_1.assert)(typeof tr.amount !== 'undefined', 'transaction must have an amount at least');
+                return sum + tr.amount;
             }, 0);
         }
         // Now that we're sure which transactions are going to be created,

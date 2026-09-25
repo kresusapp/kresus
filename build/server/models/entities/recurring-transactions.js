@@ -15,11 +15,11 @@ var RecurringTransaction_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../../helpers");
-const helpers_2 = require("../helpers");
 const __1 = require("..");
+const helpers_2 = require("../helpers");
 const accounts_1 = __importDefault(require("./accounts"));
-const users_1 = __importDefault(require("./users"));
 const applied_recurring_transactions_1 = __importDefault(require("./applied-recurring-transactions"));
+const users_1 = __importDefault(require("./users"));
 let RecurringTransaction = RecurringTransaction_1 = class RecurringTransaction {
     constructor() {
         this.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;

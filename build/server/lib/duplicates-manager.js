@@ -5,8 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDuplicatePairScore = getDuplicatePairScore;
 exports.findRedundantPairs = findRedundantPairs;
+exports.findIgnoredDuplicates = findIgnoredDuplicates;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
+const models_1 = require("../models");
+const helpers_2 = require("../shared/helpers");
 const log = (0, helpers_1.makeLogger)('duplicates-manager');
 const isMinimalTransaction = (tr) => typeof tr.rawLabel !== 'undefined' &&
     typeof tr.date !== 'undefined' &&
@@ -43,9 +46,17 @@ function getDuplicatePairScore(tr, next, threshold, ignoreDuplicatesWithDifferen
         if (tr.customLabel && next.customLabel && tr.customLabel !== next.customLabel) {
             return 0;
         }
+        // They could be duplicates if one of these is true:
+        // - `tr` is the unknown transaction type,
+        // - `next` is the unknown transaction type,
+        // - types are the same
+        // - types are respectively internal_transfer and transfer
+        // - or the opposite
         if (tr.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE &&
             next.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE &&
-            tr.type !== next.type) {
+            tr.type !== next.type &&
+            !(tr.type === helpers_2.INTERNAL_TRANSFER_TYPE.name && next.type === helpers_2.TRANSFER_TYPE.name) &&
+            !(tr.type === helpers_2.TRANSFER_TYPE.name && next.type === helpers_2.INTERNAL_TRANSFER_TYPE.name)) {
             return 0;
         }
         const trCategoryId = (_a = tr.categoryId) !== null && _a !== void 0 ? _a : helpers_1.NONE_CATEGORY_ID;
@@ -66,7 +77,17 @@ function getDuplicatePairScore(tr, next, threshold, ignoreDuplicatesWithDifferen
     }
     return score;
 }
-function findRedundantPairs(transactions, duplicateThreshold, ignoreDuplicatesWithDifferentCustomFields) {
+// Returns a stable key for a pair of transactions, whatever the order of the two ids.
+function pairKey(transactionId, otherTransactionId) {
+    return transactionId < otherTransactionId
+        ? `${transactionId}-${otherTransactionId}`
+        : `${otherTransactionId}-${transactionId}`;
+}
+/**
+ * @param pairsToIgnore pairs of transaction ids the user marked as not being duplicates; they are
+ * discarded from the results, whatever the order of the two ids in a pair.
+ */
+function findRedundantPairs(transactions, duplicateThreshold, ignoreDuplicatesWithDifferentCustomFields, pairsToIgnore = []) {
     const before = Date.now();
     log.debug('Running findRedundantPairs algorithm...');
     log.debug(`Input: ${transactions.length} transactions`);
@@ -74,6 +95,7 @@ function findRedundantPairs(transactions, duplicateThreshold, ignoreDuplicatesWi
     // duplicateThreshold is in hours, transform it to days
     const threshold = Math.round(duplicateThreshold / 24);
     log.debug(`Threshold: ${threshold}`);
+    const ignoredKeys = new Set(pairsToIgnore.map(pair => pairKey(pair[0], pair[1])));
     // O(n log n)
     // Tests showed that assert'ing the rawLabel/date/amount fields inside the getDuplicatePairScore
     // was slow (650ms for 4592 transactions, vs 280 with this filter).
@@ -84,7 +106,7 @@ function findRedundantPairs(transactions, duplicateThreshold, ignoreDuplicatesWi
         while (j < transactions.length) {
             const next = sorted[j];
             const duplicateScore = getDuplicatePairScore(tr, next, threshold, ignoreDuplicatesWithDifferentCustomFields);
-            if (duplicateScore > 0) {
+            if (duplicateScore > 0 && !ignoredKeys.has(pairKey(tr.id, next.id))) {
                 similar.push([tr, next]);
             }
             j += 1;
@@ -103,4 +125,30 @@ function findRedundantPairs(transactions, duplicateThreshold, ignoreDuplicatesWi
         return Math.max(+b[0].date, +b[1].date) - Math.max(+a[0].date, +a[1].date);
     });
     return similar.map(([trA, trB]) => [trA.id, trB.id]);
+}
+/**
+ * Returns the pairs of transactions the user chose to ignore, grouped by account id.
+ *
+ * They are listed even if the algorithm doesn't consider them duplicates anymore (e.g. after the
+ * threshold was lowered), so that the user can always un-ignore them.
+ */
+async function findIgnoredDuplicates(userId) {
+    const ignoredPairs = await models_1.DuplicatesIgnored.allWithTransaction(userId);
+    const pairsByAccount = new Map();
+    for (const pair of ignoredPairs) {
+        // Both transactions of a pair belong to the same account.
+        const { accountId } = pair.transaction;
+        const accountPairs = pairsByAccount.get(accountId);
+        if (accountPairs) {
+            accountPairs.push([pair.transactionId, pair.otherTransactionId]);
+        }
+        else {
+            pairsByAccount.set(accountId, [[pair.transactionId, pair.otherTransactionId]]);
+        }
+    }
+    const ret = [];
+    for (const [accountId, duplicates] of pairsByAccount) {
+        ret.push({ accountId, duplicates });
+    }
+    return ret;
 }

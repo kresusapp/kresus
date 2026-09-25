@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.save = save;
-const models_1 = require("../models");
+const helpers_1 = require("../helpers");
 const emailer_1 = __importDefault(require("../lib/emailer"));
 const notifications_1 = __importDefault(require("../lib/notifications"));
-const helpers_1 = require("../helpers");
-const settings_1 = require("../shared/settings");
 const translator_1 = require("../lib/translator");
+const models_1 = require("../models");
+const settings_1 = require("../shared/settings");
 function postSave(userId, key, value) {
     switch (key) {
         case settings_1.EMAIL_RECIPIENT: {

@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Transaction_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const helpers_1 = require("../../helpers");
 const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
+const helpers_2 = require("../helpers");
 const accounts_1 = __importDefault(require("./accounts"));
 const categories_1 = __importDefault(require("./categories"));
-const helpers_1 = require("../../helpers");
-const helpers_2 = require("../helpers");
+const users_1 = __importDefault(require("./users"));
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
 let Transaction = Transaction_1 = class Transaction {
@@ -61,7 +61,8 @@ let Transaction = Transaction_1 = class Transaction {
         const entity = Transaction_1.repo().create({ ...attributes, userId });
         return await Transaction_1.repo().save(entity);
     }
-    // Note: doesn't return the inserted entities.
+    // Note: doesn't return the inserted entities, only their ids, in the same order as the
+    // transactions which were passed as arguments.
     static async bulkCreate(userId, transactions) {
         const fullTransactions = transactions.map(tr => {
             return { ...tr, userId };
@@ -94,7 +95,10 @@ let Transaction = Transaction_1 = class Transaction {
             },
         };
         if (columns && columns.length) {
-            options.select = columns;
+            options.select = columns.reduce((acc, col) => {
+                acc[col] = true;
+                return acc;
+            }, {});
         }
         return await Transaction_1.repo().find(options);
     }

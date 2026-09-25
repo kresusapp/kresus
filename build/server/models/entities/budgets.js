@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Budget_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
-const categories_1 = __importDefault(require("./categories"));
-const views_1 = __importDefault(require("./views"));
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
 const helpers_2 = require("../helpers");
+const categories_1 = __importDefault(require("./categories"));
+const users_1 = __importDefault(require("./users"));
+const views_1 = __importDefault(require("./views"));
 let Budget = Budget_1 = class Budget {
     constructor() {
         // Threshold used in the budget section, defined by the user.

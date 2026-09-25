@@ -4,8 +4,8 @@ exports.loadAlert = loadAlert;
 exports.create = create;
 exports.destroy = destroy;
 exports.update = update;
-const models_1 = require("../models");
 const helpers_1 = require("../helpers");
+const models_1 = require("../models");
 const validators_1 = require("../shared/validators");
 async function loadAlert(req, res, nextHandler, alertId) {
     try {

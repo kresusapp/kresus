@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generate = generate;
 exports.apply = apply;
-const path_1 = __importDefault(require("path"));
 const ospath_1 = __importDefault(require("ospath"));
+const path_1 = __importDefault(require("path"));
+const package_json_1 = __importDefault(require("../package.json"));
 const helpers_1 = require("./helpers");
 const logger_1 = require("./lib/logger");
-const package_json_1 = __importDefault(require("../package.json"));
 const log = (0, helpers_1.makeLogger)('apply-config');
 function toBool(strOrBool) {
     const ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
@@ -87,7 +87,7 @@ const OPTIONS = [
     },
     {
         envName: 'KRESUS_USER_LOGIN_HTTP_HEADER',
-        configPath: 'config.kresus.userLoginHttpHeader',
+        configPath: 'config.kresus.user_login_http_header',
         defaultVal: null,
         processPath: 'userLoginHttpHeader',
         doc: `A HTTP header name to check when trying to retrieve the login of a pre-authenticated
@@ -126,6 +126,28 @@ const OPTIONS = [
         defaultVal: '127.0.0.1',
         processPath: 'host',
         doc: 'The host on which the Kresus server will listen to.',
+    },
+    {
+        envName: 'KRESUS_SERVER_TIMEOUT',
+        configPath: 'config.kresus.server_timeout',
+        defaultVal: '300',
+        processPath: 'serverTimeout',
+        cleanupAction: (timeoutVal) => {
+            const timeout = Number.parseInt(timeoutVal, 10);
+            if (Number.isNaN(timeout) || timeout < 1) {
+                throw new Error('the timeout value must be a valid non-negative integer');
+            }
+            if (timeout < 300) {
+                // Let the user know this value might be small, while accepting it.
+                log.warn(`the timeout value is set to ${timeout} seconds; a small value is likely to
+                    cause issues when syncing bank data, consider raising it to at least 300
+                    seconds (5 minutes).`);
+            }
+            return timeout;
+        },
+        doc: `Timeout value (in seconds) for the Kresus embedded HTTP server (express).
+        It's important to keep a high value because some banking modules could be very long to
+        fetch data on their website, and a bank fetch happens synchroneously at this time.`,
     },
     {
         envName: 'KRESUS_PYTHON_EXEC',

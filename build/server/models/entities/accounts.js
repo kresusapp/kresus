@@ -14,14 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Account_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
-const accesses_1 = __importDefault(require("./accesses"));
-const transactions_1 = __importDefault(require("./transactions"));
-const settings_1 = __importDefault(require("./settings"));
 const helpers_1 = require("../../helpers");
+const settings_1 = require("../../shared/settings");
+const __1 = require("..");
 const helpers_2 = require("../helpers");
-const settings_2 = require("../../shared/settings");
+const accesses_1 = __importDefault(require("./accesses"));
+const settings_2 = __importDefault(require("./settings"));
+const transactions_1 = __importDefault(require("./transactions"));
+const users_1 = __importDefault(require("./users"));
 let Account = Account_1 = class Account {
     constructor() {
         // external (backend) type id or UNKNOWN_ACCOUNT_TYPE.
@@ -46,37 +46,37 @@ let Account = Account_1 = class Account {
             // update migration #13 too!
             // We only select the columns we need, to avoid migrations issues when
             // columns are added later to the transaction model.
-            const ops = await transactions_1.default.byAccount(this.userId, this.id, [
+            const transactions = await transactions_1.default.byAccount(this.userId, this.id, [
                 'amount',
                 'type',
                 'debitDate',
                 'date',
             ]);
             const today = new Date();
-            const s = ops
-                .filter(op => (0, helpers_1.shouldIncludeInBalance)(op, today, this.type))
-                .reduce((sum, op) => sum + op.amount, offset);
+            const s = transactions
+                .filter(tr => (0, helpers_1.shouldIncludeInBalance)(tr, today, this.type))
+                .reduce((sum, tr) => sum + tr.amount, offset);
             return Math.round(s * 100) / 100;
         };
         this.computeOutstandingSum = async () => {
-            const ops = await transactions_1.default.byAccount(this.userId, this.id);
-            const isOngoingLimitedToCurrentMonth = await settings_1.default.findOrCreateDefaultBooleanValue(this.userId, settings_2.LIMIT_ONGOING_TO_CURRENT_MONTH);
-            const s = ops
-                .filter(op => (0, helpers_1.shouldIncludeInOutstandingSum)(op, isOngoingLimitedToCurrentMonth))
-                .reduce((sum, op) => sum + op.amount, 0);
+            const transactions = await transactions_1.default.byAccount(this.userId, this.id);
+            const isOngoingLimitedToCurrentMonth = await settings_2.default.findOrCreateDefaultBooleanValue(this.userId, settings_1.LIMIT_ONGOING_TO_CURRENT_MONTH);
+            const s = transactions
+                .filter(tr => (0, helpers_1.shouldIncludeInOutstandingSum)(tr, isOngoingLimitedToCurrentMonth))
+                .reduce((sum, tr) => sum + tr.amount, 0);
             return Math.round(s * 100) / 100;
         };
-        this.getCurrencyFormatter = async () => {
-            let checkedCurrency;
+        // Returns the account's currency, falling back to the user's default currency when the
+        // account has no currency or an unknown one.
+        this.getCurrency = async () => {
             if (helpers_1.currency.isKnown(this.currency)) {
-                checkedCurrency = this.currency;
+                (0, helpers_1.assert)(this.currency !== null, 'currency is known at this point');
+                return this.currency;
             }
-            else {
-                checkedCurrency = (await settings_1.default.findOrCreateDefault(this.userId, settings_2.DEFAULT_CURRENCY))
-                    .value;
-            }
-            (0, helpers_1.assert)(checkedCurrency !== null, 'currency is known at this point');
-            return (0, helpers_1.currencyFormatter)(checkedCurrency);
+            return (await settings_2.default.findOrCreateDefault(this.userId, settings_1.DEFAULT_CURRENCY)).value;
+        };
+        this.getCurrencyFormatter = async () => {
+            return (0, helpers_1.currencyFormatter)(await this.getCurrency());
         };
     }
     static repo() {

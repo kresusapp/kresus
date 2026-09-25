@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RemoveDuplicateBudgets1608817776804 = void 0;
-const helpers_1 = require("../helpers");
 const __1 = require("..");
+const helpers_1 = require("../helpers");
 // This cannot be run as a data migration, because data migrations are run after the import, and the
 // unique constraint might be present before the data has been imported, which would cause errors
 // during the import, so that has to be manually handled when importing.
 class RemoveDuplicateBudgets1608817776804 {
     async up(q) {
         const allBudgets = await q.manager.find(__1.Budget, {
-            select: ['id', 'userId', 'year', 'month', 'categoryId'],
+            select: { id: true, userId: true, year: true, month: true, categoryId: true },
         });
         const setOfUniqueBudgetKeys = new Set();
         const budgetIdsToDelete = [];

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.KError = exports.NONE_CATEGORY_ID = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.KError = exports.UNKNOWN_WOOB_VERSION = exports.UNKNOWN_TRANSACTION_TYPE = exports.UNKNOWN_ACCOUNT_TYPE = exports.translate = exports.TRANSACTION_CARD_TYPE = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.NONE_CATEGORY_ID = exports.MIN_WOOB_VERSION = exports.TRANSFER_TYPE = exports.INTERNAL_TRANSFER_TYPE = exports.has = exports.formatDate = exports.FETCH_STATUS_SUCCESS = exports.DEFERRED_CARD_TYPE = exports.currency = void 0;
 exports.makeLogger = makeLogger;
 exports.panic = panic;
 exports.assert = assert;
@@ -16,25 +16,27 @@ exports.normalizeVersion = normalizeVersion;
 exports.checkMinimalWoobVersion = checkMinimalWoobVersion;
 exports.makeUrlPrefixRegExp = makeUrlPrefixRegExp;
 exports.currencyFormatter = currencyFormatter;
+exports.asString = asString;
 const semver_1 = __importDefault(require("semver"));
+const logger_1 = __importDefault(require("./lib/logger"));
+const errors_json_1 = __importDefault(require("./shared/errors.json"));
 const helpers_1 = require("./shared/helpers");
-Object.defineProperty(exports, "has", { enumerable: true, get: function () { return helpers_1.maybeHas; } });
-Object.defineProperty(exports, "translate", { enumerable: true, get: function () { return helpers_1.translate; } });
 Object.defineProperty(exports, "currency", { enumerable: true, get: function () { return helpers_1.currency; } });
-Object.defineProperty(exports, "UNKNOWN_TRANSACTION_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_TRANSACTION_TYPE; } });
-Object.defineProperty(exports, "UNKNOWN_ACCOUNT_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_ACCOUNT_TYPE; } });
+Object.defineProperty(exports, "DEFERRED_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.DEFERRED_CARD_TYPE; } });
+Object.defineProperty(exports, "FETCH_STATUS_SUCCESS", { enumerable: true, get: function () { return helpers_1.FETCH_STATUS_SUCCESS; } });
 Object.defineProperty(exports, "formatDate", { enumerable: true, get: function () { return helpers_1.formatDate; } });
+Object.defineProperty(exports, "has", { enumerable: true, get: function () { return helpers_1.maybeHas; } });
+Object.defineProperty(exports, "INTERNAL_TRANSFER_TYPE", { enumerable: true, get: function () { return helpers_1.INTERNAL_TRANSFER_TYPE; } });
+Object.defineProperty(exports, "TRANSFER_TYPE", { enumerable: true, get: function () { return helpers_1.TRANSFER_TYPE; } });
 Object.defineProperty(exports, "MIN_WOOB_VERSION", { enumerable: true, get: function () { return helpers_1.MIN_WOOB_VERSION; } });
-Object.defineProperty(exports, "UNKNOWN_WOOB_VERSION", { enumerable: true, get: function () { return helpers_1.UNKNOWN_WOOB_VERSION; } });
+Object.defineProperty(exports, "NONE_CATEGORY_ID", { enumerable: true, get: function () { return helpers_1.NONE_CATEGORY_ID; } });
 Object.defineProperty(exports, "shouldIncludeInBalance", { enumerable: true, get: function () { return helpers_1.shouldIncludeInBalance; } });
 Object.defineProperty(exports, "shouldIncludeInOutstandingSum", { enumerable: true, get: function () { return helpers_1.shouldIncludeInOutstandingSum; } });
-Object.defineProperty(exports, "FETCH_STATUS_SUCCESS", { enumerable: true, get: function () { return helpers_1.FETCH_STATUS_SUCCESS; } });
 Object.defineProperty(exports, "TRANSACTION_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.TRANSACTION_CARD_TYPE; } });
-Object.defineProperty(exports, "DEFERRED_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.DEFERRED_CARD_TYPE; } });
-Object.defineProperty(exports, "INTERNAL_TRANSFER_TYPE", { enumerable: true, get: function () { return helpers_1.INTERNAL_TRANSFER_TYPE; } });
-Object.defineProperty(exports, "NONE_CATEGORY_ID", { enumerable: true, get: function () { return helpers_1.NONE_CATEGORY_ID; } });
-const errors_json_1 = __importDefault(require("./shared/errors.json"));
-const logger_1 = __importDefault(require("./lib/logger"));
+Object.defineProperty(exports, "translate", { enumerable: true, get: function () { return helpers_1.translate; } });
+Object.defineProperty(exports, "UNKNOWN_ACCOUNT_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_ACCOUNT_TYPE; } });
+Object.defineProperty(exports, "UNKNOWN_TRANSACTION_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_TRANSACTION_TYPE; } });
+Object.defineProperty(exports, "UNKNOWN_WOOB_VERSION", { enumerable: true, get: function () { return helpers_1.UNKNOWN_WOOB_VERSION; } });
 function makeLogger(prefix) {
     return new logger_1.default(prefix);
 }
@@ -200,4 +202,9 @@ function currencyFormatter(someCurrency) {
         currencyFormatterCache[someCurrency] = helpers_1.currency.makeFormat(someCurrency);
     }
     return currencyFormatterCache[someCurrency];
+}
+// Express types a route param as `string | string[]`; in practice a single value is always
+// provided, so coerce it to a plain string for parsing.
+function asString(value) {
+    return Array.isArray(value) ? value[0] : (value !== null && value !== void 0 ? value : '');
 }

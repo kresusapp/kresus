@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._ = exports.getBankVendors = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
-const account_types_1 = require("../lib/account-types");
 const helpers_1 = require("../helpers");
-const accounts_1 = __importDefault(require("../models/entities/accounts"));
+const account_types_1 = require("../lib/account-types");
 const translator_1 = require("../lib/translator");
+const accounts_1 = __importDefault(require("../models/entities/accounts"));
 exports.SOURCE_NAME = 'manual';
 const fetchAccounts = async (opts) => {
     // If there are existing accounts, return them.

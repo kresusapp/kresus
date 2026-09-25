@@ -13,8 +13,6 @@ exports.AccessesSubscriber = void 0;
 const typeorm_1 = require("typeorm");
 const accesses_1 = __importDefault(require("../entities/accesses"));
 const views_1 = __importDefault(require("../entities/views"));
-// eslint new-cap rule does not like decorators. See https://github.com/eslint/typescript-eslint-parser/issues/569
-// eslint-disable-next-line new-cap
 let AccessesSubscriber = class AccessesSubscriber {
     listenTo() {
         return accesses_1.default;

@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var AccessField_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
-const users_1 = __importDefault(require("./users"));
-const accesses_1 = __importDefault(require("./accesses"));
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
+const accesses_1 = __importDefault(require("./accesses"));
+const users_1 = __importDefault(require("./users"));
 let AccessField = AccessField_1 = class AccessField {
     static repo() {
         if (AccessField_1.REPO === null) {

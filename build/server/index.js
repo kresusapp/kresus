@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
 const log4js_1 = __importDefault(require("log4js"));
-const helpers_1 = require("./helpers");
 const routes_1 = __importDefault(require("./controllers/routes"));
+const helpers_1 = require("./helpers");
 const init_1 = __importDefault(require("./init"));
 const models_1 = require("./models");
 async function start() {
@@ -141,9 +141,9 @@ async function start() {
         }
     }
     const server = app.listen(process.kresus.port, process.kresus.host);
-    // Raise the timeout limit, since some banking modules can be quite
-    // long at fetching new transactions. Time is in milliseconds.
-    server.timeout = 5 * 60 * 1000;
+    // Raise the timeout limit, since some banking modules can be quite long at fetching new
+    // transactions. Time is in seconds, so convert it to milliseconds like Express expects it.
+    server.timeout = process.kresus.serverTimeout * 1000;
     await (0, init_1.default)();
 }
 module.exports = {

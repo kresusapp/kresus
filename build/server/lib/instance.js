@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigGhostSettings = void 0;
 exports.getAll = getAll;
-const woob_1 = require("../providers/woob");
 const helpers_1 = require("../helpers");
+const woob_1 = require("../providers/woob");
 const instance_1 = require("../shared/instance");
 async function getAll() {
     const values = {};

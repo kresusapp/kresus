@@ -5,20 +5,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddViewIdInBudget1737381056464 = void 0;
 const typeorm_1 = require("typeorm");
-const helpers_1 = require("../helpers");
-const helpers_2 = require("../../helpers");
+const helpers_1 = require("../../helpers");
 const settings_1 = require("../../shared/settings");
-const users_1 = __importDefault(require("../entities/users"));
-const settings_2 = __importDefault(require("../entities/settings"));
-const views_1 = __importDefault(require("../entities/views"));
 const accounts_1 = __importDefault(require("../entities/accounts"));
-const log = (0, helpers_2.makeLogger)('controllers/categories');
+const settings_2 = __importDefault(require("../entities/settings"));
+const users_1 = __importDefault(require("../entities/users"));
+const views_1 = __importDefault(require("../entities/views"));
+const helpers_2 = require("../helpers");
+const log = (0, helpers_1.makeLogger)('controllers/categories');
 const LEGACY_COLUMN_NAMES = ['userId', 'year', 'month', 'categoryId'];
 const COLUMN_NAMES = ['userId', 'viewId', 'year', 'month', 'categoryId'];
 class AddViewIdInBudget1737381056464 {
     static async guessDefaultAccount(q, userId) {
         const allAccounts = await q.manager.find(accounts_1.default, {
-            select: ['id', 'type'],
+            select: { id: true, type: true },
             where: {
                 userId,
             },
@@ -32,7 +32,7 @@ class AddViewIdInBudget1737381056464 {
     }
     async up(q) {
         const views = await q.manager.find(views_1.default, {
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
         await q.addColumn('budget', new typeorm_1.TableColumn({
             name: 'viewId',
@@ -59,12 +59,12 @@ class AddViewIdInBudget1737381056464 {
         // Add the unique constraint.
         await q.createUniqueConstraint('budget', new typeorm_1.TableUnique({ columnNames: COLUMN_NAMES }));
         // Add foreign key
-        await q.createForeignKey('budget', new typeorm_1.TableForeignKey((0, helpers_1.foreignKey)('budget_ref_view_id', 'viewId', 'view', 'id', {
+        await q.createForeignKey('budget', new typeorm_1.TableForeignKey((0, helpers_2.foreignKey)('budget_ref_view_id', 'viewId', 'view', 'id', {
             onDelete: 'CASCADE',
         })));
         // For each user, retrieve the current default account id.
         const users = await q.manager.find(users_1.default, {
-            select: ['id'],
+            select: { id: true },
         });
         const usersDefaultAccountIds = new Map();
         const defaultAccountSettings = await q.manager.find(settings_2.default, {

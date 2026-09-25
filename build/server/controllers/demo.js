@@ -6,13 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupDemoMode = setupDemoMode;
 exports.enable = enable;
 exports.disable = disable;
-const models_1 = require("../models");
 const helpers_1 = require("../helpers");
+const translator_1 = require("../lib/translator");
+const models_1 = require("../models");
 const default_categories_json_1 = __importDefault(require("../shared/default-categories.json"));
 const settings_1 = require("../shared/settings");
-const instance_1 = require("./instance");
 const accesses_1 = require("./accesses");
-const translator_1 = require("../lib/translator");
+const instance_1 = require("./instance");
 async function setupDemoMode(userId) {
     const i18n = await (0, translator_1.getTranslator)(userId);
     // Create default categories, unless they already existed.

@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Category_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const helpers_1 = require("../../helpers");
 const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
-const helpers_1 = require("../../helpers");
 let Category = Category_1 = class Category {
     constructor() {
         // Hexadecimal RGB format.
