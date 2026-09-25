@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
-import { bulkDelete } from '../helpers';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 import { Budget } from '..';
+import { bulkDelete } from '../helpers';
 
 // This cannot be run as a data migration, because data migrations are run after the import, and the
 // unique constraint might be present before the data has been imported, which would cause errors
@@ -9,7 +9,7 @@ import { Budget } from '..';
 export class RemoveDuplicateBudgets1608817776804 implements MigrationInterface {
     public async up(q: QueryRunner): Promise<void> {
         const allBudgets = await q.manager.find(Budget, {
-            select: ['id', 'userId', 'year', 'month', 'categoryId'],
+            select: { id: true, userId: true, year: true, month: true, categoryId: true },
         });
 
         const setOfUniqueBudgetKeys = new Set<string>();

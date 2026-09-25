@@ -1,10 +1,10 @@
-import React, {
+import {
+    type ChangeEvent,
+    forwardRef,
     useCallback,
+    useImperativeHandle,
     useReducer,
     useState,
-    ChangeEvent,
-    forwardRef,
-    useImperativeHandle,
 } from 'react';
 
 import { translate as $t } from '../../helpers';
@@ -38,13 +38,10 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
     const [value, setValue] = useState(props.value || '');
     const [valueObserver, dispatchValueChange] = useReducer((x: number) => x + 1, 0);
 
-    const onChange = useCallback(
-        (newValue: string) => {
-            setValue(newValue);
-            dispatchValueChange();
-        },
-        [setValue, dispatchValueChange]
-    );
+    const onChange = useCallback((newValue: string) => {
+        setValue(newValue);
+        dispatchValueChange();
+    }, []);
 
     const { onChange: propsOnChange } = props;
     useEffectUpdate(() => {
@@ -71,7 +68,7 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
                 setValue('');
             },
         }),
-        [setValue]
+        []
     );
 
     let { className = '' } = props;
@@ -89,7 +86,8 @@ const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props
                 type="button"
                 className="btn"
                 onClick={handleClear}
-                title={$t('client.search.clear')}>
+                title={$t('client.search.clear')}
+            >
                 <span className="screen-reader-text">X</span>
                 <i className="fa fa-times" aria-hidden="true" />
             </button>

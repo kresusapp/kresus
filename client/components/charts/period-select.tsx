@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import type * as React from 'react';
+import { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
 
 const PeriodSelect = (props: {
@@ -24,7 +25,8 @@ const PeriodSelect = (props: {
             className="form-element-block"
             defaultValue={props.defaultValue}
             onChange={onChange}
-            id={props.id}>
+            id={props.id}
+        >
             <option key="value" value="all">
                 {$t('client.charts.all_periods')}
             </option>

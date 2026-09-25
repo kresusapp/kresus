@@ -1,4 +1,4 @@
-import log4js, { Logger as LoggerType, Configuration } from 'log4js';
+import log4js, { type Configuration, type Logger as LoggerType } from 'log4js';
 
 const loggerConfig: Configuration = {
     appenders: {

@@ -1,15 +1,12 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router';
 
-import { notify, translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import { useRequiredParams } from '../../../hooks';
-
-import * as ViewsStore from '../../../store/views';
 import { useKresusState } from '../../../store';
-
-import URL from './urls';
-
+import * as ViewsStore from '../../../store/views';
 import NewViewForm from './new-view-form';
+import URL from './urls';
 
 export default () => {
     const { viewId: viewIdStr } = useRequiredParams<{ viewId: string }>();
@@ -19,7 +16,7 @@ export default () => {
     const navigate = useNavigate();
 
     const view = useKresusState(state => {
-        return ViewsStore.fromId(state.views, viewId);
+        return ViewsStore.byId(state.views, viewId);
     });
 
     const onSubmit = useCallback(() => {
@@ -28,7 +25,7 @@ export default () => {
     }, [navigate]);
 
     if (!view) {
-        return null;
+        return <Navigate to={URL.viewsList} />;
     }
 
     return (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 
-import { handleSyncError, handleFirstSyncError, genericErrorHandler } from './errors';
+import { genericErrorHandler, handleFirstSyncError, handleSyncError } from './errors';
 import { notify, translate } from './helpers';
 
 // Return a wrapped callback that calls onError with the caught error, when
@@ -61,7 +61,8 @@ export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
         if (!isFirstRender.current) {
             effect();
         }
-    }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
+        // biome-ignore lint/correctness/useExhaustiveDependencies: it works?
+    }, dependencies);
 
     useEffect(() => {
         isFirstRender.current = false;
@@ -76,7 +77,6 @@ export const useCompareWithPrev = (itemName: string, item: any) => {
     const prev = useRef<any>(null);
     useEffect(() => {
         if (prev.current !== item) {
-            /* eslint-disable-next-line no-console */
             console.log('new version of', itemName);
             prev.current = item;
         }

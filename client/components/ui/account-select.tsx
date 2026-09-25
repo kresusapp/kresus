@@ -1,9 +1,9 @@
-import React, { useCallback, useImperativeHandle, useRef } from 'react';
-
+import * as React from 'react';
+import { useCallback, useImperativeHandle, useRef } from 'react';
+import { translate as $t, displayLabel } from '../../helpers';
+import type { Account } from '../../models';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, translate as $t } from '../../helpers';
-import { Account } from '../../models';
 
 interface AccountSelectorProps {
     // A list of accounts
@@ -97,7 +97,8 @@ export const AccountSelector = React.forwardRef<{ value: number }, AccountSelect
                 id={props.id}
                 className="form-element-block"
                 defaultValue={props.initial}
-                onChange={onChange}>
+                onChange={onChange}
+            >
                 {options}
             </select>
         );
@@ -116,15 +117,13 @@ const AnyAccountSelector = React.forwardRef<{ value: number }, AnyAccountSelecto
                     ? [props.accessId]
                     : BanksStore.getAccessIds(state.banks);
 
-            const accountsIds = accessIds
-                .map(accessId => {
-                    return BanksStore.accountIdsByAccessId(state.banks, accessId);
-                })
-                .flat();
+            const accountsIds = accessIds.flatMap(accessId => {
+                return BanksStore.accountIdsByAccessId(state.banks, accessId);
+            });
 
             return accountsIds
                 .filter(accountId => {
-                    if (props.exclude && props.exclude.includes(accountId)) {
+                    if (props.exclude?.includes(accountId)) {
                         return false;
                     }
 

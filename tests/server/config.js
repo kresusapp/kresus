@@ -15,6 +15,7 @@ function checkHasConfigKeys(env) {
         'defaultUser',
         'port',
         'host',
+        'serverTimeout',
         'pythonExec',
         'urlPrefix',
         'salt',
@@ -43,7 +44,9 @@ function checkHasConfigKeys(env) {
         'dbLog',
     ];
 
-    configKeys.forEach(key => assert.ok(key in env));
+    configKeys.forEach(key => {
+        assert.ok(key in env);
+    });
 
     // Note: Checking the length as well so that test will fail if someone adds
     // new config options and does not update the tests.
@@ -53,6 +56,7 @@ function checkHasConfigKeys(env) {
 function checkCommonDefaultConfig(env) {
     assert.strictEqual(env.port, 9876);
     assert.strictEqual(env.host, '127.0.0.1');
+    assert.strictEqual(env.serverTimeout, 300);
     assert.strictEqual(env.pythonExec, 'python3');
     assert.ok(!env.salt);
     assert.strictEqual(env.forceDemoMode, false);

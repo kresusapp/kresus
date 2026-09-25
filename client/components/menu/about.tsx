@@ -1,13 +1,12 @@
-import React from 'react';
-
-import ExternalLink from '../ui/external-link';
+import { Fragment } from 'react';
+import { license, repository, version } from '../../../package.json';
 import { translate as $t } from '../../helpers';
-import { version, repository, license } from '../../../package.json';
+import ExternalLink from '../ui/external-link';
 
 import './about.css';
 
 const About = () => (
-    <React.Fragment>
+    <Fragment>
         <ExternalLink href="https://kresus.org">KRESUS</ExternalLink>&nbsp;
         {version}&nbsp;
         <ExternalLink href={`${repository.url}/blob/main/LICENSE`}>
@@ -15,7 +14,7 @@ const About = () => (
                 license,
             })}
         </ExternalLink>
-    </React.Fragment>
+    </Fragment>
 );
 
 About.displayName = 'About';

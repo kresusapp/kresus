@@ -32,7 +32,6 @@ const chartsPlaceholderPlugin = {
                 bottom: number;
                 width: number;
             };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data: any;
         },
         _args: never,
@@ -43,7 +42,7 @@ const chartsPlaceholderPlugin = {
             font: string;
         }
     ) => {
-        if (!chart.data || !chart.data.datasets || chart.data.datasets.length === 0) {
+        if (!chart.data?.datasets || chart.data.datasets.length === 0) {
             const { ctx, chartArea } = chart;
 
             ctx.save();

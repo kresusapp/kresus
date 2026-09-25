@@ -1,35 +1,30 @@
-import React, {
+import moment from 'moment';
+import {
+    type ChangeEvent,
+    type ReactElement,
     useCallback,
     useContext,
     useEffect,
     useMemo,
-    ChangeEvent,
-    ReactElement,
 } from 'react';
-import moment from 'moment';
-
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
-import * as BudgetsStore from '../../store/budgets';
-import * as UiStore from '../../store/ui';
-import * as SettingsStore from '../../store/settings';
-
+import { BUDGET_DISPLAY_NO_THRESHOLD, BUDGET_DISPLAY_PERCENT } from '../../../shared/settings';
 import {
-    assert,
     translate as $t,
-    localeComparator,
+    assert,
     endOfMonth,
+    localeComparator,
     NONE_CATEGORY_ID,
 } from '../../helpers';
-import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 import { useGenericError, useNotifyError } from '../../hooks';
-
-import BudgetListItem, { UncategorizedTransactionsItem } from './item';
-
-import { Switch, Popover, Form } from '../ui';
-import { DriverContext, isAccountDriver } from '../drivers';
-
 import type { Budget, Transaction } from '../../models';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BudgetsStore from '../../store/budgets';
+import * as CategoriesStore from '../../store/categories';
+import * as SettingsStore from '../../store/settings';
+import * as UiStore from '../../store/ui';
+import { DriverContext, isAccountDriver } from '../drivers';
+import { Form, Popover, Switch } from '../ui';
+import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 
 import './budgets.css';
 import DisplayIf from '../ui/display-if';
@@ -50,7 +45,9 @@ function PrefsPopover(props: BudgetsPopoverProps) {
     return (
         <Popover
             trigger={
-                <button className="btn btn-info">{$t('client.general.default_parameters')}</button>
+                <button type="button" className="btn btn-info">
+                    {$t('client.general.default_parameters')}
+                </button>
             }
             content={
                 <>
@@ -58,7 +55,8 @@ function PrefsPopover(props: BudgetsPopoverProps) {
                         inline={true}
                         label={$t('client.budget.show_empty_budgets')}
                         help={$t('client.budget.show_empty_budgets_desc')}
-                        id="show-without-threshold">
+                        id="show-without-threshold"
+                    >
                         <Switch
                             ariaLabel={$t('client.budget.show_empty_budgets')}
                             onChange={props.toggleWithoutThreshold}
@@ -69,7 +67,8 @@ function PrefsPopover(props: BudgetsPopoverProps) {
                     <Form.Input
                         inline={true}
                         label={$t('client.budget.display_in_percent')}
-                        id="display-in-percent">
+                        id="display-in-percent"
+                    >
                         <Switch
                             ariaLabel={$t('client.budget.display_in_percent')}
                             onChange={props.toggleDisplayPercent}
@@ -188,7 +187,7 @@ const BudgetsList = (): ReactElement => {
     );
     const { year, month } = useKresusState(state => BudgetsStore.getSelectedPeriod(state.budgets));
     const budgets: Budget[] | null = useKresusState(state =>
-        BudgetsStore.fromSelectedPeriod(state.budgets, viewId)
+        BudgetsStore.bySelectedPeriodAndView(state.budgets, viewId)
     );
 
     const categoriesNamesMap = useKresusState(state => {
@@ -202,9 +201,9 @@ const BudgetsList = (): ReactElement => {
     });
 
     const onChange = useCallback(
-        async (event: ChangeEvent<HTMLSelectElement>) => {
+        (event: ChangeEvent<HTMLSelectElement>) => {
             const period = event.currentTarget.value.split('-');
-            await setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
+            setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
         },
         [setPeriod]
     );
@@ -267,9 +266,9 @@ const BudgetsList = (): ReactElement => {
         const fromDate = new Date(year, month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
 
-        const dateFilter = (op: Transaction) => {
-            const opDate = op.budgetDate || op.date;
-            return opDate >= fromDate && opDate <= toDate;
+        const dateFilter = (tr: Transaction) => {
+            const trDate = tr.budgetDate || tr.date;
+            return trDate >= fromDate && trDate <= toDate;
         };
         const transactions = accountTransactions.filter(dateFilter);
 
@@ -375,7 +374,8 @@ const BudgetsList = (): ReactElement => {
                     <select
                         id="budget-period"
                         onChange={onChange}
-                        defaultValue={`${year}-${month}`}>
+                        defaultValue={`${year}-${month}`}
+                    >
                         {months}
                     </select>
                 </label>
@@ -399,9 +399,11 @@ const BudgetsList = (): ReactElement => {
                         <th className="category-amount">{$t('client.budget.amount')}</th>
                         <th className="category-threshold">
                             {$t('client.budget.threshold')}
+                            {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required for tooltipped */}
                             <span
                                 className="tooltipped tooltipped-s"
-                                aria-label={$t('client.budget.threshold_help')}>
+                                aria-label={$t('client.budget.threshold_help')}
+                            >
                                 <span className="fa fa-question-circle clickable" />
                             </span>
                         </th>

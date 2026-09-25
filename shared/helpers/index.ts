@@ -1,9 +1,6 @@
-/* eslint no-console: 0 */
-/* eslint @typescript-eslint/no-var-requires: 0 */
-
 import { memoize } from 'micro-memoize';
 
-import { SharedTransaction } from '../types';
+import type { SharedTransaction } from '../types';
 
 // Locales
 // It is necessary to load the locale files statically,
@@ -13,18 +10,15 @@ import { SharedTransaction } from '../types';
 // - for moment, in client/main.tsx
 // - for flatpickr, in client/components/ui/flatpicker.ts
 
-import FR_LOCALE from '../locales/fr.json';
+import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+import moment from 'moment';
+import Polyglot from 'node-polyglot';
+import TRANSACTION_TYPES from '../../shared/transaction-types.json';
+import ACCOUNT_TYPES from '../account-types.json';
 import EN_LOCALE from '../locales/en.json';
 import ES_LOCALE from '../locales/es.json';
+import FR_LOCALE from '../locales/fr.json';
 import TR_LOCALE from '../locales/tr.json';
-
-import Polyglot from 'node-polyglot';
-import { format as currencyFormatter, findCurrency } from 'currency-formatter';
-
-import moment from 'moment';
-
-import ACCOUNT_TYPES from '../account-types.json';
-import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
 import { endOfMonth } from './dates';
 
 export function maybeHas(obj: object, prop: string): boolean {
@@ -201,7 +195,7 @@ export const currency = {
         }
         const { decimalDigits } = found;
         return (amount: number) => {
-            const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+            const am = Math.abs(amount) < 10 ** (-decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
     }),
@@ -223,41 +217,40 @@ export function validatePassword(password: string) {
 }
 
 export const DEFERRED_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.deferred_card')
+    TRANSACTION_TYPES.find(type => type.name === 'type.deferred_card')
 );
 export const TRANSACTION_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.card')
+    TRANSACTION_TYPES.find(type => type.name === 'type.card')
 );
+export const TRANSFER_TYPE = unwrap(TRANSACTION_TYPES.find(type => type.name === 'type.transfer'));
 export const INTERNAL_TRANSFER_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.internal_transfer')
+    TRANSACTION_TYPES.find(type => type.name === 'type.internal_transfer')
 );
-const SUMMARY_CARD_TYPE = unwrap(
-    TRANSACTION_TYPESES.find(type => type.name === 'type.card_summary')
-);
+const SUMMARY_CARD_TYPE = unwrap(TRANSACTION_TYPES.find(type => type.name === 'type.card_summary'));
 const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (
-    op: SharedTransaction,
+    tr: SharedTransaction,
     balanceDate: Date,
     accountType: string
 ) => {
-    const opDebitMoment = moment(op.debitDate || op.date);
+    const trDebitMoment = moment(tr.debitDate || tr.date);
     return (
-        opDebitMoment.isSameOrBefore(balanceDate, 'day') &&
-        (op.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
+        trDebitMoment.isSameOrBefore(balanceDate, 'day') &&
+        (tr.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
     );
 };
 
 export const shouldIncludeInOutstandingSum = (
-    op: SharedTransaction,
+    tr: SharedTransaction,
     limitToCurrentMonth: boolean
 ) => {
-    const opDebitMoment = moment(op.debitDate || op.date);
+    const trDebitMoment = moment(tr.debitDate || tr.date);
     const today = new Date();
     return (
-        opDebitMoment.isAfter(today, 'day') &&
-        (!limitToCurrentMonth || !opDebitMoment.isAfter(endOfMonth(today), 'day')) &&
-        op.type !== SUMMARY_CARD_TYPE.name
+        trDebitMoment.isAfter(today, 'day') &&
+        (!limitToCurrentMonth || !trDebitMoment.isAfter(endOfMonth(today), 'day')) &&
+        tr.type !== SUMMARY_CARD_TYPE.name
     );
 };
 

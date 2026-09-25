@@ -1,29 +1,25 @@
 import regexEscape from 'regex-escape';
-
-import { assert, makeLogger } from '../helpers';
-import { ConfigGhostSettings, InstancePropertiesType } from '../lib/instance';
-import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-
-import {
+import type { BankVendor, DuplicatesPairs } from '../../shared/types';
+import { assert, makeLogger } from '../helpers';
+import { ConfigGhostSettings, type InstancePropertiesType } from '../lib/instance';
+import type {
     Account,
     Alert,
-    Category,
-    Transaction,
-    Budget,
-    RecurringTransaction,
     AppliedRecurringTransaction,
-    User,
-    View,
+    Budget,
+    Category,
+    RecurringTransaction,
     Setting,
+    Transaction,
     TransactionRule,
     TransactionRuleAction,
     TransactionRuleCondition,
+    User,
+    View,
 } from '../models';
-
+import DefaultSettings from '../shared/default-settings';
 import { conditionTypesList } from './rules';
-
-import type { BankVendor, Duplicates } from '../../shared/types';
 
 const log = makeLogger('controllers/helpers');
 
@@ -58,8 +54,11 @@ export type AllData = {
     views: View[];
     // For non exports only.
     user?: User;
-    duplicates?: Duplicates;
     bankVendors: BankVendor[];
+
+    duplicates?: {
+        ignored: DuplicatesPairs;
+    };
 };
 
 // Sync function
@@ -157,8 +156,6 @@ export function cleanData(world: AllData) {
 
         o.accountId = accountMap[o.accountId];
 
-        // Strip away id.
-        delete (o as any).id;
         delete (o as any).userId;
     }
 

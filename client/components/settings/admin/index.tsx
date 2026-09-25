@@ -1,16 +1,15 @@
-import React from 'react';
-
-import { getCurrentUser } from '../../../store/global';
+import { Fragment } from 'react';
 import { translate as $t } from '../../../helpers';
+import { getCurrentUser } from '../../../store/global';
 import DisplayIf from '../../ui/display-if';
-import Woob from './woob';
 import Logs from './logs';
+import Woob from './woob';
 
 export default () => {
     const currentUser = getCurrentUser();
 
     return (
-        <React.Fragment>
+        <Fragment>
             <div>
                 <h2>{$t('client.settings.admin_connectors')}</h2>
                 <Woob />
@@ -22,6 +21,6 @@ export default () => {
                     <Logs />
                 </div>
             </DisplayIf>
-        </React.Fragment>
+        </Fragment>
     );
 };

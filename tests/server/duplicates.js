@@ -1,12 +1,12 @@
 import assert from 'node:assert';
-
-import { getDuplicatePairScore, findRedundantPairs } from '../../server/lib/duplicates-manager';
 import {
-    UNKNOWN_TRANSACTION_TYPE,
     INTERNAL_TRANSFER_TYPE,
-    TRANSACTION_CARD_TYPE,
+    TRANSFER_TYPE,
     NONE_CATEGORY_ID,
+    TRANSACTION_CARD_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../server/helpers';
+import { findRedundantPairs, getDuplicatePairScore } from '../../server/lib/duplicates-manager';
 
 describe('getDuplicatePairScore', () => {
     const BaseTransaction = {
@@ -70,16 +70,31 @@ describe('getDuplicatePairScore', () => {
     it('should return 0 for transactions with everything similar but different type and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
         const BaseWithType = {
             ...BaseTransaction,
-            type: TRANSACTION_CARD_TYPE,
+            type: TRANSACTION_CARD_TYPE.name,
         };
 
         const comparison = {
             ...BaseTransaction,
-            type: INTERNAL_TRANSFER_TYPE,
+            type: INTERNAL_TRANSFER_TYPE.name,
         };
 
         const score = getDuplicatePairScore(comparison, BaseWithType, 1, true);
         assert.strictEqual(score, 0);
+    });
+
+    it('should return 1 for transactions that are the same, but of types internal transfer and transfer, and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
+        const BaseWithType = {
+            ...BaseTransaction,
+            type: TRANSFER_TYPE.name,
+        };
+
+        const comparison = {
+            ...BaseTransaction,
+            type: INTERNAL_TRANSFER_TYPE.name,
+        };
+
+        const score = getDuplicatePairScore(comparison, BaseWithType, 1, true);
+        assert.strictEqual(score, 1);
     });
 
     it('should return 1 for transactions with everything similar and one unkwown type and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
@@ -90,6 +105,10 @@ describe('getDuplicatePairScore', () => {
 
         const score = getDuplicatePairScore(comparison, BaseTransaction, 1, true);
         assert.strictEqual(score, 1);
+
+        // Also true when passing the transcations in the other direction.
+        const score2 = getDuplicatePairScore(BaseTransaction, comparison, 1, true);
+        assert.strictEqual(score2, 1);
     });
 
     it('should return 0 for transactions with everything similar but different custom label and ignoreDuplicatesWithDifferentCustomFields flag enabled', () => {
@@ -192,5 +211,24 @@ describe('findRedundantPairs', () => {
         // 2026-06-01.
         assert.deepStrictEqual(pairs[1].sort(), [3, 4]);
         assert.deepStrictEqual(pairs[2].sort(), [1, 2]);
+    });
+
+    it('should discard the pairs to ignore, whatever the order of the two ids', () => {
+        // Same date, distinct import dates: the three transactions are duplicates of each other.
+        const transactions = [
+            { ...BaseTransaction, id: 1 },
+            { ...BaseTransaction, id: 2, importDate: new Date('2026-06-01') },
+            { ...BaseTransaction, id: 3, importDate: new Date('2026-06-05') },
+        ];
+
+        assert.strictEqual(findRedundantPairs(transactions, 24, false).length, 3);
+
+        const pairs = findRedundantPairs(transactions, 24, false, [
+            [1, 2],
+            [3, 1],
+        ]);
+
+        assert.strictEqual(pairs.length, 1);
+        assert.deepStrictEqual(pairs[0].sort(), [2, 3]);
     });
 });

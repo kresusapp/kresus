@@ -1,18 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Route, Routes, Navigate, useNavigate } from 'react-router';
-
-import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
-import CategorySelect from '../reports/category-select';
-import URL from './urls';
+import { cloneElement, useCallback, useEffect, useState } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
+import type { Category, Rule } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
-import { Category, Rule } from '../../models';
+import CategorySelect from '../reports/category-select';
+import { AmountInput, BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput } from '../ui';
+import URL from './urls';
 
 import './rules.css';
-import { LoadingMessage } from '../overlay';
+import { LoadingMessage } from '../overlay/loading';
 
 const SharedForm = (props: {
     formTitle: string;
@@ -86,7 +85,7 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     let predefinedAmount = null;
     if (rawPredefinedAmount) {
         predefinedAmount = parseFloat(rawPredefinedAmount);
-        if (isNaN(predefinedAmount)) {
+        if (Number.isNaN(predefinedAmount)) {
             predefinedAmount = null;
         }
     }
@@ -168,8 +167,9 @@ const EditForm = () => {
     }
 
     if (rule === null) {
-        // Still loading the rules...
-        return null;
+        // Could be that the rule doesn't exist, or isn't loaded yet; in any case, redirect to the
+        // list of rules.
+        return <Navigate to={URL.list} />;
     }
 
     assert(rule.conditions.length > 0, 'must have at least a single condition');
@@ -275,9 +275,9 @@ const RuleText = (props: { categoryToName: Map<number, string>; rule: Rule }) =>
     return (
         <p>
             {$t('client.rules.If')}&nbsp;
-            {conditionsText.map(el => React.cloneElement(el, { ...el.props, key: i++ }))}
+            {conditionsText.map(el => cloneElement(el, { ...el.props, key: i++ }))}
             {$t('client.rules.then')}&nbsp;
-            {actionsText.map(el => React.cloneElement(el, { ...el.props, key: i++ }))}
+            {actionsText.map(el => cloneElement(el, { ...el.props, key: i++ }))}
         </p>
     );
 };
@@ -338,33 +338,40 @@ const ListItem = (props: {
                 />
 
                 <button
+                    type="button"
                     className="btn primary"
                     aria-label={$t('client.rules.move_up')}
                     title={$t('client.rules.move_up')}
                     onClick={onSwapPrev}
-                    disabled={index === 0}>
+                    disabled={index === 0}
+                >
                     <span className="fa fa-arrow-up" />
                 </button>
 
                 <button
+                    type="button"
                     className="btn primary"
                     aria-label={$t('client.rules.move_down')}
                     title={$t('client.rules.move_down')}
                     onClick={onSwapNext}
-                    disabled={index === numRules - 1}>
+                    disabled={index === numRules - 1}
+                >
                     <span className="fa fa-arrow-down" />
                 </button>
 
                 <Popconfirm
                     trigger={
                         <button
+                            type="button"
                             className="btn danger"
                             aria-label={$t('client.rules.delete')}
-                            title={$t('client.rules.delete')}>
+                            title={$t('client.rules.delete')}
+                        >
                             <span className="fa fa-trash" />
                         </button>
                     }
-                    onConfirm={onDelete}>
+                    onConfirm={onDelete}
+                >
                     <p>{$t('client.rules.delete_confirm')}</p>
                 </Popconfirm>
             </div>
@@ -410,7 +417,7 @@ export default () => {
             await dispatch(RulesStore.loadAll()).unwrap();
             setFirstLoad(false);
         }
-    }, [dispatch, firstLoad, setFirstLoad]);
+    }, [dispatch, firstLoad]);
 
     useEffect(() => {
         void loadRules();
@@ -424,7 +431,7 @@ export default () => {
     );
 
     if (firstLoad) {
-        return <LoadingMessage message={$t('client.rules.loading_rules')} />;
+        return <LoadingMessage message={$t('client.rules.loading_rules')} inline={true} />;
     }
 
     return (

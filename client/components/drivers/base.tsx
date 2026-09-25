@@ -1,12 +1,9 @@
 import { memoize } from 'micro-memoize';
-
-import * as BankStore from '../../store/banks';
-import * as ViewStore from '../../store/views';
-
 import { assert, currency } from '../../helpers';
-
+import { type Account, MANUAL_BANK_ID, type Transaction, type View } from '../../models';
 import type { GlobalState } from '../../store';
-import { MANUAL_BANK_ID, type Account, type Transaction, type View } from '../../models';
+import * as BankStore from '../../store/banks';
+import type * as ViewStore from '../../store/views';
 
 export enum DriverType {
     None = 'none',

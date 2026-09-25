@@ -256,6 +256,54 @@ describe('Ensure account ids are properly remapped after re-indexing', () => {
     });
 });
 
+describe('Ensure transaction ids are kept when exporting data', () => {
+    // Duplicates pairs need transactions ids so the export must keep them.
+    const world = {
+        accesses: [
+            {
+                id: 0,
+                vendorId: 'manual',
+            },
+        ],
+        accounts: [
+            {
+                id: 10,
+                name: 'Account 1',
+                balance: 100,
+                accessId: 0,
+                vendorId: 'manual',
+                currency: 'EUR',
+            },
+        ],
+        transactions: [
+            {
+                id: 42,
+                accountId: 10,
+                date: '2020-01-01',
+                label: 'Transaction 1',
+                amount: -10,
+                currency: 'EUR',
+            },
+            {
+                id: 1337,
+                accountId: 10,
+                date: '2020-01-02',
+                label: 'Transaction 2',
+                amount: -20,
+                currency: 'EUR',
+            },
+        ],
+    };
+
+    it('Should keep the transaction ids as-is', () => {
+        const betterWorld = cleanData(JSON.parse(JSON.stringify(world)));
+        assert.deepStrictEqual(
+            betterWorld.transactions.map(t => t.id),
+            [42, 1337]
+        );
+    });
+});
+
 describe('Ensure recurring transaction ids are properly remapped after re-indexing', () => {
     const world = {
         accesses: [

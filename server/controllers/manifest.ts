@@ -1,14 +1,11 @@
-import express from 'express';
-
-import { IdentifiedRequest, RoutesDescriptor } from './routes';
+import type express from 'express';
 import { Setting } from '../models';
+import type { IdentifiedRequest, RoutesDescriptor } from './routes';
 
 export async function getManifest(req: IdentifiedRequest<any>, res: express.Response) {
     const iconsDirectory = 'favicon/';
     const scope = process.kresus.urlPrefix;
     const { id: userId } = req.user;
-    // Eslint does not like camel_case keys in the JSON
-    /* eslint-disable */
     res.status(200)
         .contentType('application/manifest+json')
         .json({
@@ -59,7 +56,6 @@ export async function getManifest(req: IdentifiedRequest<any>, res: express.Resp
                 },
             ],
         });
-    /* eslint-enable */
 }
 
 const routes: RoutesDescriptor = {

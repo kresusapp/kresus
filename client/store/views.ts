@@ -1,13 +1,11 @@
-import { createSlice, createAsyncThunk, isAnyOf } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 
-import { assertDefined, assert } from '../helpers';
+import { assert, assertDefined } from '../helpers';
 
-import { Account, View } from '../models';
-
-import { createAccess, deleteAccess, deleteAccount, runAccountsSync } from './banks';
-
-import { mergeInArray, removeInArrayById } from './helpers';
+import type { Account, View } from '../models';
 import * as backend from './backend';
+import { createAccess, deleteAccess, deleteAccount, runAccountsSync } from './banks';
+import { mergeInArray, removeInArrayById } from './helpers';
 
 export interface ViewState {
     items: View[];
@@ -179,19 +177,23 @@ export function all(state: ViewState): View[] {
     return state.items;
 }
 
+export function allCurrencyViews(state: ViewState): View[] {
+    return state.items.filter(v => v.type === 'currency');
+}
+
 export function allUserViews(state: ViewState): View[] {
     return state.items.filter(v => v.createdByUser);
 }
 
-export function fromId(state: ViewState, id: number): View | null {
+export function byId(state: ViewState, id: number): View | null {
     return state.items.find(view => view.id === id) || null;
 }
 
-export function fromCurrencyCode(state: ViewState, currencyCode: string): View | null {
+export function byCurrencyCode(state: ViewState, currencyCode: string): View | null {
     return state.items.find(view => view.currency === currencyCode) || null;
 }
 
-export function fromAccountId(state: ViewState, accountId: number) {
+export function byAccountId(state: ViewState, accountId: number): View | null {
     return (
         state.items.find(
             view =>

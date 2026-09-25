@@ -1,11 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-import { assert, assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
-
-import * as backend from './backend';
-
 import Errors from '../errors';
+import { assert, assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
+import * as backend from './backend';
 
 import { resetStoreReducer } from './helpers';
 

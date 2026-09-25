@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import type * as React from 'react';
+import { useCallback } from 'react';
 import { Navigate, NavLink, useLocation, useNavigate } from 'react-router';
 
 export interface TabDescriptor {
@@ -59,7 +60,8 @@ const TabsContainer = (props: {
                 <select
                     className="form-element-block"
                     value={props.selectedTab}
-                    onChange={onChange}>
+                    onChange={onChange}
+                >
                     {tabsOptions}
                 </select>
             </div>

@@ -21,6 +21,18 @@ or our [Matrix chat](https://matrix.to/#/#kresus:delire.party).
 yarn install
 ```
 
+- (Optional, but recommended) Install the git hooks shipped in
+  `support/githooks`, so that formatting automatically happens upon commit:
+
+```bash
+yarn dev:githooks
+```
+
+Note that it points git at `support/githooks` instead of the default
+`.git/hooks` directory, so any hook you had put in there will no longer run.
+Alternatively, you can pick individual hooks from `support/githooks/` that you
+like.
+
 - Copy `config.example.ini` to `config.ini` and set values for your local
   development environment. See "setting up a database for development" below.
 - Start development mode: `yarn dev`. This will:

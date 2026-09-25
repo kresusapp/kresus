@@ -1,13 +1,11 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { translate as $t } from '../../helpers';
-
-import { Popform } from '../ui';
 import { useGenericError } from '../../hooks';
-import { Transaction } from '../../models';
-
+import type { Transaction } from '../../models';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
+import { Popform } from '../ui';
 
 interface MergeAllProps {
     pairs: Transaction[][];
@@ -40,12 +38,13 @@ const MergeAll = ({ pairs }: MergeAllProps) => {
         <Popform
             small={false}
             trigger={
-                <button className="btn">
+                <button type="button" className="btn">
                     <span>{$t('client.general.merge_all')}</span>
                 </button>
             }
             confirmClass="warning"
-            onConfirm={handleSubmit}>
+            onConfirm={handleSubmit}
+        >
             <h4>{$t('client.transactions.warning_merge_all')}</h4>
             <p>
                 <strong>{$t('client.transactions.warning_irrevocable')}</strong>

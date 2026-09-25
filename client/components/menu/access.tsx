@@ -1,15 +1,12 @@
-import React, { useCallback, useState } from 'react';
-
+import { useCallback, useState } from 'react';
+import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
-import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
-import { fetchStatusToLabel } from '../../errors';
-
-import AccountItem from './account';
-
 import { AccessTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
+import AccountItem from './account';
+import { fetchStatusToLabel } from '../../errors';
 
 interface AccessItemProps {
     // The access identifier.
@@ -36,7 +33,7 @@ const AccessItem = (props: AccessItemProps) => {
         }
 
         return access.accountIds.some(id => {
-            const accountView = ViewStore.fromAccountId(state.views, id);
+            const accountView = ViewStore.byAccountId(state.views, id);
             return (
                 accountView && !accountView.createdByUser && accountView.id === props.currentViewId
             );
@@ -61,7 +58,7 @@ const AccessItem = (props: AccessItemProps) => {
         return null;
     }
 
-    let accountsElements;
+    let accountsElements: React.JSX.Element[] | undefined;
     if (showAccounts) {
         accountsElements = access.accountIds.map(id => <AccountItem key={id} accountId={id} />);
     }
@@ -70,7 +67,7 @@ const AccessItem = (props: AccessItemProps) => {
 
     const { fetchStatus, isBankVendorDeprecated, enabled } = access;
 
-    let statusLabel;
+    let statusLabel: string | undefined;
     if (fetchStatus !== FETCH_STATUS_SUCCESS) {
         statusLabel = fetchStatusToLabel(fetchStatus);
     }
@@ -85,16 +82,18 @@ const AccessItem = (props: AccessItemProps) => {
                             !isBankVendorDeprecated &&
                             enabled &&
                             fetchStatus !== FETCH_STATUS_SUCCESS
-                        }>
+                        }
+                    >
+                        {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                         <span
-                            className="tooltipped tooltipped-se tooltipped-multiline
-                                           tooltipped-small"
-                            aria-label={statusLabel}>
+                            className="tooltipped tooltipped-se tooltipped-multiline tooltipped-small"
+                            aria-label={statusLabel}
+                        >
                             <span className="fa fa-exclamation-triangle status fail" />
                         </span>
                     </DisplayIf>
 
-                    <button className="btn transparent" onClick={handleClick}>
+                    <button type="button" className="btn transparent" onClick={handleClick}>
                         <span className="name">{displayLabel(access)}</span>
                         <span className={`fa fa-${stateLabel}-square`} />
                     </button>

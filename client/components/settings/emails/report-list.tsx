@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { translate as $t } from '../../../helpers';
 import { useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';

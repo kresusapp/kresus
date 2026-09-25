@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableColumn } from 'typeorm';
 
 // Add the "excludeFromPoll" column to accesses.
 export class addExcludeFromSync1731961575709 implements MigrationInterface {

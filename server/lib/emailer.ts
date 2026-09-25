@@ -1,12 +1,11 @@
 import nodemailer from 'nodemailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import SendMail from 'nodemailer/lib/sendmail-transport';
-import Mail from 'nodemailer/lib/mailer';
+import type Mail from 'nodemailer/lib/mailer';
+import type SendMail from 'nodemailer/lib/sendmail-transport';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
-import { EMAIL_RECIPIENT } from '../shared/settings';
-
+import { translate as $t, assert, isEmailEnabled, makeLogger } from '../helpers';
 import { Setting } from '../models';
+import { EMAIL_RECIPIENT } from '../shared/settings';
 import { getTranslator } from './translator';
 
 const log = makeLogger('emailer');

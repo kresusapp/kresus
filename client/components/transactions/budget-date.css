@@ -2,7 +2,9 @@
     width: 33.33%;
 }
 
-div.buttons-group.budget-date {
+.buttons-group.budget-date {
+    padding: 0;
+    border: 0;
     max-width: 23em !important;
 }
 

@@ -2,35 +2,33 @@
  * HELPERS
  */
 
-/* eslint no-console: 0 */
-
 import moment from 'moment';
 import { toast } from 'react-toastify';
 
 export {
-    maybeHas,
     currency,
-    UNKNOWN_ACCOUNT_TYPE,
-    UNKNOWN_TRANSACTION_TYPE,
+    FETCH_STATUS_SUCCESS,
     INTERNAL_TRANSFER_TYPE,
     MIN_WOOB_VERSION,
-    UNKNOWN_WOOB_VERSION,
-    validatePassword,
+    maybeHas,
+    NONE_CATEGORY_ID,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS,
-    NONE_CATEGORY_ID,
+    UNKNOWN_ACCOUNT_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
+    UNKNOWN_WOOB_VERSION,
+    validatePassword,
 } from '../../shared/helpers';
 
-export { startOfDay, endOfDay, startOfMonth, endOfMonth } from '../../shared/helpers/dates';
+export { endOfDay, endOfMonth, startOfDay, startOfMonth } from '../../shared/helpers/dates';
 
 import {
-    setupTranslator as sharedSetupTranslator,
     getDefaultEnglishTranslator,
     maybeHas,
-    translate as sharedTranslate,
-    localeComparator as sharedLocaleComparator,
     formatDate as sharedFormatDate,
+    localeComparator as sharedLocaleComparator,
+    setupTranslator as sharedSetupTranslator,
+    translate as sharedTranslate,
 } from '../../shared/helpers';
 
 export const AlertTypes = ['balance', 'transaction'];
@@ -57,7 +55,6 @@ export function assert(x: boolean, wat: string): asserts x {
         }
         if (ASSERTS) {
             window.alert(shortText);
-            /* eslint-disable-next-line no-console */
             console.error(text);
         }
     }
@@ -167,7 +164,7 @@ export function areWeFunYet() {
 }
 
 export function computeIsSmallScreen(width: number | null = null) {
-    let actualWidth;
+    let actualWidth: number;
     if (width === null) {
         // Mocha does not know window, tests fail without testing window != undefined.
         actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;

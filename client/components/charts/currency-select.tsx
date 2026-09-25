@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import type * as React from 'react';
+import { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
 
 export const ALL_CURRENCIES = '';

@@ -1,14 +1,12 @@
-import React, { useCallback } from 'react';
-
-import { useKresusDispatch, useKresusState, getUnusedCategories } from '../../store';
+import { useCallback } from 'react';
+import { translate as $t, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { getUnusedCategories, useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
-import { notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
-import { Popconfirm, ButtonLink } from '../ui';
+import { ButtonLink, Popconfirm } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
-
-import URL from './urls';
 import { CategoryListItem, SwipeableCategoryListItem } from './item';
+import URL from './urls';
 
 import './categories.css';
 
@@ -22,7 +20,7 @@ export default () => {
         try {
             await dispatch(CategoriesStore.createDefault()).unwrap();
             notify.success($t('client.category.add_default_success'));
-        } catch (e) {
+        } catch (_e) {
             notify.error($t('client.category.add_default_failure'));
         }
     }, [dispatch]);
@@ -43,12 +41,11 @@ export default () => {
     const items = categories.map(cat => <Item category={cat} key={cat.id} />);
 
     const numUnused = unusedCategories.length;
-    let deleteUnusedButtonLabel;
+    let deleteUnusedButtonLabel: string;
     if (numUnused === 0) {
         deleteUnusedButtonLabel = $t('client.category.no_unused_categories');
     } else {
         deleteUnusedButtonLabel = $t('client.category.delete_unused', {
-            // eslint-disable-next-line camelcase
             smart_count: numUnused,
         });
     }
@@ -63,7 +60,12 @@ export default () => {
                     icon="plus-circle"
                 />
 
-                <button className="btn" aria-label="add default" onClick={createDefaultCategories}>
+                <button
+                    type="button"
+                    className="btn"
+                    aria-label="add default"
+                    onClick={createDefaultCategories}
+                >
                     <span className={'fa fa-plus-circle'} />
                     <span>{$t('client.category.add_default')}</span>
                 </button>
@@ -72,13 +74,16 @@ export default () => {
                     onConfirm={deleteUnusedCategories}
                     trigger={
                         <button
+                            type="button"
                             className="btn danger"
                             aria-label="delete unused"
-                            disabled={numUnused === 0}>
+                            disabled={numUnused === 0}
+                        >
                             <span className={'fa fa-trash'} />
                             <span>{deleteUnusedButtonLabel}</span>
                         </button>
-                    }>
+                    }
+                >
                     <p>{$t('client.deleteunusedcategories.explanation')}</p>
                     <ul>
                         {unusedCategories.map(c => (

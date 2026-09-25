@@ -3,15 +3,17 @@ input.color-picker {
     padding: 0;
 }
 
-.color-picker {
-    height: 34px;
+/* Chrome adds a padding inside the color input. Remove it to match Firefox cleaner UI */
+input.color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
 }
 
-.color-picker .rc-color-picker-trigger {
-    width: 100%;
-    height: 100%;
+input.color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
 }
 
-.color-picker .rc-color-picker-panel-inner {
-    background-color: #FFF;
+input.color-picker::-moz-color-swatch {
+    border: none;
+    border-radius: 3px;
 }

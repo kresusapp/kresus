@@ -1,18 +1,16 @@
-import React, { useCallback, useContext } from 'react';
+import type * as React from 'react';
+import { useCallback, useContext } from 'react';
 import { Link } from 'react-router';
-import URL from '../../urls';
-
+import { translate as $t, assertNotNull, NONE_CATEGORY_ID, round2 } from '../../helpers';
+import { useGenericError } from '../../hooks';
+import type { Budget } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
+import * as BudgetStore from '../../store/budgets';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
-import * as BudgetStore from '../../store/budgets';
-
-import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
-
+import URL from '../../urls';
+import { type Driver, DriverContext } from '../drivers';
 import AmountInput from '../ui/amount-input';
-import { Budget } from '../../models';
-import { Driver, DriverContext } from '../drivers';
-import { useGenericError } from '../../hooks';
 
 function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {
@@ -50,7 +48,7 @@ function getBars(threshold: number | null, amount: number, warningThresholdInPct
         }
     } else if (threshold > 0) {
         // Positive threshold, it's an income: invert all the meanings.
-        let state;
+        let state: string;
         if (amountPct < warningThresholdInPct) {
             state = 'danger';
         } else if (amountPct < 100) {
@@ -145,7 +143,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     const driver = useContext(DriverContext);
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const category = useKresusState(state =>
-        CategoriesStore.fromId(state.categories, props.budget.categoryId)
+        CategoriesStore.byId(state.categories, props.budget.categoryId)
     );
 
     const dispatch = useKresusDispatch();
@@ -173,6 +171,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
     const { showTransactions } = props;
     const handleViewTransactions = useCallback(() => {
+        assertNotNull(category);
         showTransactions(category.id);
         dispatch(UiStore.toggleSearchDetails(true));
     }, [showTransactions, dispatch, category]);
@@ -245,6 +244,10 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
         return <ProgressBar />;
     };
+
+    if (category === null) {
+        return;
+    }
 
     return (
         <tr>

@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
-import { translate as $t, UNKNOWN_WOOB_VERSION, notify } from '../../../helpers';
+import { useCallback, useEffect, useState } from 'react';
+import { WOOB_VERSION } from '../../../../shared/instance';
 import {
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
@@ -8,17 +7,15 @@ import {
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
 } from '../../../../shared/settings';
-import { WOOB_VERSION } from '../../../../shared/instance';
-
+import Errors, { genericErrorHandler } from '../../../errors';
+import { translate as $t, notify, UNKNOWN_WOOB_VERSION } from '../../../helpers';
+import { useGenericError, useNotifyError } from '../../../hooks';
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
-import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-
-import { Form, Switch, LoadingButton } from '../../ui';
+import * as SettingsStore from '../../../store/settings';
+import { Form, LoadingButton, Switch } from '../../ui';
 import ExternalLink from '../../ui/external-link';
-import Errors, { genericErrorHandler } from '../../../errors';
-import { useGenericError, useNotifyError } from '../../../hooks';
 
 const UpdateButton = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +32,7 @@ const UpdateButton = () => {
         setIsLoading(true);
         await safeOnClick();
         setIsLoading(false);
-    }, [setIsLoading, safeOnClick]);
+    }, [safeOnClick]);
 
     return (
         <LoadingButton
@@ -132,7 +129,7 @@ const WoobParameters = () => {
         };
     }, [dispatch, fetchWoobVersion]);
 
-    let woobVersion;
+    let woobVersion: React.JSX.Element | string;
     if (version !== UNKNOWN_WOOB_VERSION) {
         woobVersion = version;
     } else {
@@ -154,7 +151,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-merge-accounts"
                 label={$t('client.settings.woob_auto_merge_accounts')}
-                help={$t('client.settings.woob_auto_merge_accounts_desc')}>
+                help={$t('client.settings.woob_auto_merge_accounts_desc')}
+            >
                 <Switch
                     onChange={setAutoMergeAccounts}
                     ariaLabel={$t('client.settings.woob_auto_merge_accounts')}
@@ -166,7 +164,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-update-woob"
                 label={$t('client.settings.woob_auto_update')}
-                help={$t('client.settings.woob_auto_update_desc')}>
+                help={$t('client.settings.woob_auto_update_desc')}
+            >
                 <Switch
                     onChange={setAutoUpdate}
                     ariaLabel={$t('client.settings.woob_auto_update')}
@@ -178,7 +177,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="auto-retry"
                 label={$t('client.settings.provider_auto_retry')}
-                help={$t('client.settings.provider_auto_retry_desc')}>
+                help={$t('client.settings.provider_auto_retry_desc')}
+            >
                 <Switch
                     onChange={setAutoRetry}
                     ariaLabel={$t('client.settings.provider_auto_retry')}
@@ -190,7 +190,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="update-woob"
                 label={$t('client.settings.update_woob')}
-                help={$t('client.settings.update_woob_help')}>
+                help={$t('client.settings.update_woob_help')}
+            >
                 <UpdateButton />
             </Form.Input>
 
@@ -198,7 +199,8 @@ const WoobParameters = () => {
                 inline={true}
                 id="enable-woob-debug"
                 label={$t('client.settings.woob_enable_debug')}
-                help={$t('client.settings.woob_enable_debug_desc')}>
+                help={$t('client.settings.woob_enable_debug_desc')}
+            >
                 <Switch
                     onChange={setDebug}
                     ariaLabel={$t('client.settings.woob_enable_debug')}
@@ -217,7 +219,8 @@ const WoobParameters = () => {
                             {$t('client.settings.read_more')}
                         </ExternalLink>
                     </>
-                }>
+                }
+            >
                 <Switch
                     onChange={onChangeFetchThreshold}
                     ariaLabel={$t('client.settings.woob_fetch_threshold')}

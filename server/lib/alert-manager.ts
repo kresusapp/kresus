@@ -1,10 +1,9 @@
-import { makeLogger, translate as $t, displayLabel } from '../helpers';
+import { translate as $t, displayLabel, makeLogger } from '../helpers';
 
-import { Account, Access, Alert, Transaction } from '../models';
-
-import getNotifier from './notifications';
+import { type Access, Account, Alert, type Transaction } from '../models';
+import type { I18NObject } from '../shared/helpers';
 import getEmailer from './emailer';
-import { I18NObject } from '../shared/helpers';
+import getNotifier from './notifications';
 import { getTranslator } from './translator';
 
 const log = makeLogger('alert-manager');

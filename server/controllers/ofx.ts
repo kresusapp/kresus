@@ -1,7 +1,7 @@
 import { parse as parseOfx } from 'ofx-js';
 
 import { assert, KError, makeLogger } from '../helpers';
-import { Account, Transaction } from '../models';
+import type { Account, Transaction } from '../models';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 
 const log = makeLogger('controllers/ofx');
@@ -43,7 +43,6 @@ export function parseOfxDate(date: any): Date | null {
     }
 
     // See OFX_Common.xsd in https://www.ofx.net/downloads/OFX%202.2.0%20schema.zip
-    // eslint-disable-next-line max-len
     const parsedDate =
         /(\d{4})(\d{2})(\d{2})(?:(\d{2})(\d{2})(\d{2}))?(?:\.(\d{3}))?(?:\[([-+]?\d{1,2}):\w{3}\])?/.exec(
             date
@@ -161,7 +160,6 @@ export async function ofxToKresus(ofx: string) {
 
             transactions = transactions.concat(
                 accountTransactions
-                    // eslint-disable-next-line no-loop-func
                     .map((transaction: any) => {
                         const debitDate = parseOfxDate(transaction.DTPOSTED);
                         let realizationDate = parseOfxDate(transaction.DTUSER);

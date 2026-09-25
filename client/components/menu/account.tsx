@@ -1,16 +1,14 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { NavLink, useLocation } from 'react-router';
-
+import { translate as $t, currency, displayLabel } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
-import { displayLabel, translate as $t, currency } from '../../helpers';
 import URL from '../../urls';
+import { DriverContext, DriverType } from '../drivers';
 import { DriverAccount } from '../drivers/account';
-
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
-import { DriverType, DriverContext } from '../drivers';
 
 interface AccountItemProps {
     // The account unique id.
@@ -33,7 +31,7 @@ const AccountItem = (props: AccountItemProps) => {
             return null;
         }
 
-        return ViewStore.fromAccountId(state.views, account.id);
+        return ViewStore.byAccountId(state.views, account.id);
     });
 
     const { pathname } = useLocation();
@@ -52,8 +50,8 @@ const AccountItem = (props: AccountItemProps) => {
     const newPathname =
         currentDriver.type !== DriverType.None
             ? pathname
-                .replace(currentDriver.type, DriverType.Account)
-                .replace(currentDriver.value!, view.id.toString())
+                  .replace(currentDriver.type, DriverType.Account)
+                  .replace(currentDriver.value!, view.id.toString())
             : URL.reports.url(new DriverAccount(view.id));
 
     return (

@@ -1,21 +1,18 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
     JoinColumn,
     ManyToOne,
     OneToMany,
-    Repository,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import AccessField from './access-fields';
-
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../providers';
+import { getRepository } from '..';
 import { areFieldsComplete } from '../helpers';
+import AccessField from './access-fields';
+import User from './users';
 
 @Entity('access')
 export default class Access {
@@ -54,9 +51,13 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(() => AccessField, accessField => accessField.access, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => AccessField,
+        accessField => accessField.access,
+        {
+            cascade: ['insert'],
+        }
+    )
     fields!: AccessField[];
 
     // A JSON-serialized session's content.
@@ -136,14 +137,14 @@ export default class Access {
     static async find(userId: number, accessId: number): Promise<Access | null> {
         return await Access.repo().findOne({
             where: { userId, id: accessId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 
     static async all(userId: number): Promise<Access[]> {
         return await Access.repo().find({
             where: { userId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 
@@ -180,7 +181,7 @@ export default class Access {
     ): Promise<Access[]> {
         return await Access.repo().find({
             where: { userId, vendorId },
-            relations: ['fields'],
+            relations: { fields: true },
         });
     }
 

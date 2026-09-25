@@ -1,17 +1,16 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { assert, assertDefined, translate as $t } from '../../helpers';
-import { AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
-import {
-    CustomFieldMap,
-    areCustomFieldsValid,
-    customFieldsContainCredentials,
-    bankCustomFieldsMapBuilder,
-} from './new-access-form';
-
-import CustomBankField from './custom-bank-field';
-import DisplayIf from '../ui/display-if';
+import { translate as $t, assert, assertDefined } from '../../helpers';
+import type { AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
 import { Form, Switch } from '../ui';
+import DisplayIf from '../ui/display-if';
+import CustomBankField from './custom-bank-field';
+import {
+    areCustomFieldsValid,
+    bankCustomFieldsMapBuilder,
+    type CustomFieldMap,
+    customFieldsContainCredentials,
+} from './new-access-form';
 
 export interface CredentialsFormProps {
     bankDesc: Bank;
@@ -85,9 +84,9 @@ const CredentialsForm = (props: CredentialsFormProps) => {
     return (
         <Form center={true} onSubmit={handleSubmit} className="sub-form">
             <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
-                {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
+                {bankDesc.customFields.map((field: CustomFieldDescriptor) => (
                     <CustomBankField
-                        key={index}
+                        key={field.name}
                         onChange={onChangeCustomField}
                         field={field}
                         value={customFields[field.name]}
@@ -100,7 +99,8 @@ const CredentialsForm = (props: CredentialsFormProps) => {
                     inline={true}
                     id="store-credentials"
                     label={$t('client.accountwizard.store_credentials')}
-                    help={$t('client.accountwizard.store_credentials_desc')}>
+                    help={$t('client.accountwizard.store_credentials_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.store_credentials')}
                         checked={storeCredentials}

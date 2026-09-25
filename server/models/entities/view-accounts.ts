@@ -1,11 +1,11 @@
 import {
-    DeepPartial,
-    Entity,
-    Repository,
-    PrimaryGeneratedColumn,
     Column,
-    ManyToOne,
+    type DeepPartial,
+    Entity,
     JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
 
 import { getRepository } from '..';

@@ -32,6 +32,7 @@ export function useSwipeDetection<T extends HTMLElement>(
         event.stopPropagation();
     }, []);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: explicitly required before; TODO?
     const onTouchMove = useCallback(
         (event: TouchEvent) => {
             if (!ref.current) {
@@ -55,14 +56,13 @@ export function useSwipeDetection<T extends HTMLElement>(
                 onSwipeChange(ref.current, deltaX);
             }
 
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             started = true;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             deltaX = newDeltaX;
         },
-        [ref, onSwipeChange]
+        [initialXPosition, initialYPosition, onSwipeStart, onSwipeChange]
     );
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: explicitly required before; TODO?
     const onTouchEnd = useCallback(
         (event: TouchEvent) => {
             if (!ref.current) {
@@ -107,8 +107,7 @@ export function useSwipeDetection<T extends HTMLElement>(
                 event.target.removeEventListener('contextmenu', onContextMenu);
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ref, onTouchMove, onContextMenu, onSwipeEnd]
+        [onTouchMove, onContextMenu, onSwipeEnd]
     );
 
     const onTouchStart = useCallback(
@@ -126,13 +125,9 @@ export function useSwipeDetection<T extends HTMLElement>(
                 return;
             }
 
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             started = false;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             initialXPosition = event.touches[0].clientX;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             initialYPosition = event.touches[0].clientY;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             deltaX = 0;
 
             // Do not fire the swipe start event yet, it will be done on the first
@@ -145,7 +140,7 @@ export function useSwipeDetection<T extends HTMLElement>(
                 event.target.addEventListener('contextmenu', onContextMenu);
             }
         },
-        [ref, onSwipeStart, onTouchMove, onTouchEnd, onContextMenu]
+        [excludeSelector, onTouchMove, onTouchEnd, onContextMenu]
     );
 
     // On mount.
@@ -166,7 +161,7 @@ export function useSwipeDetection<T extends HTMLElement>(
             elem.removeEventListener('touchcancel', onTouchEnd);
             elem.removeEventListener('contextmenu', onContextMenu);
         };
-    }, [ref, onTouchStart, onTouchMove, onTouchEnd, onContextMenu]);
+    }, [onTouchStart, onTouchMove, onTouchEnd, onContextMenu]);
 
     return ref;
 }
@@ -188,7 +183,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
     let swipeDelta = 0;
 
     const onSwipeStart = (element: HTMLElement) => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = 0;
 
         element.classList.add('swiped');
@@ -196,7 +190,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
 
     const onSwipeChange = (element: HTMLElement, delta: number) => {
         // The swipeable action is 100px wide so we set a maximum range of -100/100.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = Math.min(SwipeableActionWidth, Math.max(-SwipeableActionWidth, delta));
 
         // Whether the swipe will be effective or discarded because not meaningful enough.
@@ -230,7 +223,6 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
             }
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         swipeDelta = 0;
     };
 

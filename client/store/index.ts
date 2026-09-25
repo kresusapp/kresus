@@ -1,28 +1,30 @@
 import {
-    createSelector,
     configureStore,
-    createListenerMiddleware,
     createAction,
+    createListenerMiddleware,
+    createSelector,
     isAnyOf,
 } from '@reduxjs/toolkit';
-import logger from 'redux-logger';
 import { useDispatch, useSelector } from 'react-redux';
+import type { AnyAction } from 'redux';
+import logger from 'redux-logger';
 
 import * as BankStore from './banks';
 import * as BudgetStore from './budgets';
 import * as CategoryStore from './categories';
 import * as DuplicatesStore from './duplicates';
+import * as GlobalStore from './global';
 import * as InstanceStore from './instance';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
 import * as UiStore from './ui';
 import * as ViewStore from './views';
-import * as GlobalStore from './global';
 
 // Reset the stores' states following an instance import or the enablement of the demo mode.
 // Any store that is subject to reset after these actions should be added to the list below or
 // implement a reducer for these actions directly.
-// This is meant for "stores" created as redux-toolkit slices. For legacy reducers see augmentReducer.
+// Note: since duplicates are lazy-loaded (not part of the global state), they are not reset on
+// import: they will be fetched on reset in the duplicatesMiddleware.
 const storesToReset = [
     CategoryStore,
     BudgetStore,
@@ -32,7 +34,6 @@ const storesToReset = [
     RulesStore,
     InstanceStore,
     ViewStore,
-    DuplicatesStore,
 ];
 
 export const resetGlobalState = createAction<any>('global/reset');
@@ -44,7 +45,7 @@ resetStateMiddleware.startListening({
         GlobalStore.importInstance.fulfilled,
         GlobalStore.enableDemo.fulfilled
     ),
-    effect: async (action, { dispatch }) => {
+    effect: async (action: AnyAction, { dispatch }) => {
         const newGlobalState = action.payload as any;
         storesToReset.forEach(store => {
             if (newGlobalState[store.name]) {
@@ -56,14 +57,19 @@ resetStateMiddleware.startListening({
 
 // Duplicates are affected by transaction creation/deletion/update, as well as settings update, as
 // well as transactions sync, so we listen to these actions to update the duplicates list.
+// Also, since they are lazy-loaded, a reset/import/demo enablement triggers a new fetch.
 const duplicatesMiddleware = createListenerMiddleware();
 duplicatesMiddleware.startListening({
     matcher: isAnyOf(
+        resetGlobalState,
+        GlobalStore.importInstance.fulfilled,
+        GlobalStore.enableDemo.fulfilled,
         BankStore.createTransaction.fulfilled,
         BankStore.setTransactionCategory.fulfilled,
         BankStore.setTransactionType.fulfilled,
         BankStore.setTransactionCustomLabel.fulfilled,
         BankStore.setTransactionDate.fulfilled,
+        BankStore.setTransactionAmount.fulfilled,
         BankStore.runAccountsSync.fulfilled,
         BankStore.createAccess.fulfilled,
         BankStore.deleteAccess.fulfilled,
@@ -71,7 +77,7 @@ duplicatesMiddleware.startListening({
         BankStore.updateAndFetchAccess.fulfilled,
         SettingsStore.setPair.fulfilled
     ),
-    effect: async (action, { dispatch }) => {
+    effect: async (action: AnyAction, { dispatch }) => {
         // Check if the setting that was modified is related to duplicates.
         if (action.type === SettingsStore.setPair.fulfilled.toString()) {
             if (
@@ -118,12 +124,8 @@ export const reduxStore = configureStore({
 export type GlobalState = ReturnType<typeof reduxStore.getState>;
 
 // A pre-typed useSelector that embeds the app's global state.
-//
-// The line below is necessary for eslint and prettier to behave.
-// eslint-disable-next-line space-before-function-paren
-export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
-    return useSelector<GlobalState, T>(func);
-};
+export const useKresusState = <T>(func: (state: GlobalState) => T): T =>
+    useSelector<GlobalState, T>(func);
 
 export const useKresusDispatch = () => useDispatch<typeof reduxStore.dispatch>();
 

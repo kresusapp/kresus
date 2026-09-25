@@ -1,9 +1,8 @@
-import express from 'express';
+import type express from 'express';
+import { asString, asyncErr, KError } from '../helpers';
 import { Budget, Category } from '../models';
-
-import { KError, asyncErr } from '../helpers';
 import { checkBudget } from '../shared/validators';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 async function createBudget(
     userId: number,
@@ -36,17 +35,17 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
         const { id: userId } = req.user;
         const { viewId: viewIdStr, year: yearStr, month: monthStr } = req.params;
 
-        const viewId = Number.parseInt(viewIdStr, 10);
+        const viewId = Number.parseInt(asString(viewIdStr), 10);
         if (Number.isNaN(viewId)) {
             throw new KError('Invalid viewId parameter', 400);
         }
 
-        const year = Number.parseInt(yearStr, 10);
+        const year = Number.parseInt(asString(yearStr), 10);
         if (Number.isNaN(year)) {
             throw new KError('Invalid year parameter', 400);
         }
 
-        const month = Number.parseInt(monthStr, 10);
+        const month = Number.parseInt(asString(monthStr), 10);
         if (Number.isNaN(month) || month < 0 || month > 11) {
             throw new KError('Invalid month parameter', 400);
         }
@@ -106,10 +105,10 @@ export async function update(req: PreloadedRequest<Budget>, res: express.Respons
         const params = req.body;
         const { viewId: viewIdStr, year: yearStr, month: monthStr, budgetCatId } = req.params;
 
-        const viewId = Number.parseInt(viewIdStr, 10);
-        const year = Number.parseInt(yearStr, 10);
-        const month = Number.parseInt(monthStr, 10);
-        const categoryId = Number.parseInt(budgetCatId, 10);
+        const viewId = Number.parseInt(asString(viewIdStr), 10);
+        const year = Number.parseInt(asString(yearStr), 10);
+        const month = Number.parseInt(asString(monthStr), 10);
+        const categoryId = Number.parseInt(asString(budgetCatId), 10);
 
         const error = checkBudget({
             viewId,

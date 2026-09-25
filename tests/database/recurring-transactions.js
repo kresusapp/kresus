@@ -1,12 +1,11 @@
 import assert from 'node:assert';
-
+import { importData } from '../../server/controllers/all';
 import {
     Access,
     Account,
-    RecurringTransaction,
     AppliedRecurringTransaction,
+    RecurringTransaction,
 } from '../../server/models';
-import { importData } from '../../server/controllers/all';
 
 const world = {
     accesses: [

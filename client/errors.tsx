@@ -1,5 +1,3 @@
-/* eslint no-console: 0 */
-
 import errors from '../shared/errors.json';
 import { translate as $t, notify } from './helpers';
 
@@ -62,7 +60,7 @@ export function genericErrorHandler(err: any) {
 - stringified: ${JSON.stringify(kerr)}
 `);
 
-    let msg;
+    let msg: string;
     if (kerr.shortMessage) {
         msg = kerr.shortMessage;
     } else {

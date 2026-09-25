@@ -1,15 +1,22 @@
-import React, { useCallback, useState } from 'react';
-
+import { useCallback, useMemo, useState } from 'react';
+import { translate as $t, assert, displayLabel, noValueFoundMessage } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
+import type { View } from '../../../models';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import * as ViewsStore from '../../../store/views';
-import { useKresusDispatch, useKresusState } from '../../../store';
-import { assert, translate as $t, noValueFoundMessage, displayLabel } from '../../../helpers';
-
 import { BackLink, Form } from '../../ui';
+import DisplayIf from '../../ui/display-if';
 import MultipleSelect from '../../ui/multiple-select';
 import TextInput from '../../ui/text-input';
-import { useGenericError } from '../../../hooks';
-import { View } from '../../../models';
+
+// An account option in the select, augmented with the account's currency so the list can be
+// narrowed to a single currency.
+type AccountOption = {
+    label: string;
+    value: number;
+    currency: string;
+};
 
 const NewViewForm = (props: {
     backUrl: string;
@@ -26,7 +33,7 @@ const NewViewForm = (props: {
     const [accountsIds, setAccountsIds] = useState<number[]>(props.view ? props.view.accounts : []);
 
     const accountsOptions = useKresusState(state => {
-        const ret = [];
+        const ret: AccountOption[] = [];
 
         const accessIds = BanksStore.getAccessIds(state.banks);
         for (const accessId of accessIds) {
@@ -35,20 +42,32 @@ const NewViewForm = (props: {
             for (const accountId of accountIds) {
                 const account = BanksStore.accountById(state.banks, accountId);
                 ret.push({
-                    label: `${displayLabel(access)} / ${displayLabel(account)}`,
+                    label: `${displayLabel(access)} / ${displayLabel(account)} (${account.currency})`,
                     value: account.id,
+                    currency: account.currency,
                 });
             }
         }
         return ret;
     });
 
-    const handleAccountsListChange = useCallback(
-        (newValue: (string | number)[]) => {
-            setAccountsIds(newValue as number[]);
-        },
-        [setAccountsIds]
-    );
+    // The currencies of the accounts currently selected.
+    const selectedCurrencies = useMemo(() => {
+        const selected = new Set(accountsIds);
+        const currencies = new Set<string>();
+        for (const option of accountsOptions) {
+            if (selected.has(option.value)) {
+                currencies.add(option.currency);
+            }
+        }
+        return currencies;
+    }, [accountsOptions, accountsIds]);
+
+    const hasMixedCurrencies = selectedCurrencies.size > 1;
+
+    const handleAccountsListChange = useCallback((newValue: (string | number)[]) => {
+        setAccountsIds(newValue as number[]);
+    }, []);
 
     const isFormValid = useCallback(() => {
         if (!label) {
@@ -59,8 +78,12 @@ const NewViewForm = (props: {
             return false;
         }
 
+        if (hasMixedCurrencies) {
+            return false;
+        }
+
         return true;
-    }, [label, accountsIds]);
+    }, [label, accountsIds, hasMixedCurrencies]);
 
     const handleSubmit = useGenericError(
         useCallback(async () => {
@@ -104,11 +127,22 @@ const NewViewForm = (props: {
             <Form.Input
                 id="custom-label-text"
                 label={$t('client.settings.views.label')}
-                optional={false}>
+                optional={false}
+            >
                 <TextInput onChange={setLabel} initialValue={label || ''} required={true} />
             </Form.Input>
 
-            <Form.Input id="view-combobox" label={$t('client.settings.views.accounts')}>
+            <DisplayIf condition={hasMixedCurrencies}>
+                <p className="alerts warning">
+                    {$t('client.settings.views.mixed_currencies_error')}
+                </p>
+            </DisplayIf>
+
+            <Form.Input
+                id="view-combobox"
+                label={$t('client.settings.views.accounts')}
+                help={$t('client.settings.views.same_currency_help')}
+            >
                 <MultipleSelect
                     className="form-element-block"
                     noOptionsMessage={noValueFoundMessage}

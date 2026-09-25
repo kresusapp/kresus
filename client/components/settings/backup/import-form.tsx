@@ -1,20 +1,18 @@
-import React, { useCallback, useReducer, useState } from 'react';
-
+import { createRef, useCallback, useReducer, useRef, useState } from 'react';
+import { CAN_ENCRYPT } from '../../../../shared/instance';
+import { genericErrorHandler, get as getErrorCode } from '../../../errors';
+import { translate as $t, assert, notify } from '../../../helpers';
+import { useEffectUpdate } from '../../../hooks';
 // Global variables
 import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-import * as InstanceStore from '../../../store/instance';
 import * as GlobalStore from '../../../store/global';
-import { get as getErrorCode, genericErrorHandler } from '../../../errors';
-import { translate as $t, notify, assert } from '../../../helpers';
-
+import * as InstanceStore from '../../../store/instance';
 import DisplayIf from '../../ui/display-if';
-import PasswordInput from '../../ui/password-input';
+import FileInput, { type FileInputRef } from '../../ui/file-input';
 import Form from '../../ui/form';
-import FileInput, { FileInputRef } from '../../ui/file-input';
-import Select, { ComboboxProps } from '../../ui/fuzzy-or-native-select';
-import { CAN_ENCRYPT } from '../../../../shared/instance';
-import { useEffectUpdate } from '../../../hooks';
+import Select, { type ComboboxProps } from '../../ui/fuzzy-or-native-select';
+import PasswordInput from '../../ui/password-input';
 
 const handleError = (error: any) => {
     switch (error.errCode) {
@@ -54,8 +52,8 @@ const ImportForm = (props: {
 
     const [password, setPassword] = useState<string | null>(null);
 
-    const refFileInput = React.useRef<FileInputRef>(null);
-    const refPassword = React.createRef<HTMLInputElement>();
+    const refFileInput = useRef<FileInputRef>(null);
+    const refPassword = createRef<HTMLInputElement>();
     const [observeFormReset, dispatchFormReset] = useReducer((x: number) => x + 1, 0);
     const [observeShowPassword, dispatchShowPassword] = useReducer((x: number) => x + 1, 0);
 
@@ -67,7 +65,7 @@ const ImportForm = (props: {
         });
         setPassword(null);
         dispatchFormReset();
-    }, [dispatchFormReset, setPassword, setDoc]);
+    }, []);
 
     const handleAccessChange = useCallback(
         (accessId: string | null) => {
@@ -77,7 +75,7 @@ const ImportForm = (props: {
                 accessId: accessId && accessId !== 'new' ? parseInt(accessId, 10) || null : null,
             });
         },
-        [doc, setDoc]
+        [doc]
     );
 
     const handleContentChange = useCallback(
@@ -103,11 +101,11 @@ const ImportForm = (props: {
             setPassword(null);
             dispatchShowPassword();
         },
-        [props.type, doc.accessId, setDoc, setPassword, dispatchShowPassword, resetForm]
+        [props.type, doc.accessId, resetForm]
     );
 
     useEffectUpdate(() => {
-        if (doc.jsonContent && doc.jsonContent.encrypted && refPassword.current) {
+        if (doc.jsonContent?.encrypted && refPassword.current) {
             refPassword.current.focus();
         }
     }, [observeShowPassword, doc]);
@@ -233,9 +231,9 @@ const ImportForm = (props: {
                 </DisplayIf>
 
                 <p className="data-and-format">
-                    <label>{$t('client.general.select_file')}</label>
+                    <label htmlFor="file-input">{$t('client.general.select_file')}</label>
 
-                    <FileInput ref={refFileInput} onChange={handleContentChange} />
+                    <FileInput id="file-input" ref={refFileInput} onChange={handleContentChange} />
                 </p>
 
                 <DisplayIf condition={hasEncryptedContent}>
@@ -263,10 +261,12 @@ const ImportForm = (props: {
 
             <Form.Toolbar>
                 <button
+                    type="button"
                     className="btn primary"
                     tabIndex={0}
                     disabled={disableSubmit}
-                    onClick={handleSubmit}>
+                    onClick={handleSubmit}
+                >
                     {$t('client.settings.go_import_instance')}
                 </button>
             </Form.Toolbar>

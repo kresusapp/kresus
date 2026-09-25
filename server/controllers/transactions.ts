@@ -1,9 +1,8 @@
-import express from 'express';
-import { IdentifiedRequest, PreloadedRequest } from './routes';
-
-import { Account, Category, Transaction } from '../models';
+import type express from 'express';
+import { asyncErr, KError, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
-import { KError, asyncErr, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
+import { Account, Category, Transaction } from '../models';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 async function preload(
     varName: string,
@@ -57,12 +56,13 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined' &&
             typeof attr.budgetDate === 'undefined' &&
-            (typeof attr.date === 'undefined' || !req.preloaded.transaction.createdByUser)
+            (typeof attr.date === 'undefined' || !req.preloaded.transaction.createdByUser) &&
+            (typeof attr.amount === 'undefined' || !req.preloaded.transaction.createdByUser)
         ) {
             throw new KError('Missing parameter', 400);
         }
 
-        const opUpdate: Partial<Transaction> = {};
+        const transactionUpdate: Partial<Transaction> = {};
         if (typeof attr.categoryId !== 'undefined') {
             if (attr.categoryId !== null) {
                 const found = await Category.find(userId, attr.categoryId);
@@ -70,47 +70,66 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
                     throw new KError('Category not found', 404);
                 }
             }
-            opUpdate.categoryId = attr.categoryId;
+            transactionUpdate.categoryId = attr.categoryId;
         }
 
         if (typeof attr.type !== 'undefined') {
             if (isKnownTransactionTypeName(attr.type)) {
-                opUpdate.type = attr.type;
+                transactionUpdate.type = attr.type;
             } else {
-                opUpdate.type = UNKNOWN_TRANSACTION_TYPE;
+                transactionUpdate.type = UNKNOWN_TRANSACTION_TYPE;
             }
         }
 
-        if (typeof opUpdate.type !== 'undefined') {
-            opUpdate.isUserDefinedType = true;
+        if (typeof transactionUpdate.type !== 'undefined') {
+            transactionUpdate.isUserDefinedType = true;
         }
 
         if (typeof attr.customLabel !== 'undefined') {
             if (attr.customLabel === '') {
-                opUpdate.customLabel = null;
+                transactionUpdate.customLabel = null;
             } else {
-                opUpdate.customLabel = attr.customLabel;
+                transactionUpdate.customLabel = attr.customLabel;
             }
         }
 
         if (typeof attr.budgetDate !== 'undefined') {
             if (attr.budgetDate === null) {
-                opUpdate.budgetDate = null;
+                transactionUpdate.budgetDate = null;
             } else {
-                opUpdate.budgetDate = new Date(attr.budgetDate);
+                transactionUpdate.budgetDate = new Date(attr.budgetDate);
             }
         }
 
         if (typeof attr.date !== 'undefined') {
-            opUpdate.date = new Date(attr.date);
+            transactionUpdate.date = new Date(attr.date);
 
             if (typeof attr.debitDate !== 'undefined') {
-                opUpdate.debitDate = new Date(attr.debitDate);
+                transactionUpdate.debitDate = new Date(attr.debitDate);
             }
         }
 
-        await Transaction.update(userId, req.preloaded.transaction.id, opUpdate);
-        res.status(200).end();
+        if (typeof attr.amount === 'number') {
+            transactionUpdate.amount = attr.amount;
+        }
+
+        const updatedTransaction = await Transaction.update(
+            userId,
+            req.preloaded.transaction.id,
+            transactionUpdate
+        );
+
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await Account.find(userId, updatedTransaction.accountId);
+        if (!account) {
+            throw new KError('bank account not found', 404);
+        }
+
+        res.status(201).json({
+            transaction: updatedTransaction,
+            accountBalance: account.balance,
+            accountId: updatedTransaction.accountId,
+        });
     } catch (err) {
         asyncErr(res, err, 'when updating attributes of transaction');
     }
@@ -123,6 +142,14 @@ export async function merge(req: PreloadedRequest<Transaction>, res: express.Res
         // @transaction is the one to keep, @otherTransaction is the one to delete.
         const otherTr = req.preloaded.otherTransaction;
         let tr = req.preloaded.transaction;
+
+        // Check that both transactions belong to the same account.
+        if (tr.accountId !== otherTr.accountId) {
+            throw new KError(
+                'transactions merge is only possible for transactions of a same account',
+                400
+            );
+        }
 
         // Transfer various fields upon deletion
         const newFields = tr.mergeWith(otherTr);
@@ -164,6 +191,8 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
 
         // We fill potentially missing fields.
         transaction.rawLabel = transaction.rawLabel || transaction.label;
+        transaction.customLabel =
+            transaction.customLabel || transaction.label || transaction.rawLabel;
         transaction.importDate = transaction.importDate || new Date();
         transaction.debitDate = transaction.debitDate || transaction.date;
         transaction.createdByUser = true;
@@ -195,19 +224,19 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
 export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const op = req.preloaded.transaction;
+        const tr = req.preloaded.transaction;
 
-        await Transaction.destroy(userId, op.id);
+        await Transaction.destroy(userId, tr.id);
 
         // Send back the transaction as well as the (possibly) updated account balance.
-        const account = await Account.find(userId, op.accountId);
+        const account = await Account.find(userId, tr.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
 
         res.status(200).json({
             accountBalance: account.balance,
-            accountId: op.accountId,
+            accountId: tr.accountId,
         });
     } catch (err) {
         asyncErr(res, err, 'when deleting transaction');

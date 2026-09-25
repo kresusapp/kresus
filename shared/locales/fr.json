@@ -14,7 +14,8 @@
         "user-action": {
             "title": "On y est presque !",
             "help": "Cette connexion bancaire nécessite une validation supplémentaire ou une information supplémentaire envoyée par SMS ou via une application mobile. Rentrez toutes les informations nécessaires ou validez la connexion, puis cliquez sur continuer.",
-            "code": "Code"
+            "code": "Code",
+            "after-validation": "Après la validation, l'opération continuera automatiquement."
         },
 
         "account-select": {
@@ -321,7 +322,8 @@
             "deletion_error": "Erreur lors de la suppression de l'opération : %{error}.",
             "budget_help": "Sélectionnez le mois pour lequel l'opération doit être budgetisée. Cela affectera les graphiques et les budgets.",
             "date_update_success": "La date de l'opération a bien été modifiée.",
-            "date_update_success_budget_date_sync": "Veuillez noter que la date de budget a automatiquement été ajustée pour rester synchronisée avec la nouvelle date."
+            "date_update_success_budget_date_sync": "Veuillez noter que la date de budget a automatiquement été ajustée pour rester synchronisée avec la nouvelle date.",
+            "amount_update_success": "Le montant de l'opération a bien été modifié."
         },
         "budget": {
             "amount": "Montant réel",
@@ -551,6 +553,7 @@
             },
             "views": {
                 "title": "Vues personnalisées",
+                "overall": "Vues globales par devise",
                 "none": "Vous n'avez aucune vue personnalisée.",
                 "manage": "Gérer les vues",
                 "back_to_views_list": "Retourner à la liste des vues",
@@ -558,6 +561,8 @@
                 "edit": "Éditer une vue",
                 "label": "Libellé de la vue",
                 "accounts": "Liste de comptes",
+                "same_currency_help": "Tous les comptes d'une vue doivent avoir la même devise.",
+                "mixed_currencies_error": "Cette vue mélange des comptes de devises différentes, ce qui n'est pas autorisé.",
                 "creation_success": "Vue créée avec succès !",
                 "creation_error": "Erreur lors de la création de la vue : %{err}",
                 "creation_form_title": "Créer une nouvelle vue",
@@ -568,6 +573,7 @@
             }
         },
         "similarity": {
+            "loading_duplicates": "Chargement des doublons...",
             "nothing_found": "Aucune paire d'opérations similaires n'a été trouvée.",
             "help": "Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
             "date": "Date",
@@ -588,7 +594,13 @@
             "lax_level_desc": "Lorsque cette option est activée, l'algorithme de détection automatique des doublons sera plus permissif. En particulier il réutilisera le seuil utilisateur temporel au lieu de ne permettre aucun écart de date.",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
-            "will_be_removed": "Cette opération sera supprimée."
+            "will_be_removed": "Cette opération sera supprimée.",
+            "ignore": "Ignorer",
+            "unignore": "Ne plus ignorer",
+            "show_ignored_duplicates": "Afficher les paires ignorées",
+            "back_to_duplicates": "Retour aux doublons détectés",
+            "ignored_duplicates_desc": "Ces paires d'opérations ont été marquées comme n'étant pas des doublons, elles n'apparaissent donc plus parmi les doublons détectés. Vous pouvez à tout moment ne plus les ignorer.",
+            "no_ignored_duplicates": "Aucune paire d'opérations ignorée."
         },
         "about": {
             "title": "À propos",

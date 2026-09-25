@@ -1,17 +1,16 @@
-import React, { useCallback } from 'react';
-
-import { translate as $t } from '../../../helpers';
-import { useKresusDispatch, useKresusState } from '../../../store';
-import * as SettingsStore from '../../../store/settings';
-import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
+import { useCallback } from 'react';
 import {
     DARK_MODE,
     DISCOVERY_MODE,
     FLUID_LAYOUT,
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../../../shared/settings';
+import { translate as $t } from '../../../helpers';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
+import * as SettingsStore from '../../../store/settings';
 
-import { Switch, Form } from '../../ui';
+import { Form, Switch } from '../../ui';
 import AnyAccountSelector from '../../ui/account-select';
 
 import LocaleSelector from './locale-selector';
@@ -70,7 +69,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 label={$t('client.accesses.default_account')}
                 id="default-account-selector"
-                help={$t('client.accesses.default_account_helper')}>
+                help={$t('client.accesses.default_account_helper')}
+            >
                 <AnyAccountSelector
                     includeNone={true}
                     onChange={setDefaultAccount}
@@ -85,7 +85,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.dark_mode')}
-                id="dark-mode">
+                id="dark-mode"
+            >
                 <Switch
                     onChange={toggleDarkMode}
                     checked={isDarkMode}
@@ -97,7 +98,8 @@ const CustomizationOptions = () => {
                 inline={true}
                 label={$t('client.settings.customization.fluid_layout')}
                 help={$t('client.settings.customization.fluid_layout_help')}
-                id="fluid-layout">
+                id="fluid-layout"
+            >
                 <Switch
                     onChange={toggleFluidLayout}
                     checked={isFluidLayout}
@@ -108,7 +110,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.discovery_label')}
-                id="discovery-mode">
+                id="discovery-mode"
+            >
                 <Switch
                     onChange={toggleDiscoveryMode}
                     checked={isDiscoveryModeEnabled}
@@ -119,7 +122,8 @@ const CustomizationOptions = () => {
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.limit_ongoing_to_current_month')}
-                id="discovery-mode">
+                id="discovery-mode"
+            >
                 <Switch
                     onChange={setIsOngoingLimitedToCurrentMonth}
                     checked={isOngoingLimitedToCurrentMonth}

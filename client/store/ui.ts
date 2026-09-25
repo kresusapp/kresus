@@ -1,12 +1,11 @@
-import { createSlice, PayloadAction, isAnyOf } from '@reduxjs/toolkit';
-
-import { assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
+import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
-import { FinishUserAction } from './banks';
-import { UserActionField } from '../../shared/types';
-import * as SettingsStore from './settings';
+import type { UserActionField } from '../../shared/types';
+import { translate as $t, assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
+import type { FinishUserAction } from './banks';
 import * as BanksStore from './banks';
 import * as GlobalStore from './global';
+import * as SettingsStore from './settings';
 
 // All the possible search fields.
 // Note: update `setSearchFields` if you add a field here.
@@ -24,6 +23,7 @@ export type UserActionRequested = {
     message: string | null;
     fields: UserActionField[] | null;
     finish: FinishUserAction;
+    // A translation key explaining why the processing (materialized by the spinner) happens.
     processingReason: string | null;
 };
 
@@ -33,7 +33,10 @@ export type UiState = {
     isSmallScreen: boolean;
     isMenuHidden: boolean;
     isDemoMode: boolean;
+    // A translation key explaining why the processing (materialized by the spinner) happens.
     processingReason: string | null;
+    // An extra message to be appended below the processing reason.
+    processingReasonExtraMessage: string[] | null;
     userActionRequested: UserActionRequested | null;
 };
 
@@ -78,6 +81,7 @@ function makeInitialState(
         search,
         displaySearchDetails: false,
         processingReason: null,
+        processingReasonExtraMessage: null,
         userActionRequested: null,
         isDemoMode: isDemoEnabled,
         isSmallScreen: computeIsSmallScreen(),
@@ -110,6 +114,10 @@ const uiSlice = createSlice({
                 finish,
                 processingReason: state.processingReason,
             };
+
+            state.processingReasonExtraMessage = message
+                ? [message, $t('client.user-action.after-validation')]
+                : null;
 
             // Clear the processing reason for now, will be reset later.
             state.processingReason = null;
@@ -161,9 +169,7 @@ const uiSlice = createSlice({
                 state.processingReason = 'client.spinner.import';
             })
             .addCase(GlobalStore.enableDemo.pending, (state, action) => {
-                state.processingReason = `client.demo.${
-                    action.meta.arg ? 'enabling' : 'disabling'
-                }`;
+                state.processingReason = `client.demo.${action.meta.arg ? 'enabling' : 'disabling'}`;
             })
             .addCase(GlobalStore.enableDemo.fulfilled, (state, action) => {
                 state.isDemoMode = action.payload;
@@ -225,6 +231,7 @@ const uiSlice = createSlice({
                 ),
                 state => {
                     state.processingReason = null;
+                    state.processingReasonExtraMessage = null;
                 }
             );
     },
@@ -267,9 +274,22 @@ export function hasSearchFields(state: UiState): boolean {
 export function getDisplaySearchDetails(state: UiState): boolean {
     return state.displaySearchDetails;
 }
-export function getProcessingReason(state: UiState): string | null {
-    return state.processingReason;
+
+interface ProcessingReason {
+    reasonTranslationKey: string;
+    extra: string[] | null;
 }
+
+export function getProcessingReason(state: UiState): ProcessingReason | null {
+    if (!state.processingReason) {
+        return null;
+    }
+    return {
+        reasonTranslationKey: state.processingReason,
+        extra: state.processingReasonExtraMessage,
+    };
+}
+
 export function isSmallScreen(state: UiState): boolean {
     return state.isSmallScreen;
 }

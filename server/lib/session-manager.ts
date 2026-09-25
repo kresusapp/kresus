@@ -1,5 +1,5 @@
 import { Access } from '../models';
-import { SessionManager as ISessionManager } from '../providers';
+import type { SessionManager as ISessionManager } from '../providers';
 
 export default class SessionManager implements ISessionManager {
     // A map to store session information attached to an access (cookies, last
@@ -46,7 +46,6 @@ export default class SessionManager implements ISessionManager {
         }
 
         // Explicitly return nothing, for TypeScript.
-        // eslint-disable-next-line no-useless-return
         return;
     }
 }

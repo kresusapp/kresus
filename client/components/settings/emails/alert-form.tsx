@@ -1,15 +1,14 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { assert, translate as $t } from '../../../helpers';
+import { translate as $t, assert } from '../../../helpers';
+import { useGenericError, useRequiredParams } from '../../../hooks';
 import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-
+import { BackLink, Form } from '../../ui';
 import AccountSelector from '../../ui/account-select';
 import AmountInput from '../../ui/amount-input';
-import { BackLink, Form } from '../../ui';
 import URL from './urls';
-import { useGenericError, useRequiredParams } from '../../../hooks';
 
 const AlertForm = () => {
     const { type } = useRequiredParams<{ type: 'balance' | 'transaction' }>();
@@ -44,7 +43,7 @@ const AlertForm = () => {
             ).unwrap();
 
             navigate(URL.all);
-        }, [dispatch, navigate, type, limit, refSelectOrder, refSelectAccount])
+        }, [dispatch, navigate, type, limit])
     );
 
     const isBalanceAlert = type === 'balance';
@@ -69,7 +68,8 @@ const AlertForm = () => {
             <Form.Input
                 id="order-select"
                 dontPropagateId={true}
-                label={$t(`client.settings.emails.send_if_${type}_is`)}>
+                label={$t(`client.settings.emails.send_if_${type}_is`)}
+            >
                 <div className="balance-inputs">
                     <select id="order-select" ref={refSelectOrder}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>
@@ -84,7 +84,7 @@ const AlertForm = () => {
                 </div>
             </Form.Input>
 
-            <button className="btn success" disabled={isSubmitDisabled}>
+            <button type="submit" className="btn success" disabled={isSubmitDisabled}>
                 {$t('client.settings.emails.create')}
             </button>
         </Form>

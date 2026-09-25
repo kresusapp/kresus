@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, Table, TableColumn } from 'typeorm';
 import { foreignKey, foreignKeyUserId, idColumn } from '../helpers';
 
 export class AddRecurringTransactions1671005821717 implements MigrationInterface {

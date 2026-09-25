@@ -1,12 +1,14 @@
-import React, {
-    useState,
-    useImperativeHandle,
-    ReactNode,
-    ReactElement,
+import Tippy, { type TippyProps } from '@tippyjs/react/headless';
+
+import * as React from 'react';
+import {
+    type ReactElement,
+    type ReactNode,
     useCallback,
     useEffect,
+    useImperativeHandle,
+    useState,
 } from 'react';
-import Tippy, { TippyProps } from '@tippyjs/react/headless';
 
 import './popover.css';
 
@@ -35,7 +37,7 @@ export interface PopoverRef {
 const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
     const [isOpen, setOpen] = useState(false);
 
-    const close = useCallback(() => setOpen(false), [setOpen]);
+    const close = useCallback(() => setOpen(false), []);
 
     const trigger = React.cloneElement(
         props.trigger as React.ReactElement<Record<string, unknown>>,
@@ -117,7 +119,8 @@ const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
             visible={isOpen}
             onClickOutside={close}
             interactive={true}
-            render={render}>
+            render={render}
+        >
             {trigger}
         </Tippy>
     );

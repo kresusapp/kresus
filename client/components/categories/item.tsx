@@ -1,69 +1,65 @@
-import React, { useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { useNavigate } from 'react-router';
-
+import { translate as $t } from '../../helpers';
+import type { Category } from '../../models';
 import { ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
 import { useTableRowSwipeDetection } from '../ui/use-swipe';
-
 import URL from './urls';
-import { Category } from '../../models';
-import { translate as $t } from '../../helpers';
 
 interface CategoryItemProps {
     // The category related to this item.
     category: Category;
 }
 
-export const CategoryListItem = React.forwardRef<HTMLTableRowElement, CategoryItemProps>(
-    (props, ref) => {
-        const { category } = props;
+export const CategoryListItem = forwardRef<HTMLTableRowElement, CategoryItemProps>((props, ref) => {
+    const { category } = props;
 
-        const style = {
-            backgroundColor: category.color,
-        };
+    const style = {
+        backgroundColor: category.color,
+    };
 
-        return (
-            <tr key={category.id} ref={ref}>
-                <IfMobile>
-                    <td className="swipeable-action swipeable-action-left">
-                        <span>{$t('client.general.edit')}</span>
-                        <span className="fa fa-edit" />
-                    </td>
-                </IfMobile>
-
-                <td>
-                    <div className="color-preview" style={style} />
+    return (
+        <tr key={category.id} ref={ref}>
+            <IfMobile>
+                <td className="swipeable-action swipeable-action-left">
+                    <span>{$t('client.general.edit')}</span>
+                    <span className="fa fa-edit" />
                 </td>
+            </IfMobile>
 
-                <td>{category.label}</td>
+            <td>
+                <div className="color-preview" style={style} />
+            </td>
 
-                <IfNotMobile>
-                    <td className="item-actions">
-                        <ButtonLink
-                            className="primary"
-                            to={URL.edit(category.id)}
-                            icon="edit"
-                            aria={$t('client.category.edition')}
-                        />
-                        <ButtonLink
-                            className="danger"
-                            to={URL.delete(category.id)}
-                            icon="trash"
-                            aria={$t('client.category.deletion')}
-                        />
-                    </td>
-                </IfNotMobile>
+            <td>{category.label}</td>
 
-                <IfMobile>
-                    <td className="swipeable-action swipeable-action-right">
-                        <span className="fa fa-trash" />
-                        <span>{$t('client.general.delete')}</span>
-                    </td>
-                </IfMobile>
-            </tr>
-        );
-    }
-);
+            <IfNotMobile>
+                <td className="item-actions">
+                    <ButtonLink
+                        className="primary"
+                        to={URL.edit(category.id)}
+                        icon="edit"
+                        aria={$t('client.category.edition')}
+                    />
+                    <ButtonLink
+                        className="danger"
+                        to={URL.delete(category.id)}
+                        icon="trash"
+                        aria={$t('client.category.deletion')}
+                    />
+                </td>
+            </IfNotMobile>
+
+            <IfMobile>
+                <td className="swipeable-action swipeable-action-right">
+                    <span className="fa fa-trash" />
+                    <span>{$t('client.general.delete')}</span>
+                </td>
+            </IfMobile>
+        </tr>
+    );
+});
 
 export const SwipeableCategoryListItem = (props: CategoryItemProps) => {
     const navigate = useNavigate();

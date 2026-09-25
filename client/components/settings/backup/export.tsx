@@ -1,17 +1,15 @@
-import React, { useCallback, useReducer, useState } from 'react';
-
-import { assert, translate as $t, validatePassword } from '../../../helpers';
+import { createRef, useCallback, useReducer, useState } from 'react';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
+import { translate as $t, assert, validatePassword } from '../../../helpers';
+import { useEffectUpdate, useNotifyError } from '../../../hooks';
 import { useKresusState } from '../../../store';
 import * as InstanceStore from '../../../store/instance';
+import { LoadingButton, Switch } from '../../ui';
 import DisplayIf from '../../ui/display-if';
-import { Switch, LoadingButton } from '../../ui';
-
-import { useEffectUpdate, useNotifyError } from '../../../hooks';
 
 const finishExport = (content: Record<string, unknown> | string) => {
-    let blob;
-    let extension;
+    let blob: Blob;
+    let extension: string;
     if (typeof content === 'object') {
         blob = new Blob([JSON.stringify(content, null, 2)], {
             type: 'application/json',
@@ -60,7 +58,7 @@ const ExportButton = ({
         setIsLoading(true);
         await safeOnClick();
         setIsLoading(false);
-    }, [setIsLoading, safeOnClick]);
+    }, [safeOnClick]);
 
     const label = isLoading
         ? $t('client.settings.exporting')
@@ -92,7 +90,7 @@ const Export = () => {
 
     const [passwordInputObserver, dispatchPasswordInputEvent] = useReducer((x: number) => x + 1, 0);
 
-    const refPassword = React.createRef<HTMLInputElement>();
+    const refPassword = createRef<HTMLInputElement>();
 
     // Update export button disabled state on every password change.
     const handleChangePassword = useCallback(() => {
@@ -105,18 +103,15 @@ const Export = () => {
         });
     }, [refPassword]);
 
-    const handleToggleWithPassword = useCallback(
-        (checked: boolean) => {
-            setPasswordState({
-                withPassword: checked,
-                valid: false,
-                error: null,
-            });
-            // Trigger an effect after the state is done updating.
-            dispatchPasswordInputEvent();
-        },
-        [setPasswordState, dispatchPasswordInputEvent]
-    );
+    const handleToggleWithPassword = useCallback((checked: boolean) => {
+        setPasswordState({
+            withPassword: checked,
+            valid: false,
+            error: null,
+        });
+        // Trigger an effect after the state is done updating.
+        dispatchPasswordInputEvent();
+    }, []);
 
     // Show password error only on blur.
     const handleBlurPassword = useCallback(() => {
@@ -125,7 +120,7 @@ const Export = () => {
                 ? null
                 : $t('client.settings.weak_password');
         setPasswordState(state => ({ ...state, error }));
-    }, [setPasswordState, passwordState]);
+    }, [passwordState]);
 
     useEffectUpdate(() => {
         assert(refPassword.current !== null, 'password input must be mounted');
@@ -137,7 +132,7 @@ const Export = () => {
     }, [passwordInputObserver]);
 
     const handleSubmit = useCallback(async () => {
-        let password;
+        let password: string | undefined;
         if (passwordState.withPassword) {
             assert(refPassword.current !== null, 'password input must be mounted');
             password = refPassword.current.value;

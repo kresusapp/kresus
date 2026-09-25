@@ -1,6 +1,6 @@
-import makeDiff, { DiffParams } from './diff-list';
-import { getDuplicatePairScore } from './duplicates-manager';
 import type { MinimalTransaction, Transaction } from '../models';
+import makeDiff, { type DiffParams } from './diff-list';
+import { getDuplicatePairScore } from './duplicates-manager';
 
 function isPerfectMatch(
     known: Transaction,

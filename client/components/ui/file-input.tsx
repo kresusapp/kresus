@@ -1,15 +1,18 @@
-import React, {
+import {
+    type ChangeEvent,
     forwardRef,
     useCallback,
+    useImperativeHandle,
     useRef,
     useState,
-    useImperativeHandle,
-    ChangeEvent,
 } from 'react';
 
 import { translate as $t } from '../../helpers';
 
 interface FileInputProps {
+    // HTML identifier.
+    id: string;
+
     // Callback receiving file input.
     onChange: (result: string | null) => void;
 }
@@ -52,7 +55,7 @@ const FileInput = forwardRef<FileInputRef, FileInputProps>((props, ref) => {
         <span className="file-input">
             <label className="btn">
                 {$t('client.general.browse')}
-                <input ref={internalRef} type="file" onChange={onChange} />
+                <input id={props.id} ref={internalRef} type="file" onChange={onChange} />
             </label>
             <output>{fileLabel}</output>
         </span>

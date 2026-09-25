@@ -1,16 +1,14 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { notify, translate as $t } from '../../helpers';
+import { translate as $t, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
-
-import URL from '../../urls';
-
-import { BackLink } from '../ui';
+import type { RecurringTransaction } from '../../models';
+import { useKresusDispatch } from '../../store';
 
 import * as BankStore from '../../store/banks';
-import { useKresusDispatch } from '../../store';
-import { RecurringTransaction } from '../../models';
+import URL from '../../urls';
+import { BackLink } from '../ui';
 
 import SharedForm from './form';
 
@@ -35,7 +33,7 @@ export default () => {
     let predefinedAmount = 0;
     if (rawPredefinedAmount) {
         predefinedAmount = Number.parseFloat(rawPredefinedAmount);
-        if (isNaN(predefinedAmount)) {
+        if (Number.isNaN(predefinedAmount)) {
             predefinedAmount = 0;
         }
     }

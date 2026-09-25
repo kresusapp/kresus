@@ -1,22 +1,20 @@
-import React, { useCallback, useState } from 'react';
-
-import * as CategoriesStore from '../../store/categories';
-import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import * as InstanceStore from '../../store/instance';
-import { useKresusDispatch, useKresusState } from '../../store';
-import { assert, translate as $t, noValueFoundMessage, notify } from '../../helpers';
+import type * as React from 'react';
+import { useCallback, useState } from 'react';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
-
-import { BackLink, Switch, Form } from '../ui';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import DisplayIf from '../ui/display-if';
-import TextInput from '../ui/text-input';
-
-import CustomBankField from './custom-bank-field';
-import { Bank, AccessCustomField } from '../../models';
+import { translate as $t, assert, notify, noValueFoundMessage } from '../../helpers';
 import { useFirstSyncError } from '../../hooks';
+import type { AccessCustomField, Bank } from '../../models';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
+import * as InstanceStore from '../../store/instance';
+import * as SettingsStore from '../../store/settings';
+import { BackLink, Form, Switch } from '../ui';
+import DisplayIf from '../ui/display-if';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import TextInput from '../ui/text-input';
+import CustomBankField from './custom-bank-field';
 
 export type CustomFieldMap = Record<string, string | null>;
 
@@ -25,13 +23,13 @@ export const renderCustomFields = (
     customFieldValues: CustomFieldMap | null,
     handleChange: (name: string, value: string | null) => void
 ) => {
-    if (!bankDesc || !bankDesc.customFields.length) {
+    if (!bankDesc?.customFields.length) {
         return null;
     }
     assert(customFieldValues !== null, 'must have customFieldValues if bankDesc has custom fields');
-    return bankDesc.customFields.map((field, index) => (
+    return bankDesc.customFields.map(field => (
         <CustomBankField
-            key={index}
+            key={field.name}
             onChange={handleChange}
             field={field}
             value={customFieldValues[field.name]}
@@ -187,7 +185,7 @@ const NewAccessForm = (props: {
             setBankDescData(newBankDesc);
             setCustomFields(newFields);
         },
-        [banks, setBankDescData, setCustomFields]
+        [banks]
     );
 
     const isFormValid = useCallback(() => {
@@ -204,13 +202,10 @@ const NewAccessForm = (props: {
         );
     }, [bankDesc, mustCreateDefaultAlerts, isEmailValid, noCredentials, customFields]);
 
-    const handleChangeEmail = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            setEmailRecipient(event.target.value);
-            setIsEmailValid(event.target.validity.valid);
-        },
-        [setEmailRecipient, setIsEmailValid]
-    );
+    const handleChangeEmail = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmailRecipient(event.target.value);
+        setIsEmailValid(event.target.validity.valid);
+    }, []);
 
     const handleChangeCustomField = useCallback(
         (name: string, value: string | null) => {
@@ -225,7 +220,7 @@ const NewAccessForm = (props: {
                 [name]: value,
             });
         },
-        [setCustomFields, customFields]
+        [customFields]
     );
 
     const { onSubmitSuccess } = props;
@@ -261,7 +256,7 @@ const NewAccessForm = (props: {
 
             // Create access.
             const res = await createAccess(arrayCustomFields);
-            if (res && res.errors instanceof Array && res.errors.length) {
+            if (res && Array.isArray(res.errors) && res.errors.length) {
                 notify.error(
                     $t('client.sync.partial_errors', {
                         errors: res.errors.map((err: string) => `”${err}”`).join(', '),
@@ -334,7 +329,8 @@ const NewAccessForm = (props: {
             <Form.Input
                 id="custom-label-text"
                 label={$t('client.settings.custom_label')}
-                optional={true}>
+                optional={true}
+            >
                 <TextInput onChange={setCustomLabel} initialValue={props.customBankTitle || ''} />
             </Form.Input>
 
@@ -345,7 +341,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="default-categories-switch"
                     label={$t('client.accountwizard.default_categories')}
-                    help={$t('client.accountwizard.default_categories_desc')}>
+                    help={$t('client.accountwizard.default_categories_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.default_categories')}
                         checked={mustCreateDefaultCategories}
@@ -359,7 +356,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="default-alerts"
                     label={$t('client.accountwizard.default_alerts')}
-                    help={$t('client.accountwizard.default_alerts_desc')}>
+                    help={$t('client.accountwizard.default_alerts_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.default_alerts')}
                         checked={mustCreateDefaultAlerts}
@@ -387,7 +385,8 @@ const NewAccessForm = (props: {
                     inline={true}
                     id="store-credentials"
                     label={$t('client.accountwizard.store_credentials')}
-                    help={$t('client.accountwizard.store_credentials_desc')}>
+                    help={$t('client.accountwizard.store_credentials_desc')}
+                >
                     <Switch
                         ariaLabel={$t('client.accountwizard.store_credentials')}
                         checked={storeCredentials}

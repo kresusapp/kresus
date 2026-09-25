@@ -1,23 +1,17 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-
-import * as BanksStore from '../../store/banks';
-import { useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
-
-import { RecurringTransaction } from '../../models';
-
 import { translate as $t } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
-
-import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import type { RecurringTransaction } from '../../models';
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
+import URL from '../../urls';
 import ButtonLink from '../ui/button-link';
-
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import RecurringTransactionItem, {
     SwipeableRecurringTransactionItem,
 } from './recurring-transaction-item';
-
-import URL from '../../urls';
 
 const RecurringTransactionsList = () => {
     const navigate = useNavigate();
@@ -53,7 +47,7 @@ const RecurringTransactionsList = () => {
         if (!account) {
             navigate(URL.recurringTransactions.pattern);
         }
-    }, [account, recurringTransactions, navigate]);
+    }, [account, navigate]);
 
     if (!account) {
         return null;
@@ -81,11 +75,11 @@ const RecurringTransactionsList = () => {
             <DisplayIf condition={!recurringTransactions.length}>
                 <p className="recurring-transactions-none">
                     <span>{$t('client.recurring_transactions.none')}</span>
+                    {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                     <span
                         className="tooltipped tooltipped-s multiline"
-                        aria-label={$t('client.recurring_transactions.explanation')
-                            .split('. ')
-                            .join('\n')}>
+                        aria-label={$t('client.recurring_transactions.explanation')}
+                    >
                         <span className="fa fa-question-circle clickable" />
                     </span>
                 </p>

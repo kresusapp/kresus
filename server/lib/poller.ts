@@ -1,24 +1,21 @@
 import moment from 'moment';
-
+import { WOOB_AUTO_UPDATE } from '../../shared/settings';
+import {
+    translate as $t,
+    assert,
+    errorRequiresUserAction,
+    getErrorCode,
+    KError,
+    makeLogger,
+    POLLER_START_HIGH_HOUR,
+    POLLER_START_LOW_HOUR,
+} from '../helpers';
 import { Access, Setting, User } from '../models';
 import { bankVendorByUuid } from '../providers';
-
 import accountManager from './accounts-manager';
+import AlertManager from './alert-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
-import AlertManager from './alert-manager';
-
-import {
-    assert,
-    makeLogger,
-    translate as $t,
-    errorRequiresUserAction,
-    POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR,
-    KError,
-    getErrorCode,
-} from '../helpers';
-import { WOOB_AUTO_UPDATE } from '../../shared/settings';
 import { getTranslator } from './translator';
 
 const log = makeLogger('poller');
@@ -33,11 +30,9 @@ async function managePollingErrors(
     const i18n = await getTranslator(userId);
 
     const blockingStatusLocale = $t(i18n, `server.email.fetch_error.${type}`, {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
     });
     const subject = $t(i18n, 'server.email.fetch_error.subject', {
-        // eslint-disable-next-line camelcase
         smart_count: errorMessages.length,
 
         type: blockingStatusLocale,

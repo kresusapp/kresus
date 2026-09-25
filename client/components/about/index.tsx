@@ -1,16 +1,9 @@
-import React from 'react';
-
-import { translate as $t } from '../../helpers';
-
-import ExternalLink from '../ui/external-link';
-
-import rawDependencies from './dependencies.json';
-import { repository } from '../../../package.json';
-
-// eslint-disable-next-line
 import { plainText as LICENSE } from '../../../LICENSE';
-
+import { repository } from '../../../package.json';
+import { translate as $t } from '../../helpers';
 import DisplayIf from '../ui/display-if';
+import ExternalLink from '../ui/external-link';
+import rawDependencies from './dependencies.json';
 
 import './about.css';
 
@@ -76,7 +69,7 @@ const About = () => {
     for (const dependencyName of Object.keys(dependencies).sort()) {
         const descriptor = dependencies[dependencyName];
 
-        let maybeDepLink;
+        let maybeDepLink: React.JSX.Element;
         if (descriptor.website) {
             maybeDepLink = <ExternalLink href={descriptor.website}>{dependencyName}</ExternalLink>;
         } else {
@@ -97,6 +90,7 @@ const About = () => {
         );
     }
 
+    // biome-ignore lint/suspicious/noArrayIndexKey: not performance critical
     const license = (LICENSE as string).split('\n\n').map((x, i) => <p key={i}>{x}</p>);
 
     return (

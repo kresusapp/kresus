@@ -1,9 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { unwrap } from '../../helpers';
+import { getRepository } from '..';
+import User from './users';
 
 @Entity('category')
 export default class Category {

@@ -1,9 +1,7 @@
-import React from 'react';
-import { Route, Routes, Navigate } from 'react-router';
-
-import List from './list';
+import { Navigate, Route, Routes } from 'react-router';
 import DeleteForm from './delete-form';
 import { EditForm, NewForm } from './form';
+import List from './list';
 import URL from './urls';
 
 export default () => {

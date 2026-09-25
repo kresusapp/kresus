@@ -1,18 +1,24 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { Chart, type LegendItem } from 'chart.js';
+import moment, { type Moment } from 'moment';
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { assert, localeComparator, round2 } from '../../helpers';
+import type { Category, Transaction } from '../../models';
+import * as UiStore from '../../store/ui';
+import URLs from '../../urls';
+import { DriverContext } from '../drivers';
+import type { AmountKindType } from './amount-select';
+import type { Hideable } from './hidable-chart';
 
-import { assert, round2, localeComparator } from '../../helpers';
-import { Category, Transaction } from '../../models';
-import { Hideable } from './hidable-chart';
-
-function datekey(op: Transaction) {
-    const d = op.budgetDate || op.date;
+function datekey(tr: Transaction) {
+    const d = tr.budgetDate || tr.date;
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
 export interface BaseChartProps {
     // Function to map from a category id to its content.
-    getCategoryById: (id: number) => Category;
+    getCategoryById: (id: number) => Category | null;
 
     // Click handler on a legend item, to select/deselect it.
     handleLegendClick: (legendItem: LegendItem) => void;
@@ -27,6 +33,12 @@ export interface TransactionsChartProps extends BaseChartProps {
 
     // A unique chart id that will serve as the container's id.
     chartId: string;
+
+    // What's the selected date range?
+    dateRange?: [Date] | [Date, Date];
+
+    // What's the selected type (only positive, only negative, or both)?
+    amountKind: AmountKindType;
 }
 
 interface BarchartProps extends TransactionsChartProps {
@@ -41,9 +53,14 @@ interface BarchartProps extends TransactionsChartProps {
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
     const container = useRef<Chart | null>(null);
 
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const driver = useContext(DriverContext);
+
     const redraw = useCallback(() => {
         // Category name -> {date key string -> [amounts]}.
         const map = new Map<string, Record<string, number[]>>();
+        const categoryNameToId = new Map<string, number>();
 
         // Category name -> color string.
         const colorMap: Record<string, string> = {};
@@ -51,17 +68,26 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         // Datekey -> Date.
         const dateset = new Map<string, number>();
 
-        for (const op of props.transactions) {
-            const cat = props.getCategoryById(op.categoryId);
+        for (const tr of props.transactions) {
+            const cat = props.getCategoryById(tr.categoryId);
+            if (cat === null) {
+                console.warn(
+                    `unknown category id ${tr.categoryId} for transaction ${tr.id}, dismissing`
+                );
+                continue;
+            }
 
             map.set(cat.label, map.get(cat.label) || {});
+            categoryNameToId.set(cat.label, cat.id);
+
             const categoryDates = map.get(cat.label);
             assert(typeof categoryDates !== 'undefined', 'defensively created above');
 
-            const dk = datekey(op);
-            const amount = props.invertSign ? -op.amount : op.amount;
-            (categoryDates[dk] = categoryDates[dk] || []).push(amount);
-            dateset.set(dk, +(op.budgetDate || op.date));
+            const dk = datekey(tr);
+            const amount = props.invertSign ? -tr.amount : tr.amount;
+            categoryDates[dk] = categoryDates[dk] || [];
+            categoryDates[dk].push(amount);
+            dateset.set(dk, +(tr.budgetDate || tr.date));
 
             colorMap[cat.label] = colorMap[cat.label] || cat.color;
         }
@@ -77,6 +103,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             data: number[];
             backgroundColor: string;
             hidden?: boolean;
+            categoryId: number;
         }[] = [];
         for (const categoryName of map.keys()) {
             const data: number[] = [];
@@ -85,22 +112,26 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 const dk = dates[j][0];
                 const mapEntry = map.get(categoryName);
                 assert(typeof mapEntry !== 'undefined', 'found by construction');
-                const values = (mapEntry[dk] = mapEntry[dk] || []);
+                mapEntry[dk] = mapEntry[dk] || [];
+                const values = mapEntry[dk];
                 data.push(round2(values.reduce((a, b) => a + b, 0)));
             }
+
+            const categoryId = categoryNameToId.get(categoryName)!;
 
             datasets.push({
                 label: categoryName,
                 data,
                 backgroundColor: colorMap[categoryName],
                 hidden:
-                    props.hiddenCategories instanceof Array &&
+                    Array.isArray(props.hiddenCategories) &&
                     props.hiddenCategories.includes(categoryName),
+                categoryId,
             });
         }
 
         // Undefined means the default locale.
-        let defaultLocale;
+        const defaultLocale = undefined;
 
         const labels: string[] = [];
         for (let i = 0; i < dates.length; i++) {
@@ -120,6 +151,85 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             },
             options: {
                 aspectRatio: props.aspectRatio || 2,
+
+                // Make it clear that the elements can be clicked.
+                onHover: (_evt, elements, thisChart) => {
+                    thisChart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                },
+
+                // On click, open the reports view corresponding to the current category.
+                onClick(_event, elements) {
+                    if (elements.length === 0) {
+                        return;
+                    }
+
+                    // Can only click one element at a time.
+                    const e = elements[0];
+
+                    // e.datasetIndex is the dataset for a given category; we can retrieve the
+                    // categoryId quite easily.
+                    const categoryId = datasets[e.datasetIndex].categoryId;
+
+                    // e.index refers to the selected date.
+                    const clickedDate = moment(dates[e.index][1]);
+                    const firstDayOfClickedMonth = clickedDate.date(1);
+                    const lastDayOfClickedMonth = moment(clickedDate).date(
+                        clickedDate.daysInMonth()
+                    );
+
+                    // We want to compute a min and a max bound according to the following:
+                    // min := max(first day of clicked month, dateRange[0])
+                    // max := min(last day of clicked month, dateRange[1])
+                    let newLeftBound: Moment, newRightBound: Moment;
+                    if (typeof props.dateRange === 'undefined') {
+                        // The bounds are the full month.
+                        newLeftBound = firstDayOfClickedMonth;
+                        newRightBound = lastDayOfClickedMonth;
+                    } else if (typeof props.dateRange[1] === 'undefined') {
+                        // Only a left bound is set; take the later date (max) among the first
+                        // day, or the left bound.
+                        newLeftBound = moment.max(
+                            firstDayOfClickedMonth,
+                            moment(props.dateRange[0])
+                        );
+                        newRightBound = lastDayOfClickedMonth;
+                    } else {
+                        // Both bounds are set; take the later date for the left bound, and the
+                        // sooner date for the right bound.
+                        newLeftBound = moment.max(
+                            firstDayOfClickedMonth,
+                            moment(props.dateRange[0])
+                        );
+                        newRightBound = moment.min(
+                            lastDayOfClickedMonth,
+                            moment(props.dateRange[1])
+                        );
+                    }
+
+                    // Extend the date boundaries as much as possible to avoid bad surprises.
+                    newLeftBound.hours(0).minutes(0).seconds(0);
+                    newRightBound.hours(23).minutes(59).seconds(59);
+
+                    // Make sure the search panel is open, in the reports view.
+                    dispatch(UiStore.toggleSearchDetails(true));
+
+                    const amountLow = props.amountKind === 'positive' ? 0 : undefined;
+                    const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
+
+                    // Set the date, category, and amount fields if needs be.
+                    dispatch(
+                        UiStore.setSearchFields({
+                            dateLow: newLeftBound.toDate(),
+                            dateHigh: newRightBound.toDate(),
+                            categoryIds: [categoryId],
+                            amountLow,
+                            amountHigh,
+                        })
+                    );
+
+                    // Move to the reports view.
+                    navigate(URLs.reports.url(driver));
+                },
 
                 plugins: {
                     legend: {
@@ -143,7 +253,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         });
 
         container.current = chart;
-    }, [props]);
+    }, [props, navigate, dispatch, driver]);
 
     useEffect(() => {
         // Redraw on mount and update.

@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
-import { Category, TransactionRule } from '../../server/models';
 import { updateCategorizeRules } from '../../server/lib/rule-engine';
+import { Category, TransactionRule } from '../../server/models';
 
 describe('automatic database cleanups', () => {
     let USER_ID = null;

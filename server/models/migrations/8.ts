@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableUnique } from 'typeorm';
+import { type MigrationInterface, type QueryRunner, TableUnique } from 'typeorm';
 
 const COLUMN_NAMES = ['userId', 'year', 'month', 'categoryId'];
 

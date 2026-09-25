@@ -1,10 +1,13 @@
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm';
+import {
+    type EntitySubscriberInterface,
+    EventSubscriber,
+    type InsertEvent,
+    type UpdateEvent,
+} from 'typeorm';
 
 import Account from '../entities/accounts';
 import View from '../entities/views';
 
-// eslint new-cap rule does not like decorators. See https://github.com/eslint/typescript-eslint-parser/issues/569
-// eslint-disable-next-line new-cap
 @EventSubscriber()
 export class AccountsSubscriber implements EntitySubscriberInterface<Account> {
     listenTo() {
@@ -32,7 +35,13 @@ export class AccountsSubscriber implements EntitySubscriberInterface<Account> {
     /* Renames associated views after account renaming */
     async afterUpdate(event: UpdateEvent<Account>) {
         const account = event.entity;
-        if (!account) {
+        // On a bulk update (`manager.update(Account, criteria, partialValues)`), typeorm only
+        // provides the partial set of updated values, without any id or userId.
+        if (
+            !account ||
+            typeof account.id === 'undefined' ||
+            typeof account.userId === 'undefined'
+        ) {
             return;
         }
 

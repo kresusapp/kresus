@@ -1,14 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import type * as React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
-import * as BanksStore from '../../store/banks';
-
-import ClearableInput from '../ui/clearable-input';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import { translate as $t, assert, NONE_CATEGORY_ID } from '../../helpers';
 import { useGenericError } from '../../hooks';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
+import ClearableInput from '../ui/clearable-input';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { formatCreateCategoryLabel, useOnCreateCategory } from './category-select';
 
 const NO_TYPE_ID = null;
@@ -73,7 +73,7 @@ const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) =
             setCurrentValue(newValInt);
             propsOnChange(newValInt);
         },
-        [setCurrentValue, propsOnChange]
+        [propsOnChange]
     );
 
     const updateOnCreate = useCallback(
@@ -81,7 +81,7 @@ const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) =
             propsOnChange(value);
             setCurrentValue(value);
         },
-        [setCurrentValue, propsOnChange]
+        [propsOnChange]
     );
 
     const onCreateCategory = useOnCreateCategory(dispatch, updateOnCreate);
@@ -192,7 +192,8 @@ const BulkEditComponent = (props: {
                             className="btn warning"
                             type="button"
                             disabled={!isApplyEnabled}
-                            onClick={isApplyEnabled ? handleApplyBulkEdit : undefined}>
+                            onClick={isApplyEnabled ? handleApplyBulkEdit : undefined}
+                        >
                             {buttonLabel}
                         </button>
                     </td>

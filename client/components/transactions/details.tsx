@@ -1,27 +1,26 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
-
-import rulesUrl from '../rules/urls';
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as BanksStore from '../../store/banks';
 import {
+    translate as $t,
     assertNotNull,
+    currency,
     displayLabel,
     formatDate,
     notify,
-    translate as $t,
-    currency,
 } from '../../helpers';
-import MainURLs from '../../urls';
 import { useNotifyError, useRequiredParams } from '../../hooks';
-
-import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
-import Label from '../reports/label';
-import TransactionTypeSelect from '../reports/editable-type-select';
-import CategorySelect from '../reports/editable-category-select';
-import DateComponent from './date';
-import BudgetDateComponent from './budget-date';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import MainURLs from '../../urls';
 import { DriverContext } from '../drivers';
+import CategorySelect from '../reports/editable-category-select';
+import TransactionTypeSelect from '../reports/editable-type-select';
+import Label from '../reports/label';
+import rulesUrl from '../rules/urls';
+import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
+import BudgetDateComponent from './budget-date';
+import DateComponent from './date';
+import AmountComponent from './amount';
 
 const TransactionDetails = (props: { transactionId: number }) => {
     const { transactionId } = props;
@@ -93,7 +92,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 </Form.Input>
 
                 <Form.Input id="value" label={$t('client.transactions.amount')}>
-                    <span>{currencyFormatter(transaction.amount)}</span>
+                    <AmountComponent transaction={transaction} />
                 </Form.Input>
 
                 <Form.Input
@@ -111,7 +110,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                             label={$t('client.transactions.create_categorization_rule')}
                             icon="magic"
                         />
-                    }>
+                    }
+                >
                     <CategorySelect transactionId={transaction.id} value={transaction.categoryId} />
                 </Form.Input>
 
@@ -125,7 +125,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 <Form.Input
                     id="budget-date"
                     label={$t('client.transactions.budget')}
-                    help={$t('client.transactions.budget_help')}>
+                    help={$t('client.transactions.budget_help')}
+                >
                     <BudgetDateComponent transaction={transaction} />
                 </Form.Input>
             </Form>
@@ -134,7 +135,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 <Form.Input
                     id="recurring-transaction-shortcut"
                     label={$t('client.recurring_transactions.new')}
-                    help={`${$t('client.addtransaction.recurring_transaction')}.`}>
+                    help={`${$t('client.addtransaction.recurring_transaction')}.`}
+                >
                     <ButtonLink
                         className="btn"
                         to={MainURLs.newAccountRecurringTransaction.url(account.id, {
@@ -161,7 +163,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
                                 &nbsp;
                                 {$t('client.transactions.delete_transaction_button')}
                             </button>
-                        }>
+                        }
+                    >
                         <p>
                             {$t('client.transactions.warning_delete')}{' '}
                             <Link to={MainURLs.duplicates.url(driver)}>

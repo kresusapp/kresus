@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
-import { setupTranslator } from '../../shared/helpers';
 import { testing } from '../../client/components/reports';
+import { setupTranslator } from '../../shared/helpers';
 
 const { localeContains } = testing;
 

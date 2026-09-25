@@ -1,26 +1,27 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { matchPath } from 'react-router';
 import debounce from 'lodash.debounce';
+import * as React from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { matchPath } from 'react-router';
 
 import {
     translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
+    assert,
+    endOfDay,
     NONE_CATEGORY_ID,
     startOfDay,
-    endOfDay,
-    assert,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
+import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
 import URL from '../../urls';
 
-import ClearableInput, { ClearableInputRef } from '../ui/clearable-input';
+import ClearableInput, { type ClearableInputRef } from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import MinMaxInput, { type MinMaxInputRef } from '../ui/min-max-input';
 import MultipleSelect from '../ui/multiple-select';
-import MinMaxInput, { MinMaxInputRef } from '../ui/min-max-input';
 
 import './search.css';
 
@@ -221,7 +222,6 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     const refKeywordsInput = React.createRef<ClearableInputRef>();
     const refMinMaxInput = React.createRef<MinMaxInputRef>();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleKeyword = useCallback(
         debounce(
             (value: string) => {
@@ -230,7 +230,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             INPUT_DEBOUNCING,
             { trailing: true }
         ),
-        [setKeywords]
+        []
     );
 
     const handleClearSearch = useCallback(
@@ -264,7 +264,6 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
         [handleClearSearch, resetAll]
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleMinMaxChange = useCallback(
         debounce((low: number | null, high: number | null) => {
             // Don't trigger a false rerender if the values haven't changed.
@@ -272,7 +271,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
                 setAmountLowHigh(low, high);
             }
         }, INPUT_DEBOUNCING),
-        [searchFields, setAmountLowHigh]
+        []
     );
 
     useEffect(() => {
@@ -314,7 +313,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             </div>
 
             <div className="search-amounts">
-                <label>{$t('client.search.amount')}</label>
+                <span>{$t('client.search.amount')}</span>
                 <MinMaxInput
                     low={searchFields.amountLow}
                     high={searchFields.amountHigh}

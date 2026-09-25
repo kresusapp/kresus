@@ -1,13 +1,13 @@
-import React, { useCallback } from 'react';
 import moment from 'moment';
+import { useCallback } from 'react';
 
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 import './budget-date.css';
-import { Transaction } from '../../models';
 import { useGenericError } from '../../hooks';
+import type { Transaction } from '../../models';
 
 interface Props {
     // The transaction from which to get the budget date.
@@ -20,7 +20,8 @@ function toggleButton(label: string, toggled: boolean, icon: string, onclick: ()
         <button
             type="button"
             onClick={onclick}
-            className={`${toggleButtonClass} budget-assignment`}>
+            className={`${toggleButtonClass} budget-assignment`}
+        >
             <i className={`fa ${icon}`} />
             <span>{label}</span>
         </button>
@@ -70,7 +71,7 @@ const BudgetDateComponent = (props: Props) => {
     }, [budgetDate, setBudgetDate, followingMonth]);
 
     return (
-        <div className="budget-date buttons-group" role="group">
+        <fieldset className="budget-date buttons-group">
             {toggleButton(
                 $t('client.transactions.assign_to_previous_month'),
                 budgetDate !== null && +budgetDate === +previousMonth,
@@ -89,7 +90,7 @@ const BudgetDateComponent = (props: Props) => {
                 'fa-calendar-plus-o',
                 handleToggleFollowingMonth
             )}
-        </div>
+        </fieldset>
     );
 };
 

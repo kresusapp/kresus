@@ -1,15 +1,15 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
     JoinColumn,
     ManyToOne,
-    Repository,
     OneToMany,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
 import { assert, unwrap } from '../../helpers';
-import { PartialOnePlus } from '../helpers';
+import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
+import type { PartialOnePlus } from '../helpers';
 
 import User from './users';
 
@@ -42,14 +42,22 @@ export default class TransactionRule {
     @Column('integer')
     position!: number;
 
-    @OneToMany(() => TransactionRuleCondition, condition => condition.rule, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => TransactionRuleCondition,
+        condition => condition.rule,
+        {
+            cascade: ['insert'],
+        }
+    )
     conditions!: TransactionRuleCondition[];
 
-    @OneToMany(() => TransactionRuleAction, action => action.rule, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => TransactionRuleAction,
+        action => action.rule,
+        {
+            cascade: ['insert'],
+        }
+    )
     actions!: TransactionRuleAction[];
 
     // Static methods.
@@ -90,7 +98,7 @@ export default class TransactionRule {
     static async allOrdered(userId: number): Promise<TransactionRule[]> {
         return await TransactionRule.repo().find({
             where: { userId },
-            relations: ['conditions', 'actions'],
+            relations: { conditions: true, actions: true },
             order: {
                 position: 'ASC',
             },

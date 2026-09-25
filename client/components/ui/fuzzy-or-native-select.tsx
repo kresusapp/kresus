@@ -1,10 +1,9 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
-
+import { translate as $t, assert } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
-import { assert, translate as $t } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
     ignoreCase: true,
@@ -93,7 +92,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             // Don't test against typeof X === 'undefined' here! The event is
             // a proxy which doesn't reflect typeof. It does reflect "in"
             // though, so use this instead.
-            if (event && event.target && 'value' in event.target) {
+            if (event?.target && 'value' in event.target) {
                 // That's the native select.
                 newValue = event.target.value;
             } else if (event && 'value' in event) {
@@ -190,7 +189,8 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
                 onChange={handleChange}
                 value={value}
                 className={className}
-                required={required}>
+                required={required}
+            >
                 {emptyOption}
                 {nativeOptions}
             </select>

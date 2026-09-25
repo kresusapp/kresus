@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import DefaultSettings from '../../shared/default-settings';
-import { assert, assertDefined, setupTranslator } from '../helpers';
-import { Setting } from '../models';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
+import { assert, assertDefined, setupTranslator } from '../helpers';
+import type { Setting } from '../models';
 
 import * as backend from './backend';
 

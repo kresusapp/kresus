@@ -1,24 +1,21 @@
 import {
-    In,
     Between,
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    type DeepPartial,
+    Entity,
+    type FindManyOptions,
+    In,
     JoinColumn,
     ManyToOne,
-    Repository,
-    DeepPartial,
-    FindManyOptions,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
+import { UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
 import { getRepository } from '..';
-
-import User from './users';
+import { bulkInsert, DatetimeType, ForceNumericColumn, mergeWith } from '../helpers';
 import Account from './accounts';
 import Category from './categories';
-
-import { UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
-import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
+import User from './users';
 
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
@@ -161,8 +158,12 @@ export default class Transaction {
         return await Transaction.repo().save(entity);
     }
 
-    // Note: doesn't return the inserted entities.
-    static async bulkCreate(userId: number, transactions: Partial<Transaction>[]): Promise<void> {
+    // Note: doesn't return the inserted entities, only their ids, in the same order as the
+    // transactions which were passed as arguments.
+    static async bulkCreate(
+        userId: number,
+        transactions: Partial<Transaction>[]
+    ): Promise<Transaction['id'][]> {
         const fullTransactions = transactions.map(tr => {
             return { ...tr, userId };
         });
@@ -209,7 +210,10 @@ export default class Transaction {
         };
 
         if (columns && columns.length) {
-            options.select = columns;
+            options.select = columns.reduce<Record<string, boolean>>((acc, col) => {
+                acc[col] = true;
+                return acc;
+            }, {});
         }
 
         return await Transaction.repo().find(options);

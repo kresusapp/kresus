@@ -1,16 +1,14 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router';
 
-import { notify, translate as $t } from '../../helpers';
+import { translate as $t, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
-
-import URL from '../../urls';
-
-import { BackLink } from '../ui';
+import type { RecurringTransaction } from '../../models';
+import { useKresusDispatch, useKresusState } from '../../store';
 
 import * as BankStore from '../../store/banks';
-import { useKresusDispatch, useKresusState } from '../../store';
-import { RecurringTransaction } from '../../models';
+import URL from '../../urls';
+import { BackLink } from '../ui';
 
 import SharedForm from './form';
 
@@ -57,7 +55,10 @@ export default () => {
     );
 
     if (!recurringTransaction) {
-        return null;
+        // If we didn't find the recurring transaction, the best we can do is redirect to the list
+        // of recurring transactions, since we have no ideas to which account the not-found
+        // recurring transaction could have been related.
+        return <Navigate to={URL.recurringTransactions.pattern} />;
     }
 
     const indexLink = <BackLink to={listUrl}>{$t('client.recurring_transactions.list')}</BackLink>;

@@ -1,13 +1,11 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router';
-
-import { useKresusState, useKresusDispatch } from '../../../store';
-import * as ViewsStore from '../../../store/views';
 import { translate as $t } from '../../../helpers';
-
-import URL from './urls';
-import DisplayIf from '../../ui/display-if';
+import { useKresusDispatch, useKresusState } from '../../../store';
+import * as ViewsStore from '../../../store/views';
 import { Popconfirm } from '../../ui';
+import DisplayIf from '../../ui/display-if';
+import URL from './urls';
 
 import './views.css';
 
@@ -31,10 +29,11 @@ const ViewItem = (props: { view: View }) => {
                 <Popconfirm
                     onConfirm={deleteView}
                     trigger={
-                        <button className="btn danger" aria-label="delete view">
+                        <button type="button" className="btn danger" aria-label="delete view">
                             <span className={'fa fa-trash'} />
                         </button>
-                    }>
+                    }
+                >
                     <p>
                         {$t('client.settings.views.delete_confirmation', {
                             label: view.label,

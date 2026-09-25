@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
 import DatePicker from './date-picker';
 
@@ -35,7 +35,7 @@ const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
             setValid(!!date);
             onSelect(date);
         },
-        [setValid, onSelect]
+        [onSelect]
     );
 
     useImperativeHandle(

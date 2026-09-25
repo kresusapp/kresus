@@ -24,7 +24,7 @@ function pushDepLicense(dep, dependencies) {
     let packageData;
     try {
         packageData = JSON.parse(fs.readFileSync(depPath, 'utf8'));
-    } catch (e) {
+    } catch (_e) {
         console.error('unable to read or parse package.json file for dependency', dep);
         return;
     }
@@ -39,8 +39,12 @@ function pushDepLicense(dep, dependencies) {
 const packageJson = require(path.resolve(kresusRoot, 'package.json'));
 const dependencies = Object.assign({}, staticDependencies);
 
-Object.keys(packageJson.dependencies).forEach(dep => pushDepLicense(dep, dependencies));
-Object.keys(packageJson.devDependencies).forEach(dep => pushDepLicense(dep, dependencies));
+Object.keys(packageJson.dependencies).forEach(dep => {
+    pushDepLicense(dep, dependencies);
+});
+Object.keys(packageJson.devDependencies).forEach(dep => {
+    pushDepLicense(dep, dependencies);
+});
 
 const content = JSON.stringify(dependencies, null, 4);
 fs.writeFileSync(targetFile, content);

@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { assert } from '../../helpers';
 
 interface UncontrolledTextInputProps {
@@ -56,7 +56,7 @@ export default (props: UncontrolledTextInputProps) => {
         return () => {
             currentRef.removeEventListener('change', onSubmit);
         };
-    }, [ref, onSubmit]);
+    }, [onSubmit]);
 
     return (
         <input

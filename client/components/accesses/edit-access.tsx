@@ -1,20 +1,16 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router';
-
+import { useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router';
+import { translate as $t, assert, displayLabel, notify } from '../../helpers';
+import { useNotifyError, useRequiredParams, useSyncError } from '../../hooks';
+import { type Access, type AccessCustomField, type Bank, isManualAccess } from '../../models';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
-import { assert, translate as $t, notify, displayLabel } from '../../helpers';
-
 import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
-
 import DisplayIf from '../ui/display-if';
 import CredentialsForm from './sync-form';
-
 import URL from './urls';
-import { useNotifyError, useSyncError, useRequiredParams } from '../../hooks';
-import { Access, AccessCustomField, Bank, isManualAccess } from '../../models';
 
 const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
@@ -87,7 +83,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         inline={true}
                         id="reload-accounts"
                         label={$t('client.settings.reload_accounts')}
-                        help={$t('client.settings.reload_accounts_help')}>
+                        help={$t('client.settings.reload_accounts_help')}
+                    >
                         <button type="button" className="btn primary" onClick={onSyncAccounts}>
                             {$t('client.settings.reload_accounts_go')}
                         </button>
@@ -97,7 +94,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         inline={true}
                         id="exclude-from-poll"
                         label={$t('client.editaccess.include_in_polls')}
-                        help={$t('client.editaccess.include_in_polls_details')}>
+                        help={$t('client.editaccess.include_in_polls_details')}
+                    >
                         <Switch
                             onChange={onToggleExcludeFromPoll}
                             ariaLabel={$t('client.editaccess.include_in_polls')}
@@ -145,7 +143,8 @@ const CustomLabelForm = (props: { access: Access }) => {
         <Form.Input
             id="custom-label-text"
             label={$t('client.settings.custom_label')}
-            optional={true}>
+            optional={true}
+        >
             <UncontrolledTextInput onSubmit={saveCustomLabel} value={access.customLabel} />
         </Form.Input>
     );
@@ -191,7 +190,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.editaccess.disable_access')}
                             </button>
                         }
-                        onConfirm={onDisableAccess}>
+                        onConfirm={onDisableAccess}
+                    >
                         <p>{$t('client.editaccess.disable_access_body')}</p>
                     </Popconfirm>
 
@@ -201,7 +201,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.editaccess.delete_session')}
                             </button>
                         }
-                        onConfirm={onDeleteSession}>
+                        onConfirm={onDeleteSession}
+                    >
                         <p>{$t('client.editaccess.delete_session_help')}</p>
                     </Popconfirm>
                 </DisplayIf>
@@ -213,7 +214,8 @@ const DangerZone = (props: { access: Access }) => {
                                 {$t('client.settings.delete_access_button')}
                             </button>
                         }
-                        onConfirm={onDeleteAccess}>
+                        onConfirm={onDeleteAccess}
+                    >
                         <p>
                             {$t('client.settings.delete_access', {
                                 name: displayLabel(props.access),
@@ -242,8 +244,9 @@ export default () => {
     });
 
     if (access === null) {
-        return null;
+        return <Navigate to={URL.accessList} />;
     }
+
     assert(bankDesc !== null, 'bank descriptor must be set at this point');
 
     return (

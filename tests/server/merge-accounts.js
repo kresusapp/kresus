@@ -1,18 +1,17 @@
 import assert from 'node:assert';
+import { importData } from '../../server/controllers/all';
 
+import accountsManager from '../../server/lib/accounts-manager';
 import {
     Access,
     Account,
     Alert,
+    AppliedRecurringTransaction,
+    RecurringTransaction,
+    Setting,
     Transaction,
     User,
-    RecurringTransaction,
-    AppliedRecurringTransaction,
-    Setting,
 } from '../../server/models';
-
-import accountsManager from '../../server/lib/accounts-manager';
-import { importData } from '../../server/controllers/all';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 async function cleanAll(userId) {
@@ -291,7 +290,9 @@ describe('Merging two accounts together', () => {
     it('should have a null balance for manual access', async () => {
         const manualWorld = structuredClone(genesis);
         manualWorld.accesses[0].vendorId = 'manual';
-        manualWorld.accounts.forEach(acc => (acc.balance = null));
+        manualWorld.accounts.forEach(acc => {
+            acc.balance = null;
+        });
         await importData(USER_ID, newWorld(manualWorld));
         let accounts = await Account.all(USER_ID);
         const success = await accountsManager.mergeExistingAccounts(

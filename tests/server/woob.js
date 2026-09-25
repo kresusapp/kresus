@@ -2,18 +2,17 @@ import assert from 'node:assert';
 
 import { KError } from '../../server/helpers';
 import { testing } from '../../server/providers/woob';
-import { applyTestConfig } from '../database/config';
-
 import {
-    UNKNOWN_WOOB_MODULE,
-    INVALID_PASSWORD,
-    EXPIRED_PASSWORD,
     ACTION_NEEDED,
-    WOOB_NOT_INSTALLED,
-    INVALID_PARAMETERS,
-    NO_PASSWORD,
     AUTH_METHOD_NYI,
+    EXPIRED_PASSWORD,
+    INVALID_PARAMETERS,
+    INVALID_PASSWORD,
+    NO_PASSWORD,
+    UNKNOWN_WOOB_MODULE,
+    WOOB_NOT_INSTALLED,
 } from '../../shared/errors.json';
+import { applyTestConfig } from '../database/config';
 
 const { callWoob, defaultOptions, CallWoobCommand } = testing;
 
@@ -262,30 +261,39 @@ async function makeDefectSituation(command) {
 
             assert.ok('success' in result);
             assert.ok('kind' in result.success);
-            assert.strictEqual(result.success.kind, 'user_action');
-            assert.ok('fields' in result.success);
-            assert.ok(result.success.fields instanceof Array);
 
-            // And re-calling with the same session and fields should be
-            // sufficient to launch the sync.
-            let woobOptions = {
-                ...defaultOptions(),
-                userActionFields: {
-                    code: '1337',
-                },
-            };
+            if (textCmd === 'accounts') {
+                // In the fakewoobbank module, only the accounts command requires a 2fa. Even when
+                // fetching transactions we start with fetching the accounts anyways, which causes
+                // a 2fa that overlives the transactions fetch.
+                assert.strictEqual(result.success.kind, 'user_action');
+                assert.ok('fields' in result.success);
+                assert.ok(result.success.fields instanceof Array);
 
-            let woobResponse = await callWoob(
-                command,
-                woobOptions,
-                sessionManager,
-                setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
-            );
+                // And re-calling with the same session and fields should be
+                // sufficient to launch the sync.
+                let woobOptions = {
+                    ...defaultOptions(),
+                    userActionFields: {
+                        code: '1337',
+                    },
+                };
 
-            assert.ok(woobResponse);
-            assert.ok('kind' in woobResponse);
-            assert.strictEqual(woobResponse.kind, 'values');
-            assert.ok('values' in woobResponse);
+                result = await callWoob(
+                    command,
+                    woobOptions,
+                    sessionManager,
+                    setAccessField(VALID_FAKE_ACCESS, 'login', '2fa')
+                );
+
+                assert.ok(result);
+                assert.ok('kind' in result);
+
+                result = { success: result };
+            }
+
+            assert.strictEqual(result.success.kind, 'values');
+            assert.ok('values' in result.success);
         });
     });
 }
@@ -295,7 +303,16 @@ describe('Testing kresus/woob integration', function () {
     // These tests can be long
     this.slow(4000);
     this.timeout(10000);
+
     describe('with woob not installed.', () => {
+        beforeEach(function () {
+            // If the Python executable is explicitly set, assume it's pointing to a python in a
+            // virtual environment where Woob is globally installed, and thus skip this test.
+            if (typeof process.env.KRESUS_PYTHON_EXEC !== 'undefined') {
+                this.skip();
+            }
+        });
+
         it('call "test" should raise "WOOB_NOT_INSTALLED" error, if woob is not globally installed. WARNING: if this test fails, make sure Woob is not installed globally before opening an issue.', async () => {
             applyTestConfig();
             // Simulate the non installation of woob.
@@ -307,7 +324,9 @@ describe('Testing kresus/woob integration', function () {
 
     describe('with woob installed', () => {
         beforeEach(function () {
-            if (!process.env.KRESUS_WOOB_DIR) {
+            // Don't run these tests if the woob directory isn't set, and if the python exec isn't
+            // set (which could point to a virtual environment with woob installed).
+            if (!process.env.KRESUS_WOOB_DIR && !process.env.KRESUS_PYTHON_EXEC) {
                 this.skip();
             }
         });

@@ -1,15 +1,12 @@
-import express from 'express';
-
-import { Setting } from '../models';
-
-import * as woob from '../providers/woob';
+import type express from 'express';
+import { asyncErr, checkMinimalWoobVersion, KError, UNKNOWN_WOOB_VERSION } from '../helpers';
 import getEmailer from '../lib/emailer';
 import { sendTestNotification } from '../lib/notifications';
+import { Setting } from '../models';
+import * as woob from '../providers/woob';
 import { WOOB_NOT_INSTALLED } from '../shared/errors.json';
-
-import { KError, asyncErr, checkMinimalWoobVersion, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { DEMO_MODE } from '../shared/settings';
-import { IdentifiedRequest } from './routes';
+import type { IdentifiedRequest } from './routes';
 
 export async function getWoobVersion(_req: express.Request, res: express.Response) {
     try {

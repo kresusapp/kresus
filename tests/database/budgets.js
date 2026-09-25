@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 
 import { QueryFailedError } from 'typeorm';
-import { Access, Budget, Category, View } from '../../server/models';
 import { importData } from '../../server/controllers/all';
+import { Access, Budget, Category, View } from '../../server/models';
 
 describe('Budgets model API', () => {
     const world = {

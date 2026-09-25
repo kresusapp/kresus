@@ -1,14 +1,12 @@
-import express from 'express';
-
-import { Access, Account, Setting, type AccessField } from '../models';
-import { makeLogger, KError, asyncErr, unwrap } from '../helpers';
+import type express from 'express';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-import { hasForbiddenField } from '../shared/validators';
+import { asyncErr, KError, makeLogger, unwrap } from '../helpers';
 import accountManager from '../lib/accounts-manager';
-
-import { isDemoEnabled } from './instance';
-import { PreloadedRequest, IdentifiedRequest } from './routes';
+import { Access, type AccessField, Account, Setting } from '../models';
+import { hasForbiddenField } from '../shared/validators';
 import { extractUserActionFields } from './accesses';
+import { isDemoEnabled } from './instance';
+import type { IdentifiedRequest, PreloadedRequest } from './routes';
 
 const log = makeLogger('controllers/accounts');
 

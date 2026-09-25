@@ -7,4 +7,4 @@ import 'flatpickr/dist/l10n/tr';
 
 export default Flatpickr;
 
-export { type DateTimePickerHandle } from 'react-flatpickr';
+export type { DateTimePickerHandle } from 'react-flatpickr';

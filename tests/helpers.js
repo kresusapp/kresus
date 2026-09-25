@@ -19,7 +19,6 @@ export const checkObjectIsSubsetOf = (toCompare, reference) => {
             return reference === null;
         }
 
-        // eslint-disable-next-line guard-for-in
         for (const key in toCompare) {
             if (!checkObjectIsSubsetOf(toCompare[key], reference[key])) {
                 return false;

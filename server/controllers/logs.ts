@@ -1,12 +1,11 @@
-import fs from 'fs';
-import express from 'express';
-import { promisify } from 'util';
-
-import { Access, Account, User } from '../models';
+import fs from 'node:fs';
+import { promisify } from 'node:util';
+import type express from 'express';
 import { asyncErr } from '../helpers';
+import { Access, Account, User } from '../models';
 
 import { obfuscateEmails, obfuscateKeywords, obfuscatePasswords } from './helpers';
-import { IdentifiedRequest } from './routes';
+import type { IdentifiedRequest } from './routes';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -16,7 +15,7 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
         const { id: userId } = req.user;
         const user = await User.find(userId);
 
-        if (!user || !user.isAdmin) {
+        if (!user?.isAdmin) {
             res.status(403).end();
             return;
         }
@@ -74,7 +73,7 @@ export async function clearLogs(req: IdentifiedRequest<any>, res: express.Respon
         const { id: userId } = req.user;
         const user = await User.find(userId);
 
-        if (!user || !user.isAdmin) {
+        if (!user?.isAdmin) {
             res.status(403).end();
             return;
         }

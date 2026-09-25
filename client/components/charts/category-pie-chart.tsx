@@ -1,11 +1,21 @@
 import { Chart, type LegendItem } from 'chart.js';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { assert, localeComparator, round2, translate as $t } from '../../helpers';
-import { Hideable } from './hidable-chart';
+import moment from 'moment';
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { translate as $t, assert, localeComparator, round2 } from '../../helpers';
+import * as UiStore from '../../store/ui';
+import URLs from '../../urls';
+import { DriverContext } from '../drivers';
 import type { TransactionsChartProps } from './category-barchart';
+import type { Hideable } from './hidable-chart';
 
 const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
     const container = useRef<Chart<'pie'> | null>(null);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const driver = useContext(DriverContext);
 
     const redraw = useCallback(() => {
         const catMap = new Map<number, number>();
@@ -22,31 +32,40 @@ const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
         }
 
         const series: number[] = [];
+        const categoryIds: number[] = [];
         const labels: string[] = [];
         const colors: string[] = [];
         let totalAmount = 0;
         for (const [catId, amount] of catMap) {
             const c = props.getCategoryById(catId);
+            if (c === null) {
+                console.warn(`unknown category with ID ${catId}`);
+                continue;
+            }
+
             labels.push(c.label);
             colors.push(c.color);
+            categoryIds.push(c.id);
 
             series.push(amount);
             totalAmount += amount;
         }
+
+        const datasets = series.length
+            ? [
+                  {
+                      data: series,
+                      backgroundColor: colors,
+                  },
+              ]
+            : [];
 
         container.current = new Chart(props.chartId, {
             type: 'pie',
 
             data: {
                 labels,
-                datasets: series.length
-                    ? [
-                          {
-                              data: series,
-                              backgroundColor: colors,
-                          },
-                      ]
-                    : [],
+                datasets,
             },
 
             options: {
@@ -78,9 +97,61 @@ const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
                         },
                     },
                 },
+
+                // Make it clear that the elements can be clicked.
+                onHover: (_evt, elements, thisChart) => {
+                    thisChart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                },
+
+                // On click, open the reports view corresponding to the current category.
+                onClick(_event, elements) {
+                    if (datasets.length === 0 || elements.length === 0) {
+                        return;
+                    }
+
+                    // Can click only one element at a time.
+                    const e = elements[0];
+
+                    // Index is the category in the series array.
+                    // The categoryIds array has been constructed such that index always match
+                    // the index in the series too.
+                    const categoryId = categoryIds[e.index];
+
+                    const dates = props.dateRange;
+
+                    // Extend the date boundaries as much as possible to avoid bad surprises.
+                    const dateLow =
+                        dates && dates.length > 0
+                            ? moment(dates[0]).hours(0).minutes(0).seconds(0).toDate()
+                            : undefined;
+                    const dateHigh =
+                        dates && dates.length > 1
+                            ? moment(dates[1]).hours(23).minutes(59).seconds(59).toDate()
+                            : undefined;
+
+                    // Make sure the search panel is open, in the reports view.
+                    dispatch(UiStore.toggleSearchDetails(true));
+
+                    const amountLow = props.amountKind === 'positive' ? 0 : undefined;
+                    const amountHigh = props.amountKind === 'negative' ? 0 : undefined;
+
+                    // Set the date, category, and amount fields if needs be.
+                    dispatch(
+                        UiStore.setSearchFields({
+                            dateLow,
+                            dateHigh,
+                            categoryIds: [categoryId],
+                            amountLow,
+                            amountHigh,
+                        })
+                    );
+
+                    // Move to the reports view.
+                    navigate(URLs.reports.url(driver));
+                },
             },
         });
-    }, [props]);
+    }, [props, dispatch, navigate, driver]);
 
     useEffect(() => {
         // Redraw on mount and update.
@@ -88,13 +159,7 @@ const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
 
         // We cannot hide the categories on redraw, it needs to be done dynamically.
         const chart = container.current;
-        if (
-            props.hiddenCategories &&
-            props.hiddenCategories.length &&
-            chart &&
-            chart.legend &&
-            chart.legend.legendItems
-        ) {
+        if (props.hiddenCategories?.length && chart?.legend?.legendItems) {
             for (const legend of chart.legend.legendItems) {
                 if (
                     props.hiddenCategories.includes(legend.text) &&
@@ -156,21 +221,17 @@ export const PieChartWithHelp = forwardRef<Hideable, PieChartWithHelpProps>((pro
     return (
         <div>
             <h3>
+                {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required for tooltipped */}
                 <span
                     className="tooltipped tooltipped-ne tooltipped-multiline"
-                    aria-label={$t(props.helpKey)}>
+                    aria-label={$t(props.helpKey)}
+                >
                     <span className="fa fa-question-circle clickable" />
                 </span>
                 {$t(props.titleKey)}
             </h3>
-            <PieChart
-                chartId={props.chartId}
-                getCategoryById={props.getCategoryById}
-                transactions={props.transactions}
-                ref={ref}
-                handleLegendClick={props.handleLegendClick}
-                hiddenCategories={props.hiddenCategories}
-            />
+
+            <PieChart ref={ref} {...props} />
         </div>
     );
 });

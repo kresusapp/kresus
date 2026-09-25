@@ -1,20 +1,16 @@
-import React, { useCallback, useRef, useImperativeHandle } from 'react';
-import { useNavigate } from 'react-router';
 import moment from 'moment';
-
-import * as BankStore from '../../store/banks';
-import { useKresusDispatch } from '../../store';
-
-import { RecurringTransaction } from '../../models';
-
+import * as React from 'react';
+import { useCallback, useImperativeHandle, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import { translate as $t, currency, notify } from '../../helpers';
-
-import Popconfirm from '../ui/popform';
+import type { RecurringTransaction } from '../../models';
+import { useKresusDispatch } from '../../store';
+import * as BankStore from '../../store/banks';
+import URL from '../../urls';
 import { ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
+import Popconfirm from '../ui/popform';
 import { useTableRowSwipeDetection } from '../ui/use-swipe';
-
-import URL from '../../urls';
 
 type RecurringTransactionItemProps = {
     recurringTransaction: RecurringTransaction;
@@ -44,7 +40,7 @@ const RecurringTransactionItem = React.forwardRef<
             await dispatch(BankStore.deleteRecurringTransaction(rt)).unwrap();
 
             notify.success($t('client.recurring_transactions.delete_success'));
-        } catch (err: any) {
+        } catch (_err: any) {
             notify.error($t('client.recurring_transactions.delete_error'));
         }
     }, [rt, dispatch]);
@@ -73,7 +69,7 @@ const RecurringTransactionItem = React.forwardRef<
         });
     }, [rt, navigate, handleDelete]);
 
-    let months;
+    let months: React.JSX.Element;
     if (rt.listOfMonths === 'all') {
         months = <span>{$t('client.recurring_transactions.all')}</span>;
     } else {
@@ -82,11 +78,13 @@ const RecurringTransactionItem = React.forwardRef<
             months = <span>{moment.months(parseInt(listOfMonths[0], 10) - 1)}</span>;
         } else {
             months = (
+                // biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped
                 <span
                     className="tooltipped"
                     aria-label={listOfMonths
                         .map(m => moment.months(parseInt(m, 10) - 1))
-                        .join(', ')}>
+                        .join(', ')}
+                >
                     {$t('client.recurring_transactions.several')}
                 </span>
             );
@@ -116,13 +114,16 @@ const RecurringTransactionItem = React.forwardRef<
                     <Popconfirm
                         trigger={
                             <button
+                                type="button"
                                 className="btn danger"
                                 aria-label={$t('client.recurring_transactions.delete')}
-                                title={$t('client.recurring_transactions.delete')}>
+                                title={$t('client.recurring_transactions.delete')}
+                            >
                                 <span className="fa fa-trash" />
                             </button>
                         }
-                        onConfirm={handleDelete}>
+                        onConfirm={handleDelete}
+                    >
                         <p>{$t('client.recurring_transactions.delete_confirm')}</p>
                     </Popconfirm>
                 </td>
@@ -142,7 +143,7 @@ export const SwipeableRecurringTransactionItem = (props: RecurringTransactionIte
     let ref: React.RefObject<RecurringTransactionRef | null> | null = null;
 
     const openEditionView = useCallback(async () => {
-        if (!ref || !ref.current) {
+        if (!ref?.current) {
             return;
         }
 
@@ -150,11 +151,11 @@ export const SwipeableRecurringTransactionItem = (props: RecurringTransactionIte
     }, [ref]);
 
     const deleteRecurringTransaction = useCallback(async () => {
-        if (!ref || !ref.current) {
+        if (!ref?.current) {
             return;
         }
 
-        await ref.current.delete();
+        ref.current.delete();
     }, [ref]);
 
     ref = useTableRowSwipeDetection<RecurringTransactionRef>(

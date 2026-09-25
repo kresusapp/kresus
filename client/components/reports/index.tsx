@@ -1,30 +1,28 @@
-import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
+import { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { translate as $t, localeComparator, formatDate } from '../../helpers';
+import { translate as $t, formatDate, localeComparator } from '../../helpers';
 
-import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
-import * as UiStore from '../../store/ui';
-import * as SettingsStore from '../../store/settings';
+import { type GlobalState, useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-
-import InfiniteList from '../ui/infinite-list';
-import TransactionUrls from '../transactions/urls';
-
-import SearchComponent from './search';
-import BulkEditComponent from './bulkedit';
-import { TransactionItem, SwipeableTransactionItem } from './item';
-import MonthYearSeparator from './month-year-separator';
-import SyncButton from './sync-button';
-import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import * as SettingsStore from '../../store/settings';
+import * as UiStore from '../../store/ui';
 import { DriverContext, isAccountDriver } from '../drivers';
+import TransactionUrls from '../transactions/urls';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
+import InfiniteList from '../ui/infinite-list';
+import BulkEditComponent from './bulkedit';
+import { SwipeableTransactionItem, TransactionItem } from './item';
+import MonthYearSeparator from './month-year-separator';
+import SearchComponent from './search';
+import SyncButton from './sync-button';
 
 import './reports.css';
 import './account-summary.css';
 import './toolbar.css';
 
-import { Transaction } from '../../models';
-import { ButtonLink } from '../ui';
 import { LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../../shared/settings';
+import type { Transaction } from '../../models';
+import { ButtonLink } from '../ui';
 
 // Keep in sync with reports.css.
 function getTransactionHeight(isSmallScreen: boolean) {
@@ -51,7 +49,8 @@ const SearchButton = () => {
             className="btn"
             aria-label={$t('client.search.title')}
             onClick={handleClick}
-            title={$t('client.search.title')}>
+            title={$t('client.search.title')}
+        >
             <span className="fa fa-search" />
             <span className="label">{$t('client.search.title')}</span>
         </button>
@@ -69,7 +68,8 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
             className={toggleButtonClass}
             aria-label={$t('client.bulkedit.title')}
             onClick={props.handleClick}
-            title={$t('client.bulkedit.title')}>
+            title={$t('client.bulkedit.title')}
+        >
             <span className="fa fa-list-alt" />
             <span className="label">{$t('client.bulkedit.title')}</span>
         </button>
@@ -166,12 +166,12 @@ const Reports = () => {
 
         let month = null;
         let year = null;
-        for (const opId of filteredTransactionIds) {
-            if (!BanksStore.transactionExists(state.banks, opId)) {
+        for (const trId of filteredTransactionIds) {
+            if (!BanksStore.transactionExists(state.banks, trId)) {
                 continue;
             }
 
-            const transaction = BanksStore.transactionById(state.banks, opId);
+            const transaction = BanksStore.transactionById(state.banks, trId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
 
@@ -192,7 +192,7 @@ const Reports = () => {
 
             ret.push({
                 kind: ITEM_KIND_TRANSACTION,
-                transactionId: opId,
+                transactionId: trId,
             });
         }
 
@@ -212,8 +212,8 @@ const Reports = () => {
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const transactionHeight = getTransactionHeight(isSmallScreen);
 
-    const refTransactionTable = React.createRef<HTMLTableElement>();
-    const refThead = React.createRef<HTMLTableSectionElement>();
+    const refTransactionTable = createRef<HTMLTableElement>();
+    const refThead = createRef<HTMLTableSectionElement>();
 
     const [heightAbove, setHeightAbove] = useState(0);
     const [inBulkEditMode, setInBulkEditMode] = useState(false);
@@ -245,13 +245,13 @@ const Reports = () => {
     const toggleBulkEditMode = useCallback(() => {
         setInBulkEditMode(!inBulkEditMode);
         setBulkEditSelectedSet(new Set());
-    }, [setBulkEditSelectedSet, setInBulkEditMode, inBulkEditMode]);
+    }, [inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
         (isChecked: boolean) => {
             setBulkEditSelectedSet(new Set(isChecked ? filteredTransactionIds : []));
         },
-        [filteredTransactionIds, setBulkEditSelectedSet]
+        [filteredTransactionIds]
     );
 
     const toggleBulkItem = useCallback(
@@ -267,7 +267,7 @@ const Reports = () => {
 
             setBulkEditSelectedSet(selectedSet);
         },
-        [filteredSelectedTransactions, setBulkEditSelectedSet]
+        [filteredSelectedTransactions]
     );
 
     const renderItems = useCallback(
@@ -317,7 +317,7 @@ const Reports = () => {
 
     useEffect(() => {
         // On every re-render.
-        let newHeightAbove;
+        let newHeightAbove: number;
         if (!refTransactionTable.current || !refThead.current) {
             newHeightAbove = 0;
         } else {
@@ -326,7 +326,7 @@ const Reports = () => {
         if (heightAbove !== newHeightAbove) {
             setHeightAbove(newHeightAbove);
         }
-    }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
+    }, [heightAbove, refTransactionTable, refThead]);
 
     const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state));
     const balance = useKresusState(state => driver.getBalance(state));
@@ -344,9 +344,9 @@ const Reports = () => {
 
     const lastCheckDateTooltip = `${$t(
         'client.transactions.last_sync_full'
-    )} ${formatDate.toLongString(lastCheckDate)}`;
+    )} ${formatDate.toLongString(lastCheckDate)} `;
 
-    let syncButton;
+    let syncButton: React.JSX.Element | undefined;
     if (accounts.length === 1 && !onlyOneManualAccount) {
         syncButton = (
             <li>
@@ -380,9 +380,11 @@ const Reports = () => {
                     <p className="main-balance">
                         <span className="label">
                             <span className="date">{formatDate.fromNow(lastCheckDate)}</span>
+                            {/** biome-ignore lint/a11y/useAriaPropsSupportedByRole: required by tooltipped */}
                             <span
                                 className="tooltipped tooltipped-sw tooltipped-multiline"
-                                aria-label={lastCheckDateTooltip}>
+                                aria-label={lastCheckDateTooltip}
+                            >
                                 <span className="fa fa-question-circle clickable" />
                             </span>
                         </span>
@@ -438,7 +440,7 @@ const Reports = () => {
                 <p className="alerts info">
                     {$t('client.transactions.no_transaction_found')}
                     <DisplayIf condition={hasSearchFields}>
-                        {` ${$t('client.transactions.broaden_search')}`}
+                        {` ${$t('client.transactions.broaden_search')} `}
                     </DisplayIf>
                 </p>
             </DisplayIf>
@@ -469,7 +471,8 @@ const Reports = () => {
                 <div className="swipeable-table-wrapper">
                     <table
                         className="swipeable-table no-vertical-border transaction-table"
-                        ref={refTransactionTable}>
+                        ref={refTransactionTable}
+                    >
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>
@@ -562,9 +565,9 @@ function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[
             return false;
         }
 
-        const op = BanksStore.transactionById(state.banks, id);
-        const opDate = op.budgetDate || op.date;
-        return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
+        const tr = BanksStore.transactionById(state.banks, id);
+        const trDate = tr.budgetDate || tr.date;
+        return trDate.getFullYear() === currentYear && trDate.getMonth() === currentMonth;
     });
 }
 
@@ -575,13 +578,12 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
         if (!BanksStore.transactionExists(state.banks, id)) {
             continue;
         }
-
-        const op = BanksStore.transactionById(state.banks, id);
-        if (op.amount < min) {
-            min = op.amount;
+        const tr = BanksStore.transactionById(state.banks, id);
+        if (tr.amount < min) {
+            min = tr.amount;
         }
-        if (op.amount > max) {
-            max = op.amount;
+        if (tr.amount > max) {
+            max = tr.amount;
         }
     }
     // Round the values to the nearest integer.
@@ -592,7 +594,7 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
 
 function computeTotal(
     state: GlobalState,
-    filterFunction: (op: Transaction) => boolean,
+    filterFunction: (tr: Transaction) => boolean,
     transactionIds: number[]
 ) {
     let total = 0;

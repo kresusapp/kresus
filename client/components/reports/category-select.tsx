@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
 import { createSelector } from '@reduxjs/toolkit';
+import { useCallback } from 'react';
 
-import { NONE_CATEGORY_ID, translate as $t, generateColor, notify, assert } from '../../helpers';
-import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
+import { translate as $t, assert, generateColor, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { type GlobalState, useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
@@ -90,7 +90,7 @@ const CategorySelector = (props: Props) => {
                 return;
             }
             const categoryId = parseInt(value, 10);
-            if (isNaN(categoryId)) {
+            if (Number.isNaN(categoryId)) {
                 return;
             }
             propsOnChange(categoryId);

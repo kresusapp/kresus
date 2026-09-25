@@ -1,8 +1,10 @@
 import moment from 'moment';
 
-import { UNKNOWN_TRANSACTION_TYPE, NONE_CATEGORY_ID, makeLogger } from '../helpers';
-
+import { makeLogger, NONE_CATEGORY_ID, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 import type { MinimalTransaction, Transaction } from '../models';
+import { DuplicatesIgnored } from '../models';
+import type { DuplicatesByAccount } from '../shared/types';
+import { INTERNAL_TRANSFER_TYPE, TRANSFER_TYPE } from '../shared/helpers';
 
 const log = makeLogger('duplicates-manager');
 
@@ -54,10 +56,18 @@ export function getDuplicatePairScore(
             return 0;
         }
 
+        // They could be duplicates if one of these is true:
+        // - `tr` is the unknown transaction type,
+        // - `next` is the unknown transaction type,
+        // - types are the same
+        // - types are respectively internal_transfer and transfer
+        // - or the opposite
         if (
             tr.type !== UNKNOWN_TRANSACTION_TYPE &&
             next.type !== UNKNOWN_TRANSACTION_TYPE &&
-            tr.type !== next.type
+            tr.type !== next.type &&
+            !(tr.type === INTERNAL_TRANSFER_TYPE.name && next.type === TRANSFER_TYPE.name) &&
+            !(tr.type === TRANSFER_TYPE.name && next.type === INTERNAL_TRANSFER_TYPE.name)
         ) {
             return 0;
         }
@@ -87,10 +97,22 @@ export function getDuplicatePairScore(
     return score;
 }
 
+// Returns a stable key for a pair of transactions, whatever the order of the two ids.
+function pairKey(transactionId: number, otherTransactionId: number): string {
+    return transactionId < otherTransactionId
+        ? `${transactionId}-${otherTransactionId}`
+        : `${otherTransactionId}-${transactionId}`;
+}
+
+/**
+ * @param pairsToIgnore pairs of transaction ids the user marked as not being duplicates; they are
+ * discarded from the results, whatever the order of the two ids in a pair.
+ */
 export function findRedundantPairs(
     transactions: Transaction[],
     duplicateThreshold: number,
-    ignoreDuplicatesWithDifferentCustomFields: boolean
+    ignoreDuplicatesWithDifferentCustomFields: boolean,
+    pairsToIgnore: [Transaction['id'], Transaction['id']][] = []
 ): [Transaction['id'], Transaction['id']][] {
     const before = Date.now();
     log.debug('Running findRedundantPairs algorithm...');
@@ -100,6 +122,8 @@ export function findRedundantPairs(
     // duplicateThreshold is in hours, transform it to days
     const threshold = Math.round(duplicateThreshold / 24);
     log.debug(`Threshold: ${threshold}`);
+
+    const ignoredKeys = new Set(pairsToIgnore.map(pair => pairKey(pair[0], pair[1])));
 
     // O(n log n)
     // Tests showed that assert'ing the rawLabel/date/amount fields inside the getDuplicatePairScore
@@ -119,7 +143,7 @@ export function findRedundantPairs(
                 ignoreDuplicatesWithDifferentCustomFields
             );
 
-            if (duplicateScore > 0) {
+            if (duplicateScore > 0 && !ignoredKeys.has(pairKey(tr.id, next.id))) {
                 similar.push([tr, next]);
             }
 
@@ -145,4 +169,32 @@ export function findRedundantPairs(
     });
 
     return similar.map(([trA, trB]) => [trA.id, trB.id]);
+}
+
+/**
+ * Returns the pairs of transactions the user chose to ignore, grouped by account id.
+ *
+ * They are listed even if the algorithm doesn't consider them duplicates anymore (e.g. after the
+ * threshold was lowered), so that the user can always un-ignore them.
+ */
+export async function findIgnoredDuplicates(userId: number): Promise<DuplicatesByAccount> {
+    const ignoredPairs = await DuplicatesIgnored.allWithTransaction(userId);
+
+    const pairsByAccount = new Map<number, [number, number][]>();
+    for (const pair of ignoredPairs) {
+        // Both transactions of a pair belong to the same account.
+        const { accountId } = pair.transaction;
+        const accountPairs = pairsByAccount.get(accountId);
+        if (accountPairs) {
+            accountPairs.push([pair.transactionId, pair.otherTransactionId]);
+        } else {
+            pairsByAccount.set(accountId, [[pair.transactionId, pair.otherTransactionId]]);
+        }
+    }
+
+    const ret: DuplicatesByAccount = [];
+    for (const [accountId, duplicates] of pairsByAccount) {
+        ret.push({ accountId, duplicates });
+    }
+    return ret;
 }

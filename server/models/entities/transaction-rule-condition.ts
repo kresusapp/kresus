@@ -1,9 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { unwrap } from '../../helpers';
-
+import type { TransactionRuleConditionType } from '../../shared/types';
 import { getRepository } from '..';
-
-import { TransactionRuleConditionType } from '../../shared/types';
 import TransactionRule from './transaction-rule';
 
 import User from './users';

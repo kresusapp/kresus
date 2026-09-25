@@ -1,7 +1,6 @@
-import { defineConfig } from 'vite';
-
-import plainText from 'vite-plugin-plain-text';
 import sprites from 'rollup-plugin-sprite';
+import { defineConfig } from 'vite';
+import plainText from 'vite-plugin-plain-text';
 import reactRefresh from 'vite-plugin-react-refresh';
 
 // NOTE: Known workarounds:

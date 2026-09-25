@@ -1,17 +1,16 @@
 import {
-    Entity,
-    Repository,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
-    JoinColumn,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
 
 import { assert, unwrap } from '../../helpers';
-import { PartialOnePlus } from '../helpers';
-
 import { getRepository } from '..';
+import type { PartialOnePlus } from '../helpers';
 
 import User from './users';
 import ViewAccount from './view-accounts';
@@ -50,9 +49,13 @@ export default class View {
     @Column('boolean', { default: false })
     createdByUser = false;
 
-    @OneToMany(() => ViewAccount, viewAccount => viewAccount.view, {
-        cascade: ['insert'],
-    })
+    @OneToMany(
+        () => ViewAccount,
+        viewAccount => viewAccount.view,
+        {
+            cascade: ['insert'],
+        }
+    )
     accounts!: ViewAccount[];
 
     // Static methods.
@@ -82,7 +85,7 @@ export default class View {
     static async find(userId: number, viewId: number): Promise<View | null> {
         return await View.repo().findOne({
             where: { id: viewId, userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
 
@@ -94,7 +97,7 @@ export default class View {
     static async all(userId: number): Promise<View[]> {
         return await View.repo().find({
             where: { userId },
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
     }
 

@@ -1,14 +1,12 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
-import * as GlobalStore from '../../store/global';
 import { translate as $t } from '../../helpers';
-
-import { Popconfirm } from '../ui';
 import { useGenericError } from '../../hooks';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as GlobalStore from '../../store/global';
+import * as UiStore from '../../store/ui';
 import URL from '../../urls';
+import { Popconfirm } from '../ui';
 
 export default () => {
     const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
@@ -56,7 +54,8 @@ export default () => {
                 </button>
             }
             onConfirm={handleDisable}
-            confirmClass="warning">
+            confirmClass="warning"
+        >
             <p>{$t('client.demo.disable_warning')}</p>
         </Popconfirm>
     );

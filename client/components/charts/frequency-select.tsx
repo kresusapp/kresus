@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import type * as React from 'react';
+import { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
 
 const FrequencySelect = (props: {
@@ -24,7 +25,8 @@ const FrequencySelect = (props: {
             className="form-element-block"
             value={props.value}
             onChange={onChange}
-            id={props.id}>
+            id={props.id}
+        >
             <option key="monthly" value="monthly">
                 {$t('client.charts.monthly')}
             </option>

@@ -1,9 +1,7 @@
-import React from 'react';
-
+import { assert } from '../../helpers';
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { assert } from '../../helpers';
-import { Driver, DriverType } from '../drivers';
+import { type Driver, DriverType } from '../drivers';
 
 import AccessItem from './access';
 

@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
-import { mergeWith } from '../../server/models/helpers';
 import { UNKNOWN_TRANSACTION_TYPE } from '../../server/helpers';
+import { mergeWith } from '../../server/models/helpers';
 
 describe('Merging two transactions together', () => {
     let target = {

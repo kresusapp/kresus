@@ -1,10 +1,8 @@
-import React, { useCallback } from 'react';
-
-import TypeSelect from './type-select';
-
+import { useCallback } from 'react';
 import { UNKNOWN_TRANSACTION_TYPE } from '../../helpers';
 import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
+import TypeSelect from './type-select';
 
 interface Props {
     // The unique identifier of the transaction for which the type has to be changed.

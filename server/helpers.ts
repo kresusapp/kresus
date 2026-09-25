@@ -1,43 +1,44 @@
-import { Response } from 'express';
+import type { Response } from 'express';
 import semver from 'semver';
-
-import {
-    maybeHas as has,
-    translate,
-    currency,
-    UNKNOWN_TRANSACTION_TYPE,
-    UNKNOWN_ACCOUNT_TYPE,
-    formatDate,
-    MIN_WOOB_VERSION,
-    UNKNOWN_WOOB_VERSION,
-    shouldIncludeInBalance,
-    shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS,
-    TRANSACTION_CARD_TYPE,
-    DEFERRED_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE,
-    NONE_CATEGORY_ID,
-} from './shared/helpers';
-
-import errors from './shared/errors.json';
 import Logger from './lib/logger';
 
-export {
-    has,
-    translate,
+import errors from './shared/errors.json';
+import {
     currency,
-    UNKNOWN_TRANSACTION_TYPE,
-    UNKNOWN_ACCOUNT_TYPE,
+    DEFERRED_CARD_TYPE,
+    FETCH_STATUS_SUCCESS,
     formatDate,
+    maybeHas as has,
+    INTERNAL_TRANSFER_TYPE,
+    TRANSFER_TYPE,
     MIN_WOOB_VERSION,
-    UNKNOWN_WOOB_VERSION,
+    NONE_CATEGORY_ID,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
+    translate,
+    UNKNOWN_ACCOUNT_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
+    UNKNOWN_WOOB_VERSION,
+} from './shared/helpers';
+
+export {
+    currency,
     DEFERRED_CARD_TYPE,
+    FETCH_STATUS_SUCCESS,
+    formatDate,
+    has,
     INTERNAL_TRANSFER_TYPE,
+    TRANSFER_TYPE,
+    MIN_WOOB_VERSION,
     NONE_CATEGORY_ID,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum,
+    TRANSACTION_CARD_TYPE,
+    translate,
+    UNKNOWN_ACCOUNT_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
+    UNKNOWN_WOOB_VERSION,
 };
 
 export function makeLogger(prefix: string): Logger {
@@ -250,4 +251,10 @@ export function currencyFormatter(someCurrency: string): CurrencyFormatter {
         currencyFormatterCache[someCurrency] = currency.makeFormat(someCurrency);
     }
     return currencyFormatterCache[someCurrency];
+}
+
+// Express types a route param as `string | string[]`; in practice a single value is always
+// provided, so coerce it to a plain string for parsing.
+export function asString(value: string | string[] | undefined): string {
+    return Array.isArray(value) ? value[0] : (value ?? '');
 }

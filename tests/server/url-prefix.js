@@ -1,6 +1,5 @@
 import assert from 'node:assert';
 
-// eslint-disable-next-line import/named
 import { makeUrlPrefixRegExp } from '../../server/helpers';
 
 describe('makeUrlPrefix', () => {

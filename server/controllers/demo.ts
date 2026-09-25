@@ -1,20 +1,16 @@
-import express from 'express';
-
+import type express from 'express';
+import { translate as $t, assert, asyncErr, KError } from '../helpers';
+import { getTranslator } from '../lib/translator';
 import { Access, Budget, Category, Setting } from '../models';
-import { assert, asyncErr, KError, translate as $t } from '../helpers';
-
 import DefaultCategories from '../shared/default-categories.json';
 import { DEMO_MODE } from '../shared/settings';
-
-import { IdentifiedRequest } from './routes';
-import { isDemoForced, isDemoEnabled } from './instance';
-
 import {
+    type CreateAndRetrieveDataResult,
     createAndRetrieveData as createAndRetrieveAccessData,
-    CreateAndRetrieveDataResult,
     destroyWithData as destroyAccessWithData,
 } from './accesses';
-import { getTranslator } from '../lib/translator';
+import { isDemoEnabled, isDemoForced } from './instance';
+import type { IdentifiedRequest } from './routes';
 
 export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDataResult> {
     const i18n = await getTranslator(userId);

@@ -1,6 +1,3 @@
-/* eslint-disable import/unambiguous */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // Allow side-effect imports of CSS files.
 declare module '*.css';
 

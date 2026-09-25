@@ -1,4 +1,4 @@
-import { SharedAlert, SharedBudget } from './types';
+import type { SharedAlert, SharedBudget } from './types';
 
 // Checks that the given object has at least all the properties which names are listed in
 // allowedFieldNames.

@@ -1,5 +1,3 @@
-/* eslint-disable import/unambiguous */
-
 type EmailTransport = 'smtp' | 'sendmail';
 
 type KresusProcess = {
@@ -13,6 +11,7 @@ type KresusProcess = {
     dataDir: string;
     port: number;
     host: string;
+    serverTimeout: number;
     pythonExec: string;
     urlPrefix: string;
     salt: string | null;

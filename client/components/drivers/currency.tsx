@@ -13,6 +13,6 @@ export class DriverCurrency extends Driver {
 
     getView(state: ViewStore.ViewState) {
         assert(this.currentCurrency !== null, 'currency must be defined');
-        return ViewStore.fromCurrencyCode(state, this.currentCurrency);
+        return ViewStore.byCurrencyCode(state, this.currentCurrency);
     }
 }

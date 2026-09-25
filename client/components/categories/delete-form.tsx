@@ -1,20 +1,19 @@
-import React, { useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback, useRef } from 'react';
+import { Navigate, useNavigate } from 'react-router';
 
-import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';
+import { translate as $t, NONE_CATEGORY_ID, notify } from '../../helpers';
 import { useRequiredParams } from '../../hooks';
 import { useKresusDispatch, useKresusState } from '../../store';
-import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import URL from './urls';
-
+import * as CategoriesStore from '../../store/categories';
 import { BackLink, Form } from '../ui';
+import URL from './urls';
 
 const DeleteForm = () => {
     const { categoryId: categoryStringId } = useRequiredParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryStringId, 10);
 
-    const category = useKresusState(state => CategoriesStore.fromId(state.categories, categoryId));
+    const category = useKresusState(state => CategoriesStore.byId(state.categories, categoryId));
     const categories = useKresusState(state => CategoriesStore.all(state.categories));
     const numTransactions = useKresusState(
         state => BanksStore.transactionIdsByCategoryId(state.banks, categoryId).length
@@ -45,13 +44,12 @@ const DeleteForm = () => {
             notify.error($t('client.category.deletion_error', { error: error.message }));
             navigate(URL.delete(categoryId));
         }
-    }, [dispatch, navigate, refReplace, categoryId]);
+    }, [dispatch, navigate, categoryId]);
 
-    let explainer;
-    let replaceForm;
+    let explainer: string;
+    let replaceForm: React.JSX.Element | undefined;
     if (numTransactions > 0) {
         explainer = $t('client.category.attached_transactions', {
-            // eslint-disable-next-line camelcase
             smart_count: numTransactions,
         });
 
@@ -70,7 +68,8 @@ const DeleteForm = () => {
                 inline={true}
                 label={$t('client.category.replace_with')}
                 id="replace-selector"
-                help={$t('client.category.replace_with_info')}>
+                help={$t('client.category.replace_with_info')}
+            >
                 <select ref={refReplace}>
                     <option key="none" value={NONE_CATEGORY_ID}>
                         {$t('client.category.dont_replace')}
@@ -81,6 +80,11 @@ const DeleteForm = () => {
         );
     } else {
         explainer = $t('client.category.no_transactions_attached');
+    }
+
+    if (category === null) {
+        // If the category to delete doesn't exist, redirect to the list of categories.
+        return <Navigate to={URL.list}></Navigate>;
     }
 
     return (
@@ -94,7 +98,7 @@ const DeleteForm = () => {
 
             {replaceForm}
 
-            <button className="btn danger" onClick={deleteCategory}>
+            <button type="button" className="btn danger" onClick={deleteCategory}>
                 {$t('client.general.delete')}
             </button>
         </Form>

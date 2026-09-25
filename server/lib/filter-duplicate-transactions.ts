@@ -1,8 +1,7 @@
 import moment from 'moment';
-
+import { DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
+import type { MinimalTransaction, Transaction } from '../models';
 import { getDuplicatePairScore } from './duplicates-manager';
-import { Transaction, MinimalTransaction } from '../models';
-import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
     This function tries to be smarter in detecting which of the provided
@@ -44,11 +43,11 @@ export default function filterDuplicateTransactions(
 
         const updateBase: Partial<Transaction> = {};
 
-        if (!!known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
+        if (known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
             updateBase.isRecurrentTransaction = false;
         }
 
-        if (!!known.createdByUser && !provided.createdByUser) {
+        if (known.createdByUser && !provided.createdByUser) {
             updateBase.createdByUser = false;
         }
 

@@ -1,21 +1,18 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
+    Entity,
     JoinColumn,
     ManyToOne,
-    Repository,
+    PrimaryGeneratedColumn,
+    type Repository,
     Unique,
 } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import Category from './categories';
-import View from './views';
-
 import { unwrap } from '../../helpers';
+import { getRepository } from '..';
 import { ForceNumericColumn } from '../helpers';
+import Category from './categories';
+import User from './users';
+import View from './views';
 
 @Entity('budget')
 @Unique(['userId', 'viewId', 'year', 'month', 'categoryId'])

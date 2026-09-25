@@ -1,19 +1,20 @@
-import React, { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
+import throttle from 'lodash.throttle';
+import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import {
     HashRouter,
+    Link,
+    matchPath,
+    Navigate,
+    type NavigateOptions,
     Route,
     Routes,
-    Link,
-    Navigate,
-    useMatch,
-    useLocation,
-    matchPath,
-    type NavigateOptions,
     type To,
+    useLocation,
+    useMatch,
 } from 'react-router';
-import { Provider } from 'react-redux';
-import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
 // Moment.js locales (must be imported from this file to avoid being run in
@@ -22,42 +23,39 @@ import 'moment/dist/locale/fr';
 import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
+import { DEV_ENV, FORCE_DEMO_MODE, WOOB_INSTALLED } from '../shared/instance';
+// Components
+import About from './components/about';
+import Accesses from './components/accesses';
+import Budget from './components/budget';
+import Categories from './components/categories';
+import Dashboard from './components/dashboard';
+import { DriverContext, DriverType, getDriver, NoDriver } from './components/drivers';
+import { DriverAccount } from './components/drivers/account';
+import DuplicatesList from './components/duplicates';
+import DemoButton from './components/header/demo-button';
+import Menu from './components/menu';
+import DropdownMenu from './components/menu/dropdown';
+import Onboarding from './components/onboarding';
+import WoobInstallIndex from './components/onboarding/woob-readme';
+import Overlay, { LoadingMessage } from './components/overlay';
+import RecurringTransactions from './components/recurring-transactions/index';
+import Reports from './components/reports';
+import TransactionRules from './components/rules';
+import Settings from './components/settings';
+import Transactions from './components/transactions';
+import DisplayIf from './components/ui/display-if';
+import ErrorReporter from './components/ui/error-reporter';
+import Form from './components/ui/form';
+import { translate as $t, areWeFunYet, assert, computeIsSmallScreen, debug } from './helpers';
+import { useRequiredParams } from './hooks';
 // Global variables
 import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState } from './store';
 import * as BanksStore from './store/banks';
-import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
+import * as UiStore from './store/ui';
 import * as ViewStore from './store/views';
-import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
-import { useRequiredParams } from './hooks';
 import URL from './urls';
-import { DEV_ENV, FORCE_DEMO_MODE, WOOB_INSTALLED } from '../shared/instance';
-
-// Components
-import About from './components/about';
-import Reports from './components/reports';
-import Budget from './components/budget';
-import DuplicatesList from './components/duplicates';
-import Settings from './components/settings';
-import Accesses from './components/accesses';
-import Categories from './components/categories';
-import Transactions from './components/transactions';
-import RecurringTransactions from './components/recurring-transactions/index';
-import Onboarding from './components/onboarding';
-import WoobInstallIndex from './components/onboarding/woob-readme';
-import Dashboard from './components/dashboard';
-import TransactionRules from './components/rules';
-import Menu from './components/menu';
-import DropdownMenu from './components/menu/dropdown';
-
-import DemoButton from './components/header/demo-button';
-
-import Form from './components/ui/form';
-import DisplayIf from './components/ui/display-if';
-import ErrorReporter from './components/ui/error-reporter';
-import Overlay, { LoadingMessage } from './components/overlay';
-import { DriverAccount } from './components/drivers/account';
-import { getDriver, DriverContext, NoDriver, DriverType } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -99,7 +97,7 @@ const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.Rea
     const initialViewId = useKresusState(state => {
         const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
         if (initialAccountId !== null) {
-            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            const view = ViewStore.byAccountId(state.views, initialAccountId);
             if (view) {
                 return view.id;
             }
@@ -184,7 +182,7 @@ const View = () => {
                 }
             />
             <Route
-                path="duplicates"
+                path="duplicates/*"
                 element={
                     <RedirectIfUnknownAccount>
                         <DuplicatesList />
@@ -213,7 +211,7 @@ const Kresus = () => {
     const initialViewId = useKresusState(state => {
         const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
         if (initialAccountId !== null) {
-            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            const view = ViewStore.byAccountId(state.views, initialAccountId);
             if (view) {
                 return view.id;
             }
@@ -226,7 +224,7 @@ const Kresus = () => {
     );
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // biome-ignore lint/correctness/useExhaustiveDependencies: we have a global keydown handler above.
     const handleWindowResize = useCallback(
         throttle(event => {
             const newIsSmallScreen = computeIsSmallScreen(event.target.innerWidth);
@@ -301,7 +299,11 @@ const Kresus = () => {
                         element={
                             <DisplayOrRedirectToInitialScreen>
                                 <header>
-                                    <button className="menu-toggle" onClick={handleToggleMenu}>
+                                    <button
+                                        type="button"
+                                        className="menu-toggle"
+                                        onClick={handleToggleMenu}
+                                    >
                                         <span className="fa fa-navicon" />
                                     </button>
                                     <h1>
@@ -327,6 +329,7 @@ const Kresus = () => {
                                 </header>
 
                                 <DriverProvider>
+                                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: TODO: re-check */}
                                     <main onClick={handleAutoCloseMenu}>
                                         <Routes>
                                             <Route path="/*" element={<Menu />} />
@@ -423,6 +426,7 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                 {$t('client.fun.message')
                     .split('\n')
                     .map((line, idx) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: Don't bother me for something silly :P
                         <p key={idx}>{line}</p>
                     ))}
             </div>
@@ -433,7 +437,8 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                     href="https://liberapay.com/Kresus"
                     target="_blank"
                     onClick={handleFunLinkClick}
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                >
                     {$t('client.fun.cancel')}
                 </a>
 
@@ -442,7 +447,8 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
                     href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUIcmlja3JvbGw%3D"
                     target="_blank"
                     onClick={handleFunLinkClick}
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                >
                     {$t('client.fun.confirm')}
                 </a>
             </Form.Toolbar>

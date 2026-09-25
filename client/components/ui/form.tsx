@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-
-import DisplayIf from './display-if';
+import * as React from 'react';
+import { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
+import DisplayIf from './display-if';
 
 import './form.css';
 
@@ -23,7 +23,7 @@ const Form = (props: FormProps) => {
     const { onSubmit: propsOnSubmit } = props;
 
     const onSubmit = useCallback(
-        (event: React.FormEvent<HTMLFormElement>) => {
+        (event: React.SubmitEvent<HTMLFormElement>) => {
             event.preventDefault();
             if (propsOnSubmit) {
                 return propsOnSubmit();

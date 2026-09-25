@@ -1,13 +1,12 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { translate as $t, notify, noValueFoundMessage } from '../../helpers';
-
+import type { CustomFieldDescriptor } from '../../models';
 import { Form } from '../ui';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import PasswordInput from '../ui/password-input';
 import TextInput from '../ui/text-input';
 import ValidatedTextInput from '../ui/validated-text-input';
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import { CustomFieldDescriptor } from '../../models';
 
 const CustomBankField = (props: {
     // The static custom field descriptor object.
@@ -23,7 +22,7 @@ const CustomBankField = (props: {
         (event: string | null) => {
             const field = props.field;
 
-            let value;
+            let value: string | null;
             switch (field.type) {
                 case 'select':
                     if (event !== null) {
@@ -55,7 +54,7 @@ const CustomBankField = (props: {
     const optional = !!field.optional;
     const checkValidityClass = optional ? '' : 'check-validity';
 
-    let customFieldFormInput;
+    let customFieldFormInput: React.JSX.Element;
     switch (field.type) {
         case 'select':
             customFieldFormInput = (

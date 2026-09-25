@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 const ButtonLink = (props: {
@@ -34,7 +34,8 @@ const ButtonLink = (props: {
             type="button"
             className={`btn ${additionalClass}`}
             aria-label={aria}
-            onClick={handleClick}>
+            onClick={handleClick}
+        >
             {iconComponent}
             {labelContainer}
         </button>

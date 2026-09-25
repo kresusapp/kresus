@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 import { isSqlite } from '../helpers';
 
 export class MoveLoginPasswordToFields1756391927839 implements MigrationInterface {
@@ -19,7 +19,7 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
         // fields in CASCADE. Disable the foreign keys checks beforehand and re-enable them afterwards.
         // However, doing the "PRAGMA foreign_keys" thing in a transaction is a no-op
         // (see https://www.sqlite.org/pragma.html), so we commit the transaction first.
-        const isSqliteDriver = isSqlite(queryRunner.connection);
+        const isSqliteDriver = isSqlite(queryRunner.dataSource);
         let wasInTransaction = false;
 
         if (isSqliteDriver) {
@@ -27,8 +27,6 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
                 await queryRunner.commitTransaction();
 
                 wasInTransaction = true;
-
-                // eslint-disable-next-line no-empty
             } catch (ignore) {}
 
             await queryRunner.query('PRAGMA foreign_keys = OFF');
@@ -42,7 +40,6 @@ export class MoveLoginPasswordToFields1756391927839 implements MigrationInterfac
             if (wasInTransaction) {
                 try {
                     await queryRunner.startTransaction();
-                    // eslint-disable-next-line no-empty
                 } catch (ignore) {}
             }
         }

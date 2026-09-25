@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import type * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
-
-import URL from '../../urls';
 import { translate as $t } from '../../helpers';
+import URL from '../../urls';
 
 import DisplayIf from '../ui/display-if';
 
@@ -25,9 +25,10 @@ const DropdownContent = (props: DropdownContentProps) => {
     }, [props.onKeydown]);
 
     return (
-        <div id={props.id} onClick={props.onClick}>
+        // biome-ignore lint/a11y/useKeyWithClickEvents: we have a global keydown handler above.
+        <p id={props.id} onClick={props.onClick}>
             {props.children}
-        </div>
+        </p>
     );
 };
 
@@ -36,11 +37,11 @@ const DropdownMenu = () => {
 
     const handleHide = useCallback(() => {
         setShow(false);
-    }, [setShow]);
+    }, []);
 
     const handleToggle = useCallback(() => {
         setShow(!show);
-    }, [setShow, show]);
+    }, [show]);
 
     const handleKeydown = useCallback(
         (event: KeyboardEvent) => {
@@ -53,12 +54,13 @@ const DropdownMenu = () => {
 
     return (
         <div className="settings-dropdown">
-            <button className="fa fa-cogs" onClick={handleToggle} />
+            <button type="button" className="fa fa-cogs" onClick={handleToggle} />
             <DisplayIf condition={show}>
                 <DropdownContent
                     id="dropdown-overlay"
                     onKeydown={handleKeydown}
-                    onClick={handleHide}>
+                    onClick={handleHide}
+                >
                     <nav className="settings-dropdown-menu">
                         <ul>
                             <li>

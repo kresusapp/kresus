@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
-import { foreignKey, foreignKeyUserId, idColumn } from '../helpers';
+import { type MigrationInterface, type QueryRunner, Table } from 'typeorm';
 import Account from '../entities/accounts';
+import { foreignKey, foreignKeyUserId, idColumn } from '../helpers';
 
 export class AddViews1734262035140 implements MigrationInterface {
     public async up(q: QueryRunner): Promise<void> {

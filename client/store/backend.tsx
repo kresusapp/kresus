@@ -1,22 +1,22 @@
-import { assert, translate as $t } from '../helpers';
-import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
-import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import type { DeepPartial } from 'typeorm';
+import type { BatchRequest, BatchResponse } from '../../shared/api/batch';
 import DefaultSettings from '../../shared/default-settings';
-import {
-    Account,
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { hasForbiddenField, hasForbiddenOrMissingField } from '../../shared/validators';
+import { translate as $t, assert } from '../helpers';
+import type {
     Access,
     AccessCustomField,
+    Account,
     Alert,
     Budget,
     Category,
     PartialTransaction,
-    Rule,
     RecurringTransaction,
+    Rule,
 } from '../models';
-import { ServerView } from './views';
-import { FinishUserActionFields } from './banks';
-import { DeepPartial } from 'typeorm';
-import { BatchRequest, BatchResponse } from '../../shared/api/batch';
+import type { FinishUserActionFields } from './banks';
+import type { ServerView } from './views';
 
 class Request {
     url: string;
@@ -83,13 +83,13 @@ class Request {
             options.body = this.bodyContent;
         }
 
-        let response;
+        let response: Response;
         try {
             response = await window.fetch(this.url, options);
         } catch (e) {
             let message = e.message || '?';
             let shortMessage = message;
-            if (message && message.includes('NetworkError')) {
+            if (message?.includes('NetworkError')) {
                 message = shortMessage = $t('client.general.network_error');
             }
             throw {
@@ -100,14 +100,16 @@ class Request {
         }
 
         const contentType = response.headers.get('Content-Type');
-        const isJsonResponse = contentType !== null && contentType.includes('json');
+        const isJsonResponse = contentType?.includes('json');
 
         // Do the JSON parsing ourselves. Otherwise, we cannot access the raw
         // text in case of a JSON decode error nor can we only decode if the
         // body is not empty.
         const body = await response.text();
 
-        let bodyOrJson;
+        // TODO: would be nice to better type this
+        let bodyOrJson: any;
+
         if (!isJsonResponse) {
             bodyOrJson = body;
         } else if (!body) {
@@ -127,6 +129,14 @@ class Request {
         // If the initial response status code wasn't in the 200 family, the
         // JSON describes an error.
         if (!response.ok) {
+            if (typeof bodyOrJson === 'string') {
+                throw {
+                    code: null,
+                    message: bodyOrJson || '?',
+                    shortMessage: bodyOrJson || '?',
+                };
+            }
+
             throw {
                 code: bodyOrJson.code,
                 message: bodyOrJson.message || '?',
@@ -376,11 +386,11 @@ export function deleteAlert(alertId: number) {
 
 // /api/settings
 export function saveSetting(key: string, value: string | null) {
-    let normalizedValue;
+    let normalizedValue: string | null;
 
     switch (key) {
         case DEFAULT_ACCOUNT_ID:
-            normalizedValue = value === null ? DefaultSettings.get(DEFAULT_ACCOUNT_ID) : value;
+            normalizedValue = value === null ? DefaultSettings.get(DEFAULT_ACCOUNT_ID)! : value;
             break;
 
         default:
@@ -483,4 +493,21 @@ export function deleteView(viewId: number) {
 // /api/duplicates
 export function fetchDuplicates() {
     return new Request('api/duplicates').run();
+}
+
+export function ignoreDuplicate(transactionId: number, otherTransactionId: number) {
+    return new Request('api/duplicates/ignored')
+        .post()
+        .json({ transactionId, otherTransactionId })
+        .run();
+}
+
+export function unignoreDuplicate(
+    transactionId: number,
+    otherTransactionId: number
+): Promise<{ isDuplicate: boolean }> {
+    return new Request('api/duplicates/ignored')
+        .delete()
+        .json({ transactionId, otherTransactionId })
+        .run();
 }

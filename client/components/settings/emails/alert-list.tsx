@@ -1,11 +1,8 @@
-import React from 'react';
-
 import { translate as $t } from '../../../helpers';
 import { useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
-
-import AlertItem from './alert-item';
 import { ButtonLink } from '../../ui';
+import AlertItem from './alert-item';
 
 import URL from './urls';
 

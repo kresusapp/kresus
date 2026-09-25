@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import type * as moment from 'moment';
 
 // In ms.
 const WAKEUP_INTERVAL = 20 * 60 * 1000;

@@ -1,20 +1,17 @@
 import {
-    MigrationInterface,
-    QueryRunner,
+    type MigrationInterface,
+    type QueryRunner,
     TableColumn,
     TableForeignKey,
     TableUnique,
 } from 'typeorm';
-
-import { foreignKey } from '../helpers';
 import { makeLogger } from '../../helpers';
-
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-
-import User from '../entities/users';
-import Setting from '../entities/settings';
-import View from '../entities/views';
 import Account from '../entities/accounts';
+import Setting from '../entities/settings';
+import User from '../entities/users';
+import View from '../entities/views';
+import { foreignKey } from '../helpers';
 
 const log = makeLogger('controllers/categories');
 
@@ -24,7 +21,7 @@ const COLUMN_NAMES = ['userId', 'viewId', 'year', 'month', 'categoryId'];
 export class AddViewIdInBudget1737381056464 implements MigrationInterface {
     public static async guessDefaultAccount(q: QueryRunner, userId: number) {
         const allAccounts = await q.manager.find(Account, {
-            select: ['id', 'type'],
+            select: { id: true, type: true },
             where: {
                 userId,
             },
@@ -43,7 +40,7 @@ export class AddViewIdInBudget1737381056464 implements MigrationInterface {
 
     public async up(q: QueryRunner): Promise<void> {
         const views = await q.manager.find(View, {
-            relations: ['accounts'],
+            relations: { accounts: true },
         });
 
         await q.addColumn(
@@ -90,7 +87,7 @@ export class AddViewIdInBudget1737381056464 implements MigrationInterface {
 
         // For each user, retrieve the current default account id.
         const users = await q.manager.find(User, {
-            select: ['id'],
+            select: { id: true },
         });
         const usersDefaultAccountIds = new Map<number, number>();
         const defaultAccountSettings = await q.manager.find(Setting, {

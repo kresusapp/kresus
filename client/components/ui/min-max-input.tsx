@@ -1,12 +1,12 @@
-import React, {
-    useState,
-    useImperativeHandle,
-    ChangeEvent,
-    useCallback,
-    useLayoutEffect,
-} from 'react';
-
 import Slider from 'rc-slider';
+import {
+    type ChangeEvent,
+    forwardRef,
+    useCallback,
+    useImperativeHandle,
+    useLayoutEffect,
+    useState,
+} from 'react';
 
 import 'rc-slider/assets/index.css';
 import './min-max-input.css';
@@ -34,13 +34,14 @@ export interface MinMaxInputRef {
     clear: () => void;
 }
 
-const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
-    const currentLow = props.low || props.min;
-    const currentMax = props.high || props.max;
+const MinMaxInput = forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
+    const currentLow = props.low ?? props.min;
+    const currentHigh = props.high ?? props.max;
+
     const [lowText, setLowText] = useState<string>(`${currentLow}`);
     const [lowNumber, setLowNumber] = useState<number>(currentLow);
-    const [highText, setHighText] = useState<string>(`${currentMax}`);
-    const [highNumber, setHighNumber] = useState<number>(currentMax);
+    const [highText, setHighText] = useState<string>(`${currentHigh}`);
+    const [highNumber, setHighNumber] = useState<number>(currentHigh);
 
     const [prevMin, setPrevMin] = useState<number>(props.min);
     const [prevMax, setPrevMax] = useState<number>(props.max);
@@ -91,7 +92,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
                 onChange(newVal, highNumber);
             }
         },
-        [setLowNumber, lowNumber, setLowText, highNumber, onChange]
+        [lowNumber, highNumber, onChange]
     );
 
     const updateHigh = useCallback(
@@ -102,7 +103,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
                 onChange(lowNumber, newVal);
             }
         },
-        [setHighNumber, setHighText, lowNumber, onChange, highNumber]
+        [lowNumber, onChange, highNumber]
     );
 
     const validateLow = useCallback(
@@ -137,7 +138,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
                 validateLow(newLow);
             }
         },
-        [setLowText, validateLow]
+        [validateLow]
     );
 
     const handleLowBlur = useCallback(() => {
@@ -148,7 +149,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
         } else {
             validateLow(newLow);
         }
-    }, [lowText, setLowText, lowNumber, validateLow]);
+    }, [lowText, lowNumber, validateLow]);
 
     const handleHigh = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
@@ -163,7 +164,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
                 validateHigh(newHigh);
             }
         },
-        [setHighText, validateHigh]
+        [validateHigh]
     );
 
     const handleHighBlur = useCallback(() => {
@@ -174,7 +175,7 @@ const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, r
         } else {
             validateHigh(newHigh);
         }
-    }, [highText, setHighText, validateHigh, highNumber]);
+    }, [highText, validateHigh, highNumber]);
 
     const handleSlider = useCallback(
         (values: number | number[]) => {

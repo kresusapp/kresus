@@ -1,8 +1,7 @@
-import React, { ReactNode } from 'react';
-
-import { copyContentToClipboard, translate as $t } from '../../helpers';
-import ExternalLink from '../ui/external-link';
+import { Component, createRef, type ReactNode } from 'react';
 import { repository } from '../../../package.json';
+import { translate as $t, copyContentToClipboard } from '../../helpers';
+import ExternalLink from '../ui/external-link';
 
 import './error-reporter.css';
 
@@ -14,12 +13,12 @@ interface ErrorReporterState {
     error: string | null;
 }
 
-class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterState> {
+class ErrorReporter extends Component<ErrorReporterProps, ErrorReporterState> {
     state = {
         error: null,
     };
 
-    refErrorContent = React.createRef<HTMLPreElement>();
+    refErrorContent = createRef<HTMLPreElement>();
 
     static getDerivedStateFromError(error: Error) {
         let err = error.toString();
@@ -58,7 +57,7 @@ class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterSta
                         </ExternalLink>
                     </p>
                     <p>
-                        <button className="btn" onClick={this.handleCopy}>
+                        <button type="button" className="btn" onClick={this.handleCopy}>
                             {$t('client.general.copy')}
                         </button>
                     </p>

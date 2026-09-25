@@ -1,15 +1,12 @@
-import express from 'express';
-
-import { Setting } from '../models';
+import type express from 'express';
+import { asyncErr, KError } from '../helpers';
 
 import getEmailer from '../lib/emailer';
 import getNotifier from '../lib/notifications';
-
-import { IdentifiedRequest } from './routes';
-
-import { KError, asyncErr } from '../helpers';
-import { APPRISE_URL, EMAIL_RECIPIENT, LOCALE } from '../shared/settings';
 import { resetTranslator } from '../lib/translator';
+import { Setting } from '../models';
+import { APPRISE_URL, EMAIL_RECIPIENT, LOCALE } from '../shared/settings';
+import type { IdentifiedRequest } from './routes';
 
 function postSave(userId: number, key: string, value: string) {
     switch (key) {

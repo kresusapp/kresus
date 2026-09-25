@@ -1,7 +1,7 @@
 import assert from 'node:assert';
-
-import { Access, Account, Transaction } from '../../server/models';
 import { importData } from '../../server/controllers/all';
+import { Access, Account, Transaction } from '../../server/models';
+import { LOW_NUM_ENTITIES_IN_BATCH } from '../../server/models/helpers';
 
 import { checkObjectIsSubsetOf } from '../helpers';
 
@@ -126,6 +126,98 @@ describe('Transaction model API', () => {
             );
             assert.ok(
                 world.transactions.some(tr => checkObjectIsSubsetOf(tr, twoFirstTransactions[1]))
+            );
+        });
+    });
+
+    describe('Transaction.bulkCreate', () => {
+        let accountId = null;
+
+        // Builds `count` distinct transactions for the test account.
+        function makeTransactions(count) {
+            return Array.from({ length: count }, (_unused, i) => ({
+                accountId,
+                type: 'type.card',
+                label: `bulk transaction ${i}`,
+                rawLabel: `bulk transaction ${i}`,
+                date: new Date('2021-01-01T00:00:00.000Z'),
+                importDate: new Date('2021-01-01T00:00:00.000Z'),
+                amount: -(i + 1),
+            }));
+        }
+
+        beforeEach(async () => {
+            await Access.destroyAll(USER_ID);
+            await Account.destroyAll(USER_ID);
+            await Transaction.destroyAll(USER_ID);
+
+            await importData(USER_ID, {
+                accesses: [
+                    {
+                        id: 0,
+                        vendorId: 'manual',
+                        login: 'whatever-manual-acc--does-not-care',
+                    },
+                ],
+                accounts: [
+                    {
+                        id: 0,
+                        accessId: 0,
+                        vendorAccountId: 'bulk-create-account',
+                        type: 'account-type.checking',
+                        initialBalance: 0,
+                        label: 'Compte bulk',
+                        currency: 'EUR',
+                        importDate: new Date('2021-01-01T00:00:00.000Z'),
+                    },
+                ],
+            });
+
+            const accounts = await Account.all(USER_ID);
+            assert.strictEqual(accounts.length, 1);
+            accountId = accounts[0].id;
+        });
+
+        it('should return no id when there is nothing to insert', async () => {
+            assert.deepStrictEqual(await Transaction.bulkCreate(USER_ID, []), []);
+        });
+
+        it('should return the id of the single inserted transaction', async () => {
+            const insertedIds = await Transaction.bulkCreate(USER_ID, makeTransactions(1));
+
+            const transactions = await Transaction.byAccount(USER_ID, accountId);
+            assert.strictEqual(transactions.length, 1);
+            assert.deepStrictEqual(insertedIds, [transactions[0].id]);
+        });
+
+        it('should return one id per inserted transaction, in the same order', async () => {
+            const toInsert = makeTransactions(3);
+            const insertedIds = await Transaction.bulkCreate(USER_ID, toInsert);
+
+            assert.strictEqual(insertedIds.length, toInsert.length);
+
+            for (let i = 0; i < toInsert.length; i++) {
+                const inserted = await Transaction.find(USER_ID, insertedIds[i]);
+                assert.ok(inserted !== null, `transaction ${insertedIds[i]} should exist`);
+                assert.strictEqual(inserted.label, toInsert[i].label);
+            }
+        });
+
+        it('should return one id per inserted transaction when split in several batches', async () => {
+            const toInsert = makeTransactions(LOW_NUM_ENTITIES_IN_BATCH * 2);
+            const insertedIds = await Transaction.bulkCreate(USER_ID, toInsert);
+
+            assert.strictEqual(insertedIds.length, toInsert.length);
+            assert.strictEqual(new Set(insertedIds).size, toInsert.length);
+
+            const transactions = await Transaction.byAccount(USER_ID, accountId);
+            assert.strictEqual(transactions.length, toInsert.length);
+            assert.deepStrictEqual(
+                insertedIds.slice().sort((a, b) => a - b),
+                transactions
+                    .map(tr => tr.id)
+                    .slice()
+                    .sort((a, b) => a - b)
             );
         });
     });

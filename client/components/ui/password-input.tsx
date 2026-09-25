@@ -1,6 +1,7 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import * as React from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t, assert } from '../../helpers';
 
 // Note this password input doesn't accept passwords starting with or ending
 // with spaces (or passwords only containing spaces).
@@ -39,7 +40,7 @@ const PasswordInput = forwardRef<PasswordInputRef, PasswordInputProps>((props, r
 
     const handleClick = useCallback(() => {
         setShowPassword(!showPassword);
-    }, [setShowPassword, showPassword]);
+    }, [showPassword]);
 
     const { onChange: propsOnChange } = props;
     const handleChange = useCallback(
@@ -61,10 +62,10 @@ const PasswordInput = forwardRef<PasswordInputRef, PasswordInputProps>((props, r
         },
     }));
 
-    let iconClass;
-    let type;
-    let title;
-    let accessibleIconClass;
+    let iconClass: string;
+    let type: string;
+    let title: string;
+    let accessibleIconClass: string;
     if (showPassword) {
         iconClass = 'eye-slash';
         type = 'text';
@@ -88,6 +89,7 @@ const PasswordInput = forwardRef<PasswordInputRef, PasswordInputProps>((props, r
                 placeholder={props.placeholder}
                 onChange={handleChange}
                 autoComplete="new-password"
+                // biome-ignore lint/a11y/noAutofocus: it's fiiiiine
                 autoFocus={props.autoFocus || false}
                 className="check-validity"
                 defaultValue={props.defaultValue || undefined}

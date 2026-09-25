@@ -1,28 +1,31 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { Dispatch } from '@reduxjs/toolkit';
 import { Chart } from 'chart.js';
-
-import { useKresusState } from '../../store';
-import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import {
-    getWellsColors,
-    assert,
-    translate as $t,
-    round2,
-    INTERNAL_TRANSFER_TYPE,
-    getFontColor,
-} from '../../helpers';
+import moment from 'moment';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { type NavigateFunction, useNavigate } from 'react-router';
 import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
-
-import DisplayIf from '../ui/display-if';
-import DiscoveryMessage from '../ui/discovery-message';
-
-import FrequencySelect from './frequency-select';
-import CurrencySelect from './currency-select';
-import { Transaction } from '../../models';
+import {
+    translate as $t,
+    assert,
+    getFontColor,
+    getWellsColors,
+    INTERNAL_TRANSFER_TYPE,
+    round2,
+} from '../../helpers';
+import type { Transaction } from '../../models';
+import { useKresusState } from '../../store';
+import * as BanksStore from '../../store/banks';
+import * as SettingsStore from '../../store/settings';
+import * as UiStore from '../../store/ui';
+import URLs from '../../urls';
+import { type Driver, DriverContext } from '../drivers';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
+import DiscoveryMessage from '../ui/discovery-message';
+import DisplayIf from '../ui/display-if';
 import { initializeCharts } from '.';
-import { DriverContext } from '../drivers';
+import CurrencySelect from './currency-select';
+import FrequencySelect from './frequency-select';
 
 initializeCharts();
 
@@ -34,7 +37,7 @@ function dateToMonthlyKey(d: Date) {
 
 function formatLabelMonthly(date: Date) {
     // Undefined means the default locale
-    let defaultLocale;
+    const defaultLocale = undefined;
     return date.toLocaleDateString(defaultLocale, {
         year: '2-digit',
         month: 'short',
@@ -46,6 +49,9 @@ function formatLabelYearly(date: Date) {
 }
 
 function createChartPositiveNegative(
+    dispatch: Dispatch<any>,
+    navigate: NavigateFunction,
+    driver: Driver,
     chartId: string,
     frequency: string,
     transactions: Transaction[],
@@ -54,7 +60,7 @@ function createChartPositiveNegative(
 ) {
     let dateKey: (d: Date) => string;
     let decrement: (d: Date) => Date;
-    let formatLabel;
+    let formatLabel: (d: Date) => string;
     switch (frequency) {
         case 'monthly':
             dateKey = dateToMonthlyKey;
@@ -89,18 +95,18 @@ function createChartPositiveNegative(
     // Datekey -> Date
     const dateSet = new Map();
     for (let i = 0; i < transactions.length; i++) {
-        const op = transactions[i];
-        const dk = transactionToKey(op);
+        const tr = transactions[i];
+        const dk = transactionToKey(tr);
         map.set(dk, map.get(dk) || [0, 0, 0]);
 
         const triplet = map.get(dk);
         assert(typeof triplet !== 'undefined', 'just created');
 
-        triplet[POS] += op.amount > 0 ? op.amount : 0;
-        triplet[NEG] += op.amount < 0 ? -op.amount : 0;
-        triplet[BAL] += op.amount;
+        triplet[POS] += tr.amount > 0 ? tr.amount : 0;
+        triplet[NEG] += tr.amount < 0 ? -tr.amount : 0;
+        triplet[BAL] += tr.amount;
 
-        dateSet.set(dk, +(op.budgetDate || op.date));
+        dateSet.set(dk, +(tr.budgetDate || tr.date));
     }
 
     // Sort date in ascending order: push all pairs of (transactionToKey, date) in an
@@ -185,6 +191,57 @@ function createChartPositiveNegative(
         options: {
             responsive: true,
             maintainAspectRatio: false,
+
+            // Make it clear that the elements can be clicked.
+            onHover: (_evt, elements, thisChart) => {
+                thisChart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            },
+
+            // On click, open the reports view corresponding to the current category.
+            onClick(_e, elements) {
+                if (elements.length === 0) {
+                    return;
+                }
+
+                // Can click only one element at a time.
+                const e = elements[0];
+
+                const amountLow = e.datasetIndex === POS ? 0 : undefined;
+                const amountHigh = e.datasetIndex === NEG ? 0 : undefined;
+
+                // e.index is the index in the date set. Reconstruct a date from it.
+                const dateLow = moment(ascTicks[e.index]);
+                let dateHigh: moment.Moment;
+                if (frequency === 'monthly') {
+                    dateLow.date(1);
+                    dateHigh = moment(dateLow).date(dateLow.daysInMonth());
+                } else if (frequency === 'yearly') {
+                    dateLow.month(0).date(1);
+                    dateHigh = moment(dateLow).month(11).date(31);
+                } else {
+                    assert(false, 'unexpected frequency');
+                }
+
+                // Extend the date boundaries as much as possible to avoid bad surprises.
+                dateLow.hours(0).minutes(0).seconds(0);
+                dateHigh.hours(23).minutes(59).seconds(59);
+
+                // Make sure the search panel is open, in the reports view.
+                dispatch(UiStore.toggleSearchDetails(true));
+
+                // Set the date and amount fields if needs be.
+                dispatch(
+                    UiStore.setSearchFields({
+                        dateLow: dateLow.toDate(),
+                        dateHigh: dateHigh.toDate(),
+                        amountLow,
+                        amountHigh,
+                    })
+                );
+
+                // Move to the reports view.
+                navigate(URLs.reports.url(driver));
+            },
         },
     });
 }
@@ -204,15 +261,22 @@ const BarChart = (
 ) => {
     const container = useRef<Chart | null>(null);
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const driver = useContext(DriverContext);
+
     const redraw = useCallback(() => {
         container.current = createChartPositiveNegative(
+            dispatch,
+            navigate,
+            driver,
             props.chartId,
             props.frequency,
             props.transactions,
             props.fromDate,
             props.toDate
         );
-    }, [props]);
+    }, [props, dispatch, navigate, driver]);
 
     useEffect(() => {
         redraw();
@@ -255,28 +319,22 @@ const InOutChart = () => {
     const [fromDate, setFromDate] = useState<Date | undefined>();
     const [toDate, setToDate] = useState<Date | undefined>();
 
-    const selectDateRange = useCallback(
-        (dates: [Date, Date?] | null) => {
-            if (dates === null) {
-                setFromDate(undefined);
-                setToDate(undefined);
-            } else {
-                setFromDate(dates[0]);
-                if (typeof dates[1] !== 'undefined') {
-                    setToDate(dates[1]);
-                }
-            }
-        },
-        [setFromDate, setToDate]
-    );
-
-    const setDateRange = useCallback(
-        (dates: [Date, Date]) => {
+    const selectDateRange = useCallback((dates: [Date, Date?] | null) => {
+        if (dates === null) {
+            setFromDate(undefined);
+            setToDate(undefined);
+        } else {
             setFromDate(dates[0]);
-            setToDate(dates[1]);
-        },
-        [setFromDate, setToDate]
-    );
+            if (typeof dates[1] !== 'undefined') {
+                setToDate(dates[1]);
+            }
+        }
+    }, []);
+
+    const setDateRange = useCallback((dates: [Date, Date]) => {
+        setFromDate(dates[0]);
+        setToDate(dates[1]);
+    }, []);
 
     let dateRangeValue: [Date] | [Date, Date] | undefined;
     if (typeof fromDate !== 'undefined') {

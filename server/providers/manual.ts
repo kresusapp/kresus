@@ -1,15 +1,15 @@
 // This modules implements a manual access where the user fills the transactions themselves.
 
-import { accountTypeNameToId } from '../lib/account-types';
 import { translate as $t } from '../helpers';
-import {
+import { accountTypeNameToId } from '../lib/account-types';
+import { getTranslator } from '../lib/translator';
+import Account from '../models/entities/accounts';
+import type {
     FetchAccountsOptions,
     Provider,
     ProviderAccountResponse,
     ProviderTransactionResponse,
 } from '.';
-import Account from '../models/entities/accounts';
-import { getTranslator } from '../lib/translator';
 
 export const SOURCE_NAME = 'manual';
 

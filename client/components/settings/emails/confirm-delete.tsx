@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { translate as $t } from '../../../helpers';
 import { useGenericError } from '../../../hooks';
@@ -33,7 +33,8 @@ const DeleteButton = (props: {
                     title={$t(`client.settings.emails.delete_${props.type}`)}
                 />
             }
-            onConfirm={onConfirm}>
+            onConfirm={onConfirm}
+        >
             <p>{$t(`client.settings.emails.delete_${props.type}_full_text`)}</p>
         </Popconfirm>
     );

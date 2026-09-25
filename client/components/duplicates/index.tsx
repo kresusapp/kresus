@@ -1,33 +1,19 @@
-import React, { useCallback, useContext } from 'react';
-
-import { translate as $t } from '../../helpers';
+import { Fragment, useCallback, useContext } from 'react';
+import { Link, Navigate, Route, Routes } from 'react-router';
 import { DUPLICATE_THRESHOLD } from '../../../shared/settings';
-
-import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
+import { translate as $t } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import * as DuplicatesStore from '../../store/duplicates';
-
-import DefaultParameters from './default-params';
-
-import Pair from './item';
+import URL from '../../urls';
 import { DriverContext } from '../drivers';
+import DefaultParameters from './default-params';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
-
 import DiscoveryMessage from '../ui/discovery-message';
+import IgnoredDuplicates from './ignored';
 import MergeAll from './merge-all';
-
-export function findRedundantPairs(state: GlobalState, accountId: number) {
-    const accountDuplicates = DuplicatesStore.byAccountId(state.duplicates, accountId);
-    return accountDuplicates.flatMap(item => {
-        return item.duplicates.map(dup => [
-            BanksStore.transactionById(state.banks, dup[0]),
-            BanksStore.transactionById(state.banks, dup[1]),
-        ]);
-    });
-}
+import PairsList, { usePairsByAccount } from './pairs';
 
 const THRESHOLDS_SUITE = [24, 24 * 2, 24 * 3, 24 * 4, 24 * 7, 24 * 14];
 const NUM_THRESHOLDS_SUITE = THRESHOLDS_SUITE.length;
@@ -46,7 +32,7 @@ function computePrevNextThreshold(current: number) {
     return [previousThreshold, nextThreshold];
 }
 
-const Duplicates = () => {
+const DetectedDuplicates = () => {
     const driver = useContext(DriverContext);
 
     const duplicateThreshold = useKresusState(state =>
@@ -58,19 +44,7 @@ const Duplicates = () => {
     const allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
     const allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
-    const pairsByAccount = useKresusState(state => {
-        const mapping = new Map<string, ReturnType<typeof findRedundantPairs>>();
-        const accounts = driver.getAccounts(state);
-        accounts.forEach(account => {
-            const accPairs = findRedundantPairs(state, account.id);
-            if (accPairs.length) {
-                mapping.set(account.customLabel || account.label, accPairs);
-            }
-        });
-        return mapping;
-    });
-
-    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
+    const pairsByAccount = usePairsByAccount(driver, false);
 
     const dispatch = useKresusDispatch();
 
@@ -92,38 +66,8 @@ const Duplicates = () => {
 
     const duplicateThresholdInDays = duplicateThreshold / 24;
 
-    let sim;
-    if (pairsByAccount.size === 0) {
-        sim = <div>{$t('client.similarity.nothing_found')}</div>;
-    } else {
-        sim = [];
-        let currentAccountLabel = '';
-        for (const [accountLabel, pairs] of pairsByAccount) {
-            // If there are several accounts, display the account's label before the duplicates.
-            if (pairsByAccount.size > 1 && accountLabel !== currentAccountLabel) {
-                sim.push(<h3>{accountLabel}</h3>);
-            }
-
-            sim.push(
-                ...pairs.map(p => {
-                    const key = p[0].id.toString() + p[1].id.toString();
-                    return (
-                        <Pair
-                            key={key}
-                            toKeep={p[0]}
-                            toRemove={p[1]}
-                            formatCurrency={formatCurrency}
-                        />
-                    );
-                })
-            );
-
-            currentAccountLabel = accountLabel;
-        }
-    }
-
     return (
-        <React.Fragment>
+        <Fragment>
             <p className="form-toolbar right">
                 <DefaultParameters />
                 <MergeAll pairs={Array.from(pairsByAccount.values()).flat()} />
@@ -133,16 +77,21 @@ const Duplicates = () => {
                 <p>{$t('client.similarity.threshold_desc')}</p>
 
                 <div className="duplicates-explanation">
-                    <label>{$t('client.similarity.threshold')}:</label>
+                    <span>{$t('client.similarity.threshold')}:</span>
                     <p className="buttons-group">
-                        <button className="btn" onClick={fewer} disabled={!allowFewer}>
+                        <button
+                            type="button"
+                            className="btn"
+                            onClick={fewer}
+                            disabled={!allowFewer}
+                        >
                             {$t('client.similarity.find_fewer')}
                         </button>
                         <span className="btn inner-text">
                             {duplicateThresholdInDays}
                             &nbsp;{$t('client.similarity.days')}
                         </span>
-                        <button className="btn" onClick={more} disabled={!allowMore}>
+                        <button type="button" className="btn" onClick={more} disabled={!allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
                     </p>
@@ -150,9 +99,33 @@ const Duplicates = () => {
 
                 <DiscoveryMessage message={$t('client.similarity.help')} />
 
-                {sim}
+                <PairsList
+                    pairsByAccount={pairsByAccount}
+                    ignored={false}
+                    emptyMessage={$t('client.similarity.nothing_found')}
+                />
+
+                <p className="duplicates-ignored-link">
+                    <Link to={URL.duplicatesIgnored.url(driver)}>
+                        {$t('client.similarity.show_ignored_duplicates')}
+                    </Link>
+                </p>
             </div>
-        </React.Fragment>
+        </Fragment>
+    );
+};
+
+DetectedDuplicates.displayName = 'DetectedDuplicates';
+
+const Duplicates = () => {
+    const driver = useContext(DriverContext);
+
+    return (
+        <Routes>
+            <Route path="/" element={<DetectedDuplicates />} />
+            <Route path="ignored" element={<IgnoredDuplicates />} />
+            <Route path="*" element={<Navigate to={URL.duplicates.url(driver)} replace={true} />} />
+        </Routes>
     );
 };
 

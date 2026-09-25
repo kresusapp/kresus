@@ -1,7 +1,6 @@
 import assert from 'node:assert';
-
-import { Access, Account } from '../../server/models';
 import { importData } from '../../server/controllers/all';
+import { Access, Account } from '../../server/models';
 
 describe('Account model API', () => {
     let world = {

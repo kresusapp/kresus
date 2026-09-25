@@ -1,20 +1,21 @@
-import React, { useCallback, useContext } from 'react';
+import type * as React from 'react';
+import { useCallback, useContext } from 'react';
 import { NavLink } from 'react-router';
-
-import URL from '../../urls';
-import { Driver, DriverType, DriverContext } from '../drivers';
 import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
+import * as DuplicatesStore from '../../store/duplicates';
 import * as UiStore from '../../store/ui';
-import { findRedundantPairs } from '../duplicates';
-import { OverallTotalBalance } from '../ui/accumulated-balances';
+import URL from '../../urls';
+import { findRedundantPairs } from '../duplicates/pairs';
 import DisplayIf from '../ui/display-if';
 
 import About from './about';
 import AccessList from './access-list';
+import CurrencyViewList from './currency-view-list';
 import UserViewList from './user-view-list';
 
 import './menu.css';
+import { type Driver, DriverContext, DriverType } from '../drivers';
 
 interface EntryProps {
     // The path to which the link directs.
@@ -41,6 +42,7 @@ const Entry = (props: EntryProps) => {
     const handleHideMenu = isSmallScreen ? hideMenu : undefined;
 
     return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: doesn't seem needed, in mobile emulation mode in firefox
         <li className={className} onClick={handleHideMenu}>
             <NavLink to={props.path}>
                 <i className={`fa fa-${props.icon}`} />
@@ -55,17 +57,26 @@ Entry.displayName = 'Entry';
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
 
+    const areDuplicatesLoaded = useKresusState(state => DuplicatesStore.isLoaded(state.duplicates));
+
     const numDuplicates = useKresusState(state => {
         if (driver.type === DriverType.None) {
             return 0;
         }
 
         const accounts = driver.getAccounts(state);
-        return accounts.map(account => findRedundantPairs(state, account.id)).flat().length;
+        return accounts.flatMap(account => findRedundantPairs(state, account.id)).length;
     });
 
     if (driver.type === DriverType.None) {
         return null;
+    }
+
+    let duplicatesBadge = null;
+    if (!areDuplicatesLoaded) {
+        duplicatesBadge = <span className="badge fa fa-hourglass" />;
+    } else if (numDuplicates > 0) {
+        duplicatesBadge = <span className="badge">{numDuplicates}</span>;
     }
 
     return (
@@ -86,9 +97,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
 
             <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
                 <span>{$t('client.menu.duplicates')}</span>
-                <DisplayIf condition={numDuplicates > 0}>
-                    <span className="badge">{numDuplicates}</span>
-                </DisplayIf>
+                {duplicatesBadge}
             </Entry>
         </ul>
     );
@@ -103,7 +112,7 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
+            <CurrencyViewList />
 
             <AccessList driver={driver} />
 

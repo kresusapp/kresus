@@ -1,10 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { assert } from '../../helpers';
 
 import { getRepository } from '..';
-
-import RecurringTransactions from './recurring-transactions';
 import Account from './accounts';
+import RecurringTransactions from './recurring-transactions';
 import User from './users';
 
 @Entity('applied-recurring-transaction')

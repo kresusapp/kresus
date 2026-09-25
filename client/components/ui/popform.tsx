@@ -1,8 +1,8 @@
-import React, { useCallback, useRef } from 'react';
-
-import Popover, { PopoverRef } from './popover';
+import type * as React from 'react';
+import { useCallback, useRef } from 'react';
+import { translate as $t, assert } from '../../helpers';
 import Form from './form';
-import { assert, translate as $t } from '../../helpers';
+import Popover, { type PopoverRef } from './popover';
 
 interface PopformShorthandProps {
     // Element to show as the trigger that will show the popconfirm.
@@ -57,10 +57,10 @@ function Popform(props: PopformProps) {
                 <>
                     {props.children}
                     <Form.Toolbar>
-                        <button className="btn" onClick={close}>
+                        <button type="button" className="btn" onClick={close}>
                             {cancelText}
                         </button>
-                        <button className={`btn ${confirmClass}`} onClick={onConfirm}>
+                        <button type="button" className={`btn ${confirmClass}`} onClick={onConfirm}>
                             {confirmText}
                         </button>
                     </Form.Toolbar>

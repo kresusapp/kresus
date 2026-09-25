@@ -1,20 +1,17 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { BatchStatus } from '../../shared/api/batch';
+import DefaultCategories from '../../shared/default-categories.json';
 import {
+    translate as $t,
     assert,
     assertDefined,
     localeComparator,
     NONE_CATEGORY_ID,
-    translate as $t,
 } from '../helpers';
-import { Category, createValidCategory } from '../models';
-import DefaultCategories from '../../shared/default-categories.json';
-
+import { type Category, createValidCategory } from '../models';
 import * as backend from './backend';
-
-import { removeInArrayById, replaceInArray } from './helpers';
-import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
+import { removeInArrayById, replaceInArray } from './helpers';
 
 export interface CategoryState {
     map: { [id: number]: Category };
@@ -240,8 +237,7 @@ export function allUnused(state: CategoryState, usedCategoriesSet: Set<number>):
     return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
 }
 
-export function fromId(state: CategoryState, id: number): Category {
+export function byId(state: CategoryState, id: number): Category | null {
     const map = state.map;
-    assert(typeof map[id] !== 'undefined', `fromId lookup failed for id: ${id}`);
-    return map[id];
+    return map[id] || null;
 }

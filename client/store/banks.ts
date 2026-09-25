@@ -1,57 +1,57 @@
-import { createSlice, createAsyncThunk, createSelector, Dispatch, isAnyOf } from '@reduxjs/toolkit';
-
 import {
+    createAsyncThunk,
+    createSelector,
+    createSlice,
+    type Dispatch,
+    isAnyOf,
+} from '@reduxjs/toolkit';
+import { BatchStatus } from '../../shared/api/batch';
+import DefaultAlerts from '../../shared/default-alerts.json';
+import DefaultSettings from '../../shared/default-settings';
+import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
+import TransactionTypes from '../../shared/transaction-types.json';
+import type { BankVendor, UserActionResponse } from '../../shared/types';
+import {
+    translate as $t,
     assert,
+    assertDefined,
     assertNotNull,
     currency,
+    displayLabel,
     FETCH_STATUS_SUCCESS,
     localeComparator,
     NONE_CATEGORY_ID,
-    UNKNOWN_ACCOUNT_TYPE,
-    displayLabel,
     shouldIncludeInOutstandingSum,
-    assertDefined,
-    translate as $t,
+    UNKNOWN_ACCOUNT_TYPE,
 } from '../helpers';
-
 import {
-    Access,
-    Account,
-    Alert,
-    Bank,
-    Transaction,
-    AlertType,
-    AccessCustomField,
-    CustomFieldDescriptor,
-    Type,
-    PartialTransaction,
+    type Access,
+    type AccessCustomField,
+    type Account,
+    type Alert,
+    type AlertType,
+    assertValidAlert,
+    assertValidRecurringTransaction,
+    assertValidType,
+    type Bank,
+    type CustomFieldDescriptor,
     createValidAccess,
     createValidAccount,
     createValidBank,
     createValidTransaction,
-    assertValidType,
-    assertValidAlert,
-    updateAccountFrom,
-    assertValidRecurringTransaction,
-    RecurringTransaction,
     isManualAccess,
+    type PartialTransaction,
+    type RecurringTransaction,
+    type Transaction,
+    type Type,
+    updateAccountFrom,
 } from '../models';
-
-import DefaultAlerts from '../../shared/default-alerts.json';
-import DefaultSettings from '../../shared/default-settings';
-import type { BankVendor, UserActionResponse } from '../../shared/types';
-import TransactionTypes from '../../shared/transaction-types.json';
-
-import * as UiStore from './ui';
 import * as backend from './backend';
-import * as CategoriesStore from './categories';
-import * as SettingsStore from './settings';
-
-import { mergeInArray, removeInArrayById, mergeInObject, removeInArray } from './helpers';
-
-import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
-import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
+import * as CategoriesStore from './categories';
+import { mergeInArray, mergeInObject, removeInArray, removeInArrayById } from './helpers';
+import * as SettingsStore from './settings';
+import * as UiStore from './ui';
 
 export interface BankState {
     // Bank descriptors.
@@ -139,6 +139,10 @@ type setTransactionDateError = setTransactionBudgetDateError & {
     formerDate: Date | null;
 };
 
+type setTransactionAmountError = {
+    formerAmount: number;
+};
+
 export const setTransactionDate = createAsyncThunk(
     'banks/setTransactionDate',
     async (
@@ -184,6 +188,28 @@ export const setTransactionBudgetDate = createAsyncThunk(
         } catch (error: unknown) {
             rejectWithValue({
                 formerBudgetDate,
+            });
+        }
+    }
+);
+
+export const setTransactionAmount = createAsyncThunk(
+    'banks/setTransactionAmount',
+    async (
+        params: {
+            transaction: Transaction;
+            amount: number;
+        },
+        { rejectWithValue }
+    ) => {
+        const { transaction, amount } = params;
+        const formerAmount = transaction.amount;
+
+        try {
+            return await backend.updateTransaction(transaction.id, { amount });
+        } catch (error: unknown) {
+            rejectWithValue({
+                formerAmount,
             });
         }
     }
@@ -383,7 +409,6 @@ export const resyncBalance = createAsyncThunk(
         }
 
         // We need to return at some point, to please typescript.
-        // eslint-disable-next-line no-useless-return
         return;
     }
 );
@@ -605,6 +630,7 @@ function maybeGetUserAction(dispatch: Dispatch, results: UserActionResponse | { 
                     })
                 );
             });
+
         case 'browser_question':
             assertDefined(results.fields);
 
@@ -620,6 +646,7 @@ function maybeGetUserAction(dispatch: Dispatch, results: UserActionResponse | { 
                     })
                 );
             });
+
         default:
             assert(false, `unknown user action ${results.actionKind}`);
     }
@@ -720,7 +747,7 @@ function setCurrentAccount(state: BankState): void {
     // 1. the current account id, if defined.
     // 2. the first account of the first access, if it exists.
     // 3. null otherwise
-    let current;
+    let current: number | null;
     if (defaultAccountId !== null) {
         current = defaultAccountId;
     } else if (state.accessIds.length > 0) {
@@ -1310,6 +1337,33 @@ const banksSlice = createSlice({
                     budgetDate: formerBudgetDate,
                 });
             })
+            .addCase(setTransactionAmount.pending, (state, action) => {
+                // Optimistic update.
+                const { amount, transaction } = action.meta.arg;
+
+                mergeInObject(state.transactionMap, transaction.id, {
+                    amount,
+                });
+
+                const account = accountById(state, transaction.accountId);
+
+                // Make sure the ongoing amount is still right.
+                account.outstandingSum = recomputeAccountOutstandingSum(state, account.id);
+            })
+            .addCase(setTransactionAmount.rejected, (state, action) => {
+                // Revert the optimistic update.
+                const { transaction } = action.meta.arg;
+                const { formerAmount } = action.payload as setTransactionAmountError;
+
+                mergeInObject(state.transactionMap, transaction.id, {
+                    amount: formerAmount,
+                });
+
+                const account = accountById(state, transaction.accountId);
+
+                // Make sure the ongoing amount is still right.
+                account.outstandingSum = recomputeAccountOutstandingSum(state, account.id);
+            })
             .addCase(applyBulkEdit.fulfilled, (state, action) => {
                 const { transactionIds, newFields } = action.payload;
                 for (const id of transactionIds) {
@@ -1441,6 +1495,18 @@ const banksSlice = createSlice({
                     const { accessId } = action.meta.arg;
                     updateAccessFetchStatus(state, accessId, action.error.code);
                 }
+            )
+            .addMatcher(
+                isAnyOf(
+                    setTransactionDate.fulfilled,
+                    setTransactionBudgetDate.fulfilled,
+                    setTransactionAmount.fulfilled
+                ),
+                (state, action) => {
+                    const updated = action.payload;
+                    assertDefined(updated);
+                    updateAccountBalance(state, updated.accountId, updated.accountBalance);
+                }
             );
     },
 });
@@ -1557,8 +1623,7 @@ export function transactionsByAccountId(state: BankState, accountId: number): Tr
 
 export function transactionsByAccountIds(state: BankState, accountIds: number[]): Transaction[] {
     return accountIds
-        .map(accountId => transactionsByAccountId(state, accountId))
-        .flat()
+        .flatMap(accountId => transactionsByAccountId(state, accountId))
         .sort((a, b) => +b.date - +a.date);
 }
 

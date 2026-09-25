@@ -1,25 +1,23 @@
-import React, { useCallback, useState } from 'react';
-
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as SettingsStore from '../../store/settings';
-import { assert, translate as $t } from '../../helpers';
-
+import type * as React from 'react';
+import { useCallback, useState } from 'react';
 import {
     DEFAULT_CHART_DISPLAY_TYPE,
     DEFAULT_CHART_FREQUENCY,
     DEFAULT_CHART_PERIOD,
     DEFAULT_CHART_TYPE,
 } from '../../../shared/settings';
-
-import FrequencySelect from './frequency-select';
+import { translate as $t, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import * as SettingsStore from '../../store/settings';
 import { Form, Popform } from '../ui';
+import AmountKindSelect, { type AmountKindType } from './amount-select';
+import FrequencySelect from './frequency-select';
 import PeriodSelect from './period-select';
-import AmountKindSelect from './amount-select';
 
 const DefaultParams = () => {
     const initialAmountKind = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
-    );
+    ) as AmountKindType;
     const initialDisplayType = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
     );
@@ -64,23 +62,21 @@ const DefaultParams = () => {
         dispatch,
     ]);
 
-    const handleDisplayTypeChange = useCallback(
-        (event: React.ChangeEvent<HTMLSelectElement>) => {
-            setDisplayType(event.target.value);
-        },
-        [setDisplayType]
-    );
+    const handleDisplayTypeChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+        setDisplayType(event.target.value);
+    }, []);
 
     return (
         <Popform
             small={false}
             trigger={
-                <button className="btn">
+                <button type="button" className="btn">
                     <span>{$t('client.general.default_parameters')}</span>
                 </button>
             }
             confirmClass="success"
-            onConfirm={handleSubmit}>
+            onConfirm={handleSubmit}
+        >
             <Form.Input id="default-display-type" label={$t('client.charts.default_display')}>
                 <select onChange={handleDisplayTypeChange} defaultValue={displayType}>
                     <option value="all">{$t('client.charts.by_category')}</option>

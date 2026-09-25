@@ -1,18 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
-
-import DefaultSettings from '../../shared/default-settings';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+    Unique,
+} from 'typeorm';
+import { assert, KError, makeLogger, unwrap } from '../../helpers';
 import { ConfigGhostSettings } from '../../lib/instance';
-
-import { getRepository } from '..';
-
-import User from './users';
-
-import { assert, makeLogger, KError, unwrap } from '../../helpers';
+import DefaultSettings from '../../shared/default-settings';
 import { LOCALE } from '../../shared/settings';
+import { getRepository } from '..';
+import { isUniqueConstraintViolation } from '../helpers';
+import User from './users';
 
 const log = makeLogger('models/entities/settings');
 
 @Entity('setting')
+@Unique(['userId', 'key'])
 export default class Setting {
     private static REPO: Repository<Setting> | null = null;
 
@@ -83,7 +89,18 @@ export default class Setting {
         if (found) {
             return found;
         }
-        return await Setting.create(userId, { key, value: defaultValue });
+
+        try {
+            return await Setting.create(userId, { key, value: defaultValue });
+        } catch (err) {
+            // A concurrent call may have created the setting in between the read above and this
+            // insert, which the unique constraint on (userId, key) then rejects: read it back
+            // instead of failing. Otherwise re-throw the error.
+            if (!isUniqueConstraintViolation(err)) {
+                throw err;
+            }
+            return unwrap(await Setting.byKey(userId, key));
+        }
     }
 
     static async updateByKey(userId: number, key: string, value: string): Promise<Setting> {

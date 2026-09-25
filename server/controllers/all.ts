@@ -1,55 +1,51 @@
-import express from 'express';
 import crypto from 'crypto';
+import type express from 'express';
 
+import {
+    DEFAULT_ACCOUNT_ID,
+    DEMO_MODE,
+    DUPLICATE_LAX_MODE,
+    DUPLICATE_THRESHOLD,
+} from '../../shared/settings';
+import {
+    assert,
+    asyncErr,
+    getErrorCode,
+    isAppriseApiEnabled,
+    isEmailEnabled,
+    KError,
+    makeLogger,
+    UNKNOWN_TRANSACTION_TYPE,
+    unwrap,
+} from '../helpers';
+import diffAccount from '../lib/diff-accounts';
+import diffTransactions from '../lib/diff-transactions';
+import { ConfigGhostSettings, getAll as getAllInstanceProperties } from '../lib/instance';
 import {
     Access,
     Account,
     Alert,
+    AppliedRecurringTransaction,
     Budget,
     Category,
+    DuplicatesIgnored,
+    type MinimalTransaction,
     RecurringTransaction,
     Setting,
-    MinimalTransaction,
     Transaction,
     TransactionRule,
-    AppliedRecurringTransaction,
-    View,
     User,
+    View,
 } from '../models';
-
 import runDataMigrations from '../models/data-migrations';
-
-import {
-    assert,
-    makeLogger,
-    isEmailEnabled,
-    KError,
-    asyncErr,
-    getErrorCode,
-    UNKNOWN_TRANSACTION_TYPE,
-    isAppriseApiEnabled,
-    unwrap,
-} from '../helpers';
-
 import { bankVendorByUuid, getBankVendors } from '../providers';
-import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
-import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
-import {
-    DEFAULT_ACCOUNT_ID,
-    DEMO_MODE,
-    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
-    DUPLICATE_LAX_MODE,
-    DUPLICATE_THRESHOLD,
-} from '../../shared/settings';
-
-import { cleanData, Remapping, AllData, ClientAccess } from './helpers';
+import { validatePassword } from '../shared/helpers';
+import type { DuplicatesPairs } from '../shared/types';
+import { type AllData, type ClientAccess, cleanData, type Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
-import { IdentifiedRequest } from './routes';
-import diffAccount from '../lib/diff-accounts';
-import diffTransactions from '../lib/diff-transactions';
-import { findRedundantPairs } from '../lib/duplicates-manager';
+import type { IdentifiedRequest } from './routes';
 
 const log = makeLogger('controllers/all');
 
@@ -127,7 +123,11 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         ret.accesses.push(clientAccess);
     }
 
-    ret.accounts = await Account.all(userId);
+    // On export we don't want the balance to be returned for manual accounts, otherwise
+    // on import the balance won't be automatically re-computed on transactions
+    // creation/update/deletion.
+    ret.accounts = await Account.all(userId, !isExport);
+
     ret.categories = await Category.all(userId);
     ret.transactions = await Transaction.all(userId);
     ret.settings = await Setting.all(userId);
@@ -149,61 +149,22 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
             now.getMonth(),
             now.getFullYear()
         );
+
+        const ignoredDuplicatesPairs = (await DuplicatesIgnored.all(userId)).map(pair => [
+            pair.transactionId,
+            pair.otherTransactionId,
+        ]) satisfies DuplicatesPairs;
+
+        ret.duplicates = {
+            ignored: ignoredDuplicatesPairs,
+        };
     } else {
         ret.bankVendors = getBankVendors();
 
         ret.instance = await getAllInstanceProperties();
 
-        // Find duplicates.
-        // First, map transactions to accounts
-        const accountTransactionsMap = new Map<number, Transaction[]>();
-        for (const tr of ret.transactions) {
-            if (!accountTransactionsMap.has(tr.accountId)) {
-                accountTransactionsMap.set(tr.accountId, [tr]);
-            } else {
-                accountTransactionsMap.get(tr.accountId)?.push(tr);
-            }
-        }
-
-        const duplicateThresholdSetting = ret.settings.find(s => s.key === DUPLICATE_THRESHOLD);
-        const ignoreDuplicatesWithDifferentCustomFieldsSetting = ret.settings.find(
-            s => s.key === DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
-        );
-
-        const ignoreDuplicatesWithDifferentCustomFieldsSettingValue =
-            ignoreDuplicatesWithDifferentCustomFieldsSetting
-                ? ignoreDuplicatesWithDifferentCustomFieldsSetting.value
-                : unwrap(DefaultSettings.get(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS));
-
-        const threshold = Number.parseInt(
-            duplicateThresholdSetting
-                ? duplicateThresholdSetting.value
-                : unwrap(DefaultSettings.get(DUPLICATE_THRESHOLD)),
-            10
-        );
-        const ignoreDuplicatesWithDifferentCustomFields =
-            ignoreDuplicatesWithDifferentCustomFieldsSettingValue === 'true';
-
-        const newDuplicates: NonNullable<AllData['duplicates']>['new'] = [];
-
-        for (const [accountId, transactions] of accountTransactionsMap.entries()) {
-            const duplicates = findRedundantPairs(
-                transactions,
-                threshold,
-                ignoreDuplicatesWithDifferentCustomFields
-            );
-
-            if (duplicates.length > 0) {
-                newDuplicates.push({
-                    accountId,
-                    duplicates,
-                });
-            }
-        }
-
-        ret.duplicates = {
-            new: newDuplicates,
-        };
+        // Note: the duplicates (detected and ignored ones) are lazy-loaded through the
+        // /duplicates endpoint and therefore not part of this payload.
 
         const user = await User.find(userId);
         if (user) {
@@ -351,14 +312,14 @@ function applyRenamings(model: any): (arg: AnyObject) => AnyObject {
 }
 
 export function parseDate(date: any) {
-    let parsedDate;
     switch (typeof date) {
-        case 'string':
-            parsedDate = Date.parse(date);
+        case 'string': {
+            const parsedDate = Date.parse(date);
             if (!isNaN(parsedDate)) {
                 return new Date(parsedDate);
             }
             break;
+        }
 
         case 'number':
             if (!isNaN(date) && date > -8640000000000000 && date < 8640000000000000) {
@@ -417,6 +378,9 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     // importing Kresus data in an older version of kresus.
     world.settings = world.settings.filter((s: any) => DefaultSettings.has(s.key)) || [];
 
+    // Exports made before the ignored duplicates were exported don't have a `duplicates` object.
+    world.ignoredDuplicates = world.duplicates?.ignored || [];
+
     log.info(`Importing:
         accesses:          ${world.accesses.length}
         accounts:          ${world.accounts.length}
@@ -429,7 +393,8 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
-        views:           ${world.views.length}
+        views:           ${world.views.length},
+        ignoredDuplicates ${world.ignoredDuplicates.length}
     `);
 
     log.info('Import accesses...');
@@ -563,19 +528,22 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         // handmade JSON file), there might be no lastCheckDate.
         accountCopy.lastCheckDate = parseDate(accountCopy.lastCheckDate);
         if (accountCopy.lastCheckDate === null) {
-            let latestOpDate: Date | null = null;
+            let latestTransactionDate: Date | null = null;
             if (world.transactions) {
-                const accountOps = world.transactions.filter(
-                    (op: any) => op.accountId === accountId
+                const accountTransactions = world.transactions.filter(
+                    (tr: any) => tr.accountId === accountId
                 );
-                for (const op of accountOps) {
-                    const opDate = parseDate(op.date);
-                    if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
-                        latestOpDate = opDate;
+                for (const tr of accountTransactions) {
+                    const trDate = parseDate(tr.date);
+                    if (
+                        trDate !== null &&
+                        (latestTransactionDate === null || trDate > latestTransactionDate)
+                    ) {
+                        latestTransactionDate = trDate;
                     }
                 }
             }
-            accountCopy.lastCheckDate = latestOpDate || new Date();
+            accountCopy.lastCheckDate = latestTransactionDate || new Date();
         }
 
         // If the access containing this account was known, then try to match this account against
@@ -846,6 +814,13 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     }
     const newByAccountId: Map<number, MinimalTransaction[]> = new Map();
 
+    // Maps the transaction ids as they were in the imported data to the ids they were given when
+    // inserted in database. Since the transactions are inserted per account, and only some of them
+    // are actually inserted, the previous id is kept on the transaction object itself rather than
+    // in a list, so it can't be mismatched.
+    const transactionIdsMap: Remapping = {};
+    const previousTransactionIds: Map<MinimalTransaction, number> = new Map();
+
     for (let i = 0; i < world.transactions.length; i++) {
         const tr = world.transactions[i];
 
@@ -924,9 +899,17 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             tr.isUserDefinedType = true;
         }
 
+        // Now that we are sure the transaction is to be imported (we are past all `continue`),
+        // store the id.
+        if (typeof tr.id === 'number') {
+            previousTransactionIds.set(tr, tr.id);
+        }
+
         // Remove contents of deprecated fields, if there were any.
         delete tr.attachments;
         delete tr.binary;
+
+        // Remove ids that differ depending on the instance (due to auto-increment mainly).
         delete tr.id;
         delete tr.userId;
 
@@ -949,9 +932,40 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
 
         if (transactions.length > 0) {
             log.info(`Importing ${transactions.length} transactions for account ${accountId}.`);
-            await Transaction.bulkCreate(userId, transactions);
+            const insertedIds = await Transaction.bulkCreate(userId, transactions);
+
+            // There should be the same number of inserted transactions as transactions to create…
+            // Otherwise we can't map new ids to old ids.
+            if (transactions.length === insertedIds.length) {
+                insertedIds.forEach((trId, index) => {
+                    const previousId = previousTransactionIds.get(transactions[index]);
+                    if (typeof previousId === 'number') {
+                        transactionIdsMap[previousId] = trId;
+                    }
+                });
+            } else {
+                log.warn(
+                    'Could not map the imported transaction ids to the inserted ones, the duplicates pairs to ignore will be lost.'
+                );
+            }
         } else {
             log.info(`No transactions to import for account ${accountId}.`);
+        }
+    }
+
+    log.info('Done.');
+
+    log.info('Import duplicates pairs to ignore...');
+    for (const pair of world.ignoredDuplicates) {
+        const newId = transactionIdsMap[pair[0]];
+        const newOtherId = transactionIdsMap[pair[1]];
+
+        if (typeof newId === 'number' && typeof newOtherId === 'number') {
+            await DuplicatesIgnored.create(userId, newId, newOtherId);
+        } else {
+            log.warn(
+                `Could not import pair of duplicates to ignore because the ids do not match the ids mapping: ${pair[0]}/${pair[1]}`
+            );
         }
     }
 
@@ -1250,13 +1264,15 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {
             // Make sure the access exists.
-            if (!Access.exists(userId, userData.accessId)) {
+            if (!(await Access.exists(userId, userData.accessId))) {
                 throw new KError('No existing access for this access id', 400);
             }
 
             // Replace the accessId in the converted data by this one.
             convertedData.accesses[0].id = userData.accessId;
-            convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
+            convertedData.accounts.forEach(acc => {
+                acc.accessId = userData.accessId;
+            });
             dontCreateAccess = true;
         }
 

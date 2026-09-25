@@ -1,21 +1,19 @@
-import React, { useCallback, useState, ReactElement } from 'react';
 import moment from 'moment';
+import { type ReactElement, useCallback, useState } from 'react';
 
 import {
     translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
-    noValueFoundMessage,
     notify,
+    noValueFoundMessage,
+    UNKNOWN_TRANSACTION_TYPE,
 } from '../../helpers';
 
-import { RecurringTransaction } from '../../models';
-
+import type { RecurringTransaction } from '../../models';
+import TypeSelect from '../reports/type-select';
 import { Form, ValidatedTextInput } from '../ui';
 import AmountInput from '../ui/amount-input';
 import Select from '../ui/fuzzy-or-native-select';
-import MultipleSelect, { MultiSelectOptionProps } from '../ui/multiple-select';
-
-import TypeSelect from '../reports/type-select';
+import MultipleSelect, { type MultiSelectOptionProps } from '../ui/multiple-select';
 
 type OrphanRecurringTransaction = Omit<RecurringTransaction, 'id' | 'accountId'>;
 
@@ -69,40 +67,28 @@ export default (props: {
     const [dayOfMonth, setDayOfMonth] = useState(initialValues.dayOfMonth || 1);
     const [listOfMonths, setListOfMonths] = useState(predefinedListOfMonths);
 
-    const handleLabelChange = useCallback(
-        (newValue: string | null) => {
-            if (typeof newValue === 'string') {
-                setLabel(newValue);
-            }
-        },
-        [setLabel]
-    );
+    const handleLabelChange = useCallback((newValue: string | null) => {
+        if (typeof newValue === 'string') {
+            setLabel(newValue);
+        }
+    }, []);
 
-    const handleAmountChange = useCallback(
-        (newValue: number | null) => {
-            if (typeof newValue === 'number') {
-                setAmount(newValue);
-            }
-        },
-        [setAmount]
-    );
+    const handleAmountChange = useCallback((newValue: number | null) => {
+        if (typeof newValue === 'number') {
+            setAmount(newValue);
+        }
+    }, []);
 
-    const handleDayOfMonthChange = useCallback(
-        (newValue: string | null) => {
-            const numVal = parseInt(newValue || '', 10);
-            if (!isNaN(numVal)) {
-                setDayOfMonth(numVal);
-            }
-        },
-        [setDayOfMonth]
-    );
+    const handleDayOfMonthChange = useCallback((newValue: string | null) => {
+        const numVal = parseInt(newValue || '', 10);
+        if (!Number.isNaN(numVal)) {
+            setDayOfMonth(numVal);
+        }
+    }, []);
 
-    const handleListOfMonthsChange = useCallback(
-        (newValue: Array<string | number>) => {
-            setListOfMonths(newValue.map(v => ({ value: v as number, label: '' })));
-        },
-        [setListOfMonths]
-    );
+    const handleListOfMonthsChange = useCallback((newValue: Array<string | number>) => {
+        setListOfMonths(newValue.map(v => ({ value: v as number, label: '' })));
+    }, []);
 
     const onSubmitCallback = props.onSubmit;
     const onSubmit = useCallback(async () => {
@@ -150,7 +136,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-amount"
-                label={$t('client.addtransaction.amount')}>
+                label={$t('client.addtransaction.amount')}
+            >
                 <AmountInput
                     signId="recurring-transaction-amount-sign"
                     onInput={handleAmountChange}
@@ -162,7 +149,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-dayofmonth"
-                label={$t('client.recurring_transactions.day')}>
+                label={$t('client.recurring_transactions.day')}
+            >
                 <Select
                     onChange={handleDayOfMonthChange}
                     value={dayOfMonth}
@@ -173,7 +161,8 @@ export default (props: {
 
             <Form.Input
                 id="recurring-transaction-listofmonths"
-                label={$t('client.recurring_transactions.every')}>
+                label={$t('client.recurring_transactions.every')}
+            >
                 <MultipleSelect
                     onChange={handleListOfMonthsChange}
                     values={listOfMonths.map(v => v.value)}

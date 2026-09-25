@@ -1,13 +1,13 @@
 import assert from 'node:assert';
 
-import { Access, Account, Budget, Category, User, Transaction } from '../../server/models';
+import { Access, Account, Budget, Category, User } from '../../server/models';
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
 import { UniqueBudget1608817798703 as BudgetsConstraintMigration } from '../../server/models/migrations/8';
-import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../server/models/migrations/13';
 import { AddViews1734262035140 as AddViewsMigration } from '../../server/models/migrations/23';
 import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
 import { AddViewIdInBudget1737381056464 as AddViewIdInBudgetMigration } from '../../server/models/migrations/25';
 import { MoveLoginPasswordToFields1756391927839 as MoveLoginPasswordToFields } from '../../server/models/migrations/27';
+import { ResetImportedManualAccountsBalance1787995963164 as ResetImportedManualAccountsBalance } from '../../server/models/migrations/29';
 
 import { checkObjectIsSubsetOf } from '../helpers';
 
@@ -102,7 +102,6 @@ describe('migrations', () => {
         const migration25ConstraintMigration = new AddViewIdInBudgetMigration();
         try {
             await migration25ConstraintMigration.down(queryRunner);
-            // eslint-disable-next-line
         } catch (ignore) {}
 
         const migration8ConstraintMigration = new BudgetsConstraintMigration();
@@ -117,7 +116,7 @@ describe('migrations', () => {
         `);
 
         let allBudgets = await queryRunner.manager.find(Budget, {
-            select: ['id'],
+            select: { id: true },
             where: {
                 userId: USER_ID,
             },
@@ -132,7 +131,7 @@ describe('migrations', () => {
         await migration8ConstraintMigration.up(queryRunner);
 
         allBudgets = await queryRunner.manager.find(Budget, {
-            select: ['id'],
+            select: { id: true },
             where: {
                 userId: USER_ID,
             },
@@ -144,71 +143,6 @@ describe('migrations', () => {
         if (table && !table.columns.some(c => c.name === 'viewId')) {
             await migration25ConstraintMigration.up(queryRunner);
         }
-    });
-
-    it('should run migration 13 (setting default bank accounts balance) properly', async () => {
-        const manualAccess = await Access.create(USER_ID, {
-            vendorId: 'manual',
-            fields: [
-                { name: 'login', value: 'login' },
-                { name: 'password', value: 'password' },
-            ],
-        });
-
-        const manualAccount = await Account.create(USER_ID, {
-            accessId: manualAccess.id,
-            vendorAccountId: 111111,
-            label: 'Manual account',
-            initialBalance: 0,
-            importDate: new Date(),
-            lastCheckDate: 0,
-        });
-
-        const classicAccess = await Access.create(USER_ID, {
-            vendorId: 'whatever',
-            fields: [
-                { name: 'login', value: 'login' },
-                { name: 'password', value: 'password' },
-            ],
-        });
-
-        const classicAccount = await Account.create(USER_ID, {
-            accessId: classicAccess.id,
-            vendorAccountId: 111111,
-            label: 'Classic account',
-            initialBalance: 500,
-            importDate: new Date(),
-            lastCheckDate: 0,
-        });
-
-        await Transaction.create(USER_ID, {
-            accountId: classicAccount.id,
-            type: 'type.card',
-            label: 'Wholemart',
-            rawLabel: 'card 07/07/2019 wholemart',
-            date: new Date('2019-07-07T00:00:00.000Z'),
-            importDate: new Date('2019-01-01:00:00.000Z'),
-            amount: -123.5,
-        });
-
-        const connection = Budget.repo().manager.connection;
-        const balanceReset = new SetDefaultBalance();
-        const queryRunner = connection.createQueryRunner();
-        await balanceReset.up(queryRunner);
-
-        // Don't use Account.find, which takes care of computing the balance if missing.
-
-        // For manual accounts the balance should be null
-        let account = await Account.repo().findOne({
-            where: { userId: USER_ID, id: manualAccount.id },
-        });
-        assert.strictEqual(account.balance, null);
-
-        // For other accounts it should be initialBalance minus the sum of transactions
-        account = await Account.repo().findOne({
-            where: { userId: USER_ID, id: classicAccount.id },
-        });
-        assert.strictEqual(account.balance, 376.5);
     });
 
     it('should run migration 23 and create views for existing accounts', async () => {
@@ -430,6 +364,51 @@ describe('migrations', () => {
                 'SELECT * FROM access_fields WHERE accessId = 2'
             );
             assert.strictEqual(fields.length, 0);
+        });
+    });
+
+    describe('should run migration 29', async () => {
+        // Exports made before this was fixed contained the computed balance of the manual accounts,
+        // and importing them back saved it as if it were a real balance.
+        async function makeAccountWithBalance(vendorId, vendorAccountId, balance) {
+            const access = await Access.create(USER_ID, {
+                login: `login-${vendorAccountId}`,
+                password: 'password',
+                vendorId,
+            });
+
+            return await Account.create(USER_ID, {
+                accessId: access.id,
+                vendorAccountId,
+                label: 'Whatever',
+                initialBalance: 0,
+                balance,
+                importDate: new Date(),
+                lastCheckDate: new Date(),
+            });
+        }
+
+        beforeEach(async () => {
+            await Access.destroyAll(USER_ID);
+        });
+
+        it('and reset the balance of the manual & demo accounts', async () => {
+            const manual = await makeAccountWithBalance('manual', 'migration29-manual', 1234);
+            const demo = await makeAccountWithBalance('demo', 'migration29-demo', 4321);
+            const polled = await makeAccountWithBalance('fakewoobbank', 'migration29-woob', 500);
+
+            const connection = User.repo().manager.connection;
+            const queryRunner = connection.createQueryRunner();
+            await new ResetImportedManualAccountsBalance().up(queryRunner);
+
+            const balanceOf = async id =>
+                (await Account.repo().findOneBy({ userId: USER_ID, id })).balance;
+
+            assert.strictEqual(await balanceOf(manual.id), null);
+            assert.strictEqual(await balanceOf(demo.id), null);
+
+            // Accounts whose balance actually comes from the provider are left alone.
+            assert.strictEqual(await balanceOf(polled.id), 500);
         });
     });
 });

@@ -1,28 +1,25 @@
-import React, { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-
+import {
+    translate as $t,
+    assert,
+    NONE_CATEGORY_ID,
+    notify,
+    UNKNOWN_TRANSACTION_TYPE,
+} from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
-import {
-    translate as $t,
-    NONE_CATEGORY_ID,
-    UNKNOWN_TRANSACTION_TYPE,
-    notify,
-    assert,
-} from '../../helpers';
-
+import { DriverContext } from '../drivers';
 import CategorySelect from '../reports/category-select';
 import TypeSelect from '../reports/type-select';
-
+import { BackLink, Form } from '../ui';
 import { AccountSelector } from '../ui/account-select';
 import AmountInput from '../ui/amount-input';
+import DiscoveryMessage from '../ui/discovery-message';
 import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
-import { BackLink, Form } from '../ui';
-import DiscoveryMessage from '../ui/discovery-message';
-import { DriverContext } from '../drivers';
 
 const CreateTransaction = () => {
     const navigate = useNavigate();
@@ -40,13 +37,15 @@ const CreateTransaction = () => {
     const [type, setType] = useState<string>(UNKNOWN_TRANSACTION_TYPE);
     const [accountId, setAccountId] = useState<number>(accounts[0].id);
 
-    const handleSetCategoryId = useCallback(
-        (newVal: number | null) => {
-            // Normalize null into undefined.
-            setCategoryId(newVal === null ? undefined : newVal);
-        },
-        [setCategoryId]
-    );
+    // When the user switches accounts in the view, reset the target account id.
+    useEffect(() => {
+        setAccountId(accounts[0].id);
+    }, [accounts]);
+
+    const handleSetCategoryId = useCallback((newVal: number | null) => {
+        // Normalize null into undefined.
+        setCategoryId(newVal === null ? undefined : newVal);
+    }, []);
 
     const dispatch = useKresusDispatch();
     const onSubmit = useCallback(async () => {
@@ -70,7 +69,7 @@ const CreateTransaction = () => {
         }
     }, [driver, dispatch, navigate, date, label, amount, categoryId, type, accountId]);
 
-    const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
+    const allowSubmit = date && label?.trim().length && amount && !Number.isNaN(amount);
     const reportUrl = URL.reports.url(driver);
 
     const displayWarning = useKresusState(state => {
@@ -118,7 +117,11 @@ const CreateTransaction = () => {
 
             <DisplayIf condition={accounts.length > 1}>
                 <Form.Input id="account" label={$t('client.addtransaction.account')}>
-                    <AccountSelector onChange={setAccountId} accounts={accounts} />
+                    <AccountSelector
+                        accounts={accounts}
+                        initial={accountId}
+                        onChange={setAccountId}
+                    />
                 </Form.Input>
             </DisplayIf>
 

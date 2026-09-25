@@ -159,18 +159,12 @@ main nav .views-details .views-list > li a.active:focus {
     border-left-color: #5959D4;
 }
 
-main nav .views-details.bank-total-accesses > a .total-balance-item {
-    color: inherit;
-}
-
-main nav .views-details.bank-total-accesses > a:hover .total-balance-item,
-main nav .views-details.bank-total-accesses > a:focus .total-balance-item {
-    background-color: #E4E4E4;
-}
-
-main nav .views-details.bank-total-accesses > a.active .total-balance-item {
-    background-color: #6792D8;
+main nav .views-details .views-list a.active .colored-amount.positive {
     color: white;
+}
+
+main nav .views-details .views-list a.active .colored-amount.negative {
+    color: #F5A4A4;
 }
 
 body.dark main nav .views-details .bank-name {
@@ -206,19 +200,4 @@ body.dark main nav .views-details .views-list > li a.active:hover,
 body.dark main nav .views-details .views-list > li a.active:focus {
     background-color: #6792D8;
     border-left-color: #6792D8;
-}
-
-body.dark main nav .views-details.bank-total-accesses > a .total-balance-item {
-    color: #C5C6C9;
-}
-
-body.dark main nav .views-details.bank-total-accesses > a:hover .total-balance-item,
-body.dark main nav .views-details.bank-total-accesses > a:focus .total-balance-item {
-    background-color: rgb(255 255 255 / 25%);
-    color: #FFF;
-}
-
-body.dark main nav .views-details.bank-total-accesses > a.active:hover .total-balance-item,
-body.dark main nav .views-details.bank-total-accesses > a.active:focus .total-balance-item {
-    background-color: #6792D8;
 }

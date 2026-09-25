@@ -1,12 +1,10 @@
-import React from 'react';
-import { Route, Routes, Navigate } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 
 import URL from '../../urls';
-
+import AdminSection from './admin';
 import BackupParameters from './backup';
 import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
-import AdminSection from './admin';
 import Views from './views';
 
 import './settings.css';

@@ -1,32 +1,29 @@
 import {
-    In,
-    Entity,
-    PrimaryGeneratedColumn,
-    JoinColumn,
     Column,
+    Entity,
+    In,
+    JoinColumn,
     ManyToOne,
-    Repository,
+    PrimaryGeneratedColumn,
+    type Repository,
 } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import Access from './accesses';
-import Transaction from './transactions';
-import Setting from './settings';
-
 import {
     assert,
+    type CurrencyFormatter,
     currency,
     currencyFormatter,
-    CurrencyFormatter,
-    UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
+    UNKNOWN_ACCOUNT_TYPE,
     unwrap,
 } from '../../helpers';
-import { ForceNumericColumn, DatetimeType } from '../helpers';
 import { DEFAULT_CURRENCY, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
+import { getRepository } from '..';
+import { DatetimeType, ForceNumericColumn } from '../helpers';
+import Access from './accesses';
+import Setting from './settings';
+import Transaction from './transactions';
+import User from './users';
 
 @Entity('account')
 export default class Account {
@@ -137,42 +134,44 @@ export default class Account {
 
         // We only select the columns we need, to avoid migrations issues when
         // columns are added later to the transaction model.
-        const ops = await Transaction.byAccount(this.userId, this.id, [
+        const transactions = await Transaction.byAccount(this.userId, this.id, [
             'amount',
             'type',
             'debitDate',
             'date',
         ]);
         const today = new Date();
-        const s = ops
-            .filter(op => shouldIncludeInBalance(op, today, this.type))
-            .reduce((sum, op) => sum + op.amount, offset);
+        const s = transactions
+            .filter(tr => shouldIncludeInBalance(tr, today, this.type))
+            .reduce((sum, tr) => sum + tr.amount, offset);
 
         return Math.round(s * 100) / 100;
     };
 
     computeOutstandingSum = async (): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this.id);
+        const transactions = await Transaction.byAccount(this.userId, this.id);
         const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
             this.userId,
             LIMIT_ONGOING_TO_CURRENT_MONTH
         );
-        const s = ops
-            .filter(op => shouldIncludeInOutstandingSum(op, isOngoingLimitedToCurrentMonth))
-            .reduce((sum, op) => sum + op.amount, 0);
+        const s = transactions
+            .filter(tr => shouldIncludeInOutstandingSum(tr, isOngoingLimitedToCurrentMonth))
+            .reduce((sum, tr) => sum + tr.amount, 0);
         return Math.round(s * 100) / 100;
     };
 
-    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
-        let checkedCurrency;
+    // Returns the account's currency, falling back to the user's default currency when the
+    // account has no currency or an unknown one.
+    getCurrency = async (): Promise<string> => {
         if (currency.isKnown(this.currency)) {
-            checkedCurrency = this.currency;
-        } else {
-            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY))
-                .value;
+            assert(this.currency !== null, 'currency is known at this point');
+            return this.currency;
         }
-        assert(checkedCurrency !== null, 'currency is known at this point');
-        return currencyFormatter(checkedCurrency);
+        return (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY)).value;
+    };
+
+    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
+        return currencyFormatter(await this.getCurrency());
     };
 
     static async ensureBalance(account: Account): Promise<void> {

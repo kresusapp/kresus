@@ -1,10 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
-
-import { getRepository, Transaction, Account, User } from '../';
-
-import { assert, formatDate, translate as $t, unwrap } from '../../helpers';
-import { I18NObject, shortLabel } from '../../shared/helpers';
-import { ForceNumericColumn, DatetimeType } from '../helpers';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
+import { translate as $t, assert, formatDate, unwrap } from '../../helpers';
+import { type I18NObject, shortLabel } from '../../shared/helpers';
+import { Account, getRepository, type Transaction, User } from '../';
+import { DatetimeType, ForceNumericColumn } from '../helpers';
 
 @Entity('alert')
 export default class Alert {

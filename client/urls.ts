@@ -1,4 +1,4 @@
-import { Driver } from './components/drivers/';
+import type { Driver } from './components/drivers/';
 
 // The list of the available sections and settings subsections.
 //
@@ -26,6 +26,13 @@ const URLs = {
         pattern: '/view/:driver/:value/duplicates',
         url(driver: Driver) {
             return `/view/${driver.type}/${driver.value}/duplicates`;
+        },
+    },
+
+    duplicatesIgnored: {
+        pattern: '/view/:driver/:value/duplicates/ignored',
+        url(driver: Driver) {
+            return `/view/${driver.type}/${driver.value}/duplicates/ignored`;
         },
     },
 

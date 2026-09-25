@@ -1,9 +1,7 @@
-import React from 'react';
-
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import Access from './access';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
+import Access from './access';
 
 import './dashboard.css';
 
@@ -16,7 +14,7 @@ const Dashboard = () => {
 
     return (
         <div id="dashboard">
-            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
+            <OverallTotalBalance />
             <ul className="accesses-list">{banks}</ul>
         </div>
     );

@@ -1,11 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Repository } from 'typeorm';
-
-import { getRepository } from '..';
-
-import User from './users';
-import Access from './accesses';
-
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    type Repository,
+} from 'typeorm';
 import { assert, unwrap } from '../../helpers';
+import { getRepository } from '..';
+import Access from './accesses';
+import User from './users';
 
 @Entity('access_fields')
 export default class AccessField {
@@ -33,11 +37,15 @@ export default class AccessField {
     userId!: number;
 
     // The access unique identifier of the access the field is attached to.
-    @ManyToOne(() => Access, access => access.fields, {
-        cascade: true,
-        onDelete: 'CASCADE',
-        nullable: false,
-    })
+    @ManyToOne(
+        () => Access,
+        access => access.fields,
+        {
+            cascade: true,
+            onDelete: 'CASCADE',
+            nullable: false,
+        }
+    )
     @JoinColumn()
     access!: Access;
 
