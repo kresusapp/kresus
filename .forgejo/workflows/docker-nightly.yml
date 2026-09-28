@@ -1,5 +1,9 @@
 name: Nightly Docker build
 
+# Send notification failures by email. Since this is a cron job, this will be sent to the
+# organization members.
+enable-email-notifications: true
+
 on:
   schedule:
     # Once a day, at 02:00 UTC.

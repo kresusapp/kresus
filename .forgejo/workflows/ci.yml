@@ -2,6 +2,9 @@
 # and readable through email notifications.
 name: CI
 
+# Send notification failures by email to the user who triggered the job.
+enable-email-notifications: true
+
 on:
   push:
     branches:
