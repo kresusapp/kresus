@@ -2,6 +2,7 @@
 
 const path = require('node:path');
 const fs = require('node:fs');
+const { parseArgs } = require('node:util');
 const ini = require('ini');
 
 function help(binaryName) {
@@ -156,72 +157,78 @@ function listUsers() {
     });
 }
 
-// First two args are [node, binaryname]
-const numActualArgs = Math.max(process.argv.length - 2, 0);
-function actualArg(n) {
-    return process.argv[2 + n];
+const binaryName = process.argv[1];
+
+function exitWithError(...message) {
+    console.error(...message);
+    help(binaryName);
+    process.exit(-1);
+}
+
+let parsedArgs;
+try {
+    parsedArgs = parseArgs({
+        options: {
+            help: { type: 'boolean', short: 'h' },
+            config: { type: 'string', short: 'c' },
+            admin: { type: 'boolean' },
+        },
+        allowPositionals: true,
+    });
+} catch (err) {
+    exitWithError(err.message);
+}
+
+const { values, positionals } = parsedArgs;
+const [commandName, ...commandPositionals] = positionals;
+
+if (values.help || commandName === 'help') {
+    help(binaryName);
+    process.exit(0);
+}
+
+if (values.admin && commandName !== 'create:user') {
+    exitWithError('The --admin option can only be used with create:user.');
+}
+
+const expectedPositionals = ['create:user', 'delete:user'].includes(commandName) ? 1 : 0;
+if (commandPositionals.length > expectedPositionals) {
+    exitWithError('Unexpected argument:', commandPositionals[expectedPositionals]);
 }
 
 let command = runServer;
 const commandArgs = [];
 
-let config = null;
-const binaryName = actualArg(-1);
-for (let i = 0; i < numActualArgs; i++) {
-    const arg = actualArg(i);
-    if (['help', '-h', '--help'].includes(arg)) {
-        help(binaryName);
-        process.exit(0);
-    } else if (['-c', '--config'].includes(arg)) {
-        if (numActualArgs <= i + 1) {
-            console.error('Missing config file path.');
-            help(binaryName);
-            process.exit(-1);
-        }
-        const configFilePath = actualArg(i + 1);
-        i += 1;
-        config = readConfigFromFile(configFilePath);
-    } else if (arg === 'create:user') {
-        if (numActualArgs <= i + 1) {
-            console.error('Missing user login.');
-            help(binaryName);
-            process.exit(-1);
-        }
-        const login = actualArg(i + 1);
-
-        command = createUser;
-        commandArgs.push(login);
-
-        if (actualArg(i + 2) === '--admin') {
-            commandArgs.push(true);
-        }
-
-        i += 1;
+switch (commandName) {
+    case undefined:
         break;
-    } else if (arg === 'delete:user') {
-        if (numActualArgs <= i + 1) {
-            console.error('Missing user login.');
-            help(binaryName);
-            process.exit(-1);
-        }
-        const login = actualArg(i + 1);
-
-        command = deleteUser;
-        commandArgs.push(login);
-
-        i += 1;
-    } else if (arg === 'list:users') {
-        command = listUsers;
-        break;
-    } else if (arg === 'create:config') {
+    case 'create:config':
         console.log(configurator.generate());
         process.exit(0);
-    } else {
-        console.error('Unknown command:', arg);
-        help(binaryName);
-        process.exit(-1);
+        break;
+    case 'create:user':
+    case 'delete:user': {
+        const login = commandPositionals[0];
+        if (!login) {
+            exitWithError('Missing user login.');
+        }
+        if (commandName === 'create:user') {
+            command = createUser;
+            commandArgs.push(login, !!values.admin);
+        } else {
+            command = deleteUser;
+            commandArgs.push(login);
+        }
+        break;
     }
+    case 'list:users':
+        command = listUsers;
+        break;
+    default:
+        exitWithError('Unknown command:', commandName);
 }
+
+const config = values.config ? readConfigFromFile(values.config) : null;
 
 if (!config) {
     console.warn(
