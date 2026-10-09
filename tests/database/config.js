@@ -15,6 +15,10 @@ process.on('unhandledRejection', (reason, promise) => {
 const TEST_DIR = '/tmp/kresus-tests';
 const TEST_DB_PATH = path.join(TEST_DIR, 'test.sqlite');
 
+// Only use the local fake modules in tests, to never hit the remote Woob repository.
+const TEST_WOOB_SOURCES_LIST = path.join(TEST_DIR, 'woob-sources.list');
+const TEST_WOOB_SOURCES_LIST_CONTENT = `file://${path.join(TEST_DIR, 'fakemodules')}\n`;
+
 // Thanks stackoverflow!
 const rmdir = dir => {
     let list = fs.readdirSync(dir);
@@ -37,6 +41,12 @@ const rmdir = dir => {
 export function applyTestConfig() {
     let dbLogs = typeof process.env.FORCE_DB_LOGS !== 'undefined' ? 'all' : 'error';
     applyConfig({
+        kresus: {
+            datadir: TEST_DIR,
+        },
+        woob: {
+            sources_list: TEST_WOOB_SOURCES_LIST,
+        },
         db: {
             type: 'sqlite',
             sqlite_path: TEST_DB_PATH,
@@ -51,6 +61,7 @@ before(async () => {
         rmdir(TEST_DIR);
     }
     fs.mkdirSync(TEST_DIR);
+    fs.writeFileSync(TEST_WOOB_SOURCES_LIST, TEST_WOOB_SOURCES_LIST_CONTENT);
 
     applyTestConfig();
 
