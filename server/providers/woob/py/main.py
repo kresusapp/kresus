@@ -361,6 +361,9 @@ class Connector:
         # Set woob data directory and sources.list file.
         self.woob_data_path = woob_data_path
         self.woob_backup_path = os.path.normpath("%s.bak" % woob_data_path)
+        self.updated_sources_list_path = os.path.join(
+            woob_data_path, "sources.list.updated"
+        )
         self.write_woob_sources_list()
 
         # Create a Woob object.
@@ -419,12 +422,30 @@ class Connector:
             with io.open(sources_list_path, encoding="utf-8") as fh:
                 original_sources_list_content = fh.read().splitlines()
 
-        # Update the source.list content and update the repository, only if the
-        # content has changed.
+        # Update the source.list content, only if the content has changed.
         if set(original_sources_list_content) != set(new_sources_list_content):
             with io.open(sources_list_path, "w", encoding="utf-8") as sources_list_file:
                 sources_list_file.write("\n".join(new_sources_list_content))
+
+        # Update the repositories if the last successful update didn't use
+        # this exact sources.list content. Comparing with the sources.list file
+        # itself is not enough, since a failed or interrupted update would
+        # leave it written while the repositories were never updated.
+        updated_sources_list_content = []
+        if os.path.isfile(self.updated_sources_list_path):
+            with io.open(self.updated_sources_list_path, encoding="utf-8") as fh:
+                updated_sources_list_content = fh.read().splitlines()
+
+        if set(updated_sources_list_content) != set(new_sources_list_content):
             self.needs_update = True
+
+    def mark_sources_list_updated(self):
+        """
+        Remember the sources.list content used by the last successful update.
+        """
+        sources_list_path = os.path.join(self.woob_data_path, "sources.list")
+        shutil.copyfile(sources_list_path, self.updated_sources_list_path)
+        self.needs_update = False
 
     def backup_data_dir(self):
         """
@@ -470,6 +491,7 @@ class Connector:
 
         try:
             self.woob.update(progress=DummyProgress())
+            self.mark_sources_list_updated()
         except (ConnectionError, HTTPError) as exc:
             # Do not delete the repository if there is a connection error or the repo has problems.
             raise exc
@@ -490,6 +512,7 @@ class Connector:
             # Retry update
             try:
                 self.woob.update(progress=DummyProgress())
+                self.mark_sources_list_updated()
             except Exception as exc:
                 # If it still fails, just restore the previous state.
                 self.restore_data_dir()
