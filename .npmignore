@@ -41,3 +41,5 @@ yarn.lock
 .claude/
 
 **/*.pyc
+
+/e2e/

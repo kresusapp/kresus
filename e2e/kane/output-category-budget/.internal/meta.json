@@ -1,0 +1,35 @@
+{
+  "commit_id": "2a9dbeb6-3d23-4e93-9a3e-6128b5d9a239",
+  "test_id": "48f3dbb2-8556-474b-bd3f-f19bced319a0",
+  "testcase_id": "01M4ZSTS8E5G22BVMCW93ZTHAR",
+  "project_id": "01J5B52EZ2S4BNSB7WZMAP3BBE",
+  "folder_id": "01M2N733Z7CVS151ZN88NAX0HK",
+  "org_id": "1665294",
+  "session_name": "category-budget",
+  "executions": [
+    {
+      "execution_id": "66658846-e3ab-4190-988b-3b378d05b286",
+      "run_kind": "author",
+      "status": "passed",
+      "valid": false,
+      "uploaded": true,
+      "at": "2026-10-15T13:08:11.189Z"
+    },
+    {
+      "execution_id": "78668c2a-a081-446f-8f62-a3282ffdfd9a",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "uploaded": true,
+      "at": "2026-10-15T13:10:07.833Z"
+    },
+    {
+      "execution_id": "cafe7a98-57c0-4f29-9acb-fdeb052b23ab",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "uploaded": true,
+      "at": "2026-10-15T13:11:48.369Z"
+    }
+  ]
+}
