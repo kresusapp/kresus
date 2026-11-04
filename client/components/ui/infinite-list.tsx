@@ -46,7 +46,23 @@ const InfiniteList = (props: Props) => {
             return;
         }
 
-        const topItemH = Math.max(container.current.scrollTop - heightAbove, 0);
+        // The height of the full list, if it were entirely rendered.
+        const fullListH = numItems * itemHeight;
+
+        // The maximum height of the top item, if the list were scrolled to the bottom.
+        const maxTopItemH = Math.max(fullListH - container.current.clientHeight, 0);
+
+        // The height of the top item, relative to the top of the list.
+        const relativeScrollTop = Math.max(container.current.scrollTop - heightAbove, 0);
+
+        // The height of the top item.
+        //
+        // Never compute a window past the end of the list: the items might have changed under the
+        // hood (a search has been narrowed, etc.) while the list was scrolled further down than
+        // the new list's height (i.e. relativeScrollTop is largely bigger than maxTopItemH), in
+        // which case the browser is about to clamp the scroll position anyway.
+        const topItemH = Math.min(relativeScrollTop, maxTopItemH);
+
         const bottomItemH = topItemH + container.current.clientHeight;
         const newFirstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
         const newLastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, numItems);
@@ -60,15 +76,28 @@ const InfiniteList = (props: Props) => {
         });
     }, [heightAbove, itemHeight, ballast, numItems]);
 
-    const handleScroll = useCallback(
-        throttle((e: Event) => {
-            e.preventDefault();
-            recomputeWindow();
-        }, SCROLL_THROTTLING),
+    // The throttled scroll handler must not be recreated on every change of `recomputeWindow`,
+    // otherwise the throttling would be reset all the time. Yet, it must not call a stale
+    // `recomputeWindow`, which would compute the window from outdated props (number of items,
+    // height above…) and could leave the visible part of the list empty. Hence the indirection
+    // through a ref.
+    //
+    // Using a reference makes us avoid having a dependency list, so we don't trigger the effect
+    // depending on `handleScroll` below. We could use `useCallback`, but it's slightly less
+    // efficient as it would evaluate `throttle()` on every render.
+    const recomputeWindowRef = useRef(recomputeWindow);
+
+    const handleScroll = useMemo(
+        () =>
+            throttle(() => {
+                recomputeWindowRef.current();
+            }, SCROLL_THROTTLING),
         []
     );
 
     useEffect(() => {
+        recomputeWindowRef.current = recomputeWindow;
+
         // The items might change under the hood, after search has been
         // cleared out, etc. Remember that `recomputeWindow` is cheap to call
         // in general.
@@ -95,6 +124,8 @@ const InfiniteList = (props: Props) => {
         return () => {
             assert(!!container.current, 'container must have been mounted');
             container.current.removeEventListener('scroll', handleScroll);
+            // Don't let a trailing throttled call outlive the listener.
+            handleScroll.cancel();
         };
     }, [containerId, handleScroll]);
 
