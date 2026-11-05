@@ -67,6 +67,14 @@ export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Re
 export async function getIgnoredDuplicates(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
+
+        const user = await User.find(userId);
+
+        if (!user) {
+            res.status(403).end();
+            return;
+        }
+
         const ignored = await findIgnoredDuplicates(userId);
         res.status(200).json(ignored);
     } catch (err) {
