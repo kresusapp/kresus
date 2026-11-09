@@ -16,8 +16,7 @@ export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Re
         const user = await User.find(userId);
 
         if (!user) {
-            res.status(403).end();
-            return;
+            throw new KError('Missing user id', 403);
         }
 
         const threshold = await Setting.findOrCreateDefault(userId, DUPLICATE_THRESHOLD);
@@ -71,8 +70,7 @@ export async function getIgnoredDuplicates(req: IdentifiedRequest<any>, res: exp
         const user = await User.find(userId);
 
         if (!user) {
-            res.status(403).end();
-            return;
+            throw new KError('Missing user id', 403);
         }
 
         const ignored = await findIgnoredDuplicates(userId);

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { promisify } from 'node:util';
 import type express from 'express';
-import { asyncErr } from '../helpers';
+import { asyncErr, KError } from '../helpers';
 import { Access, Account, User } from '../models';
 
 import { obfuscateEmails, obfuscateKeywords, obfuscatePasswords } from './helpers';
@@ -16,8 +16,7 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
         const user = await User.find(userId);
 
         if (!user?.isAdmin) {
-            res.status(403).end();
-            return;
+            throw new KError('Administration rights are required', 403);
         }
 
         let logs = await readFile(process.kresus.logFilePath, 'utf-8');
@@ -74,8 +73,7 @@ export async function clearLogs(req: IdentifiedRequest<any>, res: express.Respon
         const user = await User.find(userId);
 
         if (!user?.isAdmin) {
-            res.status(403).end();
-            return;
+            throw new KError('Administration rights are required', 403);
         }
 
         await writeFile(process.kresus.logFilePath, '');
