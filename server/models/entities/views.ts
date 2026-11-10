@@ -65,7 +65,8 @@ export default class View {
         return View.repo().create(args);
     }
 
-    // Subscribers will need to pass the repository (to do things inside a same transaction).
+    // Subscribers/event listeners will need to pass the repository (to do things inside a same
+    // transaction).
     static async create(
         userId: number,
         attributes: PartialOnePlus<View>,

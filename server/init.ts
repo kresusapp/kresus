@@ -1,6 +1,7 @@
 import * as DemoController from './controllers/demo';
 import { makeLogger } from './helpers';
 import Poller from './lib/poller';
+import { setupViewManager } from './lib/view-manager';
 import { initModels, Setting, User } from './models';
 import { DEMO_MODE } from './shared/settings';
 
@@ -32,6 +33,9 @@ async function checkDemoMode() {
 
 export default async function init() {
     try {
+        // Keep the views in sync with the accounts.
+        setupViewManager();
+
         // Initialize models.
         await initModels();
 

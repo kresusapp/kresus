@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { apply as applyConfig } from '../../server/config';
+import { setupViewManager } from '../../server/lib/view-manager';
 import { initModels } from '../../server/models';
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -64,6 +65,9 @@ before(async () => {
     fs.writeFileSync(TEST_WOOB_SOURCES_LIST, TEST_WOOB_SOURCES_LIST_CONTENT);
 
     applyTestConfig();
+
+    // Keep the views in sync with the accounts.
+    setupViewManager();
 
     // Initialize models.
     await initModels();
