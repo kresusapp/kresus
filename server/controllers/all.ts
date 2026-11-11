@@ -41,7 +41,7 @@ import runDataMigrations from '../models/data-migrations';
 import { bankVendorByUuid, getBankVendors } from '../providers';
 import DefaultSettings from '../shared/default-settings';
 import { validatePassword } from '../shared/helpers';
-import type { DuplicatesPairs } from '../shared/types';
+import type { DuplicatesPairList } from '../shared/types';
 import { type AllData, type ClientAccess, cleanData, type Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
@@ -153,7 +153,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         const ignoredDuplicatesPairs = (await DuplicatesIgnored.all(userId)).map(pair => [
             pair.transactionId,
             pair.otherTransactionId,
-        ]) satisfies DuplicatesPairs;
+        ]) satisfies DuplicatesPairList;
 
         ret.duplicates = {
             ignored: ignoredDuplicatesPairs,

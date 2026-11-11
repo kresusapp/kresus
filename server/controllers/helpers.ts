@@ -1,6 +1,6 @@
 import regexEscape from 'regex-escape';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
-import type { BankVendor, DuplicatesPairs } from '../../shared/types';
+import type { BankVendor, DuplicatesPairList } from '../../shared/types';
 import { assert, makeLogger } from '../helpers';
 import { ConfigGhostSettings, type InstancePropertiesType } from '../lib/instance';
 import type {
@@ -57,7 +57,7 @@ export type AllData = {
     bankVendors: BankVendor[];
 
     duplicates?: {
-        ignored: DuplicatesPairs;
+        ignored: DuplicatesPairList;
     };
 };
 
