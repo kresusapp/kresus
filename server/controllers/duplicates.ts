@@ -1,6 +1,7 @@
 import type express from 'express';
 import { asyncErr, KError } from '../helpers';
 import {
+    filterIgnoredPairs,
     findIgnoredDuplicates,
     findRedundantPairs,
     getDuplicatePairScore,
@@ -42,10 +43,12 @@ export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Re
         for (const account of accounts) {
             const transactions = await Transaction.byAccount(userId, account.id);
 
-            const duplicates = findRedundantPairs(
-                transactions,
-                thresholdValue,
-                ignoreDuplicatesWithDifferentCustomFields,
+            const duplicates = filterIgnoredPairs(
+                findRedundantPairs(
+                    transactions,
+                    thresholdValue,
+                    ignoreDuplicatesWithDifferentCustomFields
+                ),
                 pairsToIgnore
             );
 

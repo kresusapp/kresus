@@ -1,7 +1,11 @@
 import assert from 'node:assert';
 
 import { importData } from '../../server/controllers/all';
-import { findIgnoredDuplicates, findRedundantPairs } from '../../server/lib/duplicates-manager';
+import {
+    filterIgnoredPairs,
+    findIgnoredDuplicates,
+    findRedundantPairs,
+} from '../../server/lib/duplicates-manager';
 
 import {
     Access,
@@ -96,10 +100,8 @@ describe('ignored duplicates', () => {
     async function detectDuplicates(threshold = 30) {
         const ignored = await findIgnoredDuplicates(USER_ID);
 
-        return findRedundantPairs(
-            await Transaction.byAccount(USER_ID, accountId),
-            threshold,
-            false,
+        return filterIgnoredPairs(
+            findRedundantPairs(await Transaction.byAccount(USER_ID, accountId), threshold, false),
             ignored.flatMap(item => item.duplicates)
         );
     }

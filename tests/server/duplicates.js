@@ -6,7 +6,11 @@ import {
     TRANSACTION_CARD_TYPE,
     UNKNOWN_TRANSACTION_TYPE,
 } from '../../server/helpers';
-import { findRedundantPairs, getDuplicatePairScore } from '../../server/lib/duplicates-manager';
+import {
+    filterIgnoredPairs,
+    findRedundantPairs,
+    getDuplicatePairScore,
+} from '../../server/lib/duplicates-manager';
 
 describe('getDuplicatePairScore', () => {
     const BaseTransaction = {
@@ -223,7 +227,7 @@ describe('findRedundantPairs', () => {
 
         assert.strictEqual(findRedundantPairs(transactions, 24, false).length, 3);
 
-        const pairs = findRedundantPairs(transactions, 24, false, [
+        const pairs = filterIgnoredPairs(findRedundantPairs(transactions, 24, false), [
             [1, 2],
             [3, 1],
         ]);

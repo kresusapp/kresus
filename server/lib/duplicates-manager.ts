@@ -3,7 +3,7 @@ import moment from 'moment';
 import { makeLogger, NONE_CATEGORY_ID, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 import type { MinimalTransaction, Transaction } from '../models';
 import { DuplicatesIgnored } from '../models';
-import type { DuplicatesByAccount } from '../shared/types';
+import type { DuplicatesByAccount, DuplicatesPair } from '../shared/types';
 import { INTERNAL_TRANSFER_TYPE, TRANSFER_TYPE } from '../shared/helpers';
 
 const log = makeLogger('duplicates-manager');
@@ -105,15 +105,25 @@ function pairKey(transactionId: number, otherTransactionId: number): string {
 }
 
 /**
- * @param pairsToIgnore pairs of transaction ids the user marked as not being duplicates; they are
- * discarded from the results, whatever the order of the two ids in a pair.
+ * Removes from `pairs` the pairs the user marked as not being duplicates, whatever the order of the
+ * two ids in a pair. The order of the remaining pairs is preserved.
  */
+export function filterIgnoredPairs(
+    pairs: DuplicatesPair[],
+    pairsToIgnore: DuplicatesPair[]
+): DuplicatesPair[] {
+    if (pairsToIgnore.length === 0) {
+        return pairs;
+    }
+    const ignoredKeys = new Set(pairsToIgnore.map(pair => pairKey(pair[0], pair[1])));
+    return pairs.filter(pair => !ignoredKeys.has(pairKey(pair[0], pair[1])));
+}
+
 export function findRedundantPairs(
     transactions: Transaction[],
     duplicateThreshold: number,
-    ignoreDuplicatesWithDifferentCustomFields: boolean,
-    pairsToIgnore: [Transaction['id'], Transaction['id']][] = []
-): [Transaction['id'], Transaction['id']][] {
+    ignoreDuplicatesWithDifferentCustomFields: boolean
+): DuplicatesPair[] {
     const before = Date.now();
     log.debug('Running findRedundantPairs algorithm...');
     log.debug(`Input: ${transactions.length} transactions`);
@@ -122,8 +132,6 @@ export function findRedundantPairs(
     // duplicateThreshold is in hours, transform it to days
     const threshold = Math.round(duplicateThreshold / 24);
     log.debug(`Threshold: ${threshold}`);
-
-    const ignoredKeys = new Set(pairsToIgnore.map(pair => pairKey(pair[0], pair[1])));
 
     // O(n log n)
     // Tests showed that assert'ing the rawLabel/date/amount fields inside the getDuplicatePairScore
@@ -143,7 +151,7 @@ export function findRedundantPairs(
                 ignoreDuplicatesWithDifferentCustomFields
             );
 
-            if (duplicateScore > 0 && !ignoredKeys.has(pairKey(tr.id, next.id))) {
+            if (duplicateScore > 0) {
                 similar.push([tr, next]);
             }
 
