@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { apply as applyConfig } from '../../server/config';
+import { setupDuplicatesCache } from '../../server/lib/duplicates-cache';
 import { setupViewManager } from '../../server/lib/view-manager';
 import { initModels } from '../../server/models';
 
@@ -68,6 +69,9 @@ before(async () => {
 
     // Keep the views in sync with the accounts.
     setupViewManager();
+
+    // Invalidate the duplicates cache when transactions change.
+    setupDuplicatesCache();
 
     // Initialize models.
     await initModels();

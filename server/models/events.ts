@@ -2,12 +2,19 @@ import { EventEmitter } from 'events';
 import type { EntityManager } from 'typeorm';
 
 import type Account from './entities/accounts';
+import type Transaction from './entities/transactions';
 
 type AccountEvent = {
     // On account creation, it is the instance passed to the save method, but with its generated id.
     // Its balance is not computed.
     // On account update it is the updated instance.
     account: Account;
+};
+
+type TransactionCreatedEvent = {
+    // On a bulk insertion (e.g. `Transaction.bulkCreate`), only the inserted values are provided,
+    // not a full entity. They always include at least the `userId` and the `accountId`.
+    transaction: Partial<Transaction> & Pick<Transaction, 'userId' | 'accountId'>;
 };
 
 export const ModelEvent = {
@@ -21,6 +28,25 @@ export const ModelEvent = {
     // Might be called on a bulk deletion, for several accesses. That's why there is no data passed
     // to listeners. (see https://github.com/typeorm/typeorm/issues/6876)
     AccessesDeleted: 'accesses-deleted',
+
+    // Emitted once per inserted transaction, including on bulk insertions.
+    TransactionCreated: 'transaction-created',
+
+    // Might be called on a bulk update, for several transactions, with only the updated values.
+    // That's why there is no data passed to listeners.
+    TransactionsUpdated: 'transactions-updated',
+
+    // Might be called on a bulk deletion, for several transactions. That's why there is no data
+    // passed to listeners. (see https://github.com/typeorm/typeorm/issues/6876)
+    TransactionsDeleted: 'transactions-deleted',
+
+    // Might be called on a bulk deletion, for several categories. That's why there is no data
+    // passed to listeners. (see https://github.com/typeorm/typeorm/issues/6876)
+    CategoriesDeleted: 'categories-deleted',
+
+    // Might be called on a bulk deletion, for several users. That's why there is no data passed
+    // to listeners. (see https://github.com/typeorm/typeorm/issues/6876)
+    UsersDeleted: 'users-deleted',
 } as const;
 
 // Arguments received by the listeners of each event. Listeners may be asynchronous (see
@@ -31,6 +57,11 @@ type ModelEventMap = {
     [ModelEvent.AccountUpdated]: [manager: EntityManager, event: AccountEvent];
     [ModelEvent.AccountsDeleted]: [manager: EntityManager];
     [ModelEvent.AccessesDeleted]: [manager: EntityManager];
+    [ModelEvent.TransactionCreated]: [manager: EntityManager, event: TransactionCreatedEvent];
+    [ModelEvent.TransactionsUpdated]: [manager: EntityManager];
+    [ModelEvent.TransactionsDeleted]: [manager: EntityManager];
+    [ModelEvent.CategoriesDeleted]: [manager: EntityManager];
+    [ModelEvent.UsersDeleted]: [manager: EntityManager];
 };
 
 class ModelEvents extends EventEmitter<ModelEventMap> {
@@ -75,6 +106,29 @@ class ModelEvents extends EventEmitter<ModelEventMap> {
 
     async emitAccessesDeleted(manager: EntityManager): Promise<void> {
         await this.emitAndWait(ModelEvent.AccessesDeleted, manager);
+    }
+
+    async emitTransactionCreated(
+        manager: EntityManager,
+        event: TransactionCreatedEvent
+    ): Promise<void> {
+        await this.emitAndWait(ModelEvent.TransactionCreated, manager, event);
+    }
+
+    async emitTransactionsUpdated(manager: EntityManager): Promise<void> {
+        await this.emitAndWait(ModelEvent.TransactionsUpdated, manager);
+    }
+
+    async emitTransactionsDeleted(manager: EntityManager): Promise<void> {
+        await this.emitAndWait(ModelEvent.TransactionsDeleted, manager);
+    }
+
+    async emitCategoriesDeleted(manager: EntityManager): Promise<void> {
+        await this.emitAndWait(ModelEvent.CategoriesDeleted, manager);
+    }
+
+    async emitUsersDeleted(manager: EntityManager): Promise<void> {
+        await this.emitAndWait(ModelEvent.UsersDeleted, manager);
     }
 }
 

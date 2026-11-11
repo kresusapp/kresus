@@ -1,6 +1,11 @@
 import type express from 'express';
 import { asyncErr, KError } from '../helpers';
 import {
+    getCachedDuplicates,
+    getDuplicatesCacheVersion,
+    setCachedDuplicates,
+} from '../lib/duplicates-cache';
+import {
     filterIgnoredPairs,
     findIgnoredDuplicates,
     findRedundantPairs,
@@ -41,16 +46,34 @@ export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Re
 
         const accounts = await Account.all(userId);
         for (const account of accounts) {
-            const transactions = await Transaction.byAccount(userId, account.id);
+            // The cache contains the pairs before removing the ignored ones, so that ignoring or
+            // un-ignoring a pair doesn't require invalidating it.
+            let pairs = getCachedDuplicates(
+                userId,
+                account.id,
+                thresholdValue,
+                ignoreDuplicatesWithDifferentCustomFields
+            );
 
-            const duplicates = filterIgnoredPairs(
-                findRedundantPairs(
+            if (pairs === null) {
+                const version = getDuplicatesCacheVersion(userId);
+                const transactions = await Transaction.byAccount(userId, account.id);
+                pairs = findRedundantPairs(
                     transactions,
                     thresholdValue,
                     ignoreDuplicatesWithDifferentCustomFields
-                ),
-                pairsToIgnore
-            );
+                );
+                setCachedDuplicates(
+                    userId,
+                    account.id,
+                    version,
+                    thresholdValue,
+                    ignoreDuplicatesWithDifferentCustomFields,
+                    pairs
+                );
+            }
+
+            const duplicates = filterIgnoredPairs(pairs, pairsToIgnore);
 
             if (duplicates.length > 0) {
                 allDuplicates.new.push({

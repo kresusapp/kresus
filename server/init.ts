@@ -1,6 +1,7 @@
 import * as DemoController from './controllers/demo';
 import { makeLogger } from './helpers';
 import Poller from './lib/poller';
+import { setupDuplicatesCache } from './lib/duplicates-cache';
 import { setupViewManager } from './lib/view-manager';
 import { initModels, Setting, User } from './models';
 import { DEMO_MODE } from './shared/settings';
@@ -35,6 +36,9 @@ export default async function init() {
     try {
         // Keep the views in sync with the accounts.
         setupViewManager();
+
+        // Invalidate the duplicates cache when transactions change.
+        setupDuplicatesCache();
 
         // Initialize models.
         await initModels();
