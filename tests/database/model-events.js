@@ -1,21 +1,21 @@
 import assert from 'node:assert';
 
 import { Access, Account } from '../../server/models';
-import { modelEvents } from '../../server/models/events';
+import { ModelEvent, modelEvents } from '../../server/models/events';
 
-// Runs `triggeringMethod` with a temporary listener on the given event (e.g. 'AccountCreated'),
-// and returns whether that listener was called.
+// Runs `triggeringMethod` with a temporary listener on the given event (e.g.
+// `ModelEvent.AccountCreated`), and returns whether that listener was called.
 async function isEmitted(eventName, triggeringMethod) {
     let called = false;
     const listener = () => {
         called = true;
     };
 
-    modelEvents[`on${eventName}`](listener);
+    modelEvents.on(eventName, listener);
     try {
         await triggeringMethod();
     } finally {
-        modelEvents[`off${eventName}`](listener);
+        modelEvents.off(eventName, listener);
     }
 
     return called;
@@ -50,13 +50,13 @@ describe('Model events', () => {
     });
 
     it('should emit accountCreated on Account.create', async () => {
-        assert.ok(await isEmitted('AccountCreated', createAccount));
+        assert.ok(await isEmitted(ModelEvent.AccountCreated, createAccount));
     });
 
     it('should emit accountUpdated on Account.update', async () => {
         const account = await createAccount();
         assert.ok(
-            await isEmitted('AccountUpdated', () =>
+            await isEmitted(ModelEvent.AccountUpdated, () =>
                 Account.update(USER_ID, account.id, { customLabel: 'Renamed' })
             )
         );
@@ -64,19 +64,23 @@ describe('Model events', () => {
 
     it('should emit accountsDeleted on Account.destroy', async () => {
         const account = await createAccount();
-        assert.ok(await isEmitted('AccountsDeleted', () => Account.destroy(USER_ID, account.id)));
+        assert.ok(
+            await isEmitted(ModelEvent.AccountsDeleted, () => Account.destroy(USER_ID, account.id))
+        );
     });
 
     it('should emit accountsDeleted on Account.destroyAll', async () => {
         await createAccount();
-        assert.ok(await isEmitted('AccountsDeleted', () => Account.destroyAll(USER_ID)));
+        assert.ok(await isEmitted(ModelEvent.AccountsDeleted, () => Account.destroyAll(USER_ID)));
     });
 
     it('should emit accessesDeleted on Access.destroy', async () => {
-        assert.ok(await isEmitted('AccessesDeleted', () => Access.destroy(USER_ID, access.id)));
+        assert.ok(
+            await isEmitted(ModelEvent.AccessesDeleted, () => Access.destroy(USER_ID, access.id))
+        );
     });
 
     it('should emit accessesDeleted on Access.destroyAll', async () => {
-        assert.ok(await isEmitted('AccessesDeleted', () => Access.destroyAll(USER_ID)));
+        assert.ok(await isEmitted(ModelEvent.AccessesDeleted, () => Access.destroyAll(USER_ID)));
     });
 });
