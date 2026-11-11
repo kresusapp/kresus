@@ -1,5 +1,7 @@
+import { Transaction } from '../models';
 import { ModelEvent, modelEvents } from '../models/events';
 import type { DuplicatesPairList } from '../shared/types';
+import { findRedundantPairs } from './duplicates-manager';
 
 // The settings used to compute the pairs are stored along with them, so that a change in the
 // settings automatically invalidates the entry.
@@ -45,11 +47,11 @@ const getUserCache = (userId: number): UserCache => {
  * Without this check, the stale result would stay in the cache until the next change on the
  * account.
  */
-export const getDuplicatesCacheVersion = (userId: number): number => {
+const getDuplicatesCacheVersion = (userId: number): number => {
     return getUserCache(userId).version;
 };
 
-export const getCachedDuplicates = (
+const getCachedDuplicates = (
     userId: number,
     accountId: number,
     threshold: number,
@@ -66,7 +68,7 @@ export const getCachedDuplicates = (
     return entry.pairs;
 };
 
-export const setCachedDuplicates = (
+const setCachedDuplicates = (
     userId: number,
     accountId: number,
     version: number,
@@ -82,6 +84,28 @@ export const setCachedDuplicates = (
     }
     userCache.accounts.set(accountId, { threshold, ignoreDifferentCustomFields, pairs });
 };
+
+/**
+ * Returns the pairs of duplicates of the account, *including* the pairs ignored by the user.
+ * They're computed when they're not in the cache, or were computed with other settings.
+ */
+export async function getAccountDuplicates(
+    userId: number,
+    accountId: number,
+    threshold: number,
+    ignoreDifferentCustomFields: boolean
+): Promise<DuplicatesPairList> {
+    const cached = getCachedDuplicates(userId, accountId, threshold, ignoreDifferentCustomFields);
+    if (cached !== null) {
+        return cached;
+    }
+
+    const version = getDuplicatesCacheVersion(userId);
+    const transactions = await Transaction.byAccount(userId, accountId);
+    const pairs = findRedundantPairs(transactions, threshold, ignoreDifferentCustomFields);
+    setCachedDuplicates(userId, accountId, version, threshold, ignoreDifferentCustomFields, pairs);
+    return pairs;
+}
 
 // Invalidates the given accounts of the user, or all of them if `accountIds` is not provided.
 const invalidateDuplicates = (userId: number, accountIds?: number[]): void => {
@@ -137,5 +161,8 @@ export function setupDuplicatesCache(): void {
 }
 
 export const testing = {
+    getCachedDuplicates,
+    getDuplicatesCacheVersion,
+    setCachedDuplicates,
     invalidateDuplicates,
 };

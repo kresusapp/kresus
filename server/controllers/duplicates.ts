@@ -1,14 +1,9 @@
 import type express from 'express';
 import { asyncErr, KError } from '../helpers';
-import {
-    getCachedDuplicates,
-    getDuplicatesCacheVersion,
-    setCachedDuplicates,
-} from '../lib/duplicates-cache';
+import { getAccountDuplicates } from '../lib/duplicates-cache';
 import {
     filterIgnoredPairs,
     findIgnoredDuplicates,
-    findRedundantPairs,
     getDuplicatePairScore,
 } from '../lib/duplicates-manager';
 import { Account, DuplicatesIgnored, Setting, Transaction, User } from '../models';
@@ -48,30 +43,12 @@ export async function getDuplicates(req: IdentifiedRequest<any>, res: express.Re
         for (const account of accounts) {
             // The cache contains the pairs before removing the ignored ones, so that ignoring or
             // un-ignoring a pair doesn't require invalidating it.
-            let pairs = getCachedDuplicates(
+            const pairs = await getAccountDuplicates(
                 userId,
                 account.id,
                 thresholdValue,
                 ignoreDuplicatesWithDifferentCustomFields
             );
-
-            if (pairs === null) {
-                const version = getDuplicatesCacheVersion(userId);
-                const transactions = await Transaction.byAccount(userId, account.id);
-                pairs = findRedundantPairs(
-                    transactions,
-                    thresholdValue,
-                    ignoreDuplicatesWithDifferentCustomFields
-                );
-                setCachedDuplicates(
-                    userId,
-                    account.id,
-                    version,
-                    thresholdValue,
-                    ignoreDuplicatesWithDifferentCustomFields,
-                    pairs
-                );
-            }
 
             const duplicates = filterIgnoredPairs(pairs, pairsToIgnore);
 
