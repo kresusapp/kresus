@@ -499,9 +499,8 @@ class AccountManager {
 
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
-            if (polled.balance ?? false) {
-                const balance = polled.balance ?? 0; // typescript doesn't understand the ?? operator
-                results.push({ accountId: existing.id, balance });
+            if (typeof polled.balance === 'number') {
+                results.push({ accountId: existing.id, balance: polled.balance });
             }
         }
 
@@ -533,9 +532,9 @@ class AccountManager {
 
             let accountUpdate: { balance?: number; isOrphan?: boolean } | null = null;
 
-            if (polled.balance ?? false) {
+            if (typeof polled.balance === 'number') {
                 accountUpdate = accountUpdate || {};
-                accountUpdate.balance = polled.balance || 0; // doh, typescript ain't smart
+                accountUpdate.balance = polled.balance;
             }
 
             if (known.isOrphan) {
